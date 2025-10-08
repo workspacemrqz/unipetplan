@@ -90,8 +90,7 @@ router.post('/send', chatRateLimit, sanitizeInput, async (req, res) => {
       });
     }
 
-    const chatConfig = autoConfig.getConfig();
-    const { webhookUrl } = chatConfig;
+    const webhookUrl = autoConfig.get('CHAT_WEBHOOK_URL');
     
     console.log('🚀 [CHAT-WEBHOOK] Sending message to webhook:', {
       webhookUrl,

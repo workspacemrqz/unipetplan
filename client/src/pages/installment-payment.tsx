@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { ArrowLeft, CreditCard, QrCodeIcon } from 'lucide-react';
+import { ArrowLeft, CreditCard, Scan } from 'lucide-react';
 import { CopyButton } from '@/components/ui/copy-button';
 
 interface InstallmentData {
@@ -789,7 +789,7 @@ export default function InstallmentPayment() {
                     background: paymentMethod === 'pix' ? 'var(--bg-cream-light)' : 'white'
                   }}
                 >
-                  <QrCodeIcon className="w-6 h-6 mx-auto mb-2" 
+                  <Scan className="w-6 h-6 mx-auto mb-2" 
                     style={{color: paymentMethod === 'pix' ? 'var(--text-teal)' : 'var(--text-dark-secondary)'}} />
                   <span style={{color: 'var(--text-dark-primary)'}}>PIX</span>
                 </button>
@@ -807,7 +807,7 @@ export default function InstallmentPayment() {
                         value={cardData.cardNumber}
                         onChange={handleCardNumberChange}
                         placeholder="0000 0000 0000 0000"
-                        maxLength="19"
+                        maxLength={19}
                         required
                         className="w-full px-4 py-2 border rounded-lg"
                         style={{borderColor: 'var(--border-gray)'}}
@@ -839,7 +839,7 @@ export default function InstallmentPayment() {
                           value={cardData.expirationDate}
                           onChange={handleExpirationDateChange}
                           placeholder="MM/AA"
-                          maxLength="5"
+                          maxLength={5}
                           required
                           className="w-full px-4 py-2 border rounded-lg"
                           style={{borderColor: 'var(--border-gray)'}}
@@ -855,7 +855,7 @@ export default function InstallmentPayment() {
                           value={cardData.securityCode}
                           onChange={(e) => setCardData({...cardData, securityCode: e.target.value.replace(/[^\d]/g, '').slice(0, 4)})}
                           placeholder="000"
-                          maxLength="4"
+                          maxLength={4}
                           required
                           className="w-full px-4 py-2 border rounded-lg"
                           style={{borderColor: 'var(--border-gray)'}}
@@ -867,7 +867,7 @@ export default function InstallmentPayment() {
 
                 {paymentMethod === 'pix' && (
                   <div className="p-4 rounded-lg" style={{background: 'var(--bg-cream-light)'}}>
-                    <QrCodeIcon className="w-12 h-12 mx-auto mb-3" style={{color: 'var(--text-teal)'}} />
+                    <Scan className="w-12 h-12 mx-auto mb-3" style={{color: 'var(--text-teal)'}} />
                     <p className="text-center" style={{color: 'var(--text-dark-secondary)'}}>
                       Ao clicar em "Pagar com PIX", será gerado um QR Code para pagamento.
                       O código tem validade de 30 minutos.

@@ -106,7 +106,7 @@ export function sanitizeObject<T extends Record<string, any>>(
   if (!obj || typeof obj !== 'object') return obj;
   
   if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeObject(item, sensitiveFields)) as T;
+    return obj.map(item => sanitizeObject(item, sensitiveFields)) as unknown as T;
   }
   
   const sanitized = { ...obj };
@@ -117,21 +117,21 @@ export function sanitizeObject<T extends Record<string, any>>(
     // Check if this is a sensitive field
     if (sensitiveFields.some(field => lowerKey.includes(field.toLowerCase()))) {
       if (lowerKey.includes('cpf')) {
-        sanitized[key] = sanitizeCPF(sanitized[key]);
+        sanitized[key] = sanitizeCPF(sanitized[key]) as any;
       } else if (lowerKey.includes('card') || lowerKey.includes('creditcard')) {
-        sanitized[key] = sanitizeCreditCard(sanitized[key]);
+        sanitized[key] = sanitizeCreditCard(sanitized[key]) as any;
       } else if (lowerKey.includes('password') || lowerKey.includes('senha')) {
-        sanitized[key] = sanitizePassword(sanitized[key]);
+        sanitized[key] = sanitizePassword(sanitized[key]) as any;
       } else if (lowerKey.includes('email')) {
-        sanitized[key] = sanitizeEmail(sanitized[key]);
+        sanitized[key] = sanitizeEmail(sanitized[key]) as any;
       } else if (lowerKey.includes('phone') || lowerKey.includes('telefone') || lowerKey.includes('whatsapp')) {
-        sanitized[key] = sanitizePhone(sanitized[key]);
+        sanitized[key] = sanitizePhone(sanitized[key]) as any;
       } else {
-        sanitized[key] = '***REDACTED***';
+        sanitized[key] = '***REDACTED***' as any;
       }
     } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
       // Recursively sanitize nested objects
-      sanitized[key] = sanitizeObject(sanitized[key], sensitiveFields);
+      sanitized[key] = sanitizeObject(sanitized[key], sensitiveFields) as any;
     }
   }
   

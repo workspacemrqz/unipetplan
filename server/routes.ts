@@ -1281,7 +1281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthDate: validatedPetData.birthDate || null,
         vaccineData: validatedPetData.vaccineData || [],
         planId: validatedPetData.planId && validatedPetData.planId !== "" ? validatedPetData.planId : null,
-      };
+      } as any; // Type assertion para permitir campos opcionais
       
       const newPet = await storage.createPet(processedPetData);
       res.status(201).json(newPet);

@@ -145,6 +145,7 @@ export default function CustomerFinancial() {
       
       return () => clearTimeout(confettiTimer);
     }
+    return undefined;
   }, [showPaymentSuccessPopup, shouldShowConfetti]);
 
   // Redirect to login if not authenticated
