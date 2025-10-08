@@ -56,6 +56,7 @@ import { setupUnitRoutes } from "./unit-routes.js";
 import { setupProcedureUsageRoutes } from "./procedure-usage-routes.js";
 import multer from "multer";
 import { getCsrfToken, validateCsrf } from "./middleware/csrf.js";
+import fileType from 'file-type';
 
 // Extend express-session types
 declare module 'express-session' {
@@ -63,6 +64,18 @@ declare module 'express-session' {
     user?: any;
     userId?: string;
     client?: any;
+  }
+}
+
+// Extend express Request type for rate-limit
+declare module 'express' {
+  interface Request {
+    rateLimit?: {
+      limit: number;
+      current: number;
+      remaining: number;
+      resetTime: Date;
+    };
   }
 }
 
@@ -79,13 +92,13 @@ const uploadRateLimiter = rateLimit({
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 2 * 1024 * 1024, // Reduced to 2MB for better security
+    fileSize: 2 * 1024 * 1024, // 2MB limit for security
     files: 1, // Only 1 file per request
     fields: 10, // Maximum 10 non-file fields
     headerPairs: 100 // Maximum header pairs
   },
   fileFilter: (req, file, cb) => {
-    // Strict file type validation
+    // Basic MIME type and extension validation (first layer of defense)
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
     
@@ -108,6 +121,62 @@ const upload = multer({
     cb(null, true);
   }
 });
+
+// ✅ SECURITY: Deep content validation middleware (validates magic numbers and suspicious content)
+// This runs AFTER multer processes the file, when the buffer is available
+export const validateImageContent = async (req: any, res: any, next: any) => {
+  // Skip if no file uploaded
+  if (!req.file || !req.file.buffer) {
+    return next();
+  }
+
+  try {
+    // ✅ SECURITY: Validate magic numbers (real file content signature)
+    const type = await fileType.fromBuffer(req.file.buffer);
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    
+    if (!type || !allowedMimeTypes.includes(type.mime)) {
+      console.warn('🚨 [SECURITY] Invalid file type detected via magic numbers:', {
+        detectedType: type?.mime || 'unknown',
+        claimedType: req.file.mimetype,
+        filename: req.file.originalname
+      });
+      return res.status(400).json({ 
+        error: 'Tipo de arquivo inválido detectado. Apenas imagens JPEG, PNG e WebP são permitidas.' 
+      });
+    }
+
+    // ✅ SECURITY: Check for suspicious content (embedded scripts, executables)
+    const bufferString = req.file.buffer.toString('utf-8', 0, Math.min(req.file.buffer.length, 1024));
+    const suspiciousPatterns = ['<?php', '<script', '#!/bin', 'eval(', 'exec('];
+    
+    for (const pattern of suspiciousPatterns) {
+      if (bufferString.includes(pattern)) {
+        console.warn('🚨 [SECURITY] Suspicious content detected in file:', {
+          pattern,
+          filename: req.file.originalname
+        });
+        return res.status(400).json({ 
+          error: 'Conteúdo suspeito detectado no arquivo' 
+        });
+      }
+    }
+
+    // File passed all security checks
+    console.log('✅ [SECURITY] File validated successfully:', {
+      filename: req.file.originalname,
+      type: type.mime,
+      size: req.file.buffer.length
+    });
+
+    next();
+  } catch (error) {
+    console.error('❌ [SECURITY] Error validating file:', error);
+    return res.status(400).json({ 
+      error: 'Erro ao validar arquivo: ' + (error as Error).message 
+    });
+  }
+};
 
 
 
@@ -304,10 +373,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rate limiting for admin login endpoint
   const adminLoginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // limit each IP to 10 requests per windowMs
+    max: 3, // ✅ REDUZIDO: apenas 3 tentativas
+    skipSuccessfulRequests: true, // ✅ NOVO: não conta logins bem-sucedidos
     message: { error: "Muitas tentativas de login. Tente novamente em 15 minutos." },
     standardHeaders: true,
     legacyHeaders: false,
+    handler: (req, res) => {
+      console.warn('🚨 [SECURITY] Rate limit exceeded for admin login', {
+        ip: req.ip,
+        timestamp: new Date().toISOString()
+      });
+      res.status(429).json({ 
+        error: "Muitas tentativas de login. Tente novamente em 15 minutos.",
+        retryAfter: req.rateLimit?.resetTime ? Math.ceil(req.rateLimit.resetTime.getTime() / 1000) : 900
+      });
+    }
   });
 
   // Admin login endpoint
@@ -327,22 +407,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const isValidPassword = await bcrypt.compare(loginData.password, user.password);
         
         if (isValidPassword && user.isActive) {
-          // Set admin session with user info
-          req.session.admin = { 
-            login: user.email || user.username, 
-            authenticated: true,
-            userId: user.id,
-            role: user.role,
-            permissions: user.permissions
-          };
-          
-          console.log("✅ [ADMIN-LOGIN] Database user authenticated successfully:", user.email || user.username);
-          res.json({ success: true, message: "Login realizado com sucesso" });
+          // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
+          req.session.regenerate((err) => {
+            if (err) {
+              console.error("❌ [ADMIN-LOGIN] Erro ao regenerar sessão:", err);
+              return res.status(500).json({ error: "Erro ao criar sessão segura" });
+            }
+            
+            // Set admin session with user info
+            req.session.admin = { 
+              login: user.email || user.username, 
+              authenticated: true,
+              userId: user.id,
+              role: user.role,
+              permissions: user.permissions
+            };
+            
+            // Save session explicitly
+            req.session.save((saveErr) => {
+              if (saveErr) {
+                console.error("❌ [ADMIN-LOGIN] Erro ao salvar sessão:", saveErr);
+                return res.status(500).json({ error: "Erro ao salvar sessão" });
+              }
+              
+              console.log("✅ [ADMIN-LOGIN] Database user authenticated successfully:", user.email || user.username);
+              res.json({ success: true, message: "Login realizado com sucesso" });
+            });
+          });
           return;
         } else if (!user.isActive) {
-          console.log("❌ [ADMIN-LOGIN] User account is inactive:", user.email || user.username);
-          res.status(401).json({ error: "Conta de usuário inativa" });
-          return;
+          console.log("❌ [ADMIN-LOGIN] Inactive account:", loginData.login);
+          return res.status(401).json({ error: "Credenciais inválidas" });
+        } else {
+          console.log("❌ [ADMIN-LOGIN] Invalid password for user:", loginData.login);
+          return res.status(401).json({ error: "Credenciais inválidas" });
         }
       }
 
@@ -371,15 +469,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (isValidLogin && isValidPassword) {
-        // Set admin session for environment variable admin
-        req.session.admin = { 
-          login: adminLogin, 
-          authenticated: true,
-          role: 'superadmin' // Environment variable admin has full access
-        };
-        
-        console.log("✅ [ADMIN-LOGIN] Environment admin authenticated successfully");
-        res.json({ success: true, message: "Login realizado com sucesso" });
+        // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
+        req.session.regenerate((err) => {
+          if (err) {
+            console.error("❌ [ADMIN-LOGIN] Erro ao regenerar sessão:", err);
+            return res.status(500).json({ error: "Erro ao criar sessão segura" });
+          }
+          
+          // Set admin session for environment variable admin
+          req.session.admin = { 
+            login: adminLogin, 
+            authenticated: true,
+            role: 'superadmin' // Environment variable admin has full access
+          };
+          
+          // Save session explicitly
+          req.session.save((saveErr) => {
+            if (saveErr) {
+              console.error("❌ [ADMIN-LOGIN] Erro ao salvar sessão:", saveErr);
+              return res.status(500).json({ error: "Erro ao salvar sessão" });
+            }
+            
+            console.log("✅ [ADMIN-LOGIN] Environment admin authenticated successfully");
+            res.json({ success: true, message: "Login realizado com sucesso" });
+          });
+        });
       } else {
         console.log("❌ [ADMIN-LOGIN] Invalid credentials provided");
         res.status(401).json({ error: "Credenciais inválidas" });
@@ -393,10 +507,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin password verification endpoint (for delete confirmations)
   const passwordVerifyLimiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 5 minutes
-    max: 20, // limit each IP to 20 requests per windowMs
+    max: 5, // ✅ REDUZIDO: apenas 5 tentativas
+    skipSuccessfulRequests: true, // ✅ NOVO: não conta verificações bem-sucedidas
     message: { error: "Muitas tentativas de verificação. Tente novamente em 5 minutos." },
     standardHeaders: true,
     legacyHeaders: false,
+    handler: (req, res) => {
+      console.warn('🚨 [SECURITY] Rate limit exceeded for password verification', {
+        ip: req.ip,
+        timestamp: new Date().toISOString()
+      });
+      res.status(429).json({ 
+        error: "Muitas tentativas de verificação. Tente novamente em 5 minutos.",
+        retryAfter: req.rateLimit?.resetTime ? Math.ceil(req.rateLimit.resetTime.getTime() / 1000) : 300
+      });
+    }
   });
 
   // Rate limiting for admin CRUD operations
@@ -1065,7 +1190,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validatedPetData,
         weight: validatedPetData.weight && validatedPetData.weight !== "" ? validatedPetData.weight : null,
         birthDate: validatedPetData.birthDate || null,
-        lastCheckup: validatedPetData.lastCheckup || null,
         vaccineData: validatedPetData.vaccineData || [],
         planId: validatedPetData.planId && validatedPetData.planId !== "" ? validatedPetData.planId : null,
       };
@@ -1089,7 +1213,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validatedPetData,
         weight: validatedPetData.weight && validatedPetData.weight !== "" ? validatedPetData.weight : null,
         birthDate: validatedPetData.birthDate || null,
-        lastCheckup: validatedPetData.lastCheckup || null,
         vaccineData: validatedPetData.vaccineData || [],
         planId: validatedPetData.planId && validatedPetData.planId !== "" ? validatedPetData.planId : null,
       };
@@ -1574,7 +1697,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/admin/api/network-units/upload-image", requireAdmin, uploadRateLimiter, upload.single('image'), async (req, res) => {
+  app.post("/admin/api/network-units/upload-image", requireAdmin, uploadRateLimiter, upload.single('image'), validateImageContent, async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "Nenhuma imagem foi enviada" });
@@ -1605,7 +1728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/admin/api/settings/upload-image", uploadRateLimiter, upload.single('image'), async (req, res) => {
+  app.post("/admin/api/settings/upload-image", uploadRateLimiter, upload.single('image'), validateImageContent, async (req, res) => {
     // Development-only bypass
     if (process.env.NODE_ENV === 'development' && !req.session?.admin) {
       console.warn("⚠️ [ADMIN] Bypassing auth for /admin/api/settings/upload-image - DEVELOPMENT ONLY");
@@ -1642,7 +1765,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/admin/api/settings/chat/upload-image", uploadRateLimiter, upload.single('image'), async (req, res) => {
+  app.post("/admin/api/settings/chat/upload-image", uploadRateLimiter, upload.single('image'), validateImageContent, async (req, res) => {
     // Development-only bypass
     if (process.env.NODE_ENV === 'development' && !req.session?.admin) {
       console.warn("⚠️ [ADMIN] Bypassing auth for /admin/api/settings/chat/upload-image - DEVELOPMENT ONLY");
@@ -2460,7 +2583,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fullName: parsedClientData.full_name,
         email: parsedClientData.email,
         phone: parsedClientData.phone,
-        birthdate: parsedClientData.birthdate,
         password: null, // Sistema não usa senhas para compras
         cpf: null, // CPF null temporariamente (será adicionado no Step 3)
         id: `client-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -2892,7 +3014,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const creditCardRequest = {
           merchantOrderId: `ORDER_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
           customer: {
-            name: validatedPaymentData.customer.name || validatedPaymentData.payment.holder || 'Cliente',
+            name: validatedPaymentData.customer?.name || validatedPaymentData.payment?.holder || 'Cliente',
             email: client.email,
             cpf: client.cpf,
             address: {
@@ -2910,10 +3032,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             amount: correctAmountInCents,
             installments: validatedPaymentData.payment?.installments || 1,
             creditCard: {
-              cardNumber: validatedPaymentData.payment.cardNumber,
-              holder: validatedPaymentData.payment.holder,
-              expirationDate: validatedPaymentData.payment.expirationDate,
-              securityCode: validatedPaymentData.payment.securityCode
+              cardNumber: validatedPaymentData.payment?.cardNumber || '',
+              holder: validatedPaymentData.payment?.holder || '',
+              expirationDate: validatedPaymentData.payment?.expirationDate || '',
+              securityCode: validatedPaymentData.payment?.securityCode || ''
             }
           }
         };
@@ -3048,9 +3170,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const { PaymentReceiptService } = await import("./services/payment-receipt-service.js");
               const receiptService = new PaymentReceiptService();
               
-              const allPetsData = [];
-              const installmentIds = [];
-              let firstInstallmentPeriod = null;
+              const allPetsData: any[] = [];
+              const installmentIds: string[] = [];
+              let firstInstallmentPeriod: { periodStart: Date; periodEnd: Date; dueDate: Date; billingPeriod: string } | undefined = undefined;
               
               // Process each contract to create first installment
               for (let i = 0; i < contracts.length; i++) {
@@ -3164,7 +3286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   petName: petNames,
                   planName: selectedPlan.name,
                   paymentMethod: 'credit_card',
-                  billingPeriod: firstInstallmentPeriod.billingPeriod,
+                  billingPeriod: firstInstallmentPeriod.billingPeriod as "monthly" | "annual",
                   status: 'paid',
                   proofOfSale: paymentResult.payment.proofOfSale,
                   authorizationCode: paymentResult.payment.authorizationCode,
@@ -3286,7 +3408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Check if PIX was generated successfully (status 12 = Pending)
         if (pixPaymentResult.payment?.status === 12) {
           // Create pets for PIX payment (immediately, not waiting for confirmation)
-          let firstPetId = null;
+          let firstPetId: string | null = null;
           
           // Create pets immediately for PIX - check for duplicates first
           const createdPetsPix: Pet[] = [];
@@ -3431,9 +3553,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const { PaymentReceiptService } = await import("./services/payment-receipt-service.js");
           const receiptService = new PaymentReceiptService();
           
-          const allPixPetsData = [];
-          const pixInstallmentIds = [];
-          let pixFirstInstallmentPeriod = null;
+          const allPixPetsData: any[] = [];
+          const pixInstallmentIds: string[] = [];
+          let pixFirstInstallmentPeriod: { periodStart: Date; periodEnd: Date; dueDate: Date; billingPeriod: string } | undefined = undefined;
           
           for (let i = 0; i < contractsPix.length; i++) {
             const contract = contractsPix[i];
@@ -3547,7 +3669,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               petName: pixPetNames,
               planName: selectedPlan.name,
               paymentMethod: 'pix',
-              billingPeriod: pixFirstInstallmentPeriod.billingPeriod,
+              billingPeriod: pixFirstInstallmentPeriod.billingPeriod as "monthly" | "annual",
               installmentPeriodStart: pixFirstInstallmentPeriod.periodStart.toISOString().split('T')[0],
               installmentPeriodEnd: pixFirstInstallmentPeriod.periodEnd.toISOString().split('T')[0],
               installmentNumber: 1,
@@ -4141,7 +4263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
             
             // Update existing client with address data while preserving CPF
-            targetClient = await storage.updateClient(clientId, {
+            const updatedClient = await storage.updateClient(clientId, {
               cpf: currentClient?.cpf, // CRITICAL FIX: Preserve CPF during address update
               address: addressData.address,
               number: addressData.number,
@@ -4151,6 +4273,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               state: addressData.state,
               cep: addressData.cep
             });
+            if (!updatedClient) {
+              throw new Error('Falha ao atualizar cliente');
+            }
+            targetClient = updatedClient;
           } else {
             throw new Error('Cliente não existe e não foi possível criar automaticamente');
           }
@@ -4258,7 +4384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Standard flow: Get client's pets to create contracts
             console.log("📋 [NEW-CONTRACT] Criando pets após pagamento aprovado");
             // Create pets first (only after payment is approved)
-            const createdPets = [];
+            const createdPets: any[] = [];
             if (paymentData.pets && paymentData.pets.length > 0) {
               for (const petData of paymentData.pets) {
                 const petId = `pet-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -4427,7 +4553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     cieloPaymentId: paymentResult.payment?.paymentId,
                     clientName: paymentData.customer.name || targetClient.fullName,
                     clientEmail: targetClient.email,
-                    clientCPF: targetClient.cpf,
+                    clientCPF: targetClient.cpf || undefined,
                     clientPhone: targetClient.phone,
                     clientAddress: targetClient.address && targetClient.cep ? {
                       street: targetClient.address,
@@ -4677,31 +4803,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Email ou senha inválidos" });
       }
       
-      // Store client in session - MEASURE SESSION CREATION TIME
+      // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
       const sessionStart = performance.now();
-      req.session.client = {
-        id: client.id,
-        fullName: client.fullName,
-        email: client.email
-      };
-      sessionTime = performance.now() - sessionStart;
-      
-      // Don't return password in response
-      const { password: _, ...clientResponse } = client;
-      
-      // Calculate total time and log performance metrics
-      const totalTime = performance.now() - requestStartTime;
-      console.log(`⏱️ [PERFORMANCE-LOGIN] Tempo total: ${totalTime.toFixed(2)}ms`, {
-        email: sanitizeEmail(parsed.email),
-        dbQueryTime: `${dbQueryTime.toFixed(2)}ms`,
-        bcryptTime: `${bcryptTime.toFixed(2)}ms`,
-        sessionTime: `${sessionTime.toFixed(2)}ms`,
-        status: 'success'
-      });
-      
-      res.json({ 
-        message: "Login realizado com sucesso", 
-        client: clientResponse 
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("❌ [CLIENT-LOGIN] Erro ao regenerar sessão:", err);
+          return res.status(500).json({ error: "Erro ao criar sessão segura" });
+        }
+        
+        // Store client in session
+        req.session.client = {
+          id: client.id,
+          fullName: client.fullName,
+          email: client.email
+        };
+        
+        // Save session explicitly
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("❌ [CLIENT-LOGIN] Erro ao salvar sessão:", saveErr);
+            return res.status(500).json({ error: "Erro ao salvar sessão" });
+          }
+          
+          sessionTime = performance.now() - sessionStart;
+          
+          // Don't return password in response
+          const { password: _, ...clientResponse } = client;
+          
+          // Calculate total time and log performance metrics
+          const totalTime = performance.now() - requestStartTime;
+          console.log(`⏱️ [PERFORMANCE-LOGIN] Tempo total: ${totalTime.toFixed(2)}ms`, {
+            email: sanitizeEmail(parsed.email),
+            dbQueryTime: `${dbQueryTime.toFixed(2)}ms`,
+            bcryptTime: `${bcryptTime.toFixed(2)}ms`,
+            sessionTime: `${sessionTime.toFixed(2)}ms`,
+            status: 'success'
+          });
+          
+          res.json({ 
+            message: "Login realizado com sucesso", 
+            client: clientResponse 
+          });
+        });
       });
       
     } catch (error: any) {
@@ -4854,7 +4997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get pets with their active plan information
-      const petsWithPlans = [];
+      const petsWithPlans: any[] = [];
       const pets = await storage.getPetsByClientId(clientId);
       const now = new Date();
       
@@ -5133,8 +5276,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ]);
       
       // Criar maps para lookup rápido
-      const petsMap = new Map(pets.filter(p => p).map(p => [p.id, p]));
-      const plansMap = new Map(plans.filter(p => p).map(p => [p.id, p]));
+      const petsMap = new Map(pets.filter((p): p is NonNullable<typeof p> => p !== null && p !== undefined).map(p => [p.id, p]));
+      const plansMap = new Map(plans.filter((p): p is NonNullable<typeof p> => p !== null && p !== undefined).map(p => [p.id, p]));
       
       // Build contracts list with pet and plan information using payment status evaluation
       const contractsWithDetails = contracts.map(contract => {
@@ -5296,7 +5439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Build payment history with detailed information
-      const paymentHistoryWithDetails = [];
+      const paymentHistoryWithDetails: any[] = [];
       for (const contract of contracts) {
         // Get pet and plan information
         const pet = await storage.getPet(contract.petId);
@@ -5314,7 +5457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           continue; // Skip unpaid/unsuccessful payments
         }
         
-        const paymentHistoryItem = {
+        const paymentHistoryItem: any = {
           id: contract.id,
           contractNumber: contract.contractNumber,
           petName: pet?.name || 'Pet não encontrado',
@@ -5376,9 +5519,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Build surveys list with additional information
-      const surveysWithDetails = [];
+      const surveysWithDetails: any[] = [];
       for (const survey of surveys) {
-        let additionalInfo = {};
+        let additionalInfo: any = {};
         
         // Get contract info if survey is related to a contract
         if (survey.contractId) {
@@ -5773,7 +5916,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const procedure = await storage.getProcedure(pp.procedureId);
           return {
             ...procedure,
-            coverage_percentage: pp.coverageOverride || 100,
+            coverage_percentage: 100, // Default coverage
             limit_per_year: null,
             requires_authorization: false
           };
@@ -5874,7 +6017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const categorizedProcedures = outOfCoverageProcedures.reduce((acc, procedure) => {
-        const cat = procedure.category;
+        const cat = procedure.category || 'Outros';
         if (!acc[cat]) {
           acc[cat] = [];
         }
@@ -6307,7 +6450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (isPixPayment && isPaymentApproved) {
         // Buscar parcelas que tem o cieloPaymentId correspondente
-        const directInstallments = [];
+        const directInstallments: any[] = [];
         
         // Primeiro, buscar contratos que possam ter essa parcela
         const contracts = await storage.getAllContracts();
@@ -6816,7 +6959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📄 [CUSTOMER-RECEIPTS] Cliente solicitando comprovantes: ${clientEmail}`);
 
       // Get receipts by client email (primary method) or contract ID
-      let receipts = [];
+      let receipts: any[] = [];
       
       if (clientEmail) {
         receipts = await storage.getPaymentReceiptsByClientEmail(clientEmail);
@@ -7068,7 +7211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cieloPaymentId: installment.cieloPaymentId || paymentId,
         clientName: client?.fullName || "Cliente",
         clientEmail: client?.email || "",
-        clientCPF: client?.cpf,
+        clientCPF: client?.cpf || undefined,
         clientPhone: client?.phone,
         clientAddress: client?.address && client?.cep ? {
           street: client.address,
@@ -7083,11 +7226,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pets: pet ? [{
           name: pet.name,
           species: pet.species,
-          breed: pet.breed,
+          breed: pet.breed || undefined,
           age: pet.age ? parseInt(pet.age.toString()) : undefined,
           sex: pet.sex,
-          planName: plan?.name,
-          planType: plan?.planType,
+          planName: plan?.name || 'Plano',
+          planType: plan?.planType || 'with_waiting_period',
           value: parseFloat(installment.amount) * 100, // em centavos
           discountedValue: parseFloat(installment.amount) * 100,
           discount: 0
@@ -7175,9 +7318,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentYear = now.getFullYear();
       
       // Arrays to hold categorized installments
-      const paidInstallments = [];
-      const currentInstallments = [];
-      const overdueInstallments = [];
+      const paidInstallments: any[] = [];
+      const currentInstallments: any[] = [];
+      const overdueInstallments: any[] = [];
 
       // ✅ OTIMIZAÇÃO: Buscar dados em batch para evitar N+1 queries
       const activeContracts = contracts.filter(c => c.status !== 'cancelled' && c.status !== 'pending');
@@ -7204,8 +7347,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ]);
       
       // Criar maps para lookup rápido
-      const petsMap = new Map(pets.filter(p => p).map(p => [p.id, p]));
-      const plansMap = new Map(plans.filter(p => p).map(p => [p.id, p]));
+      const petsMap = new Map(pets.filter((p): p is NonNullable<typeof p> => p !== null && p !== undefined).map(p => [p.id, p]));
+      const plansMap = new Map(plans.filter((p): p is NonNullable<typeof p> => p !== null && p !== undefined).map(p => [p.id, p]));
       const installmentsMap = new Map(contractIds.map((id, i) => [id, allInstallments[i]]));
       const receiptsMap = new Map(contractIds.map((id, i) => [id, allReceipts[i]]));
       
@@ -7303,7 +7446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       overdueInstallments.sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime());
       
       // Filter to show only the next installment for each contract
-      const nextInstallments = [];
+      const nextInstallments: any[] = [];
       const seenContracts = new Set();
       for (const installment of currentInstallments) {
         if (!seenContracts.has(installment.contractId)) {
@@ -8163,10 +8306,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await createNextAnnualInstallmentIfNeeded(contractId, installment, '[CC-PAYMENT]');
           
           // Increment coupon usage if applied
-          if (appliedCoupon) {
+          if (appliedCoupon && typeof appliedCoupon === 'object' && 'id' in appliedCoupon) {
             try {
-              await storage.incrementCouponUsage(appliedCoupon.id);
-              console.log(`🎫 [INSTALLMENT-PAYMENT] Uso do cupom incrementado: ${appliedCoupon.code}`);
+              await storage.incrementCouponUsage((appliedCoupon as any).id);
+              console.log(`🎫 [INSTALLMENT-PAYMENT] Uso do cupom incrementado: ${(appliedCoupon as any).code}`);
             } catch (couponError) {
               console.error("❌ [INSTALLMENT-PAYMENT] Erro ao incrementar cupom:", couponError);
             }

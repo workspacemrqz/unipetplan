@@ -53,8 +53,16 @@ export class CieloWebhookService {
         });
         return false; // Always fail in production
       } else {
-        // Only warn and allow in development
-        console.warn('⚠️ [CIELO-WEBHOOK] Webhook secret não configurado, pulando validação (development only)', { correlationId });
+        // ✅ CORREÇÃO: Require explicit opt-in even in development
+        if (process.env.ALLOW_WEBHOOK_BYPASS !== 'true') {
+          console.error('🚨 [CIELO-WEBHOOK] Webhook secret não configurado e ALLOW_WEBHOOK_BYPASS não está habilitado', { correlationId });
+          console.error('💡 Configure CIELO_WEBHOOK_SECRET ou habilite ALLOW_WEBHOOK_BYPASS=true para testes');
+          return false;
+        }
+        
+        // Only warn and allow with explicit opt-in
+        console.warn('⚠️ [CIELO-WEBHOOK] Webhook bypass ativado - APENAS PARA TESTES LOCAIS', { correlationId });
+        console.warn('⚠️ [CIELO-WEBHOOK] ALLOW_WEBHOOK_BYPASS está habilitado');
         return true;
       }
     }

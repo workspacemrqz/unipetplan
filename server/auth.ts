@@ -56,13 +56,18 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 
 // Middleware function for protecting admin routes
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  // Allow bypass ONLY in local development (not in Replit deployment or production)
+  // Allow bypass ONLY in local development WITH EXPLICIT OPT-IN
   const isLocalDev = process.env.NODE_ENV === 'development' && 
+                     process.env.ALLOW_DEV_BYPASS === 'true' &&
                      process.env.REPLIT_DEPLOYMENT !== 'true' &&
                      !process.env.RAILWAY_ENVIRONMENT &&
                      !process.env.VERCEL_ENV;
                      
   if (isLocalDev) {
+    // Log de segurança
+    console.warn('🚨 [SECURITY] Admin authentication bypass ativado - APENAS DESENVOLVIMENTO');
+    console.warn('🚨 [SECURITY] Variável ALLOW_DEV_BYPASS está habilitada');
+    
     // Automatically set admin session if not present
     if (!req.session.admin) {
       req.session.admin = {
