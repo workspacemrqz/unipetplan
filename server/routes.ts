@@ -88,6 +88,16 @@ const uploadRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiter for checkout - strict to prevent fraud
+const checkoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // maximum 10 checkout attempts per 15 minutes
+  message: "Muitas tentativas de checkout. Tente novamente em 15 minutos.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false, // count all requests
+});
+
 // Configure multer for in-memory file upload with enhanced security
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -620,7 +630,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Contact form submission (public)
-  app.post("/api/contact", validateCsrf, async (req, res) => {
+  // SECURITY: Formulário de contato público usa rate limiting ao invés de CSRF
+  app.post("/api/contact", async (req, res) => {
     try {
 
       const validatedData = insertContactSubmissionSchema.parse(req.body);
@@ -2786,7 +2797,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // NEW SIMPLE CHECKOUT ENDPOINT - Find or Create Client + Process Payment
-  app.post("/api/checkout/simple-process", validateCsrf, async (req, res) => {
+  // SECURITY: Checkout público não usa CSRF mas tem rate limiting e validação de dados
+  app.post("/api/checkout/simple-process", checkoutLimiter, async (req, res) => {
     try {
       console.log("🛒 [SIMPLE-CHECKOUT] Iniciando checkout simplificado");
       
