@@ -1,0 +1,342 @@
+/* ========================================
+   SISTEMA DE CORES UNIFICADO - FONTE ÚNICA
+   Consolidando todas as fontes de cores do projeto
+======================================== */
+
+:root {
+  /* ========================================
+     TOKENS SHADCN/UI BASE - PÚBLICO E CLIENTE
+  ======================================== */
+  
+  /* Tokens base - mapeados para paleta existente */
+  --background: 255 255 255; /* #ffffff (bg-cream-lighter) */
+  --foreground: 48 48 48; /* #303030 (text-dark-primary) */
+  
+  /* Tokens de componentes primários */
+  --primary: 39 118 119; /* #277677 (bg-teal) */
+  --primary-foreground: 251 249 247; /* #FBF9F7 (text-light) */
+  
+  /* Tokens de componentes secundários */
+  --secondary: 222 216 206; /* #DED8CE (bg-beige) */
+  --secondary-foreground: 48 48 48; /* #303030 (text-dark-primary) */
+  
+  /* Tokens de destaque/accent */
+  --accent: 58 155 157; /* #3a9b9d (bg-teal-light) */
+  --accent-foreground: 251 249 247; /* #FBF9F7 (text-light) */
+  
+  /* Tokens de texto mutado/placeholder */
+  --muted: 251 249 247; /* #FBF9F7 (bg-cream-light) */
+  --muted-foreground: 80 80 80; /* #505050 (text-dark-secondary) */
+  
+  /* Tokens de bordas e inputs */
+  --border: 234 234 234; /* #eaeaea (border-gray) */
+  --input: 226 226 226; /* #E2E2E2 (background dos campos) */
+  --input-foreground: 30 30 30; /* #1e1e1e (texto escrito nos campos) */
+  
+  /* Tokens de popover */
+  --popover: 226 226 226; /* #e2e2e2 (dropdown background) */
+  --popover-foreground: 48 48 48; /* #303030 (text-dark-primary) */
+  
+  /* Tokens de foco/rings */
+  --ring: 58 155 157; /* #3a9b9d (border-teal) */
+  --ring-offset-background: 255 255 255; /* #ffffff */
+  
+  /* Tokens de estados destrutivos */
+  --destructive: 220 38 38; /* #dc2626 (bg-error) */
+  --destructive-foreground: 251 249 247; /* #FBF9F7 (text-light) */
+  
+  /* Tokens de estados de status */
+  --success: 34 197 94; /* #22c55e - verde sucesso */
+  --success-foreground: 255 255 255; /* #ffffff - texto branco */
+  --success-background: 34 197 94 / 0.1; /* #22c55e com 10% opacidade */
+  
+  --warning: 245 158 11; /* #f59e0b - laranja warning */
+  --warning-foreground: 255 255 255; /* #ffffff - texto branco */
+  --warning-background: 245 158 11 / 0.1; /* #f59e0b com 10% opacidade */
+  
+  --error: 220 38 38; /* #dc2626 - vermelho erro */
+  --error-foreground: 255 255 255; /* #ffffff - texto branco */
+  --error-background: 220 38 38 / 0.1; /* #dc2626 com 10% opacidade */
+  
+  /* Cores neutras adicionais */
+  --white: 255 255 255; /* #ffffff - branco puro */
+  --black: 0 0 0; /* #000000 - preto puro */
+  
+  /* Placeholder global - agora unificado */
+  --placeholder: 165 165 165; /* #a5a5a5 (cor do placeholder nos campos) */
+  
+  /* Tokens de UI */
+  --radius: 0.5rem;
+
+  /* Tokens RGB para cores personalizadas do projeto */
+  --teal-dark: 26 90 92; /* Mapeamento da cor legacy */
+  --gold: 225 172 51; /* Mapeamento da cor legacy */
+  --gold-darker: 201 149 36; /* Mapeamento da cor legacy */
+  
+  /* ========================================
+     TOKENS ESPECÍFICOS ADMIN - EXTENSÕES
+  ======================================== */
+  
+  /* Admin: Override de background para área administrativa */
+  --admin-background: 250 249 247; /* #faf9f7 - mais suave para admin */
+  --admin-foreground: 26 26 26; /* #1a1a1a - texto mais escuro para admin */
+  --admin-muted: 247 249 250; /* #f7f9fa */
+  --admin-muted-foreground: 107 114 128; /* #6b7280 */
+  --admin-placeholder: 165 165 165; /* #a5a5a5 (cor do placeholder nos campos) */
+  
+  /* Admin: Cards e popovers específicos */
+  --admin-card: 224 224 224; /* #e0e0e0 */
+  --admin-card-foreground: 26 26 26; /* #1a1a1a */
+  --admin-popover: 224 224 224; /* #e0e0e0 */
+  --admin-popover-foreground: 26 26 26; /* #1a1a1a */
+  
+  /* Admin: Input override */
+  --admin-input: 226 226 226; /* #E2E2E2 (background dos campos) */
+  --admin-border: 234 234 234; /* #eaeaea */
+  
+  /* Admin: Sidebar específico */
+  --admin-sidebar: 255 255 255; /* #ffffff */
+  --admin-sidebar-foreground: 26 26 26; /* #1a1a1a */
+  --admin-sidebar-primary: 39 118 119; /* #277677 (mantém primary) */
+  --admin-sidebar-primary-foreground: 255 255 255; /* #ffffff */
+  --admin-sidebar-accent: 227 236 246; /* #e3ecf6 */
+  --admin-sidebar-accent-foreground: 39 118 119; /* #277677 */
+  --admin-sidebar-border: 234 234 234; /* #eaeaea */
+  --admin-sidebar-ring: 39 118 119; /* #277677 */
+  
+  /* Admin: Charts (mantém do admin.css) */
+  --admin-chart-1: 39 118 119; /* #277677 */
+  --admin-chart-2: 16 185 129; /* #10b981 */
+  --admin-chart-3: 245 158 11; /* #f59e0b */
+  --admin-chart-4: 34 197 94; /* #22c55e */
+  --admin-chart-5: 239 68 68; /* #ef4444 */
+
+  /* ========================================
+     SISTEMA DE CORES PERSONALIZADO EXISTENTE
+  ======================================== */
+  
+  /* BOTÕES */
+  --btn-ver-planos-bg: linear-gradient(to top, #1c6363, #277677);
+  --btn-ver-planos-text: #ffffff;
+  
+  --btn-solicitar-cotacao-bg: rgba(39, 118, 119, 0.2);
+  --btn-solicitar-cotacao-text: #277677;
+  --btn-solicitar-cotacao-hover: rgba(39, 118, 119, 0.4);
+  --btn-solicitar-cotacao-border: rgba(39, 118, 119, 0.4);
+  
+  --btn-cotacao-gratuita-bg: linear-gradient(to top, #c99524, #E1AC33);
+  --btn-cotacao-gratuita-text: #FBF9F7;
+  --btn-cotacao-gratuita-hover: #c99524;
+  --btn-cotacao-gratuita-border: transparent;
+
+  /* BACKGROUNDS */
+  --bg-teal: #277677;
+  --bg-teal-light: #3a9b9d;
+  --bg-teal-dark: #1a5a5c;
+  --color-teal-rgb: 39, 118, 119;
+  --bg-cream-light: #FBF9F7;
+  --bg-cream-lighter: #ffffff;
+  --bg-cream-dark: #bdbdbd;
+  --bg-beige: #DED8CE;
+  --bg-gold: #E1AC33;
+  --bg-gold-darker: #c99524;
+  --bg-red-3: #991b1b;
+  --bg-teal-lighter: rgba(39, 118, 119, 0.1);
+
+  /* TEXTOS */
+  --text-dark-primary: #303030;
+  --text-dark-secondary: #505050;
+  --text-teal: #277677;
+  --text-light: #FBF9F7;
+  --text-gold: #E1AC33;
+
+  /* ÍCONES */
+  --icon-teal: #277677;
+  --icon-light: #FBF9F7;
+  --icon-gold: #E1AC33;
+
+  /* CONTORNOS */
+  --border-teal: #3a9b9d;
+  --border-teal-light: rgba(39, 118, 119, 0.3);
+  --border-gray: #eaeaea;
+  --border-beige: #c7c1b7;
+
+  /* STATUS */
+  --bg-green: #16a34a;
+  --bg-red-2: #dc2626;
+  --bg-orange: #ea580c;
+  --bg-yellow: #d97706;
+  --bg-emerald: #059669;
+  --bg-gray-500: #6b7280;
+  
+  /* DARK MODE COLORS */
+  --bg-gray-700: #374151;
+  --bg-gray-600: #4b5563;
+  --bg-gray-50: #f9fafb;
+  --text-gray-400: #9ca3af;
+  
+  /* CORES DE ERRO */
+  --bg-error: #dc2626;
+  --bg-error-light: #fef2f2;
+  --bg-error-50: #fef2f2;
+  --border-error: #ef4444;
+  --border-error-200: #fecaca;
+  --text-error: #b91c1c;
+  --text-error-600: #dc2626;
+  --text-error-700: #b91c1c;
+  --text-error-800: #991b1b;
+  
+  /* CORES DE WARNING/AVISOS */
+  --bg-warning: #f59e0b;
+  --bg-warning-light: #fef3c7;
+  --bg-warning-50: #fffbeb;
+  --border-warning: #f59e0b;
+  --border-warning-200: #fed7aa;
+  --text-warning: #92400e;
+  --text-warning-700: #92400e;
+  --text-warning-800: #78350f;
+  
+  /* CORES DE LOADING/PLACEHOLDER */
+  --bg-loading: #f3f4f6;
+  --bg-loading-100: #f3f4f6;
+  --bg-loading-200: #e5e7eb;
+  --text-placeholder: #9ca3af;
+  --text-loading: #6b7280;
+  
+  /* CORES NEUTRAS */
+  --bg-neutral-100: #f5f5f5;
+  --text-neutral-100: #f5f5f5;
+  
+  /* CORES DE SUCESSO */
+  --success: 34 197 94; /* #22c55e - para bg-success/10 text-success border-success */
+  --bg-success-light: #dcfce7;
+
+  /* ESTADOS INTERATIVOS */
+  --loading-spinner-transparent: transparent;
+  
+  /* SHADOWS */
+  --shadow-dark: rgba(0, 0, 0, 0.15);
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-dark-overlay: rgba(6, 6, 6, 0.8);
+  
+  /* SCROLLBAR */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: #d1d5db;
+  
+  /* TRANSPARÊNCIAS E OVERLAYS */
+  --overlay-light: rgba(255, 255, 255, 0.1);
+  --border-overlay: rgba(255, 255, 255, 0.2);
+  
+  /* TOGGLE AND UI ELEMENTS */
+  --bg-toggle-inactive: #e0e0e0;
+  --bg-white: 255 255 255;
+  
+  /* ADDITIONAL TOKENS FOR VIOLATIONS */
+  --success-foreground: 255 255 255; /* #ffffff */
+  --checkbox-border: 234 234 234; /* #eaeaea */
+  --checkbox-success: 34 197 94; /* #22c55e */
+  --card-special: 39 118 119; /* #277677 */
+  --card-special-dark: 31 94 95; /* #1f5e5f */
+  --overlay-black: 0 0 0; /* For bg-black/80 overlays */
+  --star-active: 225 172 51; /* #E1AC33 */
+  --star-inactive: 156 163 175; /* #9CA3AF */
+  --error-red: 220 38 38; /* #DC2626 */
+  --error-red-dark: 153 27 27; /* #991B1B */
+  --error-bg: 254 242 242; /* #FEF2F2 */
+  --error-border: 252 165 165; /* #FCA5A5 */
+
+  /* GRADIENTS */
+  --bg-gradient-main: linear-gradient(135deg, #277677 0%, #1a5a5c 100%);
+  
+  /* CORES ESPECÍFICAS DO ADMIN (MANTIDAS PARA COMPATIBILIDADE) */
+  --admin-overlay: rgba(6, 6, 6, 0.5);
+  --admin-teal-primary: #145759;
+  --admin-teal-secondary: #1f5a5c;
+  --admin-teal-tertiary: #1c6363;
+  --admin-gradient: linear-gradient(to top, #1c6363, #277677);
+  --admin-border-subtle: rgba(39, 118, 119, 0.2);
+  --admin-bg-input: var(--bg-beige);
+  --admin-bg-secondary: var(--bg-teal-light);
+  --bg-teal-darker: #1a5a5c;
+
+  /* Cores adicionais do admin para seletores */
+  --bg-teal-2: #277F80;
+  --bg-teal-light-2: #2D8B8E;
+  --bg-teal-dark-2: #1F6B6E;
+  --bg-cream-light-2: #FBF9F7;
+  --bg-cream-lighter-2: #FCF9F7;
+  --bg-cream-dark-2: #F5F2F0;
+}
+
+/* ========================================
+   EXTENSÕES PARA ÁREA ADMINISTRATIVA
+   Aplicadas condicionalmente via classes
+======================================== */
+
+/* Classe para ativar modo admin */
+.admin-mode {
+  --background: var(--admin-background);
+  --foreground: var(--admin-foreground);
+  --muted: var(--admin-muted);
+  --muted-foreground: var(--admin-muted-foreground);
+  --placeholder: var(--admin-placeholder);
+  --card: var(--admin-card);
+  --card-foreground: var(--admin-card-foreground);
+  --popover: var(--admin-popover);
+  --popover-foreground: var(--admin-popover-foreground);
+  --input: var(--admin-input);
+  --border: var(--admin-border);
+  --sidebar: var(--admin-sidebar);
+  --sidebar-foreground: var(--admin-sidebar-foreground);
+  --sidebar-primary: var(--admin-sidebar-primary);
+  --sidebar-primary-foreground: var(--admin-sidebar-primary-foreground);
+  --sidebar-accent: var(--admin-sidebar-accent);
+  --sidebar-accent-foreground: var(--admin-sidebar-accent-foreground);
+  --sidebar-border: var(--admin-sidebar-border);
+  --sidebar-ring: var(--admin-sidebar-ring);
+  --chart-1: var(--admin-chart-1);
+  --chart-2: var(--admin-chart-2);
+  --chart-3: var(--admin-chart-3);
+  --chart-4: var(--admin-chart-4);
+  --chart-5: var(--admin-chart-5);
+}
+
+/* Dark Mode Support - Mantido do admin.css original */
+.dark {
+  --background: 0 0 0;
+  --foreground: 200 6.6667 91.1765;
+  --card: 228 9.8039 10;
+  --card-foreground: 0 0 85.0980;
+  --popover: 0 0 0;
+  --popover-foreground: 200 6.6667 91.1765;
+  --primary: 203.7736 87.6033 52.5490;
+  --primary-foreground: 0 0 100;
+  --secondary: 195.0000 15.3846 94.9020;
+  --secondary-foreground: 210 25 7.8431;
+  --muted: 0 0 9.4118;
+  --muted-foreground: 210 3.3898 46.2745;
+  --placeholder: 210 3.3898 46.2745;
+  --accent: 205.7143 70 7.8431;
+  --accent-foreground: 203.7736 87.6033 52.5490;
+  --destructive: 356.3033 90.5579 54.3137;
+  --destructive-foreground: 0 0 100;
+  --border: 210 5.2632 14.9020;
+  --input: 207.6923 27.6596 18.4314;
+  --ring: 202.8169 89.1213 53.1373;
+  --chart-1: 203.8863 88.2845 53.1373;
+  --chart-2: 159.7826 100 36.0784;
+  --chart-3: 42.0290 92.8251 56.2745;
+  --chart-4: 147.1429 78.5047 41.9608;
+  --chart-5: 341.4894 75.2000 50.9804;
+  --sidebar: 228 9.8039 10;
+  --sidebar-foreground: 0 0 85.0980;
+  --sidebar-primary: 202.8169 89.1213 53.1373;
+  --sidebar-primary-foreground: 0 0 100;
+  --sidebar-accent: 205.7143 70 7.8431;
+  --sidebar-accent-foreground: 203.7736 87.6033 52.5490;
+  --sidebar-border: 205.7143 15.7895 26.0784;
+  --sidebar-ring: 202.8169 89.1213 53.1373;
+  --radius: 1.3rem;
+}

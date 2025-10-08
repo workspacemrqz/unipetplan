@@ -1,0 +1,40 @@
+{
+  "name": "Sistema UNIPET",
+  "description": "Sistema de gerenciamento para pets",
+  "repository": "https://github.com/your-username/your-repo",
+  "logo": "",
+  "keywords": ["node", "express", "react", "typescript", "postgresql"],
+  "stack": "heroku-24",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment",
+      "value": "production"
+    },
+    "SESSION_SECRET": {
+      "description": "Secret key for session management",
+      "generator": "secret"
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL database URL"
+    },
+    "SENHA": {
+      "description": "Admin password for system access"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:mini"
+    }
+  ]
+}

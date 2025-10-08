@@ -1,0 +1,116 @@
+modules = ["nodejs-18", "web", "python-3.12", "postgresql-16"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+packages = ["jq", "chromium", "xvfb-run"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Frontend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Backend"
+
+[[workflows.workflow]]
+name = "Frontend"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:frontend"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Backend"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 3000
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 33447
+externalPort = 6000
+
+[[ports]]
+localPort = 38073
+externalPort = 3002
+
+[[ports]]
+localPort = 39613
+externalPort = 4200
+
+[[ports]]
+localPort = 39997
+externalPort = 8000
+
+[[ports]]
+localPort = 40423
+externalPort = 5000
+
+[[ports]]
+localPort = 40479
+externalPort = 6800
+
+[[ports]]
+localPort = 40659
+externalPort = 8081
+
+[[ports]]
+localPort = 40807
+externalPort = 5173
+
+[[ports]]
+localPort = 41525
+externalPort = 8008
+
+[[ports]]
+localPort = 43575
+externalPort = 3001
+
+[[ports]]
+localPort = 43645
+externalPort = 8080
+
+[[ports]]
+localPort = 45233
+externalPort = 9000
+
+[[ports]]
+localPort = 46023
+externalPort = 3003
+
+[[ports]]
+localPort = 46843
+externalPort = 8099
+
+[deployment]
+deploymentTarget = "gce"
+run = ["npm", "start"]
+build = ["npm", "run", "build"]
