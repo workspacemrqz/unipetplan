@@ -1,5 +1,5 @@
 import { z } from "zod";
-import https from 'https';
+import * as https from 'https';
 import { randomUUID } from 'crypto';
 
 // Interfaces para a API Cielo
@@ -375,12 +375,6 @@ export class CieloService {
         }
       };
 
-      console.log('🔍 [DEBUG] Data de expiração - ANTES da formatação:', paymentData.payment.creditCard.expirationDate);
-      const formattedExpirationDate = this.formatExpirationDate(paymentData.payment.creditCard.expirationDate);
-      console.log('🔍 [DEBUG] Data de expiração - DEPOIS da formatação:', formattedExpirationDate);
-      console.log('🔍 [DEBUG] Formato esperado pela Cielo: MM/YYYY (exemplo: 12/2025)');
-      console.log('🔍 [DEBUG] Comprimento da data formatada:', formattedExpirationDate.length, 'caracteres');
-      console.log('🔍 [DEBUG] Data de expiração - DEPOIS da formatação:', cieloPayload.Payment.CreditCard.ExpirationDate);
       
       console.log('🔄 [Cielo] Enviando formato oficial 2025 para cartão:', {
         MerchantOrderId: cieloPayload.MerchantOrderId,
@@ -425,31 +419,19 @@ export class CieloService {
 
       const result: CieloPaymentResponse = await response.json();
       
-      // Log COMPLETO da resposta para debug
-      console.log('📋 [Cielo] Resposta RAW completa do Credit Card:', {
-        correlationId,
-        responseStatus: response.status,
-        fullResponse: JSON.stringify(result, null, 2)
-      });
       
       // Normalizar resposta da Cielo que retorna em PascalCase
       const resultAny = result as any;
       const payment = resultAny.Payment || result.payment;
       
-      // Log detalhado da resposta para debug
-      console.log('📋 [Cielo] Resposta processada do Credit Card:', {
+      // SECURITY FIX: Log apenas informações não sensíveis (sem fullResponse)
+      console.log('📋 [Cielo] Resposta Credit Card recebida:', {
         correlationId,
         responseStatus: response.status,
-        hasPayment: !!payment,
-        hasPaymentCapital: !!resultAny.Payment,
-        hasPaymentLower: !!result.payment,
-        paymentFields: payment ? Object.keys(payment) : [],
         paymentId: payment?.PaymentId || payment?.paymentId,
-        status: payment?.Status || payment?.status,
-        returnCode: payment?.ReturnCode || payment?.returnCode,
-        returnMessage: payment?.ReturnMessage || payment?.returnMessage,
-        allResponseKeys: Object.keys(result)
+        status: payment?.Status || payment?.status
       });
+      
       
       // Normalizar resposta para compatibilidade com frontend
       if (resultAny.Payment && !result.payment) {
@@ -522,39 +504,18 @@ export class CieloService {
 
       const result: CieloPaymentResponse = await response.json();
       
-      // Log COMPLETO da resposta para debug
-      console.log('📋 [Cielo] Resposta RAW completa do PIX:', {
-        correlationId,
-        responseStatus: response.status,
-        fullResponse: JSON.stringify(result, null, 2)
-      });
       
       // Cielo retorna dados em PascalCase, não camelCase! Precisamos usar any para acessar
       const resultAny = result as any;
       const payment = resultAny.Payment || result.payment;
       
-      // Log detalhado da resposta para debug
-      console.log('📋 [Cielo] Resposta processada do PIX:', {
+      
+      // SECURITY FIX: Log apenas informações não sensíveis
+      console.log('📋 [Cielo] Resposta PIX recebida:', {
         correlationId,
         responseStatus: response.status,
-        hasPayment: !!payment,
-        hasPaymentCapital: !!resultAny.Payment,
-        hasPaymentLower: !!result.payment,
-        paymentFields: payment ? Object.keys(payment) : [],
         paymentId: payment?.PaymentId || payment?.paymentId,
-        hasQrCodeBase64: !!(payment?.QrCodeBase64Image || payment?.qrCodeBase64Image),
-        hasQrCodeString: !!(payment?.QrCodeString || payment?.qrCodeString),
-        status: payment?.Status || payment?.status,
-        returnCode: payment?.ReturnCode || payment?.returnCode,
-        returnMessage: payment?.ReturnMessage || payment?.returnMessage,
-        allResponseKeys: Object.keys(result)
-      });
-      
-      console.log('✅ [Cielo] PIX gerado com sucesso', { 
-        correlationId, 
-        paymentId: payment?.PaymentId || payment?.paymentId,
-        hasQrCode: !!(payment?.QrCodeBase64Image || payment?.qrCodeBase64Image),
-        hasCopyPaste: !!(payment?.QrCodeString || payment?.qrCodeString)
+        status: payment?.Status || payment?.status
       });
       
       // Normalizar resposta para compatibilidade com frontend

@@ -52,10 +52,16 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Credenciais inválidas" });
       }
       
+      // ✅ SECURITY FIX: Enforce SESSION_SECRET without fallback
+      if (!process.env.SESSION_SECRET) {
+        console.error('❌ [SECURITY] SESSION_SECRET not configured for JWT');
+        return res.status(500).json({ error: 'Configuração de segurança ausente' });
+      }
+      
       // Generate JWT token
       const token = jwt.sign(
         { unitId: unit.id, slug: unit.urlSlug },
-        process.env.SESSION_SECRET || 'unit-secret-key',
+        process.env.SESSION_SECRET,
         { expiresIn: '8h' }
       );
       
@@ -77,8 +83,14 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       
       const token = authHeader.substring(7);
       
+      // ✅ SECURITY FIX: Enforce SESSION_SECRET without fallback
+      if (!process.env.SESSION_SECRET) {
+        console.error('❌ [SECURITY] SESSION_SECRET not configured for JWT verification');
+        return res.status(500).json({ error: 'Configuração de segurança ausente' });
+      }
+      
       try {
-        const decoded = jwt.verify(token, process.env.SESSION_SECRET || 'unit-secret-key') as any;
+        const decoded = jwt.verify(token, process.env.SESSION_SECRET) as any;
         req.unit = decoded;
         next();
       } catch (err) {

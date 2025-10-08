@@ -26,10 +26,10 @@ export function setupAuth(app: Express) {
     resave: false, // Don't save session if unmodified
     saveUninitialized: false, // Don't create session until something stored
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // Secure cookies only in production
+      secure: true, // SECURITY FIX: Always use secure cookies, even in development
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: 'lax'
+      sameSite: 'strict' // SECURITY FIX: More restrictive to prevent CSRF attacks
     },
     name: 'connect.sid', // Explicitly set session name
     store: new PostgreSQLStore({
@@ -56,32 +56,46 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 
 // Middleware function for protecting admin routes
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  // Allow bypass ONLY in local development WITH EXPLICIT OPT-IN
+  // SECURITY FIX: Remove development bypass completely in production environments
+  // Never allow bypass in production, staging, or any deployed environment
+  if (process.env.NODE_ENV === 'production' || 
+      process.env.NODE_ENV === 'staging' ||
+      process.env.REPLIT_DEPLOYMENT === 'true' ||
+      process.env.RAILWAY_ENVIRONMENT ||
+      process.env.VERCEL_ENV) {
+    // ALWAYS require authentication in deployed environments
+    if (!req.session || !req.session.admin || !req.session.admin.authenticated) {
+      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
+    }
+    return next();
+  }
+  
+  // SECURITY FIX: In true local development, require MULTIPLE confirmations
   const isLocalDev = process.env.NODE_ENV === 'development' && 
                      process.env.ALLOW_DEV_BYPASS === 'true' &&
-                     process.env.REPLIT_DEPLOYMENT !== 'true' &&
-                     !process.env.RAILWAY_ENVIRONMENT &&
-                     !process.env.VERCEL_ENV;
+                     process.env.DEV_BYPASS_CONFIRMATION === 'YES_I_UNDERSTAND_THE_RISKS';
                      
   if (isLocalDev) {
-    // Log de segurança
-    console.warn('🚨 [SECURITY] Admin authentication bypass ativado - APENAS DESENVOLVIMENTO');
-    console.warn('🚨 [SECURITY] Variável ALLOW_DEV_BYPASS está habilitada');
+    // Log de auditoria de segurança
+    console.warn('🚨 [SECURITY AUDIT] Admin authentication bypass ativado em desenvolvimento local');
+    console.warn('🚨 [SECURITY AUDIT] Isto NUNCA deve ocorrer em produção');
+    console.warn('🚨 [SECURITY AUDIT] IP:', req.ip);
+    console.warn('🚨 [SECURITY AUDIT] Timestamp:', new Date().toISOString());
     
     // Automatically set admin session if not present
     if (!req.session.admin) {
       req.session.admin = {
         login: 'dev-admin',
         authenticated: true,
-        role: 'superadmin',
-        permissions: ['all']
+        role: 'admin', // SECURITY FIX: Changed from superadmin to admin
+        permissions: []
       };
     }
     return next();
   }
   
-  // Production/staging mode: require actual authentication
-  if (!req.session || !req.session.admin) {
+  // Default: require actual authentication
+  if (!req.session || !req.session.admin || !req.session.admin.authenticated) {
     return res.status(401).json({ error: "Acesso administrativo não autorizado" });
   }
   next();

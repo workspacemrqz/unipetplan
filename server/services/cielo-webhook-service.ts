@@ -17,17 +17,9 @@ export class CieloWebhookService {
   constructor() {
     this.webhookSecret = process.env.CIELO_WEBHOOK_SECRET || '';
     
-    // ✅ SECURITY: Enforce webhook secret in production environments
-    const isProduction = process.env.NODE_ENV === 'production';
-    const isStaging = process.env.NODE_ENV === 'staging';
-    
+    // ✅ SECURITY FIX: ALWAYS enforce webhook secret in ALL environments
     if (!this.webhookSecret) {
-      if (isProduction || isStaging) {
-        // 🚨 CRITICAL: Never allow webhook processing without secret in production
-        throw new Error('SECURITY ERROR: CIELO_WEBHOOK_SECRET is mandatory in production/staging environments');
-      } else {
-        console.warn('⚠️ [CIELO-WEBHOOK] CIELO_WEBHOOK_SECRET não configurado - validação de assinatura desabilitada (apenas development)');
-      }
+      throw new Error('SECURITY ERROR: CIELO_WEBHOOK_SECRET is mandatory in all environments. Webhook processing cannot proceed without proper authentication.');
     }
   }
 
@@ -39,34 +31,7 @@ export class CieloWebhookService {
     signature: string,
     correlationId: string
   ): boolean {
-    // ✅ SECURITY: Check environment and enforce strict validation
-    const isProduction = process.env.NODE_ENV === 'production';
-    const isStaging = process.env.NODE_ENV === 'staging';
-    
-    if (!this.webhookSecret) {
-      if (isProduction || isStaging) {
-        // 🚨 CRITICAL: Never allow webhook validation to pass in production without secret
-        console.error('🚨 [CIELO-WEBHOOK] SECURITY BREACH ATTEMPT: Webhook received without configured secret in production', { 
-          correlationId,
-          environment: process.env.NODE_ENV,
-          timestamp: new Date().toISOString()
-        });
-        return false; // Always fail in production
-      } else {
-        // ✅ CORREÇÃO: Require explicit opt-in even in development
-        if (process.env.ALLOW_WEBHOOK_BYPASS !== 'true') {
-          console.error('🚨 [CIELO-WEBHOOK] Webhook secret não configurado e ALLOW_WEBHOOK_BYPASS não está habilitado', { correlationId });
-          console.error('💡 Configure CIELO_WEBHOOK_SECRET ou habilite ALLOW_WEBHOOK_BYPASS=true para testes');
-          return false;
-        }
-        
-        // Only warn and allow with explicit opt-in
-        console.warn('⚠️ [CIELO-WEBHOOK] Webhook bypass ativado - APENAS PARA TESTES LOCAIS', { correlationId });
-        console.warn('⚠️ [CIELO-WEBHOOK] ALLOW_WEBHOOK_BYPASS está habilitado');
-        return true;
-      }
-    }
-    
+    // ✅ SECURITY FIX: ALWAYS require webhook secret (enforced in constructor)
     // Validate signature is provided
     if (!signature || signature.trim() === '') {
       console.error('🚨 [CIELO-WEBHOOK] Assinatura ausente na requisição', { 

@@ -15,9 +15,9 @@ if (result.error) {
 
 // Log das variáveis carregadas para debug
 console.log('🔍 Variáveis de ambiente carregadas:');
-console.log('   LOGIN:', process.env.LOGIN ? '✅ Presente' : '❌ Ausente');
-console.log('   SENHA:', process.env.SENHA ? '✅ Presente' : '❌ Ausente');
-console.log('   DATABASE_URL:', process.env.DATABASE_URL ? '✅ Presente' : '❌ Ausente');
+console.log('   LOGIN:', process.env.LOGIN ? '✅ Configurado' : '❌ Ausente');
+console.log('   SENHA:', process.env.SENHA ? '✅ Configurado' : '❌ Ausente');
+console.log('   DATABASE_URL:', process.env.DATABASE_URL ? '✅ Configurado' : '❌ Ausente');
 console.log('   NODE_ENV:', process.env.NODE_ENV || 'undefined');
 
 /**
@@ -204,7 +204,6 @@ class AutoConfig {
       // ✅ CORREÇÃO: Lançar erro em produção/staging
       throw new Error('SECURITY ERROR: CIELO_WEBHOOK_SECRET is mandatory in production/staging. Cannot start server without webhook security.');
     } else if (!process.env.CIELO_WEBHOOK_SECRET) {
-      console.warn('⚠️ CIELO_WEBHOOK_SECRET não configurado - webhook validation desabilitada (desenvolvimento apenas)');
     }
 
     // DATABASE_URL é opcional em desenvolvimento

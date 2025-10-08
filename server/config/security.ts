@@ -8,14 +8,15 @@ export function configureSecurityMiddleware(app: Application) {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "https://fonts.googleapis.com"],
+        scriptSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:", "blob:"],
         connectSrc: ["'self'", "https://tkzzxsbwkgcdmcreducm.supabase.co"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
         frameSrc: ["'none'"],
+        upgradeInsecureRequests: [],
       },
     },
     hsts: {
@@ -39,16 +40,12 @@ export function configureSecurityMiddleware(app: Application) {
 
   app.use(cors({
     origin: (origin, callback) => {
-      // Permitir requisições sem origin em desenvolvimento (Replit, same-origin, etc)
+      // ✅ SECURITY FIX: Strict origin validation
       if (!origin) {
         if (process.env.NODE_ENV === 'production') {
-          // Em produção, exigir opt-in explícito
-          if (process.env.ALLOW_NO_ORIGIN === 'true') {
-            console.warn('⚠️ [CORS] Requisição sem origin permitida - ALLOW_NO_ORIGIN habilitado');
-            return callback(null, true);
-          }
+          // Em produção, NUNCA permitir requisições sem origin
           console.warn('⚠️ [CORS] Requisição sem origin bloqueada em produção');
-          return callback(new Error('Origin é obrigatória'));
+          return callback(new Error('Origin é obrigatória em produção'));
         } else {
           // Em desenvolvimento, permitir requisições sem origin (Replit, same-origin, etc)
           return callback(null, true);

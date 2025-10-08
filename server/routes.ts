@@ -148,7 +148,7 @@ export const validateImageContent = async (req: any, res: any, next: any) => {
 
     // ✅ SECURITY: Check for suspicious content (embedded scripts, executables)
     const bufferString = req.file.buffer.toString('utf-8', 0, Math.min(req.file.buffer.length, 1024));
-    const suspiciousPatterns = ['<?php', '<script', '#!/bin', 'eval(', 'exec('];
+    const suspiciousPatterns = ['<?php', '<script', '#!/bin', 'eval(', 'exec(', 'system(', 'passthru(', 'shell_exec(', '<?='];
     
     for (const pattern of suspiciousPatterns) {
       if (bufferString.includes(pattern)) {
@@ -160,6 +160,21 @@ export const validateImageContent = async (req: any, res: any, next: any) => {
           error: 'Conteúdo suspeito detectado no arquivo' 
         });
       }
+    }
+
+    // ✅ SECURITY: Validate image dimensions with Sharp
+    const sharp = (await import("sharp")).default;
+    try {
+      const metadata = await sharp(req.file.buffer).metadata();
+      if (!metadata.format || !["jpeg", "png", "webp"].includes(metadata.format)) {
+        return res.status(400).json({ error: "Formato de imagem inválido" });
+      }
+      if (metadata.width && metadata.width > 5000 || metadata.height && metadata.height > 5000) {
+        return res.status(400).json({ error: "Dimensões da imagem muito grandes. Máximo: 5000x5000 pixels" });
+      }
+    } catch (sharpError) {
+      console.error("❌ [SECURITY] Sharp validation failed:", sharpError);
+      return res.status(400).json({ error: "Arquivo não é uma imagem válida" });
     }
 
     // File passed all security checks
@@ -347,7 +362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: 'Erro interno do servidor',
-        details: error.message
+        ...(process.env.NODE_ENV === "development" && { details: error.message })
       });
     }
   });
@@ -527,7 +542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rate limiting for admin CRUD operations
   const adminCRUDLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 100, // limit each IP to 100 requests per minute
+    max: 30, // limit each IP to 100 requests per minute
     message: { error: "Muitas requisições. Tente novamente em breve." },
     standardHeaders: true,
     legacyHeaders: false,
@@ -881,7 +896,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("❌ [DASHBOARD] Error fetching aggregated dashboard data:", error);
       res.status(500).json({ 
         error: "Erro ao buscar dados do dashboard",
-        details: error instanceof Error ? error.message : "Unknown error"
+        ...(process.env.NODE_ENV === "development" && { details: error instanceof Error ? error.message : "Unknown error" })
       });
     }
   });
@@ -966,7 +981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 
           error: "Dados inválidos",
-          details: error.errors 
+          ...(process.env.NODE_ENV === "development" && { details: error.errors }) 
         });
       }
       res.status(500).json({ error: "Erro ao criar cliente" });
