@@ -26,11 +26,14 @@ Preferred communication style: Simple, everyday language.
 -   **Image Management**: Supabase Storage for uploads, Sharp for processing.
 -   **Feature Highlights**: Admin management (FAQs, Site Settings, Network Units, Procedures, Clients, Coupons), customer dashboard (pets, procedures, financial), Unit Portal (client, pet management, guide creation), intelligent duplicate pet prevention, Brazilian phone formatting, password-protected deletions in admin, comprehensive coupon/discount system, differentiated billing logic (annual/monthly), strict billing period validation, customizable payment receipt PDFs, and annual plan renewal countdown.
 -   **Performance**: Optimized login and navigation, reduced database queries, `AuthContext` with `sessionStorage` caching for client authentication data.
--   **Security Audit (October 2025)**: Comprehensive security audit completed with all 12 identified vulnerabilities fixed:
-    -   **Critical (5)**: Admin bypass removed in production, cookies always secure with sameSite=strict, logs sanitized (no sensitive data exposure), webhook authentication mandatory, session regeneration on all logins
-    -   **High (6)**: CORS restricted (no null origin in production), JWT secret enforcement (no fallbacks), enhanced file upload validation with Sharp, reduced rate limiting (30 req/min), error messages sanitized in production, session fixation prevention
-    -   **Medium (1)**: API request timeouts (30s) configured
-    -   **Low (1)**: CSP headers strengthened (no unsafe-inline, upgradeInsecureRequests enabled)
+-   **Security Audit (October 2025)**: 
+    -   **Fase 1 (COMPLETA - 12 vulnerabilidades corrigidas)**: Admin bypass removed in production, cookies always secure with sameSite=strict, logs sanitized (no sensitive data exposure), webhook authentication mandatory, session regeneration on all logins, CORS restricted, JWT secret enforcement, enhanced file upload validation with Sharp, reduced rate limiting (30 req/min), error messages sanitized in production, session fixation prevention, API request timeouts (30s), CSP headers strengthened
+    -   **Fase 2 (AUDITORIA PROFUNDA - 9 novas vulnerabilidades identificadas)**:
+        -   🔴 **CRÍTICA (1)**: 51 endpoints admin sem autenticação `requireAdmin` em `server/routes.ts` - **BLOQUEIO PARA DEPLOY**
+        -   🔴 **ALTAS (3)**: IDOR em endpoints admin, endpoints públicos com dados sensíveis, falta de rate limiting em endpoints críticos
+        -   🟡 **MÉDIAS (3)**: User enumeration, logging de informações sensíveis, tokens em localStorage
+        -   🟢 **BAIXAS (2)**: innerHTML/dangerouslySetInnerHTML, information disclosure via error messages
+    -   **Score de Segurança**: 20/100 (CRÍTICO) - Meta: 100/100 após correções
 
 ### System Design Choices
 -   **API Design**: RESTful with structured error handling.
