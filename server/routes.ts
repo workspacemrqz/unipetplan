@@ -1748,6 +1748,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password before storing
       const hashedPassword = await bcrypt.hash(password, 10);
       
+      console.log(`🔐 [CREDENTIALS] Atualizando credenciais da unidade ${id}:`, {
+        login,
+        hashedPasswordLength: hashedPassword.length,
+        passwordInputLength: password.length
+      });
+      
       const updatedUnit = await storage.updateNetworkUnit(id, {
         login,
         senhaHash: hashedPassword
@@ -1756,6 +1762,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedUnit) {
         return res.status(404).json({ error: "Unidade não encontrada" });
       }
+      
+      console.log(`✅ [CREDENTIALS] Credenciais atualizadas com sucesso para unidade: ${updatedUnit.name} (${updatedUnit.urlSlug})`);
+      console.log(`🔑 [CREDENTIALS] Login: ${login} | Use esta senha para acessar: ${password}`);
       
       // Remove sensitive data from response
       const { senhaHash, ...unitResponse } = updatedUnit;
