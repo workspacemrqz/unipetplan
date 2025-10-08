@@ -10,6 +10,7 @@ import type { z } from "zod";
 // Fixed import path and schema validation
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { logger } from "@/utils/logger";
 
 type LoginFormData = z.infer<typeof clientLoginSchema>;
 
@@ -24,7 +25,7 @@ export default function CustomerLoginPage() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('payment_success') === 'true') {
       setShowPaymentSuccessPopup(true);
-      console.log('🎉 [LOGIN] Popup de sucesso do pagamento ativado!');
+      logger.log('🎉 [LOGIN] Popup de sucesso do pagamento ativado!');
       
       // Dispara confetti quando o popup aparece
       setTimeout(() => {
@@ -74,7 +75,7 @@ export default function CustomerLoginPage() {
         setSubmitError(result.error || 'Erro no login');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       setSubmitError('Erro de conexão. Tente novamente.');
     } finally {
       setIsLoading(false);

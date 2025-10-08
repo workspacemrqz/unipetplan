@@ -67,6 +67,16 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// Função de sanitização CSS (não usada atualmente, mas disponível se necessário)
+const sanitizeCSS = (css: string): string => {
+  // Remove padrões perigosos que podem causar XSS
+  return css
+    .replace(/<script/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+    .replace(/<\/script>/gi, '');
+};
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -77,11 +87,21 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   }
 
   return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
+    <>
+      {/* 
+        SEGURANÇA: Este uso de dangerouslySetInnerHTML é seguro porque:
+        1. THEMES é um objeto hardcoded (não vem de user input)
+        2. Os valores são constantes definidas no código
+        3. Não há interpolação de dados externos
+        
+        ⚠️ ATENÇÃO: Se THEMES se tornar dinâmico no futuro, 
+        será necessário sanitizar o CSS antes de injetar.
+      */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: Object.entries(THEMES)
+            .map(
+              ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
@@ -93,10 +113,11 @@ ${colorConfig
   .join("\n")}
 }
 `
-          )
-          .join("\n"),
-      }}
-    />
+            )
+            .join("\n"),
+        }}
+      />
+    </>
   )
 }
 

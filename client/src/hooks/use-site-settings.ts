@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SiteSettings } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { clientConfig } from "../config";
+import { logger } from "@/utils/logger";
 
 // Função para formatar telefone brasileiro com formatação dinâmica para 8 ou 9 dígitos
 export const formatBrazilianPhoneForDisplay = (value: string | null | undefined): string => {
@@ -55,10 +56,10 @@ export function useSiteSettings() {
     queryKey: ["site-settings"],
     queryFn: async () => {
       try {
-        console.log('🔍 [useSiteSettings] Fetching site settings...');
+        logger.log('🔍 [useSiteSettings] Fetching site settings...');
         // apiRequest já retorna os dados processados (já fez .json() internamente)
         const data = await apiRequest("GET", "/api/site-settings");
-        console.log('✅ [useSiteSettings] Successfully fetched site settings:', data);
+        logger.log('✅ [useSiteSettings] Successfully fetched site settings:', data);
         return data;
       } catch (error) {
         // Capturar mais detalhes do erro
@@ -68,7 +69,7 @@ export function useSiteSettings() {
           stack: error instanceof Error ? error.stack : undefined,
           originalError: error
         };
-        console.warn('❌ [useSiteSettings] Failed to fetch site settings:', errorInfo);
+        logger.warn('❌ [useSiteSettings] Failed to fetch site settings:', errorInfo);
         throw error; // Permitir que o React Query gerencie o erro adequadamente
       }
     },
@@ -121,7 +122,7 @@ export function useSiteSettingsWithDefaults() {
 
   // Debug logging apenas quando necessário
   if (!typedSettings && !isLoading && error) {
-    console.log('❌ Site settings error:', error);
+    logger.log('❌ Site settings error:', error);
   }
 
   // Otimizar loading - usar defaults mais rapidamente quando dados não estão disponíveis

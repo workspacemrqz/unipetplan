@@ -16,6 +16,7 @@ import {
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useSpecies } from "@/hooks/use-species";
+import { logger } from "@/utils/logger";
 
 interface Plan {
   id: string;
@@ -153,7 +154,7 @@ export default function Checkout() {
         setCepError('CEP não encontrado. Por favor, verifique e tente novamente.');
       }
     } catch (error) {
-      console.error('Erro ao buscar CEP:', error);
+      logger.error('Erro ao buscar CEP:', error);
       setCepError('Erro ao buscar CEP. Por favor, preencha o endereço manualmente.');
     } finally {
       setIsLoadingCEP(false);
@@ -407,30 +408,30 @@ export default function Checkout() {
         // Usar apenas o campo mappedStatus para verificar aprovação
         const mappedStatus = result.data?.mappedStatus;
         
-        console.log('🔍 [FRONTEND] Status do pagamento:', { mappedStatus });
+        logger.log('🔍 [FRONTEND] Status do pagamento:', { mappedStatus });
         
         // Lógica simplificada: apenas mappedStatus
         // pending = aguardando pagamento
         // approved = aprovado, pode redirecionar
         const isApproved = mappedStatus === 'approved';
         
-        console.log('🔍 [FRONTEND] Verificação de aprovação:', {
+        logger.log('🔍 [FRONTEND] Verificação de aprovação:', {
           mappedStatus,
           isApproved
         });
         
         // Log quando aprovado
         if (isApproved) {
-          console.log('✅ PIX aprovado! Status:', { mappedStatus });
+          logger.log('✅ PIX aprovado! Status:', { mappedStatus });
         }
         
         return isApproved;
       } else {
-        console.log('❌ [FRONTEND] Resposta da API não foi OK:', response.status, response.statusText);
+        logger.log('❌ [FRONTEND] Resposta da API não foi OK:', response.status, response.statusText);
         return false;
       }
     } catch (error) {
-      console.error('❌ [FRONTEND] Erro ao verificar status PIX:', error);
+      logger.error('❌ [FRONTEND] Erro ao verificar status PIX:', error);
       return false;
     }
   };
@@ -441,7 +442,7 @@ export default function Checkout() {
       return;
     }
 
-    console.log('🚀 Iniciando polling PIX para pagamento:', pixData.paymentId);
+    logger.log('🚀 Iniciando polling PIX para pagamento:', pixData.paymentId);
     
     // Captura o paymentId em uma variável local para evitar problemas de closure
     const currentPaymentId = pixData.paymentId;
@@ -449,59 +450,59 @@ export default function Checkout() {
     
     const pollInterval = setInterval(async () => {
       checkCount++;
-      console.log(`🔄 [${checkCount}] Verificando status do PIX para payment: ${currentPaymentId}`);
+      logger.log(`🔄 [${checkCount}] Verificando status do PIX para payment: ${currentPaymentId}`);
       
       try {
         const isConfirmed = await checkPixPaymentStatus(currentPaymentId);
-        console.log(`📊 [${checkCount}] Resultado da verificação PIX:`, isConfirmed);
+        logger.log(`📊 [${checkCount}] Resultado da verificação PIX:`, isConfirmed);
         
         if (isConfirmed) {
-          console.log('🎉 PIX APROVADO! Redirecionando para login com popup de sucesso...');
+          logger.log('🎉 PIX APROVADO! Redirecionando para login com popup de sucesso...');
           clearInterval(pollInterval);
           setIsPaymentConfirmed(true);
           
           // Forçar redirecionamento usando window.location para garantir navegação
           setTimeout(() => {
-            console.log('🚪 Executando redirecionamento...');
+            logger.log('🚪 Executando redirecionamento...');
             window.location.href = '/cliente/login?payment_success=true';
           }, 100);
         }
       } catch (error) {
-        console.error(`❌ [${checkCount}] Erro durante verificação do PIX:`, error);
+        logger.error(`❌ [${checkCount}] Erro durante verificação do PIX:`, error);
       }
     }, 3000); // Verificar a cada 3 segundos
 
     // Fazer primeira verificação imediatamente
     setTimeout(async () => {
-      console.log('🔍 Primeira verificação imediata...');
+      logger.log('🔍 Primeira verificação imediata...');
       try {
         const isConfirmed = await checkPixPaymentStatus(currentPaymentId);
-        console.log('📊 Status inicial:', isConfirmed);
+        logger.log('📊 Status inicial:', isConfirmed);
         
         if (isConfirmed) {
-          console.log('🎉 PIX JÁ ESTAVA APROVADO! Redirecionando imediatamente...');
+          logger.log('🎉 PIX JÁ ESTAVA APROVADO! Redirecionando imediatamente...');
           clearInterval(pollInterval);
           setIsPaymentConfirmed(true);
           
           // Forçar redirecionamento
           setTimeout(() => {
-            console.log('🚪 Executando redirecionamento imediato...');
+            logger.log('🚪 Executando redirecionamento imediato...');
             window.location.href = '/cliente/login?payment_success=true';
           }, 100);
         }
       } catch (error) {
-        console.error('❌ Erro na primeira verificação:', error);
+        logger.error('❌ Erro na primeira verificação:', error);
       }
     }, 500);
 
     // Limpar polling após 10 minutos (600 segundos) para evitar polling infinito
     const timeout = setTimeout(() => {
-      console.log('⏰ Timeout do polling PIX após 10 minutos');
+      logger.log('⏰ Timeout do polling PIX após 10 minutos');
       clearInterval(pollInterval);
     }, 600000);
 
     return () => {
-      console.log('🧹 Limpando polling PIX...');
+      logger.log('🧹 Limpando polling PIX...');
       clearInterval(pollInterval);
       clearTimeout(timeout);
     };
@@ -542,7 +543,7 @@ export default function Checkout() {
         setPlans(data);
       }
     } catch (error) {
-      console.error('Error fetching plans:', error);
+      logger.error('Error fetching plans:', error);
     }
   };
 
@@ -617,7 +618,7 @@ export default function Checkout() {
         setAppliedCoupon(null);
       }
     } catch (error) {
-      console.error('Error validating coupon:', error);
+      logger.error('Error validating coupon:', error);
       setCouponError('Erro ao validar cupom. Tente novamente.');
       setAppliedCoupon(null);
     } finally {
@@ -761,7 +762,7 @@ export default function Checkout() {
           });
         } else if (paymentData.method === 'credit_card' && result.payment?.status === 2) {
           // Para cartão aprovado (status 2), redirecionar imediatamente para customer/login com parâmetro para mostrar popup
-          console.log('🎉 [CHECKOUT] Pagamento com cartão aprovado, redirecionando para login!');
+          logger.log('🎉 [CHECKOUT] Pagamento com cartão aprovado, redirecionando para login!');
           navigate('/cliente/login?payment_success=true');
         } else {
           navigate(`/checkout-success?order=${result.payment?.orderId}&method=${paymentData.method}`);
@@ -803,7 +804,7 @@ export default function Checkout() {
         }
       }
     } catch (error) {
-      console.error('Error during checkout:', error);
+      logger.error('Error during checkout:', error);
       setPaymentError({
         show: true,
         title: 'Erro de Conexão',

@@ -11,6 +11,7 @@ import {
 import { ChatInput } from "@/components/ui/chat-input";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
+import { logger } from "@/utils/logger";
 
 interface Message {
   id: string;
@@ -70,9 +71,9 @@ export default function ChatAI() {
         const settingsResponse = await fetch("/api/chat/settings");
         if (settingsResponse.ok) {
           const chatSettings = await settingsResponse.json();
-          console.log('🔍 [CHAT] Loaded chat settings:', chatSettings);
-          console.log('🔍 [CHAT] Bot icon:', chatSettings.botIcon ? (typeof chatSettings.botIcon === 'string' ? 'Present (' + chatSettings.botIcon.substring(0, 50) + '...)' : 'Present (Binary Data)') : 'Not set');
-          console.log('🔍 [CHAT] Support icon:', chatSettings.supportIcon ? (typeof chatSettings.supportIcon === 'string' ? 'Present (' + chatSettings.supportIcon.substring(0, 50) + '...)' : 'Present (Binary Data)') : 'Not set');
+          logger.log('🔍 [CHAT] Loaded chat settings:', chatSettings);
+          logger.log('🔍 [CHAT] Bot icon:', chatSettings.botIcon ? (typeof chatSettings.botIcon === 'string' ? 'Present (' + chatSettings.botIcon.substring(0, 50) + '...)' : 'Present (Binary Data)') : 'Not set');
+          logger.log('🔍 [CHAT] Support icon:', chatSettings.supportIcon ? (typeof chatSettings.supportIcon === 'string' ? 'Present (' + chatSettings.supportIcon.substring(0, 50) + '...)' : 'Present (Binary Data)') : 'Not set');
           setSettings(prev => ({ ...prev, ...chatSettings }));
           // Pequeno delay para garantir que não apareça antes das configurações serem aplicadas
           setTimeout(() => {
@@ -109,7 +110,7 @@ export default function ChatAI() {
 
         // If there's history, it's already set in the formattedHistory above
       } catch (error) {
-        console.error("Error loading chat data:", error);
+        logger.error("Error loading chat data:", error);
       }
     };
 
@@ -181,7 +182,7 @@ export default function ChatAI() {
         throw new Error("Failed to send message");
       }
     } catch (error) {
-      console.error("Error sending buffered messages:", error);
+      logger.error("Error sending buffered messages:", error);
       const errorMessage: Message = {
         id: `error_${Date.now()}`,
         content: "Desculpe, ocorreu um erro. Tente novamente mais tarde.",
@@ -277,7 +278,7 @@ export default function ChatAI() {
         throw new Error("Failed to send message");
       }
     } catch (error) {
-      console.error("Error sending message:", error);
+      logger.error("Error sending message:", error);
       const errorMessage: Message = {
         id: `error_${Date.now()}`,
         content: "Desculpe, ocorreu um erro. Tente novamente mais tarde.",
