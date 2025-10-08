@@ -98,6 +98,61 @@ const checkoutLimiter = rateLimit({
   skipSuccessfulRequests: false, // count all requests
 });
 
+// Rate limiter for user registration
+const registerLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: "Muitas tentativas de registro. Tente novamente em 15 minutos.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for login - strict to prevent brute force
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  skipSuccessfulRequests: true,
+  message: "Muitas tentativas de login. Tente novamente em 15 minutos.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for contact form
+const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  message: "Muitas mensagens enviadas. Tente novamente em 15 minutos.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for coupon validation
+const couponLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15,
+  message: "Muitas tentativas de validação. Tente novamente em 15 minutos.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for payment queries
+const paymentQueryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: "Muitas consultas de pagamento. Tente novamente em 15 minutos.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for CEP lookup
+const cepLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30,
+  message: "Muitas consultas de CEP. Tente novamente em 15 minutos.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Configure multer for in-memory file upload with enhanced security
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -346,7 +401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/chat", chatRoutes);
 
   // CEP LOOKUP ROUTE
-  app.get("/api/cep/:cep", async (req, res) => {
+  app.get("/api/cep/:cep", cepLimiter, async (req, res) => {
     try {
       
       // Import the CEP service
@@ -631,7 +686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Contact form submission (public)
   // SECURITY: Formulário de contato público usa rate limiting ao invés de CSRF
-  app.post("/api/contact", async (req, res) => {
+  app.post("/api/contact", contactLimiter, async (req, res) => {
     try {
 
       const validatedData = insertContactSubmissionSchema.parse(req.body);
@@ -2186,7 +2241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Validate coupon (public endpoint for checkout)
-  app.post("/api/coupons/validate", async (req, res) => {
+  app.post("/api/coupons/validate", couponLimiter, async (req, res) => {
     try {
       const { code } = req.body;
       if (!code) {
@@ -2446,7 +2501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // === CHECKOUT ROUTES ===
   
   // Step 2: Save customer and pets data (after consent accepted)
-  app.post("/api/checkout/save-customer-data", async (req, res) => {
+  app.post("/api/checkout/save-customer-data", checkoutLimiter, async (req, res) => {
     try {
       console.log("🛒 [CHECKOUT-STEP2] Iniciando salvamento dos dados do cliente e pets");
       
@@ -2592,7 +2647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // NEW ROUTE: Complete client registration with CPF and address (Step 3)
-  app.post("/api/checkout/complete-registration", async (req, res) => {
+  app.post("/api/checkout/complete-registration", checkoutLimiter, async (req, res) => {
     try {
       console.log("📝 [CHECKOUT-STEP3] Completando registro do cliente com CPF e endereço");
       
@@ -3702,7 +3757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Step 3: Complete checkout with payment processing (after address/payment form)
-  app.post("/api/checkout/process", async (req, res) => {
+  app.post("/api/checkout/process", checkoutLimiter, async (req, res) => {
     try {
       console.log("🛒 [CHECKOUT-STEP3] Iniciando processamento do checkout");
       
@@ -4655,7 +4710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // CLIENT AUTHENTICATION ROUTES
   
   // Client Registration
-  app.post("/api/clients/register", async (req, res) => {
+  app.post("/api/clients/register", registerLimiter, async (req, res) => {
     try {
       const parsed = insertClientSchema.parse(req.body);
       
@@ -4704,7 +4759,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Client Login
-  app.post("/api/clients/login", async (req, res) => {
+  app.post("/api/clients/login", loginLimiter, async (req, res) => {
     const requestStartTime = performance.now();
     let dbQueryTime = 0;
     let bcryptTime = 0;
@@ -6357,7 +6412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Query payment status
   // Permitir polling do PIX sem autenticação quando vem do checkout
-  app.get("/api/payments/query/:paymentId", async (req, res) => {
+  app.get("/api/payments/query/:paymentId", paymentQueryLimiter, async (req, res) => {
     // Verificar autenticação - permitir polling do checkout sem auth
     const isCheckoutPolling = req.headers['x-checkout-polling'] === 'true';
     if (!isCheckoutPolling && !req.session?.userId) {
@@ -7595,8 +7650,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // TEST ENDPOINT - Generate payment receipt manually
-  app.post("/api/test/generate-receipt", async (req, res) => {
+  // ✅ SECURITY: Test endpoint protected with admin authentication - NEVER expose publicly
+  app.post("/api/admin/test/generate-receipt", requireAdmin, async (req, res) => {
     try {
       const { contractId } = req.body;
       
