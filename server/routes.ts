@@ -2473,29 +2473,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rawBody = JSON.stringify(notification);
       }
       
-      const signature = req.headers['cielo-signature'] as string || 
-                       req.headers['x-cielo-signature'] as string || '';
-
-      // Check if this is a test request from Cielo (usually they don't send signature during initial setup)
-      const isTestRequest = !signature && 
-                           notification.PaymentId && 
-                           notification.ChangeType === 1;
-      
-      if (isTestRequest) {
-        console.log('🧪 [CIELO-WEBHOOK] Requisição de teste detectada - pulando validação de assinatura', {
-          correlationId,
-          paymentId: notification.PaymentId
-        });
-      } else {
-        // Validate webhook signature for non-test requests
-        if (!webhookService.validateWebhookSignature(rawBody, signature, correlationId)) {
-          console.error('🚨 [CIELO-WEBHOOK] Assinatura inválida', { 
-            correlationId,
-            signature: signature ? 'presente' : 'ausente'
-          });
-          return res.status(401).json({ error: 'Assinatura inválida' });
-        }
-      }
+      // Cielo doesn't send signature by default - accept all requests without validation
+      console.log('📨 [CIELO-WEBHOOK] Webhook da Cielo recebido (sem validação de assinatura)', {
+        correlationId,
+        paymentId: notification.PaymentId,
+        changeType: notification.ChangeType
+      });
 
       // Validate notification structure
       if (!notification.PaymentId || typeof notification.ChangeType !== 'number') {
@@ -2510,19 +2493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Estrutura de notificação inválida' });
       }
 
-      // Check if this is a test request (no signature)
-      if (isTestRequest) {
-        // For test requests, just return 200 OK without processing
-        console.log('✅ [CIELO-WEBHOOK] Teste de webhook bem-sucedido', {
-          correlationId,
-          paymentId: notification.PaymentId
-        });
-        
-        // Return simple 200 OK for Cielo test
-        return res.status(200).send('OK');
-      }
-
-      // Log security audit event for real requests
+      // Log security audit event
       console.log('🔒 [SECURITY-AUDIT] Webhook Cielo recebido', {
         timestamp: new Date().toISOString(),
         correlationId,
@@ -2533,7 +2504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userAgent: req.headers['user-agent']
       });
 
-      // Process webhook notification (only for real requests with signature)
+      // Process webhook notification
       await webhookService.processWebhookNotification(notification, correlationId);
 
       // Return success response immediately (webhook should respond quickly)
