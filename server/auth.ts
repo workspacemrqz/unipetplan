@@ -26,10 +26,10 @@ export function setupAuth(app: Express) {
     resave: false, // Don't save session if unmodified
     saveUninitialized: false, // Don't create session until something stored
     cookie: {
-      secure: true, // SECURITY FIX: Always use secure cookies, even in development
+      secure: process.env.NODE_ENV === 'production', // Secure only in production (HTTPS required)
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: 'strict' // SECURITY FIX: More restrictive to prevent CSRF attacks
+      sameSite: 'lax' // Permite navegação normal mas bloqueia CSRF cross-site
     },
     name: 'connect.sid', // Explicitly set session name
     store: new PostgreSQLStore({
