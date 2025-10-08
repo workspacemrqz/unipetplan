@@ -4244,9 +4244,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               throw new Error('Dados do cliente insuficientes para criação automática');
             }
             
-            // Hash CPF as password (using bcrypt)
-            const cpfPassword = paymentData.customer.cpf.replace(/\D/g, ''); // Clean CPF
-            const hashedPassword = await bcrypt.hash(cpfPassword, 12);
+            // Hash CPF for authentication (email + CPF login)
+            const cpfClean = paymentData.customer.cpf.replace(/\D/g, ''); // Clean CPF (only numbers)
+            const cpfHash = await bcrypt.hash(cpfClean, 12);
             
             // Prepare client data for creation
             const newClientData = {
@@ -4254,8 +4254,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               fullName: paymentData.customer.name,
               email: paymentData.customer.email,
               phone: paymentData.customer.phone || '',
-              cpf: cpfPassword,
-              password: hashedPassword,
+              cpf: paymentData.customer.cpf, // Store CPF with formatting for display
+              cpfHash: cpfHash, // Store hashed CPF for authentication
               // Include address data if available
               address: addressData.address || '',
               number: addressData.number || '',
@@ -4737,26 +4737,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ error: "Cliente já cadastrado com este email" });
       }
       
-      // Hash password
-      // Validate password is provided
+      // Hash CPF for authentication (password field contains CPF)
+      // Validate CPF is provided
       if (!parsed.password) {
-        return res.status(400).json({ error: "Senha é obrigatória" });
+        return res.status(400).json({ error: "CPF é obrigatório" });
       }
       
-      const hashedPassword = await bcrypt.hash(parsed.password, 12);
+      // Clean CPF and hash it
+      const cpfClean = parsed.password.replace(/\D/g, '');
+      const cpfHash = await bcrypt.hash(cpfClean, 12);
       
       // Create client with UUID
       const clientData = {
         ...parsed,
         fullName: parsed.full_name,
-        password: hashedPassword,
+        cpfHash: cpfHash,
         id: `client-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       };
       
       const newClient = await storage.createClient(clientData as any);
       
-      // Don't return password in response
-      const { password: _, ...clientResponse } = newClient;
+      // Don't return cpfHash in response (security)
+      const { cpfHash: _, ...clientResponse } = newClient;
       
       res.status(201).json({ 
         message: "Cliente cadastrado com sucesso", 
@@ -4800,28 +4802,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Email ou senha inválidos" });
       }
       
-      // Verify password with bcrypt - MEASURE BCRYPT TIME
+      // Verify CPF with bcrypt - MEASURE BCRYPT TIME
       let isValidAuth = false;
       
       try {
-        if (client.password) {
+        if (client.cpfHash) {
+          // Clean CPF from user input (remove all non-numeric characters)
+          const cpfClean = parsed.password.replace(/\D/g, '');
+          
           const bcryptStart = performance.now();
-          isValidAuth = await bcrypt.compare(parsed.password, client.password);
+          isValidAuth = await bcrypt.compare(cpfClean, client.cpfHash);
           bcryptTime = performance.now() - bcryptStart;
         }
       } catch (error) {
-        console.error("❌ Erro na comparação bcrypt:", error);
+        console.error("❌ Erro na comparação bcrypt do CPF:", error);
       }
       
       if (!isValidAuth) {
         const totalTime = performance.now() - requestStartTime;
-        console.log(`⏱️ [PERFORMANCE-LOGIN] Tempo total: ${totalTime.toFixed(2)}ms (FALHA - Senha inválida)`, {
+        console.log(`⏱️ [PERFORMANCE-LOGIN] Tempo total: ${totalTime.toFixed(2)}ms (FALHA - CPF inválido)`, {
           email: sanitizeEmail(parsed.email),
           dbQueryTime: `${dbQueryTime.toFixed(2)}ms`,
           bcryptTime: `${bcryptTime.toFixed(2)}ms`,
-          status: 'invalid_password'
+          status: 'invalid_cpf'
         });
-        return res.status(401).json({ error: "Email ou senha inválidos" });
+        return res.status(401).json({ error: "Email ou CPF inválidos" });
       }
       
       // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
@@ -4848,8 +4853,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           sessionTime = performance.now() - sessionStart;
           
-          // Don't return password in response
-          const { password: _, ...clientResponse } = client;
+          // Don't return cpfHash in response (security)
+          const { cpfHash: _, ...clientResponse } = client;
           
           // Calculate total time and log performance metrics
           const totalTime = performance.now() - requestStartTime;

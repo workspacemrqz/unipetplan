@@ -53,11 +53,17 @@ export default function CustomerLoginPage() {
     setIsLoading(true);
 
     try {
+      // Clean CPF: remove ALL non-numeric characters (same as checkout)
+      const cleanedCPF = data.password.replace(/\D/g, '');
+      
       const response = await fetch('/api/clients/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          email: data.email,
+          password: cleanedCPF // Send cleaned CPF as password
+        }),
       });
 
       const result = await response.json();
@@ -95,7 +101,7 @@ export default function CustomerLoginPage() {
             {/* Header */}
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--text-dark-primary)'}}>Área do Cliente</h1>
-              <p style={{color: 'var(--text-dark-secondary)'}}>Acesse sua conta com seu email e senha</p>
+              <p style={{color: 'var(--text-dark-secondary)'}}>Acesse sua conta com email e CPF</p>
             </div>
 
             {/* Login Form */}
@@ -141,7 +147,7 @@ export default function CustomerLoginPage() {
                         backgroundColor: '#FFFFFF',
                         paddingLeft: '2.5rem'
                       }}
-                      placeholder="Digite seu CPF"
+                      placeholder="Digite seu CPF (somente números)"
                     />
                   </div>
                   {errors.password && (

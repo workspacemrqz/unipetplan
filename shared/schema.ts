@@ -183,7 +183,7 @@ export const clients = pgTable("clients", {
   state: text("state"),
   city: text("city"),
   // UNIPET-specific fields
-  password: text("password"), // Optional for Admin compatibility
+  cpfHash: text("cpf_hash"), // CPF hasheado com bcrypt para autenticação (email + CPF login)
   image: text("image"), // Dados da imagem em base64
   imageUrl: text("image_url"), // URL da imagem
   createdByUnitId: varchar("created_by_unit_id"), // Track which unit created this client
