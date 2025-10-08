@@ -39,16 +39,20 @@ export function configureSecurityMiddleware(app: Application) {
 
   app.use(cors({
     origin: (origin, callback) => {
-      // ✅ SECURITY FIX: Sempre validar origin, mesmo em desenvolvimento
+      // Permitir requisições sem origin em desenvolvimento (Replit, same-origin, etc)
       if (!origin) {
-        // Permitir apenas com opt-in explícito (útil para mobile apps, Postman, etc)
-        if (process.env.ALLOW_NO_ORIGIN === 'true') {
-          console.warn('⚠️ [CORS] Requisição sem origin permitida - ALLOW_NO_ORIGIN habilitado');
+        if (process.env.NODE_ENV === 'production') {
+          // Em produção, exigir opt-in explícito
+          if (process.env.ALLOW_NO_ORIGIN === 'true') {
+            console.warn('⚠️ [CORS] Requisição sem origin permitida - ALLOW_NO_ORIGIN habilitado');
+            return callback(null, true);
+          }
+          console.warn('⚠️ [CORS] Requisição sem origin bloqueada em produção');
+          return callback(new Error('Origin é obrigatória'));
+        } else {
+          // Em desenvolvimento, permitir requisições sem origin (Replit, same-origin, etc)
           return callback(null, true);
         }
-        
-        console.warn('⚠️ [CORS] Requisição sem origin bloqueada. Configure ALLOW_NO_ORIGIN=true para permitir');
-        return callback(new Error('Origin é obrigatória'));
       }
       
       if (allowedOrigins.includes(origin)) {

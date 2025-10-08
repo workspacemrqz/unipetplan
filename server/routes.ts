@@ -2283,14 +2283,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const siteSettings = await storage.getSiteSettings();
 
       if (siteSettings) {
-        // Return only URL fields - images served from Supabase Storage
-        const cleanSettings = {
-          ...siteSettings,
-          // Remove BYTEA fields, keep only URL fields
-          mainImage: undefined,
-          networkImage: undefined,
-          aboutImage: undefined,
-        };
+        // Remove BYTEA fields before serializing - images served from Supabase Storage
+        const { mainImage, networkImage, aboutImage, ...cleanSettings } = siteSettings;
         
         return res.json(cleanSettings);
       }
