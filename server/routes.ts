@@ -16,6 +16,8 @@ import {
   updateUserSchema,
   insertPetSchema,
   updatePetSchema,
+  insertCouponSchema,
+  updateCouponSchema,
   type InsertNetworkUnit,
   type InsertSiteSettings,
   type InsertClient,

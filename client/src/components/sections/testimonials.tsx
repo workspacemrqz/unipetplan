@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
-import RobustImage from "@/components/ui/image";
 
 export default function Testimonials() {
 
@@ -8,19 +7,19 @@ export default function Testimonials() {
     {
       name: "Maria Silva",
       location: "",
-      image: "/Maria Silva.png",
+      initials: "MS",
       testimonial: "Minha Luna foi atendida super rápido quando precisou de uma cirurgia de emergência. Recomendo demais!"
     },
     {
       name: "Carlos Mendes",
       location: "",
-      image: "/Carlos Mendes.png",
+      initials: "CM",
       testimonial: "O plano familiar cobriu tudo que meus dois cães precisaram. Desde vacinas até exames especializados."
     },
     {
       name: "Ana Costa",
       location: "",
-      image: "/Ana Costa.png",
+      initials: "AC",
       testimonial: "Atendimento 24h salvou a vida do meu gato. A equipe é muito profissional. Indico para todos!"
     }
   ];
@@ -53,12 +52,9 @@ export default function Testimonials() {
               >
                 <CardContent className="pt-4 sm:pt-8 p-4 sm:p-6 flex flex-col flex-1 justify-center sm:justify-start">
                   <div className="flex items-center mb-4 sm:mb-6 flex-shrink-0">
-                    <RobustImage
-                      src={testimonial.image}
-                      alt={`${testimonial.name} com seu pet`}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
-                      onError={(error) => console.warn(`Testimonial image error for ${testimonial.name}:`, error)}
-                    />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold flex-shrink-0">
+                      {testimonial.initials}
+                    </div>
                     <div className="ml-3 sm:ml-4">
                       <h4 className="font-semibold text-sm sm:text-base text-foreground">{testimonial.name}</h4>
                       {testimonial.location && <p className="text-xs sm:text-sm text-foreground">{testimonial.location}</p>}
