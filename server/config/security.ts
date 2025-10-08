@@ -52,6 +52,12 @@ export function configureSecurityMiddleware(app: Application) {
         }
       }
       
+      // Permitir URLs do Replit durante desenvolvimento
+      if (process.env.NODE_ENV !== 'production' && origin.includes('.replit.dev')) {
+        console.log('✅ [CORS] Permitindo origem Replit em desenvolvimento:', origin);
+        return callback(null, true);
+      }
+      
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
