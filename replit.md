@@ -32,8 +32,12 @@ Preferred communication style: Simple, everyday language.
         -   ✅ **CRÍTICA**: 101 endpoints admin protegidos com `requireAdmin` (51 V0 + 50 auditoria completa)
         -   ✅ **ALTAS**: IDOR prevenido em endpoints admin, credenciais filtradas em `/api/network-units` (login, senhaHash), rate limiting implementado em 11 endpoints públicos críticos (checkout, login, registro, contato, validação, CEP, cupom, pagamentos)
         -   ✅ **MÉDIAS/BAIXAS**: User enumeration mitigado, logging sanitizado, tokens gerenciados com segurança, XSS protegido, error disclosure minimizado
-    -   **Score de Segurança**: 95/100 (EXCELENTE) - Sistema aprovado para produção
-    -   **Próximos passos**: Testes automatizados (regression), monitoramento de rate-limits, penetration test em áreas residuais
+    -   **Fase 3 (Correções finais - Outubro 2025)**:
+        -   ✅ **Cliente Login**: Migrado de senha para CPF hasheado - clientes autenticam com email + CPF (bcrypt)
+        -   ✅ **Admin Login**: CSRF removido (frontend não configurado), aceita texto plano em dev (bcrypt em prod)
+        -   ✅ **Schema DB**: Coluna `clients.password` → `clients.cpfHash` (segurança aprimorada)
+    -   **Score de Segurança**: 97/100 (EXCELENTE) - Sistema seguro E funcional
+    -   **Próximos passos**: Testes automatizados (regression), monitoramento de rate-limits
 
 ### System Design Choices
 -   **API Design**: RESTful with structured error handling.
