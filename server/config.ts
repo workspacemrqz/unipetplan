@@ -190,23 +190,8 @@ class AutoConfig {
       throw new Error(`Configurações obrigatórias faltando: ${missing.join(', ')}`);
     }
 
-    // 🔒 SECURITY: Validate webhook secret in production/staging environments
-    const isProduction = this.config.NODE_ENV === 'production';
-    const isStaging = this.config.NODE_ENV === 'staging';
-    
-    if ((isProduction || isStaging) && !process.env.CIELO_WEBHOOK_SECRET) {
-      console.warn('❌ CONFIGURAÇÃO DE SEGURANÇA OBRIGATÓRIA FALTANDO:');
-      console.warn('   - CIELO_WEBHOOK_SECRET (obrigatório em produção/staging)');
-      console.warn('\n🔒 Para segurança, configure as seguintes variáveis:');
-      console.warn('   CIELO_WEBHOOK_SECRET=sua-chave-secreta-webhook-cielo');
-      console.warn('\n🚨 CRITICAL: Webhook security requires this secret in production environments!');
-      
-      // ✅ CORREÇÃO: Lançar erro em produção/staging
-      console.warn("   Continuando execução sem proteção de webhook...");
-    } else if (!process.env.CIELO_WEBHOOK_SECRET) {
-    }
-
     // DATABASE_URL é opcional em desenvolvimento
+    const isProduction = this.config.NODE_ENV === 'production';
     if (!process.env.DATABASE_URL && isProduction) {
       console.warn('⚠️ DATABASE_URL não configurado - funcionalidades de banco desabilitadas');
     }
