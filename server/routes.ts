@@ -2310,7 +2310,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/network-units", async (req, res) => {
     try {
       const units = await storage.getNetworkUnits();
-      res.json(units);
+      
+      // ✅ SECURITY FIX: Filter sensitive credentials before sending to client
+      const publicUnits = units.map(unit => ({
+        id: unit.id,
+        name: unit.name,
+        address: unit.address,
+        cidade: unit.cidade,
+        phone: unit.phone,
+        services: unit.services,
+        imageUrl: unit.imageUrl,
+        whatsapp: unit.whatsapp,
+        googleMapsUrl: unit.googleMapsUrl,
+        urlSlug: unit.urlSlug,
+        isActive: unit.isActive
+        // SECURITY: login, senhaHash are EXCLUDED from public API
+      }));
+      
+      res.json(publicUnits);
     } catch (error) {
       console.error("Erro ao buscar unidades da rede:", error);
       res.status(500).json({ error: "Erro ao buscar unidades da rede" });
