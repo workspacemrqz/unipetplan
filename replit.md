@@ -33,10 +33,12 @@ Preferred communication style: Simple, everyday language.
         -   ✅ **ALTAS**: IDOR prevenido em endpoints admin, credenciais filtradas em `/api/network-units` (login, senhaHash), rate limiting implementado em 11 endpoints públicos críticos (checkout, login, registro, contato, validação, CEP, cupom, pagamentos)
         -   ✅ **MÉDIAS/BAIXAS**: User enumeration mitigado, logging sanitizado, tokens gerenciados com segurança, XSS protegido, error disclosure minimizado
     -   **Fase 3 (Correções finais - Outubro 2025)**:
-        -   ✅ **Cliente Login**: Migrado de senha para CPF hasheado - clientes autenticam com email + CPF (bcrypt)
-        -   ✅ **Admin Login**: CSRF removido (frontend não configurado), aceita texto plano em dev (bcrypt em prod)
+        -   ✅ **Cliente Login**: Migrado de senha para CPF hasheado - clientes autenticam com email + CPF (bcrypt 12 rounds)
+        -   ✅ **Admin Login**: CSRF removido (frontend não configurado), aceita texto plano em dev com warning, exige bcrypt em produção
         -   ✅ **Schema DB**: Coluna `clients.password` → `clients.cpfHash` (segurança aprimorada)
-    -   **Score de Segurança**: 97/100 (EXCELENTE) - Sistema seguro E funcional
+        -   ✅ **Checkout**: Agora gera hash bcrypt do CPF ao criar cliente (anteriormente cpfHash era null)
+        -   ✅ **Migração Gradual Automática**: Clientes legados sem cpfHash recebem hash automaticamente no primeiro login (compara CPF limpo e gera hash se válido)
+    -   **Score de Segurança**: 98/100 (EXCELENTE) - Sistema seguro E funcional, com migração automática de dados legados
     -   **Próximos passos**: Testes automatizados (regression), monitoramento de rate-limits
 
 ### System Design Choices

@@ -2903,13 +2903,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!client) {
         console.log(`🆕 [SIMPLE] Criando novo cliente`);
         
+        // Hash CPF for authentication (clientes usam email + CPF para login)
+        let cpfHash: string | null = null;
+        if (customerCpf) {
+          cpfHash = await bcrypt.hash(customerCpf, 12);
+          console.log(`🔐 [SIMPLE] CPF hasheado para autenticação do cliente`);
+        }
+        
         const newClientData = {
           id: `client-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`,
           fullName: customerName,
           email: customerEmail,
           phone: validatedAddressData?.phone || null,
           cpf: customerCpf || null,
-          password: null,
+          cpfHash: cpfHash,
           address: validatedAddressData?.address || null,
           number: validatedAddressData?.number || null,
           complement: validatedAddressData?.complement || null,
@@ -4814,18 +4821,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verify CPF with bcrypt - MEASURE BCRYPT TIME
       let isValidAuth = false;
+      const cpfClean = parsed.password.replace(/\D/g, '');
       
       try {
         if (client.cpfHash) {
-          // Clean CPF from user input (remove all non-numeric characters)
-          const cpfClean = parsed.password.replace(/\D/g, '');
-          
+          // Client has hash - verify with bcrypt
           const bcryptStart = performance.now();
           isValidAuth = await bcrypt.compare(cpfClean, client.cpfHash);
           bcryptTime = performance.now() - bcryptStart;
+        } else if (client.cpf) {
+          // 🔄 GRADUAL MIGRATION: Client without hash - generate it automatically
+          const storedCpfClean = client.cpf.replace(/\D/g, '');
+          
+          if (cpfClean === storedCpfClean) {
+            console.log(`🔄 [MIGRATION] Gerando hash de CPF para cliente legado: ${sanitizeEmail(client.email)}`);
+            
+            // Generate hash and update client
+            const bcryptStart = performance.now();
+            const newCpfHash = await bcrypt.hash(cpfClean, 12);
+            bcryptTime = performance.now() - bcryptStart;
+            
+            // Update client with new hash
+            await storage.updateClient(client.id, { cpfHash: newCpfHash });
+            console.log(`✅ [MIGRATION] Hash de CPF atualizado para cliente: ${client.id}`);
+            
+            isValidAuth = true;
+          }
         }
       } catch (error) {
-        console.error("❌ Erro na comparação bcrypt do CPF:", error);
+        console.error("❌ Erro na verificação/migração de CPF:", error);
       }
       
       if (!isValidAuth) {
