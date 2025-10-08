@@ -135,11 +135,15 @@ const couponLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Rate limiter for payment queries
+// Rate limiter for payment queries (permissivo para polling de checkout)
 const paymentQueryLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20,
-  message: "Muitas consultas de pagamento. Tente novamente em 15 minutos.",
+  windowMs: 1 * 60 * 1000, // 1 minuto
+  max: 100, // Permite 100 requisições por minuto (mais que suficiente para polling a cada 3s)
+  skip: (req) => {
+    // Permitir polling ilimitado do checkout (com header especial)
+    return req.headers['x-checkout-polling'] === 'true';
+  },
+  message: "Muitas consultas de pagamento. Tente novamente em alguns minutos.",
   standardHeaders: true,
   legacyHeaders: false,
 });
