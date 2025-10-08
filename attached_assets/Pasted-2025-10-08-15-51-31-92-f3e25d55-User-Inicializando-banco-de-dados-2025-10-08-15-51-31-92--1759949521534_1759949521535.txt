@@ -1,0 +1,154 @@
+2025-10-08 15:51:31.92
+f3e25d55
+User
+🔌 Inicializando banco de dados...
+2025-10-08 15:51:31.92
+f3e25d55
+User
+🔌 Inicializando conexão com banco de dados...
+2025-10-08 15:51:32.83
+f3e25d55
+User
+✅ Conexão com banco de dados estabelecida com sucesso
+2025-10-08 15:51:32.83
+f3e25d55
+User
+📊 Pool configurado com 20 conexões máximas
+2025-10-08 15:51:32.83
+f3e25d55
+User
+✅ Banco de dados inicializado com sucesso
+2025-10-08 15:51:32.83
+f3e25d55
+User
+🛣️ Registrando rotas compartilhadas (/api/* e /admin/api/*)...
+2025-10-08 15:51:32.83
+f3e25d55
+User
+📁 [STATIC-FILES] Static file serving disabled - using Supabase Storage
+2025-10-08 15:51:32.83
+f3e25d55
+User
+✅ Procedure usage routes registered successfully
+2025-10-08 15:51:32.87
+f3e25d55
+User
+✅ Rotas registradas e compartilhadas com admin
+2025-10-08 15:51:32.87
+f3e25d55
+User
+📁 Admin integrado no cliente principal - usando dist/client para todas as rotas
+2025-10-08 15:51:32.87
+f3e25d55
+User
+📁 Configurando arquivos estáticos...
+2025-10-08 15:51:32.87
+f3e25d55
+User
+✅ Arquivos estáticos configurados (UNIPET sempre servido)
+2025-10-08 15:51:32.87
+f3e25d55
+User
+🛡️ Configurando tratamento de erros...
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🎉 SERVIDOR UNIFICADO INICIADO COM SUCESSO!
+2025-10-08 15:51:32.88
+f3e25d55
+User
+==========================================
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🌐 URL: http://0.0.0.0:5000
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🏠 Host: 0.0.0.0 (Aceita conexões externas)
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🌍 Ambiente: production
+2025-10-08 15:51:32.88
+f3e25d55
+User
+📁 Diretório: /home/runner/workspace
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🔌 Banco: Conectado e saudável
+2025-10-08 15:51:32.88
+f3e25d55
+User
+2025-10-08 15:51:32.88
+f3e25d55
+User
+📋 SERVIÇOS DISPONÍVEIS:
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🦄 UNIPET:
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Frontend: / (raiz)
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• APIs: /api/*
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Health: /api/health
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🔧 ADMIN:
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Frontend: /admin
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• APIs: /admin/api/*
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Health: /admin/health
+2025-10-08 15:51:32.88
+f3e25d55
+User
+2025-10-08 15:51:32.88
+f3e25d55
+User
+🔒 FUNCIONALIDADES:
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Roteamento unificado
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Banco de dados compartilhado
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Sessions e cookies configurados
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Tratamento de erros global
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Arquivos estáticos servidos
+2025-10-08 15:51:32.88
+f3e25d55
+User
+• Cache otimizado
+2025-10-08 15:51:32.88
+f3e25d55
+User
+==========================================
