@@ -2434,7 +2434,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'user-agent': req.headers['user-agent']
         },
         ip: req.ip || req.connection.remoteAddress,
-        bodyLength: req.body?.length || 0
+        bodyType: typeof req.body,
+        bodyIsBuffer: Buffer.isBuffer(req.body),
+        bodyLength: req.body?.length || 0,
+        bodyPreview: req.body ? (Buffer.isBuffer(req.body) ? req.body.toString('utf8').substring(0, 100) : JSON.stringify(req.body).substring(0, 100)) : 'no body'
       });
 
       // Import webhook service
@@ -2447,8 +2450,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Body é obrigatório' });
       }
 
-      // Convert raw body to string for signature validation
-      const rawBody = req.body.toString('utf8');
+      // Get notification data - body can be Buffer or already-parsed Object
+      let notification;
+      let rawBody: string;
+      
+      if (Buffer.isBuffer(req.body)) {
+        // Body is raw buffer (express.raw worked)
+        rawBody = req.body.toString('utf8');
+        try {
+          notification = JSON.parse(rawBody);
+        } catch (parseError) {
+          console.error('❌ [CIELO-WEBHOOK] Erro ao fazer parse do JSON', {
+            correlationId,
+            error: parseError instanceof Error ? parseError.message : 'Erro desconhecido',
+            bodyPreview: rawBody.substring(0, 100)
+          });
+          return res.status(400).json({ error: 'JSON inválido' });
+        }
+      } else {
+        // Body already parsed as object (another middleware processed it)
+        notification = req.body;
+        rawBody = JSON.stringify(notification);
+      }
+      
       const signature = req.headers['cielo-signature'] as string || 
                        req.headers['x-cielo-signature'] as string || '';
 
@@ -2459,19 +2483,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           signature: signature ? 'presente' : 'ausente'
         });
         return res.status(401).json({ error: 'Assinatura inválida' });
-      }
-
-      // Parse JSON payload
-      let notification;
-      try {
-        notification = JSON.parse(rawBody);
-      } catch (parseError) {
-        console.error('❌ [CIELO-WEBHOOK] Erro ao fazer parse do JSON', {
-          correlationId,
-          error: parseError instanceof Error ? parseError.message : 'Erro desconhecido',
-          bodyPreview: rawBody.substring(0, 100)
-        });
-        return res.status(400).json({ error: 'JSON inválido' });
       }
 
       // Validate notification structure
