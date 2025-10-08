@@ -45,6 +45,11 @@ Preferred communication style: Simple, everyday language.
 -   **API Design**: RESTful with structured error handling.
 -   **Performance**: Code splitting, lazy loading, optimized bundle sizes, connection pooling, query optimization, response compression.
 -   **Deployment**: Separate client/server builds, Node.js 18+ environment, health checks, graceful shutdown.
+    -   **Port Configuration (October 2025)**: 
+        -   Development: Backend (port 3000), Frontend (port 5000) - separate servers
+        -   Production: Unified server on port 5000 via `unified-server.ts`
+        -   Deploy script: `PORT=5000 NODE_ENV=production npm start`
+        -   Fixed deployment port mapping issue ensuring port 5000 is properly opened
 
 ## External Dependencies
 

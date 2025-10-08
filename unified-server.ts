@@ -134,7 +134,10 @@ async function initializeUnifiedServer(): Promise<void> {
     });
 
     // 6. Iniciar servidor
-    const port = parseInt(autoConfig.get('PORT') || '3000', 10); // Use autoConfig for port with fallback
+    // Em produção, usa porta 5000 (deployment padrão), senão usa PORT do ambiente ou 3000
+    const port = process.env.NODE_ENV === 'production' 
+      ? parseInt(process.env.PORT || '5000', 10)
+      : parseInt(autoConfig.get('PORT') || '3000', 10);
     const host = autoConfig.get('HOST') || '0.0.0.0';
 
     unipetServer.listen(port, host, () => {
