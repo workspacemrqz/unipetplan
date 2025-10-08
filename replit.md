@@ -26,7 +26,11 @@ Preferred communication style: Simple, everyday language.
 -   **Image Management**: Supabase Storage for uploads, Sharp for processing.
 -   **Feature Highlights**: Admin management (FAQs, Site Settings, Network Units, Procedures, Clients, Coupons), customer dashboard (pets, procedures, financial), Unit Portal (client, pet management, guide creation), intelligent duplicate pet prevention, Brazilian phone formatting, password-protected deletions in admin, comprehensive coupon/discount system, differentiated billing logic (annual/monthly), strict billing period validation, customizable payment receipt PDFs, and annual plan renewal countdown.
 -   **Performance**: Optimized login and navigation, reduced database queries, `AuthContext` with `sessionStorage` caching for client authentication data.
--   **Security Audit**: All identified vulnerabilities addressed, including hardcoded credentials, plain text passwords, secure cookies, CSRF protection, XSS sanitization, optimized rate limiting, secure file uploads, Helmet implementation, CORS configuration, log sanitization, improved bypass validation, and restrictive HTML sanitization.
+-   **Security Audit (October 2025)**: Comprehensive security audit completed with all 12 identified vulnerabilities fixed:
+    -   **Critical (5)**: Admin bypass removed in production, cookies always secure with sameSite=strict, logs sanitized (no sensitive data exposure), webhook authentication mandatory, session regeneration on all logins
+    -   **High (6)**: CORS restricted (no null origin in production), JWT secret enforcement (no fallbacks), enhanced file upload validation with Sharp, reduced rate limiting (30 req/min), error messages sanitized in production, session fixation prevention
+    -   **Medium (1)**: API request timeouts (30s) configured
+    -   **Low (1)**: CSP headers strengthened (no unsafe-inline, upgradeInsecureRequests enabled)
 
 ### System Design Choices
 -   **API Design**: RESTful with structured error handling.
