@@ -684,13 +684,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/csrf-token", getCsrfToken);
 
   // CRITICAL: Dashboard aggregated data endpoint (required by admin dashboard)
-  app.get("/admin/api/dashboard/all", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for dashboard during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for /admin/api/dashboard/all');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.get("/admin/api/dashboard/all", requireAdmin, async (req, res) => {
     
     try {
       console.log("📊 [DASHBOARD] Processing dashboard data request");
@@ -914,7 +908,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==== ADMIN ROUTES ====
   // Admin clients routes
-  app.get("/admin/api/clients", async (req, res) => {
+  app.get("/admin/api/clients", requireAdmin, async (req, res) => {
     try {
       const { startDate, endDate } = req.query;
       const clients = await storage.getAllClients();
@@ -925,7 +919,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/clients/:id", async (req, res) => {
+  app.get("/admin/api/clients/:id", requireAdmin, async (req, res) => {
     try {
       const client = await storage.getClientById(req.params.id);
       if (!client) {
@@ -938,7 +932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/clients/:id/pets", async (req, res) => {
+  app.get("/admin/api/clients/:id/pets", requireAdmin, async (req, res) => {
     try {
       const pets = await storage.getPetsByClientId(req.params.id);
       res.json(pets);
@@ -948,7 +942,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/clients/search/:query", async (req, res) => {
+  app.get("/admin/api/clients/search/:query", requireAdmin, async (req, res) => {
     try {
       // Temporary fix: use getAllClients and filter manually
       const allClients = await storage.getAllClients();
@@ -1057,7 +1051,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==== ADMIN PAYMENT RECEIPTS ROUTES ====
   // Get all payment receipts
-  app.get("/admin/api/payment-receipts", async (req, res) => {
+  app.get("/admin/api/payment-receipts", requireAdmin, async (req, res) => {
     try {
       const receipts = await storage.getAllPaymentReceipts();
       res.json(receipts);
@@ -1068,7 +1062,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single payment receipt by ID
-  app.get("/admin/api/payment-receipts/:id", async (req, res) => {
+  app.get("/admin/api/payment-receipts/:id", requireAdmin, async (req, res) => {
     try {
       const receipt = await storage.getPaymentReceiptById(req.params.id);
       if (!receipt) {
@@ -1083,7 +1077,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==== ADMIN CONTRACTS ROUTES ====
   // Get all contracts with client and pet details
-  app.get("/admin/api/contracts", async (req, res) => {
+  app.get("/admin/api/contracts", requireAdmin, async (req, res) => {
     try {
       const contracts = await storage.getAllContracts();
       
@@ -1119,7 +1113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single contract by ID
-  app.get("/admin/api/contracts/:id", async (req, res) => {
+  app.get("/admin/api/contracts/:id", requireAdmin, async (req, res) => {
     try {
       const contract = await storage.getContract(req.params.id);
       if (!contract) {
@@ -1152,7 +1146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update contract (PATCH)
-  app.patch("/admin/api/contracts/:id", async (req, res) => {
+  app.patch("/admin/api/contracts/:id", requireAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const { monthlyAmount, status } = req.body;
@@ -1192,7 +1186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==== ADMIN PETS ROUTES ====
   // Get single pet by ID
-  app.get("/admin/api/pets/:id", async (req, res) => {
+  app.get("/admin/api/pets/:id", requireAdmin, async (req, res) => {
     try {
       const pet = await storage.getPet(req.params.id);
       if (!pet) {
@@ -1275,7 +1269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin contact submissions routes  
-  app.get("/admin/api/contact-submissions", async (req, res) => {
+  app.get("/admin/api/contact-submissions", requireAdmin, async (req, res) => {
     try {
       const submissions = await storage.getAllContactSubmissions();
       res.json(submissions);
@@ -1286,7 +1280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin FAQ routes
-  app.get("/admin/api/faq", async (req, res) => {
+  app.get("/admin/api/faq", requireAdmin, async (req, res) => {
     try {
       const faqItems = await storage.getAllFaqItems();
       res.json(faqItems);
@@ -1296,7 +1290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/admin/api/faq", async (req, res) => {
+  app.post("/admin/api/faq", requireAdmin, async (req, res) => {
     try {
       const validatedData = insertFaqItemSchema.parse(req.body);
       // Ensure required properties are present
@@ -1315,7 +1309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/admin/api/faq/:id", async (req, res) => {
+  app.put("/admin/api/faq/:id", requireAdmin, async (req, res) => {
     try {
       const validatedData = insertFaqItemSchema.parse(req.body);
       // Ensure required properties are present for update
@@ -1337,7 +1331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/admin/api/faq/:id", async (req, res) => {
+  app.delete("/admin/api/faq/:id", requireAdmin, async (req, res) => {
     try {
       const success = await storage.deleteFaqItem(req.params.id);
       if (!success) {
@@ -1352,13 +1346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin guides routes
-  app.get("/admin/api/guides", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for guides during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for /admin/api/guides');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.get("/admin/api/guides", requireAdmin, async (req, res) => {
     
     try {
       const guides = await storage.getAllGuides();
@@ -1369,13 +1357,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/guides/with-network-units", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for guides during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for /admin/api/guides/with-network-units');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.get("/admin/api/guides/with-network-units", requireAdmin, async (req, res) => {
     
     try {
       // Parse query parameters
@@ -1458,7 +1440,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/guides/:id", async (req, res) => {
+  app.get("/admin/api/guides/:id", requireAdmin, async (req, res) => {
     try {
       const guide = await storage.getGuide(req.params.id);
       if (!guide) {
@@ -1472,7 +1454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin plans routes
-  app.get("/admin/api/plans", async (req, res) => {
+  app.get("/admin/api/plans", requireAdmin, async (req, res) => {
     try {
       const plans = await storage.getAllPlans();
       res.json(plans);
@@ -1482,7 +1464,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/plans/active", async (req, res) => {
+  app.get("/admin/api/plans/active", requireAdmin, async (req, res) => {
     try {
       const plans = await storage.getPlans(); // Get active plans
       res.json(plans);
@@ -1493,7 +1475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single plan by ID
-  app.get("/admin/api/plans/:id", async (req, res) => {
+  app.get("/admin/api/plans/:id", requireAdmin, async (req, res) => {
     try {
       const plan = await storage.getPlan(req.params.id);
       if (!plan) {
@@ -1507,7 +1489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get procedures for a specific plan
-  app.get("/admin/api/plans/:id/procedures", async (req, res) => {
+  app.get("/admin/api/plans/:id/procedures", requireAdmin, async (req, res) => {
     try {
       const planId = req.params.id;
       console.log(`📋 [ADMIN] Getting procedures for plan ${planId}`);
@@ -1523,7 +1505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new plan
-  app.post("/admin/api/plans", async (req, res) => {
+  app.post("/admin/api/plans", requireAdmin, async (req, res) => {
     try {
       const planData = req.body;
       
@@ -1569,7 +1551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update plan - accepts all plan fields
-  app.put("/admin/api/plans/:id", async (req, res) => {
+  app.put("/admin/api/plans/:id", requireAdmin, async (req, res) => {
     try {
       const planId = req.params.id;
       const updateData = req.body;
@@ -1617,7 +1599,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin network units routes
-  app.get("/admin/api/network-units", adminCRUDLimiter, async (req, res) => {
+  app.get("/admin/api/network-units", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const units = await storage.getAllNetworkUnits();
       res.json(units);
@@ -1628,7 +1610,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new network unit
-  app.post("/admin/api/network-units", adminCRUDLimiter, async (req, res) => {
+  app.post("/admin/api/network-units", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       console.log("📝 [ADMIN] Creating new network unit...");
       console.log("📦 [ADMIN] Received data:", req.body);
@@ -1671,7 +1653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Network units with credentials route (must come before :id route)
-  app.get("/admin/api/network-units/credentials", adminCRUDLimiter, async (req, res) => {
+  app.get("/admin/api/network-units/credentials", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const units = await storage.getAllNetworkUnits();
       
@@ -1689,7 +1671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/admin/api/network-units/:id/credentials", adminCRUDLimiter, async (req, res) => {
+  app.put("/admin/api/network-units/:id/credentials", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const { id } = req.params;
       const { login, password } = req.body;
@@ -1754,13 +1736,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/admin/api/settings/upload-image", uploadRateLimiter, upload.single('image'), validateImageContent, async (req, res) => {
-    // Development-only bypass
-    if (process.env.NODE_ENV === 'development' && !req.session?.admin) {
-      console.warn("⚠️ [ADMIN] Bypassing auth for /admin/api/settings/upload-image - DEVELOPMENT ONLY");
-    } else if (!req.session?.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.post("/admin/api/settings/upload-image", requireAdmin, uploadRateLimiter, upload.single('image'), validateImageContent, async (req, res) => {
 
     try {
       if (!req.file) {
@@ -1791,13 +1767,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/admin/api/settings/chat/upload-image", uploadRateLimiter, upload.single('image'), validateImageContent, async (req, res) => {
-    // Development-only bypass
-    if (process.env.NODE_ENV === 'development' && !req.session?.admin) {
-      console.warn("⚠️ [ADMIN] Bypassing auth for /admin/api/settings/chat/upload-image - DEVELOPMENT ONLY");
-    } else if (!req.session?.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.post("/admin/api/settings/chat/upload-image", requireAdmin, uploadRateLimiter, upload.single('image'), validateImageContent, async (req, res) => {
 
     try {
       if (!req.file) {
@@ -1834,7 +1804,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   // GET site settings
-  app.get("/admin/api/settings/site", async (req, res) => {
+  app.get("/admin/api/settings/site", requireAdmin, async (req, res) => {
     try {
       const settings = await storage.getSiteSettings();
       if (!settings) {
@@ -1848,7 +1818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT site settings
-  app.put("/admin/api/settings/site", async (req, res) => {
+  app.put("/admin/api/settings/site", requireAdmin, async (req, res) => {
     try {
       console.log("📝 [ADMIN] Received site settings update:", req.body);
       console.log("📝 [ADMIN] aboutImageUrl field:", req.body.aboutImageUrl);
@@ -1862,7 +1832,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET rules settings
-  app.get("/admin/api/settings/rules", async (req, res) => {
+  app.get("/admin/api/settings/rules", requireAdmin, async (req, res) => {
     try {
       const settings = await storage.getRulesSettings();
       if (!settings) {
@@ -1876,7 +1846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT rules settings
-  app.put("/admin/api/settings/rules", async (req, res) => {
+  app.put("/admin/api/settings/rules", requireAdmin, async (req, res) => {
     try {
       const updatedSettings = await storage.updateRulesSettings(req.body);
       res.json(updatedSettings);
@@ -1887,7 +1857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET chat settings
-  app.get("/admin/api/settings/chat", async (req, res) => {
+  app.get("/admin/api/settings/chat", requireAdmin, async (req, res) => {
     try {
       let settings = await storage.getChatSettings();
       if (!settings) {
@@ -1902,7 +1872,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT chat settings
-  app.put("/admin/api/settings/chat", async (req, res) => {
+  app.put("/admin/api/settings/chat", requireAdmin, async (req, res) => {
     try {
       console.log("📝 [ADMIN] Received chat settings update:", req.body);
       const updatedSettings = await storage.updateChatSettings(req.body);
@@ -1914,7 +1884,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/network-units/:id", async (req, res) => {
+  app.get("/admin/api/network-units/:id", requireAdmin, async (req, res) => {
     try {
       const unit = await storage.getNetworkUnit(req.params.id);
       if (!unit) {
@@ -1927,7 +1897,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/admin/api/network-units/:id", async (req, res) => {
+  app.put("/admin/api/network-units/:id", requireAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updateData = updateNetworkUnitSchema.partial().parse(req.body);
@@ -1945,13 +1915,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/admin/api/network-units/:id", async (req, res) => {
-    // Development-only bypass
-    if (process.env.NODE_ENV === 'development' && !req.session?.user) {
-      console.warn("⚠️ [ADMIN] Bypassing auth for /admin/api/network-units - DEVELOPMENT ONLY");
-    } else if (!req.session?.user) {
-      return res.status(401).json({ error: "Não autenticado" });
-    }
+  app.delete("/admin/api/network-units/:id", requireAdmin, async (req, res) => {
     
     try {
       const { id } = req.params;
@@ -1970,13 +1934,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin procedures routes
-  app.get("/admin/api/procedures", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for procedures during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for /admin/api/procedures');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.get("/admin/api/procedures", requireAdmin, async (req, res) => {
     
     try {
       const procedures = await storage.getAllProcedures();
@@ -1988,13 +1946,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create new procedure
-  app.post("/admin/api/procedures", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for procedures during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for POST /admin/api/procedures');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.post("/admin/api/procedures", requireAdmin, async (req, res) => {
     
     try {
       console.log("📝 [ADMIN] Creating new procedure:", req.body);
@@ -2008,13 +1960,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update procedure
-  app.put("/admin/api/procedures/:id", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for procedures during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for PUT /admin/api/procedures/:id');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.put("/admin/api/procedures/:id", requireAdmin, async (req, res) => {
     
     try {
       const { id } = req.params;
@@ -2034,13 +1980,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete procedure
-  app.delete("/admin/api/procedures/:id", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for procedures during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for DELETE /admin/api/procedures/:id');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.delete("/admin/api/procedures/:id", requireAdmin, async (req, res) => {
     
     try {
       const { id } = req.params;
@@ -2060,13 +2000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get procedure plans
-  app.get("/admin/api/procedures/:id/plans", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for procedures during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for GET /admin/api/procedures/:id/plans');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.get("/admin/api/procedures/:id/plans", requireAdmin, async (req, res) => {
     
     try {
       const { id } = req.params;
@@ -2081,13 +2015,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update procedure plans (atomic operation)
-  app.put("/admin/api/procedures/:id/plans", async (req, res) => {
-    // DEVELOPMENT ONLY: Skip auth for procedures during development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ [DEV-BYPASS] Authentication bypassed in development mode for PUT /admin/api/procedures/:id/plans');
-    } else if (!req.session || !req.session.admin) {
-      return res.status(401).json({ error: "Acesso administrativo não autorizado" });
-    }
+  app.put("/admin/api/procedures/:id/plans", requireAdmin, async (req, res) => {
     
     try {
       const { id } = req.params;
@@ -2107,7 +2035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin users routes
-  app.get("/admin/api/users", adminCRUDLimiter, async (req, res) => {
+  app.get("/admin/api/users", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const users = await storage.getAllUsers();
       res.json(users);
@@ -2117,7 +2045,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/admin/api/users", adminCRUDLimiter, async (req, res) => {
+  app.post("/admin/api/users", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const validatedData = insertUserSchema.parse(req.body);
       
@@ -2141,7 +2069,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/admin/api/users/:id", adminCRUDLimiter, async (req, res) => {
+  app.put("/admin/api/users/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -2173,7 +2101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/admin/api/users/:id", adminCRUDLimiter, async (req, res) => {
+  app.delete("/admin/api/users/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const { id } = req.params;
       const deleted = await storage.deleteUser(id);
