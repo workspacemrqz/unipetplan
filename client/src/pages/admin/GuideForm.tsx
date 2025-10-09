@@ -215,7 +215,7 @@ export default function GuideForm() {
                         </FormControl>
                         <SelectContent>
                           {GUIDE_TYPES.flatMap((type, index) => [
-                            <SelectItem key={type} value={type} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                            <SelectItem key={type} value={type} className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                               {getTypeLabel(type)}
                             </SelectItem>,
                             ...(index < GUIDE_TYPES.length - 1 ? [<Separator key={`separator-${type}`} />] : [])
@@ -269,7 +269,7 @@ export default function GuideForm() {
                               <SelectItem 
                                 key={proc.id} 
                                 value={proc.name} 
-                                className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                                className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
                               >
                                 <div className="flex flex-col">
                                   <span>{proc.name}</span>
@@ -339,7 +339,7 @@ export default function GuideForm() {
                         </FormControl>
                         <SelectContent>
                           {[{value: "open", label: "Aberta"}, {value: "closed", label: "Fechada"}, {value: "cancelled", label: "Cancelada"}].flatMap((status, index, array) => [
-                            <SelectItem key={status.value} value={status.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                            <SelectItem key={status.value} value={status.value} className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                               {status.label}
                             </SelectItem>,
                             ...(index < array.length - 1 ? [<Separator key={`separator-${status.value}`} />] : [])
