@@ -66,6 +66,14 @@ export default function GuideForm() {
     },
   });
 
+  // Fetch available procedures for the selected pet
+  const petIdToFetch = form.watch("petId") || urlPetId || guide?.petId;
+  const { data: availableProcedures, isLoading: proceduresLoading } = useQuery<any>({
+    queryKey: ["/admin/api/pets", petIdToFetch, "available-procedures"],
+    queryFn: () => apiRequest("GET", `/admin/api/pets/${petIdToFetch}/available-procedures`),
+    enabled: Boolean(petIdToFetch),
+  });
+
   useEffect(() => {
     if (guide) {
       form.reset({
@@ -225,9 +233,48 @@ export default function GuideForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Procedimento *</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Descreva o procedimento" data-testid="input-procedure" />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={!petIdToFetch || proceduresLoading}>
+                        <FormControl>
+                          <SelectTrigger 
+                            data-testid="select-procedure"
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              background: 'white'
+                            }}
+                          >
+                            <SelectValue placeholder={
+                              !petIdToFetch ? "Selecione um pet primeiro" : 
+                              proceduresLoading ? "Carregando procedimentos..." :
+                              availableProcedures?.procedures?.length === 0 ? "Nenhum procedimento disponível" :
+                              "Selecione o procedimento"
+                            } />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableProcedures?.procedures?.length > 0 ? (
+                            availableProcedures.procedures.flatMap((proc: any, index: number, array: any[]) => [
+                              <SelectItem 
+                                key={proc.id} 
+                                value={proc.name} 
+                                className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                              >
+                                <div className="flex flex-col">
+                                  <span>{proc.name}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    Limite: {proc.remaining}/{proc.annualLimit} restantes
+                                  </span>
+                                </div>
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${proc.id}`} />] : [])
+                            ])
+                          ) : (
+                            <div className="p-4 text-sm text-muted-foreground">
+                              {!petIdToFetch ? "Selecione um pet primeiro" :
+                               availableProcedures?.message || "Nenhum procedimento disponível"}
+                            </div>
+                          )}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
