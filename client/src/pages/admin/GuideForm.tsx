@@ -233,7 +233,20 @@ export default function GuideForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Procedimento *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} disabled={!petIdToFetch || proceduresLoading}>
+                      <Select 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Atualizar coparticipação quando procedimento for selecionado
+                          const selectedProc = availableProcedures?.procedures?.find((p: any) => p.name === value);
+                          if (selectedProc) {
+                            const coparticipationValue = selectedProc.coparticipation || 0;
+                            // Sempre armazenar um valor numérico formatado, mesmo quando for zero
+                            form.setValue("value", coparticipationValue.toFixed(2).replace('.', ','));
+                          }
+                        }} 
+                        value={field.value} 
+                        disabled={!petIdToFetch || proceduresLoading}
+                      >
                         <FormControl>
                           <SelectTrigger 
                             data-testid="select-procedure"
@@ -283,20 +296,27 @@ export default function GuideForm() {
                 <FormField
                   control={form.control}
                   name="value"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Valor (R$)</FormLabel>
-                      <FormControl>
-                        <InputMasked 
-                          {...field} 
-                          mask="price"
-                          placeholder="0,00"
-                          data-testid="input-value" 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    // Mostrar "Sem coparticipação" visualmente quando o valor for "0,00"
+                    const displayValue = field.value === "0,00" ? "Sem coparticipação" : field.value;
+                    
+                    return (
+                      <FormItem>
+                        <FormLabel>Coparticipação</FormLabel>
+                        <FormControl>
+                          <Input 
+                            value={displayValue}
+                            onChange={field.onChange}
+                            readOnly
+                            placeholder="Selecione um procedimento"
+                            data-testid="input-coparticipation"
+                            className="bg-gray-50 cursor-not-allowed"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <FormField
