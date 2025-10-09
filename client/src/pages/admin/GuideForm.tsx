@@ -22,6 +22,9 @@ export default function GuideForm() {
   const params = useParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [cpfSearch, setCpfSearch] = useState("");
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [clientPets, setClientPets] = useState<any[]>([]);
 
   const isEdit = Boolean(params.id);
   
@@ -93,6 +96,28 @@ export default function GuideForm() {
     }
   }, [guide, form, urlClientId, urlPetId]);
 
+  // Load client and pets when editing or URL params are present
+  useEffect(() => {
+    const loadClientAndPets = async () => {
+      const clientId = guide?.clientId || urlClientId || client?.id;
+      
+      if (clientId && !selectedClient) {
+        try {
+          const loadedClient = await apiRequest("GET", `/admin/api/clients/${clientId}`);
+          setSelectedClient(loadedClient);
+          setCpfSearch(loadedClient.cpf || "");
+          
+          const pets = await apiRequest("GET", `/admin/api/clients/${clientId}/pets`);
+          setClientPets(pets);
+        } catch (error) {
+          console.error("Error loading client and pets:", error);
+        }
+      }
+    };
+    
+    loadClientAndPets();
+  }, [guide?.clientId, urlClientId, client?.id, selectedClient]);
+
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       if (isEdit) {
@@ -117,6 +142,53 @@ export default function GuideForm() {
       });
     },
   });
+
+  // Search client by CPF
+  const searchClientByCpf = async () => {
+    const sanitizedCpf = cpfSearch.replace(/\D/g, ''); // Remove non-numeric characters
+    
+    if (!sanitizedCpf || sanitizedCpf.length !== 11) {
+      toast({
+        title: "CPF inválido",
+        description: "Digite um CPF válido com 11 dígitos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const client = await apiRequest("GET", `/admin/api/clients/cpf/${sanitizedCpf}`);
+      setSelectedClient(client);
+      form.setValue("clientId", client.id);
+      
+      // Load client pets
+      const pets = await apiRequest("GET", `/admin/api/clients/${client.id}/pets`);
+      setClientPets(pets);
+      
+      // Reset petId to prevent stale associations
+      form.setValue("petId", "");
+      
+      // Auto-select if only one pet
+      if (pets.length === 1) {
+        form.setValue("petId", pets[0].id);
+      }
+      
+      toast({
+        title: "Cliente encontrado",
+        description: `${client.fullName} - CPF: ${client.cpf}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Cliente não encontrado com este CPF.",
+        variant: "destructive",
+      });
+      setSelectedClient(null);
+      setClientPets([]);
+      form.setValue("clientId", "");
+      form.setValue("petId", "");
+    }
+  };
 
   const onSubmit = (data: any) => {
     if (!data.clientId || !data.petId) {
@@ -195,6 +267,81 @@ export default function GuideForm() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* CPF Search Field */}
+                <div className="space-y-2">
+                  <FormLabel>Cliente (CPF) *</FormLabel>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Digite o CPF do cliente"
+                      value={cpfSearch}
+                      onChange={(e) => setCpfSearch(e.target.value)}
+                      maxLength={14}
+                      style={{
+                        borderColor: 'var(--border-gray)',
+                        background: 'white'
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      onClick={searchClientByCpf}
+                      variant="outline"
+                      style={{ backgroundColor: '#FFFFFF' }}
+                    >
+                      Buscar
+                    </Button>
+                  </div>
+                  {selectedClient && (
+                    <p className="text-sm text-primary">
+                      Cliente: {selectedClient.fullName}
+                    </p>
+                  )}
+                </div>
+
+                {/* Pet Selection Field */}
+                <FormField
+                  control={form.control}
+                  name="petId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pet *</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value}
+                        disabled={!selectedClient || clientPets.length === 0}
+                      >
+                        <FormControl>
+                          <SelectTrigger 
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              background: 'white'
+                            }}
+                          >
+                            <SelectValue placeholder={
+                              !selectedClient ? "Busque um cliente primeiro" :
+                              clientPets.length === 0 ? "Cliente sem pets cadastrados" :
+                              "Selecione o pet"
+                            } />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {clientPets.flatMap((pet, index) => [
+                            <SelectItem 
+                              key={pet.id} 
+                              value={pet.id}
+                              className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                            >
+                              {pet.name} ({pet.species})
+                            </SelectItem>,
+                            ...(index < clientPets.length - 1 ? [<Separator key={`separator-${pet.id}`} />] : [])
+                          ])}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="type"

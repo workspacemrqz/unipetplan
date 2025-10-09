@@ -105,6 +105,7 @@ export interface IStorage {
   // Clients
   getClientByEmail(email: string): Promise<Client | undefined>;
   getClientById(id: string): Promise<Client | undefined>;
+  getClientByCpf(cpf: string): Promise<Client | undefined>;
   createClient(client: InsertClient): Promise<Client>;
   updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined>;
   deleteClient(id: string): Promise<boolean>;
@@ -288,6 +289,7 @@ export class InMemoryStorage implements IStorage {
   }
   async getClientByEmail(email: string): Promise<Client | undefined> { return undefined; }
   async getClientById(id: string): Promise<Client | undefined> { return undefined; }
+  async getClientByCpf(cpf: string): Promise<Client | undefined> { return undefined; }
   async createClient(client: InsertClient): Promise<Client> { return client as any; }
   async updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined> { return undefined; }
   async deleteClient(id: string): Promise<boolean> { return true; }
@@ -761,6 +763,33 @@ export class DatabaseStorage implements IStorage {
       return client;
     } catch (error) {
       console.error('❌ Error fetching client by id:', error);
+      return undefined;
+    }
+  }
+
+  async getClientByCpf(cpf: string): Promise<Client | undefined> {
+    try {
+      // Try exact match first
+      let [client] = await db
+        .select()
+        .from(clients)
+        .where(eq(clients.cpf, cpf))
+        .limit(1);
+      
+      // If not found and CPF is sanitized (digits only), try formatted variations
+      if (!client && /^\d+$/.test(cpf)) {
+        // Try common CPF format: 000.000.000-00
+        const formatted = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        [client] = await db
+          .select()
+          .from(clients)
+          .where(eq(clients.cpf, formatted))
+          .limit(1);
+      }
+      
+      return client;
+    } catch (error) {
+      console.error('❌ Error fetching client by cpf:', error);
       return undefined;
     }
   }

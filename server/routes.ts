@@ -1029,6 +1029,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search client by exact CPF
+  app.get("/admin/api/clients/cpf/:cpf", requireAdmin, async (req, res) => {
+    try {
+      const cpf = req.params.cpf.replace(/\D/g, ''); // Remove non-numeric characters
+      const client = await storage.getClientByCpf(cpf);
+      
+      if (!client) {
+        return res.status(404).json({ error: "Cliente não encontrado com este CPF" });
+      }
+      
+      res.json(client);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error searching client by CPF:", error);
+      res.status(500).json({ error: "Erro ao buscar cliente por CPF" });
+    }
+  });
+
   // Create new client
   app.post("/admin/api/clients", requireAdmin, validateCsrf, async (req, res) => {
     try {
