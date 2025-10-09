@@ -368,6 +368,17 @@ export default function Procedures() {
           if (updatedManualFields[index]?.['pagar']) {
             delete updatedManualFields[index]['pagar'];
           }
+          
+          // Se coparticipação estiver habilitada, recalcular baseado no novo valor integral
+          if ((updated[index] as any).enableCoparticipacao) {
+            const calculatedCoparticipation = calculateCoparticipationValue(value);
+            (updated[index] as any)['coparticipacao'] = calculatedCoparticipation;
+            
+            // Remover marcação de edição manual do campo 'coparticipacao' quando 'receber' é alterado
+            if (updatedManualFields[index]?.['coparticipacao']) {
+              delete updatedManualFields[index]['coparticipacao'];
+            }
+          }
         }
       }
     }
@@ -399,7 +410,7 @@ export default function Procedures() {
     const updated = [...selectedPlans];
     (updated[index] as any)[field] = value;
     
-    // Reset to default values when disabling
+    // Reset to default values when disabling or calculate when enabling
     if (!value) {
       if (field === 'enableCarencia') {
         (updated[index] as any)['carencia'] = '';
@@ -407,6 +418,15 @@ export default function Procedures() {
         (updated[index] as any)['limitesAnuais'] = '0';
       } else if (field === 'enableCoparticipacao') {
         (updated[index] as any)['coparticipacao'] = '0,00';
+      }
+    } else {
+      // Quando habilitar a coparticipação, calcular automaticamente baseado no valor integral
+      if (field === 'enableCoparticipacao') {
+        const receberValue = updated[index].receber;
+        if (receberValue && receberValue.trim() !== '' && receberValue !== '0,00') {
+          const calculatedCoparticipation = calculateCoparticipationValue(receberValue);
+          (updated[index] as any)['coparticipacao'] = calculatedCoparticipation;
+        }
       }
     }
     
@@ -450,6 +470,26 @@ export default function Procedures() {
     const payValue = receberNumber * percentage;
     
     return convertNumberToPrice(payValue);
+  };
+
+  // Função para calcular coparticipação baseado na porcentagem das regras
+  const calculateCoparticipationValue = (receberValue: string): string => {
+    if (!rulesSettings || typeof rulesSettings !== 'object' || !receberValue || receberValue.trim() === '') {
+      return '0,00';
+    }
+    
+    const settings = rulesSettings as any;
+    const coparticipationPercentage = settings?.coparticipationPercentage ?? 10; // Default 10% se não configurado
+    
+    if (coparticipationPercentage <= 0) {
+      return '0,00';
+    }
+    
+    const receberNumber = convertPriceToNumber(receberValue);
+    const percentage = coparticipationPercentage / 100;
+    const coparticipationValue = receberNumber * percentage;
+    
+    return convertNumberToPrice(coparticipationValue);
   };
 
   // Função para filtrar planos já selecionados
