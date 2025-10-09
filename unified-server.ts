@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { registerRoutes as registerUnipetRoutes } from "./server/routes.js";
 import { autoConfig } from "./server/config.js";
 import { initializeDatabase, closeDatabase } from "./server/db.js";
+import { configureSecurityMiddleware } from "./server/config/security.js";
 
 // Import ADMIN modules - using existing server routes with admin prefix
 // Note: Admin now integrated into main client app, APIs mounted at /admin/api/*
@@ -31,6 +32,9 @@ app.use(express.urlencoded({
 
 // Cookie parser for admin system
 app.use(cookieParser());
+
+// Configure security middleware (CORS, Helmet, etc.) BEFORE routes
+configureSecurityMiddleware(app);
 
 // Logging middleware otimizado
 app.use((req, res, next) => {
