@@ -18,7 +18,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, Eye, MoreHorizontal, ChevronLeft, ChevronRight, Star, Copy, Check, Loader2, MessageSquare } from "lucide-react";
+import { Search, Eye, MoreHorizontal, ChevronLeft, ChevronRight, Star, Copy, Check, Loader2, MessageSquare, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
@@ -337,8 +337,8 @@ export default function Evaluations() {
               ) : (
                 <TableRow className="bg-white border-b border-[#eaeaea]">
                   <TableCell colSpan={visibleColumns.length} className="text-center py-12 bg-white">
-                    <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
+                    <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground mb-4">
                       {searchQuery
                         ? "Nenhuma avaliação encontrada para a busca."
                         : "Nenhuma avaliação registrada ainda."
