@@ -60,7 +60,8 @@ export const users = pgTable("users", {
 // Rules settings table (Admin only)
 export const rulesSettings = pgTable("rules_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  fixedPercentage: integer("fixed_percentage").default(0), // Percentage for automatic calculation (0-100)
+  fixedPercentage: integer("fixed_percentage").default(0), // Percentage for automatic calculation of pay value (0-100)
+  coparticipationPercentage: integer("coparticipation_percentage").default(10), // Percentage for automatic calculation of coparticipation (0-100)
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -862,7 +863,8 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true, creat
 export const insertProcedureSchema = createInsertSchema(procedures).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertProcedurePlanSchema = createInsertSchema(procedurePlans).omit({ id: true, createdAt: true, isIncluded: true, displayOrder: true });
 export const insertRulesSettingsSchema = createInsertSchema(rulesSettings).omit({ id: true, createdAt: true, updatedAt: true }).extend({
-  fixedPercentage: z.number().min(0, "Porcentagem deve ser pelo menos 0").max(100, "Porcentagem deve ser no máximo 100").optional()
+  fixedPercentage: z.number().min(0, "Porcentagem deve ser pelo menos 0").max(100, "Porcentagem deve ser no máximo 100").optional(),
+  coparticipationPercentage: z.number().min(0, "Porcentagem deve ser pelo menos 0").max(100, "Porcentagem deve ser no máximo 100").optional()
 });
 export const insertGuideSchema = createInsertSchema(guides).omit({ id: true, createdAt: true, updatedAt: true });
 
