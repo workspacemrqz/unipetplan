@@ -978,9 +978,9 @@ export default function Procedures() {
                                   )}
                                 </div>
 
-                                {/* Receber */}
+                                {/* Valor integral */}
                                 <div>
-                                  <label className="text-sm font-medium text-primary">Receber (R$)</label>
+                                  <label className="text-sm font-medium text-primary">Valor integral</label>
                                   <InputMasked
                                     mask="price"
                                     value={selectedPlan.receber}
