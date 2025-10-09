@@ -1144,6 +1144,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==== ADMIN SATISFACTION SURVEYS ROUTES ====
+  // Get all satisfaction surveys with client details
+  app.get("/admin/api/satisfaction-surveys", requireAdmin, async (req, res) => {
+    try {
+      const surveys = await storage.getAllSatisfactionSurveys();
+      
+      // Enrich surveys with client details
+      const enrichedSurveys = await Promise.all(
+        surveys.map(async (survey) => {
+          try {
+            const client = await storage.getClientById(survey.clientId);
+            
+            let additionalInfo: any = {};
+            
+            // Get contract info if survey is related to a contract
+            if (survey.contractId) {
+              const contract = await storage.getContract(survey.contractId);
+              if (contract) {
+                additionalInfo = { contractNumber: contract.contractNumber };
+              }
+            }
+            
+            // Get service info if survey is related to service history
+            if (survey.serviceHistoryId) {
+              additionalInfo = { ...additionalInfo, serviceName: "Atendimento Veterinário" };
+            }
+            
+            // Get protocol info if survey is related to a protocol
+            if (survey.protocolId) {
+              const protocol = await storage.getProtocol(survey.protocolId);
+              if (protocol) {
+                additionalInfo = { ...additionalInfo, protocolSubject: protocol.subject };
+              }
+            }
+            
+            return {
+              ...survey,
+              clientName: client?.fullName || 'N/A',
+              clientEmail: client?.email || 'N/A',
+              ...additionalInfo
+            };
+          } catch (error) {
+            console.error(`❌ Error enriching survey ${survey.id}:`, error);
+            return survey;
+          }
+        })
+      );
+      
+      // Sort by date (newest first)
+      enrichedSurveys.sort((a, b) => {
+        const dateA = new Date(a.respondedAt);
+        const dateB = new Date(b.respondedAt);
+        return dateB.getTime() - dateA.getTime();
+      });
+      
+      res.json(enrichedSurveys);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching satisfaction surveys:", error);
+      res.status(500).json({ error: "Erro ao buscar avaliações" });
+    }
+  });
+
   // ==== ADMIN CONTRACTS ROUTES ====
   // Get all contracts with client and pet details
   app.get("/admin/api/contracts", requireAdmin, async (req, res) => {

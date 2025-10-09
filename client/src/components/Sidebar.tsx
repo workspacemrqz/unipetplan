@@ -11,7 +11,8 @@ import {
   UserCog,
   Settings,
   Stethoscope,
-  ClipboardList
+  ClipboardList,
+  Star
 } from "lucide-react";
 
 const navigation = [
@@ -27,7 +28,8 @@ const navigation = [
       { name: "Clientes & Pets", href: "/clientes", icon: Users },
       { name: "Guias de Atendimento", href: "/guias", icon: FileText },
       { name: "Rede Credenciada", href: "/rede", icon: Building2 },
-      { name: "Formulários", href: "/formularios", icon: Mail }
+      { name: "Formulários", href: "/formularios", icon: Mail },
+      { name: "Avaliações", href: "/avaliacoes", icon: Star }
     ]
   },
   {

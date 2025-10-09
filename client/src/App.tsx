@@ -75,6 +75,7 @@ import AdminUnitDashboard from './pages/admin/UnitDashboard';
 import AdminFinancial from './pages/admin/Financial';
 import AdminContracts from './pages/admin/Contracts';
 import AdminCoupons from './pages/admin/Coupons';
+import AdminEvaluations from './pages/admin/Evaluations';
 import AdminNotFound from './pages/admin/not-found';
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -122,6 +123,7 @@ function AdminRouter() {
             <Route path="/procedimentos" component={AdminProcedures} />
             <Route path="/perguntas-frequentes" component={AdminFAQ} />
             <Route path="/formularios" component={AdminContactSubmissions} />
+            <Route path="/avaliacoes" component={AdminEvaluations} />
             <Route path="/configuracoes" component={AdminSettings} />
             <Route path="/administracao" component={AdminAdministration} />
             
