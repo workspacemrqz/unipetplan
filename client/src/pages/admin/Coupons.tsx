@@ -25,6 +25,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/admin/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/admin/ui/alert-dialog";
 import { Label } from "@/components/admin/ui/label";
 import {
   Select,
@@ -33,10 +41,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/admin/ui/select";
-import { Plus, Edit, Trash2, DollarSign, Search, MoreHorizontal, ChevronLeft, ChevronRight, CreditCard } from "lucide-react";
+import { Plus, Edit, Trash2, DollarSign, Search, MoreHorizontal, ChevronLeft, ChevronRight, CreditCard, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { cn } from "@/lib/utils";
+import { apiRequest } from "@/lib/admin/queryClient";
 
 interface Coupon {
   id: string;
@@ -79,6 +88,10 @@ export default function Coupons() {
     validUntil: '',
     isActive: true,
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string>("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deletePasswordError, setDeletePasswordError] = useState("");
 
   const { data: coupons = [], isLoading } = useQuery<Coupon[]>({
     queryKey: ['/admin/api/coupons'],
@@ -197,6 +210,36 @@ export default function Coupons() {
       id, 
       data: { isActive: !currentStatus } 
     });
+  };
+
+  const handleDelete = (id: string) => {
+    setItemToDelete(id);
+    setDeletePassword("");
+    setDeletePasswordError("");
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      // Verificar senha
+      const response = await apiRequest("POST", "/admin/api/admin/verify-password", {
+        password: deletePassword,
+      });
+      
+      if (!response.valid) {
+        setDeletePasswordError("Senha incorreta");
+        return;
+      }
+
+      // Deletar cupom
+      deleteMutation.mutate(itemToDelete);
+      setDeleteDialogOpen(false);
+      setDeletePassword("");
+      setDeletePasswordError("");
+      setItemToDelete("");
+    } catch (error) {
+      setDeletePasswordError("Senha incorreta");
+    }
   };
 
   const allFilteredCoupons = Array.isArray(coupons) ? coupons.filter((coupon: Coupon) =>
@@ -467,11 +510,7 @@ export default function Coupons() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => {
-                              if (confirm('Tem certeza que deseja excluir este cupom?')) {
-                                deleteMutation.mutate(coupon.id);
-                              }
-                            }}
+                            onClick={() => handleDelete(coupon.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -549,6 +588,70 @@ export default function Coupons() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o 
+              cupom selecionado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="delete-password" className="text-sm font-medium">
+                Digite sua senha para confirmar
+              </label>
+              <Input
+                id="delete-password"
+                type="password"
+                value={deletePassword}
+                onChange={(e) => {
+                  setDeletePassword(e.target.value);
+                  setDeletePasswordError("");
+                }}
+                placeholder="Senha de administrador"
+                className={deletePasswordError ? "border-red-500" : ""}
+              />
+              {deletePasswordError && (
+                <p className="text-sm text-red-600">{deletePasswordError}</p>
+              )}
+            </div>
+          </div>
+
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteDialogOpen(false);
+                setDeletePassword("");
+                setDeletePasswordError("");
+                setItemToDelete("");
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              disabled={!deletePassword || deleteMutation.isPending}
+              className="min-w-[140px]"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Excluindo...
+                </>
+              ) : (
+                "Excluir Cupom"
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
