@@ -53,6 +53,7 @@ export default function GuideForm() {
 
   const form = useForm({
     resolver: zodResolver(insertGuideSchema),
+    mode: 'onChange',
     defaultValues: {
       clientId: urlClientId || "",
       petId: urlPetId || "",
@@ -340,7 +341,7 @@ export default function GuideForm() {
               variant="admin-action"
               size="sm"
               className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
-              disabled={mutation.isPending}
+              disabled={mutation.isPending || !form.formState.isValid || !form.getValues('type') || !form.getValues('procedure')}
               data-testid="button-save"
             >
               {mutation.isPending ? "Salvando..." : isEdit ? "Atualizar" : "Criar Guia"}
