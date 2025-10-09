@@ -1,25 +1,42 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit, Trash2, Percent, DollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/admin/ui/button";
+import { Input } from "@/components/admin/ui/input";
+import { Badge } from "@/components/admin/ui/badge";
+import { Switch } from "@/components/admin/ui/switch";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/admin/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/admin/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/admin/ui/dialog";
+import { Label } from "@/components/admin/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+} from "@/components/admin/ui/select";
+import { Plus, Edit, Trash2, Percent, DollarSign, Search, MoreHorizontal, ChevronLeft, ChevronRight, Tag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { cn } from "@/lib/utils";
 
 interface Coupon {
   id: string;
@@ -35,11 +52,24 @@ interface Coupon {
   updatedAt: string;
 }
 
+const allColumns = [
+  "Código",
+  "Tipo",
+  "Valor",
+  "Uso",
+  "Status",
+  "Ações",
+] as const;
+
 export default function Coupons() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { visibleColumns, toggleColumn } = useColumnPreferences('coupons.columns', allColumns);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const [formData, setFormData] = useState({
     code: '',
     type: 'percentage' as 'percentage' | 'fixed_value',
@@ -162,20 +192,34 @@ export default function Coupons() {
     }
   };
 
-  if (isLoading) {
-    return <div className="p-6">Carregando...</div>;
-  }
+  const handleToggleStatus = (id: string, currentStatus: boolean) => {
+    updateMutation.mutate({ 
+      id, 
+      data: { isActive: !currentStatus } 
+    });
+  };
+
+  const allFilteredCoupons = Array.isArray(coupons) ? coupons.filter((coupon: Coupon) =>
+    coupon.code?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
+
+  const totalCoupons = allFilteredCoupons.length;
+  const totalPages = Math.ceil(totalCoupons / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const filteredCoupons = allFilteredCoupons.slice(startIndex, endIndex);
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Cupons</h1>
-          <p className="text-gray-600">Gerencie os cupons de desconto</p>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Cupons</h1>
+          <p className="text-sm text-muted-foreground">Gerencie os cupons de desconto</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button variant="admin-action">
               <Plus className="h-4 w-4 mr-2" />
               Novo Cupom
             </Button>
@@ -287,7 +331,7 @@ export default function Coupons() {
                 <Button type="button" variant="outline" onClick={handleCloseDialog}>
                   Cancelar
                 </Button>
-                <Button type="submit">
+                <Button type="submit" variant="admin-action">
                   {editingCoupon ? 'Atualizar' : 'Criar'}
                 </Button>
               </div>
@@ -296,95 +340,218 @@ export default function Coupons() {
         </Dialog>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Código
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tipo
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Valor
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Uso
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ações
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {coupons.map((coupon) => (
-              <tr key={coupon.id}>
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                  {coupon.code}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {coupon.type === 'percentage' ? (
-                    <span className="flex items-center">
-                      <Percent className="h-4 w-4 mr-1" />
-                      Porcentagem
-                    </span>
-                  ) : (
-                    <span className="flex items-center">
-                      <DollarSign className="h-4 w-4 mr-1" />
-                      Valor Fixo
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {coupon.type === 'percentage'
-                    ? `${coupon.value}%`
-                    : `R$ ${parseFloat(coupon.value).toFixed(2)}`}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {coupon.usageCount} / {coupon.usageLimit || '∞'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      coupon.isActive
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {coupon.isActive ? 'Ativo' : 'Inativo'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEdit(coupon)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      if (confirm('Tem certeza que deseja excluir este cupom?')) {
-                        deleteMutation.mutate(coupon.id);
+      {/* Filters and Column Controls */}
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-10 w-80"
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                style={{
+                  borderColor: 'var(--border-gray)',
+                  background: 'white'
+                }}
+              >
+                <MoreHorizontal className="h-4 w-4 mr-2" />
+                Colunas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {allColumns.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col}
+                  checked={visibleColumns.includes(col)}
+                  onCheckedChange={() => toggleColumn(col)}
+                  className="mb-1"
+                >
+                  {col}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Modern Table Container */}
+      <div className="container my-10 space-y-4 border border-[#eaeaea] rounded-lg bg-white shadow-sm">
+        {/* Table */}
+        <div className="rounded-lg overflow-hidden">
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow className="bg-white border-b border-[#eaeaea]">
+                {visibleColumns.includes("Código") && <TableHead className="w-[150px] bg-white">Código</TableHead>}
+                {visibleColumns.includes("Tipo") && <TableHead className="w-[150px] bg-white">Tipo</TableHead>}
+                {visibleColumns.includes("Valor") && <TableHead className="w-[120px] bg-white">Valor</TableHead>}
+                {visibleColumns.includes("Uso") && <TableHead className="w-[120px] bg-white">Uso</TableHead>}
+                {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
+                {visibleColumns.includes("Ações") && <TableHead className="w-[150px] bg-white">Ações</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell colSpan={visibleColumns.length} className="text-center py-6">
+                      <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : filteredCoupons?.length ? (
+                filteredCoupons.map((coupon: Coupon) => (
+                  <TableRow key={coupon.id} className="bg-white border-b border-[#eaeaea]">
+                    {visibleColumns.includes("Código") && (
+                      <TableCell className="font-medium whitespace-nowrap bg-white">
+                        {coupon.code}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Tipo") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {coupon.type === 'percentage' ? (
+                          <span className="flex items-center">
+                            <Percent className="h-4 w-4 mr-1" />
+                            Porcentagem
+                          </span>
+                        ) : (
+                          <span className="flex items-center">
+                            <DollarSign className="h-4 w-4 mr-1" />
+                            Valor Fixo
+                          </span>
+                        )}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Valor") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <span className="font-bold text-foreground">
+                          {coupon.type === 'percentage'
+                            ? `${coupon.value}%`
+                            : `R$ ${parseFloat(coupon.value).toFixed(2)}`}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Uso") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <Badge className={cn("whitespace-nowrap", "border border-border rounded-lg bg-background text-foreground")}>
+                          {coupon.usageCount} / {coupon.usageLimit || '∞'}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Status") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <Switch
+                          checked={coupon.isActive}
+                          onCheckedChange={() => handleToggleStatus(coupon.id, coupon.isActive)}
+                          disabled={updateMutation.isPending}
+                        />
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Ações") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <div className="flex items-center space-x-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(coupon)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm('Tem certeza que deseja excluir este cupom?')) {
+                                deleteMutation.mutate(coupon.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow className="bg-white border-b border-[#eaeaea]">
+                  <TableCell colSpan={visibleColumns.length} className="text-center py-12 bg-white">
+                    <Tag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground mb-4">
+                      {searchQuery 
+                        ? "Nenhum cupom encontrado para a busca." 
+                        : "Nenhum cupom cadastrado ainda."
                       }
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-600" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {coupons.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            Nenhum cupom cadastrado
+                    </p>
+                    {!searchQuery && (
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsDialogOpen(true)}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Criar Primeiro Cupom
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
+        {totalCoupons > 10 && (
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              <div className="flex items-center space-x-2">
+                <p className="text-sm font-medium">
+                  {totalCoupons > 0 ? (
+                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalCoupons)} de {totalCoupons} cupo{totalCoupons !== 1 ? 'ns' : 'm'}</>
+                  ) : (
+                    "Nenhum cupom encontrado"
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1 || isLoading}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Anterior
+              </Button>
+              <div className="flex items-center space-x-1">
+                <span className="text-sm font-medium">
+                  Página {currentPage} de {totalPages}
+                </span>
+              </div>
+              <Button
+                variant="admin-action"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages || isLoading}
+              >
+                Próximo
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
       </div>

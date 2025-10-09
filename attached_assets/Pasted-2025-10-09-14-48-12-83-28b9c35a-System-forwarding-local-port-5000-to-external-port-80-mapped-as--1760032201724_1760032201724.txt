@@ -1,0 +1,152 @@
+2025-10-09 14:48:12.83
+28b9c35a
+System
+forwarding local port 5000 to external port 80 (mapped as 1104)
+2025-10-09 14:48:22.38
+28b9c35a
+User
+> PORT=5000 NODE_ENV=production tsx unified-server.ts
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🔍 Carregando .env de: /home/runner/workspace/.env
+2025-10-09 14:48:33.55
+28b9c35a
+User
+📄 Status do .env: Arquivo não encontrado (usando variáveis de ambiente do sistema)
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🔍 Variáveis de ambiente carregadas:
+2025-10-09 14:48:33.55
+28b9c35a
+User
+LOGIN: ✅ Configurado
+2025-10-09 14:48:33.55
+28b9c35a
+User
+SENHA: ✅ Configurado
+2025-10-09 14:48:33.55
+28b9c35a
+User
+DATABASE_URL: ✅ Configurado
+2025-10-09 14:48:33.55
+28b9c35a
+User
+NODE_ENV: production
+2025-10-09 14:48:33.55
+28b9c35a
+User
+✅ Todas as configurações obrigatórias estão presentes
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🔒 Validação de segurança concluída com sucesso
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+2025-10-09 14:48:33.55
+28b9c35a
+User
+=====================================
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🌍 Ambiente: production
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🔌 Porta: 5000
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🏠 Host: 0.0.0.0
+2025-10-09 14:48:33.55
+28b9c35a
+User
+💾 Armazenamento: local
+2025-10-09 14:48:33.55
+28b9c35a
+User
+🔑 Sessão: Configurada
+2025-10-09 14:48:33.55
+28b9c35a
+User
+📞 Contato: Configurado via ambiente/banco
+2025-10-09 14:48:33.55
+28b9c35a
+User
+=====================================
+2025-10-09 14:48:33.89
+28b9c35a
+User
+⚠️ Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+2025-10-09 14:48:34.62
+28b9c35a
+User
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+2025-10-09 14:48:35.68
+28b9c35a
+User
+🚀 Inicializando servidor unificado UNIPET + Admin...
+2025-10-09 14:48:35.68
+28b9c35a
+User
+🔌 Inicializando banco de dados...
+2025-10-09 14:48:35.68
+28b9c35a
+User
+🔌 Inicializando conexão com banco de dados...
+2025-10-09 14:48:36.54
+28b9c35a
+User
+✅ Conexão com banco de dados estabelecida com sucesso
+2025-10-09 14:48:36.54
+28b9c35a
+User
+📊 Pool configurado com 20 conexões máximas
+2025-10-09 14:48:36.54
+28b9c35a
+User
+✅ Banco de dados inicializado com sucesso
+2025-10-09 14:48:36.54
+28b9c35a
+User
+🛣️ Registrando rotas compartilhadas (/api/* e /admin/api/*)...
+2025-10-09 14:48:36.55
+28b9c35a
+User
+📁 [STATIC-FILES] Static file serving disabled - using Supabase Storage
+2025-10-09 14:48:36.55
+28b9c35a
+User
+✅ Procedure usage routes registered successfully
+2025-10-09 14:48:36.62
+28b9c35a
+User
+✅ Rotas registradas e compartilhadas com admin
+2025-10-09 14:48:36.62
+28b9c35a
+User
+📁 Admin integrado no cliente principal - usando dist/client para todas as rotas
+2025-10-09 14:48:36.62
+28b9c35a
+User
+📁 Configurando arquivos estáticos...
+2025-10-09 14:48:36.62
+28b9c35a
+User
+✅ Arquivos estáticos configurados (UNIPET sempre servido)
+2025-10-09 14:48:36.62
+28b9c35a
+User
+🛡️ Configurando tratamento de erros...
+2025-10-09 14:48:36.63
+28b9c35a
+User
+🎉 SERVIDOR UNIFICADO INICIADO COM SUCESSO!
+2025-10-09 14:48:36.63
+28b9c35a
+User
+==========================================
