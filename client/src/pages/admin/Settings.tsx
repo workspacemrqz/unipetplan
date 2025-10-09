@@ -75,6 +75,7 @@ export default function Settings() {
     resolver: zodResolver(insertRulesSettingsSchema),
     defaultValues: {
       fixedPercentage: 0,
+      coparticipationPercentage: 10,
     },
   });
 
@@ -190,6 +191,7 @@ export default function Settings() {
     if (rulesSettings && typeof rulesSettings === 'object' && !rulesLoading) {
       const mergedRulesSettings = {
         fixedPercentage: Number((rulesSettings as any).fixedPercentage ?? 0),
+        coparticipationPercentage: Number((rulesSettings as any).coparticipationPercentage ?? 10),
       };
       
       rulesForm.reset(mergedRulesSettings);
@@ -887,7 +889,7 @@ export default function Settings() {
                             name="fixedPercentage"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Porcentagem Fixa para Cálculo Automático</FormLabel>
+                                <FormLabel>Porcentagem para Valor a Pagar</FormLabel>
                                 <FormControl>
                                   <Input 
                                     {...field}
@@ -905,7 +907,36 @@ export default function Settings() {
                                 </FormControl>
                                 <FormMessage />
                                 <p className="text-sm text-muted-foreground">
-                                  Porcentagem que será aplicada automaticamente no campo "Pagar (R$)" quando inserir um valor em "Receber (R$)"
+                                  Porcentagem que será aplicada automaticamente no campo "Pagar (R$)" quando inserir um valor em "Valor integral"
+                                </p>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={rulesForm.control}
+                            name="coparticipationPercentage"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Porcentagem para Coparticipação</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field}
+                                    type="number" 
+                                    placeholder="Ex: 10" 
+                                    min="0" 
+                                    max="100"
+                                    value={field.value || ""}
+                                    onChange={(e) => {
+                                      const value = e.target.value === "" ? "" : Number(e.target.value);
+                                      field.onChange(value);
+                                    }}
+                                    data-testid="input-percentage-coparticipation"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                                <p className="text-sm text-muted-foreground">
+                                  Porcentagem que será aplicada automaticamente no campo "Coparticipação" quando habilitado, baseado no "Valor integral"
                                 </p>
                               </FormItem>
                             )}
