@@ -18,6 +18,7 @@ Preferred communication style: Simple, everyday language.
 -   **Responsiveness**: Dynamic grid adjustments for various content sections.
 -   **Image Handling**: Conditional rendering of images on public pages.
 -   **Admin UI Consistency (October 2025)**: All admin pages (Plans, Coupons, Evaluations) follow unified design pattern with `@/components/admin/ui`, border-[#eaeaea], bg-white tables, column visibility controls, and admin-action button variants.
+-   **Dropdown Standardization (October 2025)**: All 21 dropdown (Select) components across /admin routes standardized to match "Função *" field pattern from Administration.tsx: SelectTrigger with border-gray color and white background (inline style), SelectItem with py-3 pl-10 pr-4 padding and primary color selection, Separator components between items using .flatMap() pattern. Files: GuideForm, PetForm, Procedures, PlanForm, Contracts, Guides, Coupons, Settings, UnitDashboard.
 
 ### Technical Implementations
 -   **Backend**: Node.js with Express.js, TypeScript, ES modules.
