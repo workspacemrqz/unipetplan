@@ -7402,7 +7402,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const overdueInstallments: any[] = [];
 
       // ✅ OTIMIZAÇÃO: Buscar dados em batch para evitar N+1 queries
-      const activeContracts = contracts.filter(c => c.status !== 'cancelled' && c.status !== 'pending');
+      // Include 'active' and 'paid' status contracts as they might still need to show next renewal
+      const activeContracts = contracts.filter(c => c.status !== 'cancelled' && c.status !== 'pending' && c.status !== 'suspended');
       
       if (activeContracts.length === 0) {
         return res.json({ 
@@ -7535,9 +7536,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check each active contract and create next installment if needed
-      for (const contract of contracts) {
-        // Skip cancelled, pending or suspended contracts
-        if (contract.status !== 'active') {
+      for (const contract of activeContracts) {
+        // Skip only if the contract is in a final cancelled/suspended state
+        // Allow 'active' and 'paid' contracts to show next installments
+        if (contract.status === 'cancelled' || contract.status === 'suspended') {
           continue;
         }
         
@@ -7558,6 +7560,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 )
               : null;
             
+            // Check if there's already a pending installment that represents a future renewal
+            // We should only skip if there's a pending installment with a future due date
+            const pendingInstallments = allInstallments.filter(i => i.status === 'pending');
+            const futurePendingInstallment = pendingInstallments.find(inst => {
+              const dueDate = new Date(inst.dueDate);
+              return dueDate > now;
+            });
+            
+            // If there's already a future pending installment, it will be shown in 'current'
+            // so we don't need to create a virtual one
+            if (futurePendingInstallment) {
+              continue;
+            }
+            
             if (paidInstallment && paidInstallment.dueDate) {
               const paidDueDate = new Date(paidInstallment.dueDate);
               // ✅ BUG FIX: Calculate NEXT renewal date (1 year after the paid installment)
@@ -7566,8 +7582,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // ALWAYS show virtual next installment for annual plans (display only, not saved to DB)
               // Get pet and plan info for the virtual installment
-              const pet = await storage.getPet(contract.petId);
-              const plan = await storage.getPlan(contract.planId);
+              const pet = petsMap.get(contract.petId);
+              const plan = plansMap.get(contract.planId);
               
               // Use the annual amount from contract
               let annualAmount = contract.annualAmount;
@@ -7594,8 +7610,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 daysUntilDue: daysTilRenewal
               });
               
-              console.log(`[INSTALLMENTS] Showing virtual annual installment for contract ${contract.id}, ${daysTilRenewal} days until renewal`);
               continue;
+            } else if (!paidInstallment) {
+              // For annual contracts without any paid installment yet, create virtual first installment
+              // This might happen for new contracts that haven't been paid yet
+              const pet = petsMap.get(contract.petId);
+              const plan = plansMap.get(contract.planId);
+              
+              // Use the contract start date or current date for the first installment
+              const firstDueDate = contract.startDate ? new Date(contract.startDate) : new Date();
+              const daysTilDue = Math.ceil((firstDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+              
+              // Only show if the due date is in the future
+              if (daysTilDue > 0) {
+                let annualAmount = contract.annualAmount;
+                if (!annualAmount || parseFloat(annualAmount) === 0) {
+                  annualAmount = (parseFloat(contract.monthlyAmount) * 12).toFixed(2);
+                }
+                
+                // Add virtual first installment to display (not saved in DB)
+                nextInstallments.push({
+                  id: `virtual-first-${contract.id}`, // Virtual ID for first installment
+                  contractId: contract.id,
+                  contractNumber: contract.contractNumber,
+                  installmentNumber: 1,
+                  dueDate: firstDueDate.toISOString(),
+                  periodStart: firstDueDate.toISOString(), 
+                  periodEnd: addYears(firstDueDate, 1).toISOString(),
+                  amount: parseFloat(annualAmount),
+                  petName: pet?.name || 'Pet não encontrado',
+                  planName: plan?.name || 'Plano não encontrado',
+                  petId: contract.petId,
+                  planId: contract.planId,
+                  billingPeriod: contract.billingPeriod,
+                  status: 'current' as const,
+                  daysUntilDue: daysTilDue
+                });
+                
+                continue;
+              }
             }
           }
           
@@ -7677,9 +7730,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const newInstallment = await storage.createContractInstallment(newInstallmentData);
             console.log(`✅ [INSTALLMENTS] Created next installment for contract ${contract.id}: Installment #${nextNumber}`);
             
-            // Get pet and plan info for the response
-            const pet = await storage.getPet(contract.petId);
-            const plan = await storage.getPlan(contract.planId);
+            // Get pet and plan info for the response - use maps for consistency
+            const pet = petsMap.get(contract.petId) || await storage.getPet(contract.petId);
+            const plan = plansMap.get(contract.planId) || await storage.getPlan(contract.planId);
             
             // Add to nextInstallments for display
             const daysUntilDue = Math.ceil((nextDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
