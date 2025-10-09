@@ -4,6 +4,7 @@ import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Badge } from "@/components/admin/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
+import { Separator } from "@/components/admin/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
 import {
   Table,
@@ -340,12 +341,19 @@ export default function Contracts() {
               <SelectValue placeholder="Filtrar por status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os status</SelectItem>
-              <SelectItem value="active">Ativo</SelectItem>
-              <SelectItem value="inactive">Inativo</SelectItem>
-              <SelectItem value="suspended">Suspenso</SelectItem>
-              <SelectItem value="cancelled">Cancelado</SelectItem>
-              <SelectItem value="pending">Pendente</SelectItem>
+              {[
+                { value: "all", label: "Todos os status" },
+                { value: "active", label: "Ativo" },
+                { value: "inactive", label: "Inativo" },
+                { value: "suspended", label: "Suspenso" },
+                { value: "cancelled", label: "Cancelado" },
+                { value: "pending", label: "Pendente" }
+              ].flatMap((status, index, array) => [
+                <SelectItem key={status.value} value={status.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                  {status.label}
+                </SelectItem>,
+                ...(index < array.length - 1 ? [<Separator key={`separator-${status.value}`} />] : [])
+              ])}
             </SelectContent>
           </Select>
         </div>
@@ -680,11 +688,18 @@ export default function Contracts() {
                     <SelectValue placeholder="Selecione o status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="inactive">Inativo</SelectItem>
-                    <SelectItem value="suspended">Suspenso</SelectItem>
-                    <SelectItem value="cancelled">Cancelado</SelectItem>
-                    <SelectItem value="pending">Pendente</SelectItem>
+                    {[
+                      { value: "active", label: "Ativo" },
+                      { value: "inactive", label: "Inativo" },
+                      { value: "suspended", label: "Suspenso" },
+                      { value: "cancelled", label: "Cancelado" },
+                      { value: "pending", label: "Pendente" }
+                    ].flatMap((status, index, array) => [
+                      <SelectItem key={status.value} value={status.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                        {status.label}
+                      </SelectItem>,
+                      ...(index < array.length - 1 ? [<Separator key={`separator-${status.value}`} />] : [])
+                    ])}
                   </SelectContent>
                 </Select>
               </div>

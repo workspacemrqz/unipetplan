@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { FileText, User, Heart, MapPin, Clock, DollarSign, CheckCircle, XCircle, Eye, Users, CreditCard, Plus, Settings, Search, AlertCircle, Info } from "lucide-react";
 import { Link } from "wouter";
 import DigitalCard from "@/components/DigitalCard";
@@ -1015,15 +1016,21 @@ export default function UnitDashboard() {
                           value={guideForm.clientId} 
                           onValueChange={handleClientChange}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              background: 'white'
+                            }}
+                          >
                             <SelectValue placeholder="Selecione um cliente" />
                           </SelectTrigger>
                           <SelectContent>
-                            {availableClients.map(client => (
-                              <SelectItem key={client.id} value={client.id} className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                            {availableClients.flatMap((client, index, array) => [
+                              <SelectItem key={client.id} value={client.id} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                                 {client.fullName} - {client.cpf}
-                              </SelectItem>
-                            ))}
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${client.id}`} />] : [])
+                            ])}
                           </SelectContent>
                         </Select>
                       </div>
@@ -1037,15 +1044,21 @@ export default function UnitDashboard() {
                           onValueChange={handlePetChange}
                           disabled={!guideForm.clientId}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              background: 'white'
+                            }}
+                          >
                             <SelectValue placeholder="Selecione um pet" />
                           </SelectTrigger>
                           <SelectContent>
-                            {availablePets.map(pet => (
-                              <SelectItem key={pet.id} value={pet.id} className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                            {availablePets.flatMap((pet, index, array) => [
+                              <SelectItem key={pet.id} value={pet.id} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                                 {pet.name} - {pet.species} {pet.breed ? `(${pet.breed})` : ''}
-                              </SelectItem>
-                            ))}
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${pet.id}`} />] : [])
+                            ])}
                           </SelectContent>
                         </Select>
                         {!guideForm.clientId && (
@@ -1064,17 +1077,29 @@ export default function UnitDashboard() {
                           value={guideForm.type} 
                           onValueChange={(value) => setGuideForm(prev => ({ ...prev, type: value }))}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              background: 'white'
+                            }}
+                          >
                             <SelectValue placeholder="Selecione o tipo" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="consulta" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Consulta</SelectItem>
-                            <SelectItem value="exames" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Exames</SelectItem>
-                            <SelectItem value="cirurgia" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Cirurgia</SelectItem>
-                            <SelectItem value="internacao" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Internação</SelectItem>
-                            <SelectItem value="emergencia" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Emergência</SelectItem>
-                            <SelectItem value="procedimento" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Procedimento</SelectItem>
-                            <SelectItem value="reembolso" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Reembolso</SelectItem>
+                            {[
+                              { value: "consulta", label: "Consulta" },
+                              { value: "exames", label: "Exames" },
+                              { value: "cirurgia", label: "Cirurgia" },
+                              { value: "internacao", label: "Internação" },
+                              { value: "emergencia", label: "Emergência" },
+                              { value: "procedimento", label: "Procedimento" },
+                              { value: "reembolso", label: "Reembolso" }
+                            ].flatMap((type, index, array) => [
+                              <SelectItem key={type.value} value={type.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                                {type.label}
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${type.value}`} />] : [])
+                            ])}
                           </SelectContent>
                         </Select>
                       </div>
@@ -1088,18 +1113,24 @@ export default function UnitDashboard() {
                           onValueChange={handleProcedureChange}
                           disabled={!guideForm.petId || loadingProcedures}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              background: 'white'
+                            }}
+                          >
                             <SelectValue placeholder={loadingProcedures ? "Carregando procedimentos..." : "Selecione um procedimento"} />
                           </SelectTrigger>
                           <SelectContent>
-                            {availableProcedures.map(procedure => (
-                              <SelectItem key={procedure.id} value={procedure.id} className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                            {availableProcedures.flatMap((procedure, index, array) => [
+                              <SelectItem key={procedure.id} value={procedure.id} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                                 {procedure.name}
                                 {procedure.description && (
                                   <span className="text-xs text-gray-500 block">{procedure.description}</span>
                                 )}
-                              </SelectItem>
-                            ))}
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${procedure.id}`} />] : [])
+                            ])}
                           </SelectContent>
                         </Select>
                         {!guideForm.petId && (
@@ -1514,12 +1545,18 @@ export default function UnitDashboard() {
                             <SelectValue placeholder="Todos os tipos" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="all" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Todos os tipos</SelectItem>
-                            {Array.from(new Set(coverage.map(item => item.procedure.procedureType))).map(type => (
-                              <SelectItem key={type} value={type} className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                                {type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                              </SelectItem>
-                            ))}
+                            {[
+                              { value: "all", label: "Todos os tipos" },
+                              ...Array.from(new Set(coverage.map(item => item.procedure.procedureType))).map(type => ({
+                                value: type,
+                                label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                              }))
+                            ].flatMap((item, index, array) => [
+                              <SelectItem key={item.value} value={item.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                                {item.label}
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${item.value}`} />] : [])
+                            ])}
                           </SelectContent>
                         </Select>
                       </div>
@@ -1538,9 +1575,16 @@ export default function UnitDashboard() {
                             <SelectValue placeholder="Todas as coberturas" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="all" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Todas as coberturas</SelectItem>
-                            <SelectItem value="included" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Apenas incluídos</SelectItem>
-                            <SelectItem value="not_included" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Apenas não incluídos</SelectItem>
+                            {[
+                              { value: "all", label: "Todas as coberturas" },
+                              { value: "included", label: "Apenas incluídos" },
+                              { value: "not_included", label: "Apenas não incluídos" }
+                            ].flatMap((item, index, array) => [
+                              <SelectItem key={item.value} value={item.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                                {item.label}
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${item.value}`} />] : [])
+                            ])}
                           </SelectContent>
                         </Select>
                       </div>

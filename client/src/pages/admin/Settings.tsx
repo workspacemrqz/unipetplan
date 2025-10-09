@@ -18,6 +18,7 @@ import { SiteSettingsImageUpload } from "@/components/admin/ui/site-settings-ima
 import { ChatImageUpload } from "@/components/admin/ui/chat-image-upload";
 import { Switch } from "@/components/admin/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
+import { Separator } from "@/components/admin/ui/separator";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -728,8 +729,15 @@ export default function Settings() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="bottom-right">Inferior Direito</SelectItem>
-                                <SelectItem value="bottom-left">Inferior Esquerdo</SelectItem>
+                                {[
+                                  { value: "bottom-right", label: "Inferior Direito" },
+                                  { value: "bottom-left", label: "Inferior Esquerdo" }
+                                ].flatMap((position, index, array) => [
+                                  <SelectItem key={position.value} value={position.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                                    {position.label}
+                                  </SelectItem>,
+                                  ...(index < array.length - 1 ? [<Separator key={`separator-${position.value}`} />] : [])
+                                ])}
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -755,11 +763,18 @@ export default function Settings() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="sm">Pequeno</SelectItem>
-                                <SelectItem value="md">Médio</SelectItem>
-                                <SelectItem value="lg">Grande</SelectItem>
-                                <SelectItem value="xl">Extra Grande</SelectItem>
-                                <SelectItem value="full">Tela Cheia</SelectItem>
+                                {[
+                                  { value: "sm", label: "Pequeno" },
+                                  { value: "md", label: "Médio" },
+                                  { value: "lg", label: "Grande" },
+                                  { value: "xl", label: "Extra Grande" },
+                                  { value: "full", label: "Tela Cheia" }
+                                ].flatMap((size, index, array) => [
+                                  <SelectItem key={size.value} value={size.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                                    {size.label}
+                                  </SelectItem>,
+                                  ...(index < array.length - 1 ? [<Separator key={`separator-${size.value}`} />] : [])
+                                ])}
                               </SelectContent>
                             </Select>
                             <FormMessage />

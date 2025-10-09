@@ -41,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/admin/ui/select";
+import { Separator } from "@/components/admin/ui/separator";
 import { Plus, Edit, Trash2, DollarSign, Search, MoreHorizontal, ChevronLeft, ChevronRight, CreditCard, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
@@ -293,19 +294,29 @@ export default function Coupons() {
                     setFormData({ ...formData, type: value })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger
+                    style={{
+                      borderColor: 'var(--border-gray)',
+                      background: 'white'
+                    }}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="percentage">
-                      Porcentagem
-                    </SelectItem>
-                    <SelectItem value="fixed_value">
-                      <div className="flex items-center">
-                        <DollarSign className="h-4 w-4 mr-2" />
-                        Valor Fixo (R$)
-                      </div>
-                    </SelectItem>
+                    {[
+                      { value: "percentage", label: "Porcentagem" },
+                      { value: "fixed_value", label: "Valor Fixo (R$)", icon: true }
+                    ].flatMap((item, index, array) => [
+                      <SelectItem key={item.value} value={item.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                        {item.icon ? (
+                          <div className="flex items-center">
+                            <DollarSign className="h-4 w-4 mr-2" />
+                            {item.label}
+                          </div>
+                        ) : item.label}
+                      </SelectItem>,
+                      ...(index < array.length - 1 ? [<Separator key={`separator-${item.value}`} />] : [])
+                    ])}
                   </SelectContent>
                 </Select>
               </div>

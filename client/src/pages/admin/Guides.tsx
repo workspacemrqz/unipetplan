@@ -4,6 +4,7 @@ import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Badge } from "@/components/admin/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
+import { Separator } from "@/components/admin/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
 import {
   Table,
@@ -298,11 +299,12 @@ export default function Guides() {
               <SelectValue placeholder="Filtrar por tipo" />
             </SelectTrigger>
             <SelectContent>
-              {[{ value: "all", label: "Todos os tipos" }, ...GUIDE_TYPES.map(type => ({ value: type, label: getTypeLabel(type) }))].map((item) => (
-                <SelectItem key={item.value} value={item.value} className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+              {[{ value: "all", label: "Todos os tipos" }, ...GUIDE_TYPES.map(type => ({ value: type, label: getTypeLabel(type) }))].flatMap((item, index, array) => [
+                <SelectItem key={item.value} value={item.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                   {item.label}
-                </SelectItem>
-              ))}
+                </SelectItem>,
+                ...(index < array.length - 1 ? [<Separator key={`separator-${item.value}`} />] : [])
+              ])}
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value) => {
@@ -325,11 +327,12 @@ export default function Guides() {
                 { value: "open", label: "Abertas" },
                 { value: "closed", label: "Fechadas" },
                 { value: "cancelled", label: "Canceladas" }
-              ].map((status) => (
-                <SelectItem key={status.value} value={status.value} className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+              ].flatMap((status, index, array) => [
+                <SelectItem key={status.value} value={status.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                   {status.label}
-                </SelectItem>
-              ))}
+                </SelectItem>,
+                ...(index < array.length - 1 ? [<Separator key={`separator-${status.value}`} />] : [])
+              ])}
             </SelectContent>
           </Select>
         </div>

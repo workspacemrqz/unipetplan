@@ -18,7 +18,8 @@ import {
 } from "@/components/admin/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/admin/ui/form";
 import { CustomCheckbox } from "@/components/admin/ui/custom-checkbox";
-import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
+import { Separator } from "@/components/admin/ui/separator";
 import {
   Table,
   TableBody,
@@ -939,21 +940,19 @@ export default function Procedures() {
                                 data-testid="select-procedure-type"
                                 style={{
                                   borderColor: 'var(--border-gray)',
-                                  backgroundColor: '#FFFFFF'
+                                  background: 'white'
                                 }}
                               >
                                 <SelectValue placeholder="Selecione o tipo" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {PROCEDURE_TYPES.map((type, index) => (
-                                <React.Fragment key={type}>
-                                  <SelectItem value={type}>
-                                    {PROCEDURE_TYPE_LABELS[type as keyof typeof PROCEDURE_TYPE_LABELS]}
-                                  </SelectItem>
-                                  {index < PROCEDURE_TYPES.length - 1 && <SelectSeparator />}
-                                </React.Fragment>
-                              ))}
+                              {PROCEDURE_TYPES.flatMap((type, index, array) => [
+                                <SelectItem key={type} value={type} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                                  {PROCEDURE_TYPE_LABELS[type as keyof typeof PROCEDURE_TYPE_LABELS]}
+                                </SelectItem>,
+                                ...(index < array.length - 1 ? [<Separator key={`separator-${type}`} />] : [])
+                              ])}
                             </SelectContent>
                           </Select>
                           <FormMessage />
