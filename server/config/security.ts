@@ -3,20 +3,19 @@ import cors from "cors";
 import { Application } from "express";
 
 export function configureSecurityMiddleware(app: Application) {
-  // Security Headers com Helmet
+  // Security Headers com Helmet - Configuração ajustada para deployment
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "https://fonts.googleapis.com"],
-        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         imgSrc: ["'self'", "data:", "https:", "blob:"],
-        connectSrc: ["'self'", "https://tkzzxsbwkgcdmcreducm.supabase.co"],
+        connectSrc: ["'self'", "https://tkzzxsbwkgcdmcreducm.supabase.co", "https://*.replit.app", "https://*.replit.dev"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
         frameSrc: ["'none'"],
-        upgradeInsecureRequests: [],
       },
     },
     hsts: {
@@ -29,36 +28,35 @@ export function configureSecurityMiddleware(app: Application) {
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
   }));
 
-  // CORS Configuration
+  // CORS Configuration - Allow Replit deployment domains
   const allowedOrigins = process.env.NODE_ENV === 'production' 
     ? [
         'https://unipetplan.com.br', 
         'https://www.unipetplan.com.br',
-        process.env.REPLIT_DEPLOYMENT === 'true' ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : null
+        // Support both old and new Replit domain formats
+        'https://unipet.replit.app',
+        process.env.REPLIT_DEPLOYMENT === 'true' ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : null,
+        process.env.REPLIT_DEPLOYMENT === 'true' ? `https://${process.env.REPL_SLUG}.replit.app` : null
       ].filter(Boolean)
     : ['http://localhost:5000', 'http://127.0.0.1:5000', 'http://localhost:3000'];
 
   app.use(cors({
     origin: (origin, callback) => {
-      // ✅ SECURITY FIX: Strict origin validation
+      // ✅ DEPLOYMENT FIX: Allow same-origin requests (no origin header)
+      // This is required for deployed apps where frontend and backend are on same domain
       if (!origin) {
-        if (process.env.NODE_ENV === 'production') {
-          // Em produção, NUNCA permitir requisições sem origin
-          console.warn('⚠️ [CORS] Requisição sem origin bloqueada em produção');
-          return callback(new Error('Origin é obrigatória em produção'));
-        } else {
-          // Em desenvolvimento, permitir requisições sem origin (Replit, same-origin, etc)
-          return callback(null, true);
-        }
+        // Allow same-origin requests in both dev and production
+        return callback(null, true);
       }
       
-      // Permitir URLs do Replit durante desenvolvimento
-      if (process.env.NODE_ENV !== 'production' && origin.includes('.replit.dev')) {
-        console.log('✅ [CORS] Permitindo origem Replit em desenvolvimento:', origin);
+      // Permitir URLs do Replit durante desenvolvimento e produção
+      if (origin.includes('.replit.dev') || origin.includes('.replit.app')) {
+        console.log('✅ [CORS] Permitindo origem Replit:', origin);
         return callback(null, true);
       }
       
       if (allowedOrigins.includes(origin)) {
+        console.log('✅ [CORS] Origem permitida:', origin);
         callback(null, true);
       } else {
         console.warn(`⚠️ [CORS] Blocked request from origin: ${origin}`);

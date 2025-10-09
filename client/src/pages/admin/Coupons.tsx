@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/admin/ui/select";
-import { Plus, Edit, Trash2, Percent, DollarSign, Search, MoreHorizontal, ChevronLeft, ChevronRight, Tag } from "lucide-react";
+import { Plus, Edit, Trash2, DollarSign, Search, MoreHorizontal, ChevronLeft, ChevronRight, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { cn } from "@/lib/utils";
@@ -165,8 +165,8 @@ export default function Coupons() {
       type: coupon.type,
       value: coupon.value,
       usageLimit: coupon.usageLimit?.toString() || '',
-      validFrom: coupon.validFrom ? new Date(coupon.validFrom).toISOString().split('T')[0] : '',
-      validUntil: coupon.validUntil ? new Date(coupon.validUntil).toISOString().split('T')[0] : '',
+      validFrom: coupon.validFrom ? (new Date(coupon.validFrom).toISOString().split('T')[0] || '') : '',
+      validUntil: coupon.validUntil ? (new Date(coupon.validUntil).toISOString().split('T')[0] || '') : '',
       isActive: coupon.isActive,
     });
     setIsDialogOpen(true);
@@ -255,10 +255,7 @@ export default function Coupons() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="percentage">
-                      <div className="flex items-center">
-                        <Percent className="h-4 w-4 mr-2" />
-                        Porcentagem
-                      </div>
+                      Porcentagem
                     </SelectItem>
                     <SelectItem value="fixed_value">
                       <div className="flex items-center">
@@ -423,10 +420,7 @@ export default function Coupons() {
                     {visibleColumns.includes("Tipo") && (
                       <TableCell className="whitespace-nowrap bg-white">
                         {coupon.type === 'percentage' ? (
-                          <span className="flex items-center">
-                            <Percent className="h-4 w-4 mr-1" />
-                            Porcentagem
-                          </span>
+                          <span>Porcentagem</span>
                         ) : (
                           <span className="flex items-center">
                             <DollarSign className="h-4 w-4 mr-1" />
@@ -489,7 +483,7 @@ export default function Coupons() {
               ) : (
                 <TableRow className="bg-white border-b border-[#eaeaea]">
                   <TableCell colSpan={visibleColumns.length} className="text-center py-12 bg-white">
-                    <Tag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground mb-4">
                       {searchQuery 
                         ? "Nenhum cupom encontrado para a busca." 

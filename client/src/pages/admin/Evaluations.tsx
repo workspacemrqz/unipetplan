@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface SatisfactionSurvey {
   id: string;
@@ -48,7 +49,6 @@ const allColumns = [
   "Ações",
 ] as const;
 
-const statusStyle = "border border-border rounded-lg bg-background text-foreground";
 
 export default function Evaluations() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -306,7 +306,7 @@ export default function Evaluations() {
                     )}
                     {visibleColumns.includes("Recomendaria") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        <Badge className={statusStyle}>
+                        <Badge className={cn("whitespace-nowrap", "border border-border rounded-lg bg-background text-foreground")}>
                           {survey.wouldRecommend === true ? "Sim" : survey.wouldRecommend === false ? "Não" : "N/A"}
                         </Badge>
                       </TableCell>
@@ -455,7 +455,7 @@ export default function Evaluations() {
                       {renderStars(selectedSurvey.rating)}
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Recomendaria:</strong> <Badge className={statusStyle}>{selectedSurvey.wouldRecommend === true ? "Sim" : selectedSurvey.wouldRecommend === false ? "Não" : "Não informado"}</Badge></span>
+                      <span><strong className="text-primary">Recomendaria:</strong> <Badge className={cn("whitespace-nowrap", "border border-border rounded-lg bg-background text-foreground")}>{selectedSurvey.wouldRecommend === true ? "Sim" : selectedSurvey.wouldRecommend === false ? "Não" : "Não informado"}</Badge></span>
                     </div>
                   </div>
                 </div>
