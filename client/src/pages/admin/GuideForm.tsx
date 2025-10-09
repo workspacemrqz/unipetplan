@@ -170,6 +170,7 @@ export default function GuideForm() {
         onClick={() => setLocation("/guias")}
         data-testid="button-back-to-guides"
         className="w-full sm:w-auto"
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Voltar
@@ -179,7 +180,7 @@ export default function GuideForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
           {/* Guide Information */}
-          <Card>
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
             <CardHeader>
               <CardTitle className="text-foreground">Informações da Guia</CardTitle>
             </CardHeader>
@@ -195,10 +196,6 @@ export default function GuideForm() {
                         <FormControl>
                           <SelectTrigger 
                             data-testid="select-guide-type"
-                            style={{
-                              borderColor: 'var(--border-gray)',
-                              background: 'white'
-                            }}
                           >
                             <SelectValue placeholder="Selecione o tipo de guia" />
                           </SelectTrigger>
