@@ -14,7 +14,8 @@ import {
   Clipboard,
   DollarSign,
   File,
-  Ticket
+  Ticket,
+  Star
 } from "lucide-react";
 import { createCacheManager } from "@/lib/admin/cacheUtils";
 
@@ -34,7 +35,8 @@ const navigation = [
       { name: "Financeiro", href: "/financeiro", icon: DollarSign },
       { name: "Cupom", href: "/cupom", icon: Ticket },
       { name: "Contratos", href: "/contratos", icon: File },
-      { name: "Formulários", href: "/formularios", icon: Mail }
+      { name: "Formulários", href: "/formularios", icon: Mail },
+      { name: "Avaliações", href: "/avaliacoes", icon: Star }
     ]
   },
   {
