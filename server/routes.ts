@@ -1148,7 +1148,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all satisfaction surveys with client details
   app.get("/admin/api/satisfaction-surveys", requireAdmin, async (req, res) => {
     try {
+      console.log("✅ [ADMIN] Fetching satisfaction surveys...");
       const surveys = await storage.getAllSatisfactionSurveys();
+      console.log(`✅ [ADMIN] Found ${surveys.length} surveys`);
       
       // Enrich surveys with client details
       const enrichedSurveys = await Promise.all(
@@ -1199,6 +1201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return dateB.getTime() - dateA.getTime();
       });
       
+      console.log(`✅ [ADMIN] Returning ${enrichedSurveys.length} enriched surveys`);
       res.json(enrichedSurveys);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching satisfaction surveys:", error);
