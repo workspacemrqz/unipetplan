@@ -51,6 +51,13 @@ Preferred communication style: Simple, everyday language.
         -   Production: Unified server on port 5000 via `unified-server.ts`
         -   Deploy script: `PORT=5000 NODE_ENV=production npm start`
         -   Fixed deployment port mapping issue ensuring port 5000 is properly opened
+    -   **CORS & Security Fix (October 2025)**:
+        -   Fixed CORS blocking on deployed domain `https://unipet.replit.app/`
+        -   Added security middleware (`configureSecurityMiddleware`) to `unified-server.ts` 
+        -   Allowed Replit domains (`.replit.app`, `.replit.dev`) in CORS configuration
+        -   Fixed same-origin requests (no origin header) to work in production
+        -   Updated CSP to allow necessary inline scripts/styles for deployment
+        -   Ensured both dev (`server/index.ts`) and production (`unified-server.ts`) servers use same security config
 
 ## External Dependencies
 
