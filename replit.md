@@ -28,6 +28,12 @@ Preferred communication style: Simple, everyday language.
 -   **Security**: Helmet, CORS, rate limiting, input sanitization, CSRF, XSS, SQL injection prevention, comprehensive mass assignment protection.
 -   **Image Management**: Supabase Storage for uploads, Sharp for processing.
 -   **Feature Highlights**: Admin management (FAQs, Site Settings, Network Units, Procedures, Clients, Coupons, Evaluations/Satisfaction Surveys), customer dashboard (pets, procedures, financial, surveys), Unit Portal (client, pet management, guide creation), intelligent duplicate pet prevention, Brazilian phone formatting, password-protected deletions in admin, comprehensive coupon/discount system, differentiated billing logic (annual/monthly), strict billing period validation, customizable payment receipt PDFs, annual plan renewal countdown, and customer satisfaction tracking with admin review panel.
+-   **Guide Management (October 2025)**: 
+    -   Formulário de guias com filtro inteligente de procedimentos disponíveis por pet
+    -   Campo de procedimento mostra apenas procedimentos do plano do pet com uso disponível
+    -   Preenchimento automático de coparticipação baseado no procedimento selecionado
+    -   Validação de limites anuais e período de carência antes de exibir procedimentos
+    -   Exibição visual de "Sem coparticipação" quando valor é zero, mantendo valor numérico (0,00) para API
 -   **Performance**: Optimized login and navigation, reduced database queries, `AuthContext` with `sessionStorage` caching for client authentication data.
 -   **Security Audit (October 2025 - COMPLETA)**: 
     -   **Fase 1 (12 vulnerabilidades corrigidas)**: Admin bypass removed, cookies secure (sameSite=strict), logs sanitized, webhook authentication (HMAC-SHA256), session regeneration on all logins, CORS restricted, JWT secret enforcement, file upload validation with Sharp, error messages sanitized in production, session fixation prevention, API request timeouts (30s), CSP headers strengthened
