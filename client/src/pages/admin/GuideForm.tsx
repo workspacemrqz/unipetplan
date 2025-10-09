@@ -273,7 +273,7 @@ export default function GuideForm() {
                               >
                                 <div className="flex flex-col">
                                   <span>{proc.name}</span>
-                                  <span className="text-xs text-muted-foreground">
+                                  <span className="text-xs">
                                     Limite: {proc.remaining}/{proc.annualLimit} restantes
                                   </span>
                                 </div>
