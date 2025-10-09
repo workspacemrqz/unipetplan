@@ -17,6 +17,7 @@ Preferred communication style: Simple, everyday language.
 -   **Animation**: Framer Motion.
 -   **Responsiveness**: Dynamic grid adjustments for various content sections.
 -   **Image Handling**: Conditional rendering of images on public pages.
+-   **Admin UI Consistency (October 2025)**: All admin pages (Plans, Coupons, Evaluations) follow unified design pattern with `@/components/admin/ui`, border-[#eaeaea], bg-white tables, column visibility controls, and admin-action button variants.
 
 ### Technical Implementations
 -   **Backend**: Node.js with Express.js, TypeScript, ES modules.
