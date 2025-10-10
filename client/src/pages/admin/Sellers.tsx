@@ -114,7 +114,7 @@ export default function Sellers() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Vendedores</h1>
-        <Button onClick={() => setLocation("/admin/vendedores/novo")} className="flex items-center gap-2">
+        <Button onClick={() => setLocation("/vendedores/novo")} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Novo Vendedor
         </Button>
@@ -179,7 +179,7 @@ export default function Sellers() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setLocation(`/admin/vendedores/${seller.id}/editar`)}
+                        onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

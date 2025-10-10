@@ -102,7 +102,7 @@ export default function SellerForm() {
         title: isEdit ? "Vendedor atualizado" : "Vendedor cadastrado",
         description: isEdit ? "Vendedor foi atualizado com sucesso." : "Vendedor foi cadastrado com sucesso.",
       });
-      setLocation("/admin/vendedores");
+      setLocation("/vendedores");
     },
     onError: () => {
       toast({
@@ -164,7 +164,7 @@ export default function SellerForm() {
         type="button"
         variant="outline"
         size="sm"
-        onClick={() => setLocation("/admin/vendedores")}
+        onClick={() => setLocation("/vendedores")}
         className="w-full sm:w-auto"
         style={{ backgroundColor: '#FFFFFF' }}
       >
@@ -515,7 +515,7 @@ export default function SellerForm() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setLocation("/admin/vendedores")}
+              onClick={() => setLocation("/vendedores")}
             >
               Cancelar
             </Button>
