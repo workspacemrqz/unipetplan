@@ -271,21 +271,21 @@ export default function Settings() {
         >
           <TabsTrigger 
             value="site" 
-            className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="flex items-center justify-start gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             <CustomIcon name="Conteudo" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             <span className="truncate">Geral</span>
           </TabsTrigger>
           <TabsTrigger 
             value="chat" 
-            className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="flex items-center justify-start gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             <CustomIcon name="Chat" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             <span className="truncate">Chat</span>
           </TabsTrigger>
           <TabsTrigger 
             value="rules" 
-            className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="flex items-center justify-start gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             <CustomIcon name="Regras" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             <span className="truncate">Regras</span>
