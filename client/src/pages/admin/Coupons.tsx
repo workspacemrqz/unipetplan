@@ -647,13 +647,10 @@ export default function Coupons() {
             <Button
               onClick={confirmDelete}
               disabled={!deletePassword || deleteMutation.isPending}
-              className="min-w-[140px]"
+              className="min-w-[100px]"
             >
               {deleteMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Excluindo...
-                </>
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Excluir"
               )}

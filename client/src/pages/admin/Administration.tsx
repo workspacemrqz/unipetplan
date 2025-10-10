@@ -1184,13 +1184,10 @@ export default function Administration() {
               onClick={confirmDelete}
               disabled={!deletePassword || deleteMutation.isPending}
               data-testid="button-confirm-delete"
-              className="min-w-[140px]"
+              className="min-w-[100px]"
             >
               {deleteMutation.isPending ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Excluindo...
-                </div>
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Excluir"
               )}

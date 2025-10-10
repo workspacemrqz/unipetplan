@@ -636,13 +636,10 @@ export default function Network() {
             <Button
               onClick={confirmDelete}
               disabled={!deletePassword || deleteUnitMutation.isPending}
-              className="min-w-[140px]"
+              className="min-w-[100px]"
             >
               {deleteUnitMutation.isPending ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Excluindo...
-                </div>
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Excluir"
               )}
