@@ -15,8 +15,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, MoreHorizontal, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
+import { Search, Eye, MoreHorizontal, FileText, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { useToast } from "@/hooks/admin/use-toast";
 
 interface PlanDetail {
   planId: string;
@@ -41,12 +43,9 @@ interface Procedure {
 const allColumns = [
   "Procedimento",
   "Categoria",
-  "Plano",
-  "Valor Integral",
-  "Pagar (R$)",
-  "Coparticipação",
-  "Carência",
-  "Limites Anuais"
+  "Descrição",
+  "Status",
+  "Ações"
 ] as const;
 
 export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
@@ -54,7 +53,11 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProcedure, setSelectedProcedure] = useState<Procedure | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
   const { visibleColumns, toggleColumn } = useColumnPreferences('unit.procedures.columns', allColumns);
+  const { toast } = useToast();
   const pageSize = 10;
 
   useEffect(() => {
@@ -81,35 +84,11 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
     }
   };
 
-  // Create expanded rows for procedures with plans
-  const expandProceduresWithPlans = (procedures: Procedure[]) => {
-    const expanded: any[] = [];
-    procedures.forEach(procedure => {
-      if (procedure.plans && procedure.plans.length > 0) {
-        procedure.plans.forEach(plan => {
-          expanded.push({
-            ...procedure,
-            plan: plan
-          });
-        });
-      } else {
-        expanded.push({
-          ...procedure,
-          plan: null
-        });
-      }
-    });
-    return expanded;
-  };
-
-  const expandedProcedures = expandProceduresWithPlans(procedures);
-
-  const filteredProcedures = expandedProcedures.filter(item => {
+  const filteredProcedures = procedures.filter(procedure => {
     const searchLower = searchQuery.toLowerCase();
-    return item.name.toLowerCase().includes(searchLower) ||
-           item.category.toLowerCase().includes(searchLower) ||
-           (item.plan && item.plan.planName.toLowerCase().includes(searchLower)) ||
-           (item.description && item.description.toLowerCase().includes(searchLower));
+    return procedure.name.toLowerCase().includes(searchLower) ||
+           procedure.category.toLowerCase().includes(searchLower) ||
+           (procedure.description && procedure.description.toLowerCase().includes(searchLower));
   });
 
   const totalProcedures = filteredProcedures.length;
@@ -125,13 +104,67 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
     }).format(price / 100); // Convert from cents to reais
   };
 
+  const handleCopyToClipboard = async () => {
+    if (!selectedProcedure || copyState !== 'idle') return;
+    
+    try {
+      setCopyState('copying');
+      
+      let text = `VISUALIZAR PROCEDIMENTO\n`;
+      text += `${'='.repeat(50)}\n\n`;
+      
+      // Informações básicas
+      text += `NOME DO PROCEDIMENTO: ${selectedProcedure.name}\n`;
+      text += `CATEGORIA: ${selectedProcedure.category}\n\n`;
+      
+      // Planos vinculados
+      if (selectedProcedure.plans && selectedProcedure.plans.length > 0) {
+        text += `PLANOS VINCULADOS:\n`;
+        text += `${'-'.repeat(50)}\n\n`;
+        
+        selectedProcedure.plans.forEach((plan, index) => {
+          text += `${index + 1}. ${plan.planName}\n`;
+          text += `   Valor Integral: ${formatPrice(plan.price)}\n`;
+          text += `   Pagar (R$): ${formatPrice(plan.payValue)}\n`;
+          text += `   Coparticipação: ${plan.coparticipacao > 0 ? formatPrice(plan.coparticipacao) : 'N/A'}\n`;
+          text += `   Carência: ${plan.carencia || 'N/A'}\n`;
+          text += `   Limites Anuais: ${plan.limitesAnuais || 'N/A'}\n\n`;
+        });
+      } else {
+        text += `PLANOS VINCULADOS: Nenhum plano vinculado\n\n`;
+      }
+      
+      text += `${'='.repeat(50)}\n`;
+      text += `Preço no plano\n`;
+      
+      await navigator.clipboard.writeText(text);
+      
+      setCopyState('copied');
+      toast({
+        title: "Copiado!",
+        description: "Informações copiadas para a área de transferência.",
+      });
+      
+      setTimeout(() => {
+        setCopyState('idle');
+      }, 2000);
+    } catch (error) {
+      setCopyState('idle');
+      toast({
+        title: "Erro",
+        description: "Não foi possível copiar as informações.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Procedimentos</h1>
-          <p className="text-sm text-muted-foreground">Visualize todos os procedimentos disponíveis com detalhes dos planos</p>
+          <p className="text-sm text-muted-foreground">Visualize todos os procedimentos disponíveis</p>
         </div>
       </div>
 
@@ -167,7 +200,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                 Colunas
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-40">
               {allColumns.map((col) => (
                 <DropdownMenuCheckboxItem
                   key={col}
@@ -187,18 +220,15 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
       <div className="container my-10 space-y-4 border border-[#eaeaea] rounded-lg bg-white shadow-sm">
 
         {/* Table */}
-        <div className="rounded-lg overflow-x-auto">
+        <div className="rounded-lg overflow-hidden">
           <Table className="w-full">
             <TableHeader>
               <TableRow className="bg-white border-b border-[#eaeaea]">
-                {visibleColumns.includes("Procedimento") && <TableHead className="min-w-[200px] bg-white">Procedimento</TableHead>}
-                {visibleColumns.includes("Categoria") && <TableHead className="min-w-[140px] bg-white">Categoria</TableHead>}
-                {visibleColumns.includes("Plano") && <TableHead className="min-w-[150px] bg-white">Plano</TableHead>}
-                {visibleColumns.includes("Valor Integral") && <TableHead className="min-w-[120px] bg-white">Valor Integral</TableHead>}
-                {visibleColumns.includes("Pagar (R$)") && <TableHead className="min-w-[120px] bg-white">Pagar (R$)</TableHead>}
-                {visibleColumns.includes("Coparticipação") && <TableHead className="min-w-[130px] bg-white">Coparticipação</TableHead>}
-                {visibleColumns.includes("Carência") && <TableHead className="min-w-[100px] bg-white">Carência</TableHead>}
-                {visibleColumns.includes("Limites Anuais") && <TableHead className="min-w-[150px] bg-white">Limites Anuais</TableHead>}
+                {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
+                {visibleColumns.includes("Categoria") && <TableHead className="w-[140px] bg-white">Categoria</TableHead>}
+                {visibleColumns.includes("Descrição") && <TableHead className="w-[250px] bg-white">Descrição</TableHead>}
+                {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
+                {visibleColumns.includes("Ações") && <TableHead className="w-[80px] bg-white">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -211,68 +241,48 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                   </TableRow>
                 ))
               ) : displayProcedures && displayProcedures.length > 0 ? (
-                displayProcedures.map((item: any, index: number) => (
-                  <TableRow key={`${item.id}-${item.plan?.planId || index}`} className="bg-white border-b border-[#eaeaea] hover:bg-gray-50">
+                displayProcedures.map((procedure: Procedure) => (
+                  <TableRow key={procedure.id} className="bg-white border-b border-[#eaeaea]">
                     {visibleColumns.includes("Procedimento") && (
                       <TableCell className="font-medium whitespace-nowrap bg-white">
-                        {item.name}
+                        {procedure.name}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Categoria") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        {item.category}
+                        {procedure.category}
                       </TableCell>
                     )}
-                    {visibleColumns.includes("Plano") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        {item.plan ? (
-                          <span className="font-medium text-primary">
-                            {item.plan.planName}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Valor Integral") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        {item.plan ? formatPrice(item.plan.price) : '-'}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Pagar (R$)") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        {item.plan ? (
-                          <span className="font-semibold text-green-600">
-                            {formatPrice(item.plan.payValue)}
-                          </span>
-                        ) : '-'}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Coparticipação") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        {item.plan && item.plan.coparticipacao > 0 ? (
-                          <span className="text-orange-600">
-                            {formatPrice(item.plan.coparticipacao)}
-                          </span>
-                        ) : '-'}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Carência") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        {item.plan && item.plan.carencia ? (
-                          <span className="text-sm">
-                            {item.plan.carencia}
-                          </span>
-                        ) : '-'}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Limites Anuais") && (
+                    {visibleColumns.includes("Descrição") && (
                       <TableCell className="bg-white">
-                        {item.plan && item.plan.limitesAnuais ? (
-                          <span className="text-sm line-clamp-2">
-                            {item.plan.limitesAnuais}
-                          </span>
-                        ) : '-'}
+                        <span className="line-clamp-2">
+                          {procedure.description || "Não informada"}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Status") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          procedure.isActive
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {procedure.isActive ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Ações") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedProcedure(procedure);
+                            setDetailsOpen(true);
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     )}
                   </TableRow>
@@ -301,7 +311,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
               <div className="flex items-center space-x-2">
                 <p className="text-sm font-medium">
                   {totalProcedures > 0 ? (
-                    <>Mostrando {startIndex + 1} a {Math.min(endIndex, totalProcedures)} de {totalProcedures} registros</>
+                    <>Mostrando {startIndex + 1} a {Math.min(endIndex, totalProcedures)} de {totalProcedures} procedimentos</>
                   ) : (
                     "Nenhum procedimento encontrado"
                   )}
@@ -336,6 +346,133 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
           </div>
         )}
       </div>
+
+      {/* Enhanced Details Dialog with All Fields */}
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Visualizar Procedimento
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedProcedure && (
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <div className="border-b pb-4">
+                <h3 className="font-semibold text-lg mb-3">Informações Básicas</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Nome do Procedimento</label>
+                    <p className="font-medium">{selectedProcedure.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Categoria</label>
+                    <p className="font-medium">{selectedProcedure.category}</p>
+                  </div>
+                  {selectedProcedure.description && (
+                    <div className="col-span-2">
+                      <label className="text-sm text-muted-foreground">Descrição</label>
+                      <p className="text-sm mt-1">{selectedProcedure.description}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Plans Details */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Planos Vinculados</h3>
+                {selectedProcedure.plans && selectedProcedure.plans.length > 0 ? (
+                  <div className="space-y-4">
+                    {selectedProcedure.plans.map((plan, index) => (
+                      <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold text-lg text-primary">{plan.planName}</h4>
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                            Cobertura total com todos os benefícios inclusos
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="text-sm text-muted-foreground">Valor Integral</label>
+                            <p className="font-semibold text-base">{formatPrice(plan.price)}</p>
+                          </div>
+                          
+                          <div>
+                            <label className="text-sm text-muted-foreground">Pagar (R$)</label>
+                            <p className="font-semibold text-base text-green-600">
+                              {formatPrice(plan.payValue)}
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <label className="text-sm text-muted-foreground">Coparticipação</label>
+                            <p className="font-semibold text-base text-orange-600">
+                              {plan.coparticipacao > 0 ? formatPrice(plan.coparticipacao) : 'Sem coparticipação'}
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <label className="text-sm text-muted-foreground">Carência</label>
+                            <p className="font-medium text-sm">
+                              {plan.carencia || 'Sem carência'}
+                            </p>
+                          </div>
+                          
+                          <div className="md:col-span-2">
+                            <label className="text-sm text-muted-foreground">Limites Anuais</label>
+                            <p className="font-medium text-sm">
+                              {plan.limitesAnuais || 'Sem limites anuais'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {/* Summary */}
+                    <div className="bg-primary/5 rounded-lg p-4 mt-4">
+                      <p className="text-sm text-muted-foreground text-center">
+                        Preço no plano
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>Nenhum plano vinculado a este procedimento</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={handleCopyToClipboard}
+                  disabled={copyState !== 'idle'}
+                  className="flex items-center gap-2"
+                >
+                  {copyState === 'idle' && <Copy className="h-4 w-4" />}
+                  {copyState === 'copying' && <Copy className="h-4 w-4 animate-pulse" />}
+                  {copyState === 'copied' && <Check className="h-4 w-4 text-green-600" />}
+                  {copyState === 'idle' && 'Copiar'}
+                  {copyState === 'copying' && 'Copiando...'}
+                  {copyState === 'copied' && 'Copiado!'}
+                </Button>
+                
+                <Button
+                  variant="default"
+                  onClick={() => setDetailsOpen(false)}
+                >
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
