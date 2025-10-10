@@ -507,7 +507,7 @@ export default function Settings() {
                   {/* Content */}
                   <AccordionItem value="content" data-testid="accordion-content">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <FileText className="h-4 w-4" />
+                      <CustomIcon name="Conteudo" color="gray" className="h-4 w-4" />
                       <div>
                         <span>Conteúdo</span>
                       </div>
