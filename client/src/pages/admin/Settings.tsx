@@ -311,9 +311,8 @@ export default function Settings() {
           ) : (
             <Card className="border-[#eaeaea] bg-white shadow-sm">
               <CardHeader>
-                <CardTitle className="text-foreground flex items-center justify-start space-x-2">
-                  <CustomIcon name="Conteudo" className="h-5 w-5" />
-                  <span>Configurações Gerais</span>
+                <CardTitle className="text-foreground">
+                  Configurações Gerais
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -668,9 +667,8 @@ export default function Settings() {
           ) : (
             <Card className="border-[#eaeaea] bg-white shadow-sm">
               <CardHeader>
-                <CardTitle className="text-foreground flex items-center justify-start space-x-2">
-                  <CustomIcon name="Chat" className="h-5 w-5" />
-                  <span>Configurações do Chat</span>
+                <CardTitle className="text-foreground">
+                  Configurações do Chat
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -901,9 +899,8 @@ export default function Settings() {
               <form onSubmit={rulesForm.handleSubmit(onSubmitRules)} className="space-y-4 sm:space-y-6">
                 <Card className="border-[#eaeaea] bg-white shadow-sm">
                   <CardHeader>
-                    <CardTitle className="text-foreground flex items-center justify-start space-x-2">
-                      <CustomIcon name="Regras" className="h-5 w-5" />
-                      <span>Configurações de Regras</span>
+                    <CardTitle className="text-foreground">
+                      Configurações de Regras
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
