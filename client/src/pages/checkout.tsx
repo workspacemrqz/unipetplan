@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { motion } from 'framer-motion';
-import { CheckCircle, ArrowLeft, ArrowRight, Plus, Trash2, Edit, Check, Star } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, Plus, Trash2, Edit, Check, Star, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { CopyButton } from '@/components/ui/copy-button';
@@ -1959,17 +1959,12 @@ export default function Checkout() {
                 }}
               >
                 {isLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Processando...
-                  </>
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <>
-                    <span className="flex items-center">
-                      {currentStep === 4 ? 'Finalizar' : 'Próximo'}
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </span>
-                  </>
+                  <span className="flex items-center">
+                    {currentStep === 4 ? 'Finalizar' : 'Próximo'}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </span>
                 )}
               </button>
             </div>

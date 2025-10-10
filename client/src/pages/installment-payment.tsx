@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { ArrowLeft, CreditCard, Scan } from 'lucide-react';
+import { ArrowLeft, CreditCard, Scan, Loader2 } from 'lucide-react';
 import { CopyButton } from '@/components/ui/copy-button';
 
 interface InstallmentData {
@@ -885,11 +885,7 @@ export default function InstallmentPayment() {
                   }}
                 >
                   {isProcessingPayment ? (
-                    <span className="inline-flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 rounded-full animate-spin" 
-                        style={{borderColor: 'white', borderTopColor: 'transparent'}}></span>
-                      Processando...
-                    </span>
+                    <Loader2 className="h-4 w-4 animate-spin mx-auto" />
                   ) : (
                     'Pagar'
                   )}

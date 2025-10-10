@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { CopyButton } from '@/components/ui/copy-button';
 
 // Reutilizar tipos e utilitários do checkout principal
@@ -761,10 +761,7 @@ export default function RenewalCheckout() {
                   }}
                 >
                   {isProcessingPayment ? (
-                    <span className="flex items-center justify-center">
-                      <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
-                      Processando...
-                    </span>
+                    <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                   ) : (
                     'Renovar Contrato'
                   )}
