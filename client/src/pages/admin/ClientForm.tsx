@@ -112,6 +112,24 @@ export default function ClientForm() {
     mutation.mutate(data);
   };
 
+  const handleCEPLookup = async (cep: string) => {
+    const cleanCEP = cep.replace(/\D/g, "");
+    if (cleanCEP.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          form.setValue("address", data.logradouro || "");
+          form.setValue("district", data.bairro || "");
+          form.setValue("city", data.localidade || "");
+          form.setValue("state", data.uf || "");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
+  };
+
   if (isEdit && isLoading) {
     return (
       <div className="p-6">
