@@ -6337,17 +6337,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // 6. Check Out-of-Coverage Costs
   app.get("/api/customer/out-of-coverage", requireClient, async (req, res) => {
     try {
-      const { procedureType } = req.query;
-      
       // Get all procedures not covered by any plan (or procedures with 0% coverage)
       const allProcedures = await storage.getAllProcedures();
       
-      let outOfCoverageProcedures = allProcedures;
-      
-      // Filter by procedure type if provided
-      if (procedureType) {
-        outOfCoverageProcedures = allProcedures.filter(p => p.category === procedureType);
-      }
+      const outOfCoverageProcedures = allProcedures;
       
       const categorizedProcedures = outOfCoverageProcedures.reduce((acc, procedure) => {
         const cat = procedure.category || 'Outros';
