@@ -714,18 +714,17 @@ export default function Procedures() {
       text += "-".repeat(20) + "\n";
       
       viewingProcedurePlans.forEach((planItem: any, index: number) => {
-        text += `${index + 1}. Plano: ${planItem.planName ?? 'Nome não informado'}\n`;
-        text += `   Valor a Receber: R$ ${planItem.price ? (planItem.price / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}\n`;
-        text += `   Valor a Pagar: R$ ${planItem.payValue ? (planItem.payValue / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}\n`;
+        const plan = Array.isArray(plans) ? plans.find((p: any) => p.id === planItem.planId) : null;
+        text += `${index + 1}. Plano: ${plan?.name ?? 'Nome não informado'}\n`;
+        text += `   Valor Integral: R$ ${planItem.price ? (planItem.price / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}\n`;
+        text += `   Pagar (R$): R$ ${planItem.payValue ? (planItem.payValue / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}\n`;
         if (planItem.coparticipacao && planItem.coparticipacao > 0) {
           text += `   Coparticipação: R$ ${(planItem.coparticipacao / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
+        } else {
+          text += `   Coparticipação: Sem coparticipação\n`;
         }
-        if (planItem.carencia) {
-          text += `   Carência: ${planItem.carencia}\n`;
-        }
-        if (planItem.limitesAnuais) {
-          text += `   Limites Anuais: ${planItem.limitesAnuais}\n`;
-        }
+        text += `   Carência: ${planItem.carencia || '60 dias'}\n`;
+        text += `   Limites Anuais: ${planItem.limitesAnuais || '10 vezes no ano'}\n`;
         text += "\n";
       });
     } else {
