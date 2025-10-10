@@ -51,7 +51,7 @@ function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto p-3 sm:p-4 lg:p-6">
+        <main className="flex-1 overflow-auto p-3 sm:p-4 lg:p-6 bg-[var(--bg-cream-light)]" style={{ overscrollBehaviorY: 'contain' }}>
           <div className="container-mobile max-w-none">
             {children}
           </div>
