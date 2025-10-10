@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/admin/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
 import {
   Table,
   TableBody,
@@ -556,24 +556,6 @@ export default function Sellers() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Confirm Dialog */}
-      <Dialog open={confirmDialog.isOpen} onOpenChange={confirmDialog.closeDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{confirmDialog.title}</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-600 mb-4">{confirmDialog.description}</p>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={confirmDialog.closeDialog}>
-              {confirmDialog.cancelText || "Cancelar"}
-            </Button>
-            <Button type="button" onClick={confirmDialog.confirm} disabled={confirmDialog.isLoading}>
-              {confirmDialog.confirmText || "Confirmar"}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
