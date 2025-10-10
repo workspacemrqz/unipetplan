@@ -133,9 +133,24 @@ export default function GuideForm() {
           const petId = guide?.petId || urlPetId;
           if (petId) {
             form.setValue("petId", petId);
+            // When loading existing data, preserve other fields if editing
+            // But clear them if creating new (no guide data)
+            if (!guide) {
+              form.setValue("networkUnitId", "");
+              form.setValue("procedure", "");
+              form.setValue("generalNotes", "");
+              form.setValue("value", "");
+            }
           } else if (pets.length === 1) {
             // Auto-select if only one pet
             form.setValue("petId", pets[0].id);
+            // Clear dependent fields for new guides
+            if (!guide) {
+              form.setValue("networkUnitId", "");
+              form.setValue("procedure", "");
+              form.setValue("generalNotes", "");
+              form.setValue("value", "");
+            }
           }
         } catch (error) {
           console.error("Error loading client and pets:", error);
@@ -224,12 +239,17 @@ export default function GuideForm() {
       const pets = await apiRequest("GET", `/admin/api/clients/${client.id}/pets`);
       setClientPets(pets);
       
-      // Reset petId to prevent stale associations
+      // Reset ALL dependent fields when client changes
       form.setValue("petId", "");
+      form.setValue("networkUnitId", "");
+      form.setValue("procedure", "");
+      form.setValue("generalNotes", "");
+      form.setValue("value", "");
       
       // Auto-select if only one pet
       if (pets.length === 1) {
         form.setValue("petId", pets[0].id);
+        // Keep dependent fields cleared - user must select them again
       }
       
       toast({
@@ -246,6 +266,10 @@ export default function GuideForm() {
       setClientPets([]);
       form.setValue("clientId", "");
       form.setValue("petId", "");
+      form.setValue("networkUnitId", "");
+      form.setValue("procedure", "");
+      form.setValue("generalNotes", "");
+      form.setValue("value", "");
     } finally {
       setIsSearchingClient(false); // Stop loading
     }
