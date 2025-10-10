@@ -1135,8 +1135,13 @@ export default function Administration() {
                     variant="outline"
                     size="sm"
                     disabled={updateCredentialsMutation.isPending}
+                    className="min-w-[140px]"
                   >
-                    {updateCredentialsMutation.isPending ? "Salvando..." : "Salvar Credenciais"}
+                    {updateCredentialsMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Salvar Credenciais"
+                    )}
                   </Button>
                 </div>
               </form>

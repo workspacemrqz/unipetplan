@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertSiteSettingsSchema, insertRulesSettingsSchema, insertChatSettingsSchema } from "@shared/schema";
-import { Globe, Save, FileText, Share, Image, MessageSquare } from "lucide-react";
+import { Globe, Save, FileText, Share, Image, MessageSquare, Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SiteSettingsImageUpload } from "@/components/admin/ui/site-settings-image-upload";
 import { ChatImageUpload } from "@/components/admin/ui/chat-image-upload";
@@ -631,9 +631,16 @@ export default function Settings() {
                     size="sm"
                     disabled={saveSiteMutation.isPending}
                     data-testid="button-save-site"
+                    className="min-w-[140px]"
                   >
-                    <Save className="h-4 w-4 mr-2" />
-                    {saveSiteMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+                    {saveSiteMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Salvar Alterações
+                      </>
+                    )}
                   </Button>
                 </div>
                   </form>
@@ -856,9 +863,16 @@ export default function Settings() {
                         variant="admin-action"
                         size="sm"
                         disabled={saveChatMutation.isPending}
+                        className="min-w-[140px]"
                       >
-                        <Save className="h-4 w-4 mr-2" />
-                        {saveChatMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+                        {saveChatMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Salvar Alterações
+                          </>
+                        )}
                       </Button>
                     </div>
                   </form>
@@ -969,9 +983,16 @@ export default function Settings() {
                         size="sm"
                         disabled={saveRulesMutation.isPending}
                         data-testid="button-save-rules"
+                        className="min-w-[140px]"
                       >
-                        <Save className="h-4 w-4 mr-2" />
-                        {saveRulesMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+                        {saveRulesMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Salvar Alterações
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardContent>
