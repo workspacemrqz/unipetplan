@@ -27,20 +27,30 @@ const navigation = [
     ]
   },
   {
-    name: "Gestão",
+    name: "Clientes",
     items: [
       { name: "Clientes & Pets", href: "/clientes", icon: Users },
-      { name: "Guias de Atendimento", href: "/guias", icon: FileText },
-      { name: "Rede Credenciada", href: "/rede", icon: Building },
-      { name: "Financeiro", href: "/financeiro", icon: DollarSign },
-      { name: "Cupom", href: "/cupom", icon: Ticket },
       { name: "Contratos", href: "/contratos", icon: File },
+      { name: "Guias de Atendimento", href: "/guias", icon: FileText }
+    ]
+  },
+  {
+    name: "Financeiro",
+    items: [
+      { name: "Pagamentos", href: "/financeiro", icon: DollarSign },
+      { name: "Cupons", href: "/cupom", icon: Ticket }
+    ]
+  },
+  {
+    name: "Comunicação",
+    items: [
+      { name: "Rede Credenciada", href: "/rede", icon: Building },
       { name: "Formulários", href: "/formularios", icon: Mail },
       { name: "Avaliações", href: "/avaliacoes", icon: Star }
     ]
   },
   {
-    name: "Sistema",
+    name: "Configurações",
     items: [
       { name: "Planos de Saúde", href: "/planos", icon: CreditCard },
       { name: "Procedimentos", href: "/procedimentos", icon: Clipboard },
@@ -85,10 +95,10 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 px-6 pb-6 space-y-6 overflow-y-auto">
+      <nav className="flex-1 px-4 pb-6 space-y-8 overflow-y-auto">
         {navigation.map((section) => (
           <div key={section.name}>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 px-3">
               {section.name}
             </h3>
             <div className="space-y-1">
@@ -102,16 +112,19 @@ export default function Sidebar() {
                     key={item.name} 
                     href={item.href}
                     className={cn(
-                      "flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+                      "flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group",
                       isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-gray-600 hover:text-gray-900"
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "text-gray-600 hover:bg-primary/10 hover:text-primary"
                     )}
                     data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     onMouseEnter={() => handleNavigationHover(item.href)}
                   >
-                    <item.icon className="h-5 w-5 mr-3" />
-                    {item.name}
+                    <item.icon className={cn(
+                      "h-5 w-5 mr-3 transition-transform duration-200",
+                      !isActive && "group-hover:scale-110"
+                    )} />
+                    <span className="font-medium">{item.name}</span>
                   </Link>
                 );
               })}
