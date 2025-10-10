@@ -154,12 +154,16 @@ export default function GuideForm() {
     if (sanitizedCpf.length === 11) {
       searchClientByCpf();
     } 
-    // If CPF is cleared or modified (less than 11 digits), clear the client data
+    // If CPF is cleared or modified (less than 11 digits), clear all dependent data
     else if (sanitizedCpf.length < 11 && selectedClient) {
       setSelectedClient(null);
       setClientPets([]);
       form.setValue("clientId", "");
       form.setValue("petId", "");
+      form.setValue("networkUnitId", "");
+      form.setValue("procedure", "");
+      form.setValue("generalNotes", "");
+      form.setValue("value", "");
     }
   }, [cpfSearch]);
 
@@ -346,7 +350,14 @@ export default function GuideForm() {
                       <FormItem>
                         <FormLabel>Pet *</FormLabel>
                         <Select 
-                          onValueChange={field.onChange} 
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Reset dependent fields when pet changes
+                            form.setValue("networkUnitId", "");
+                            form.setValue("procedure", "");
+                            form.setValue("generalNotes", "");
+                            form.setValue("value", "");
+                          }} 
                           value={field.value}
                           disabled={!selectedClient || clientPets.length === 0}
                         >
