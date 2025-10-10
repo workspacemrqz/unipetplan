@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   MapPin, 
   Phone, 
@@ -148,11 +149,29 @@ export default function Network() {
     return buttons;
   };
 
+  // Skeleton loader for network units
+  const NetworkUnitSkeleton = () => (
+    <Card className="shadow-lg rounded-xl border bg-[var(--bg-cream-lighter)] overflow-hidden flex flex-col h-full" style={{borderColor: '#dbdbdb'}}>
+      <Skeleton className="w-full aspect-square rounded-t-xl" />
+      <CardContent className="px-6 pt-6 pb-0 flex flex-col flex-1">
+        <Skeleton className="h-6 w-3/4 mb-3" />
+        <div className="space-y-3 mb-6">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+        <div className="flex gap-3 mt-auto">
+          <Skeleton className="h-10 flex-1" />
+          <Skeleton className="h-10 w-10" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <main className="page-section bg-[var(--bg-cream-light)] min-h-screen">
       <div className="section-container">
         <div className="page-header">
-          <AnimatedSection animation="slideUp" delay={100}>
+          <AnimatedSection animation="slideUp" delay={0}>
             <h1 className="page-title text-[var(--text-teal)]">
               Principais Unidades
             </h1>
@@ -160,7 +179,7 @@ export default function Network() {
         </div>
 
         {/* Filter Section */}
-            <AnimatedSection animation="scale" delay={200}>
+            <AnimatedSection animation="scale" delay={50}>
               <div className="max-w-4xl mx-auto bg-[var(--bg-cream-lighter)] rounded-xl shadow-lg pt-10 pb-6 px-6 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                   {/* Search Input */}
@@ -257,8 +276,10 @@ export default function Network() {
             </AnimatedSection>
 
         {isLoading ? (
-            <div className="text-center py-12">
-              <p className="text-[var(--text-dark-primary)] text-lg">Carregando unidades da rede...</p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <NetworkUnitSkeleton key={i} />
+              ))}
             </div>
           ) : filteredUnits.length === 0 ? (
             <div className="text-center py-12">
@@ -266,7 +287,7 @@ export default function Network() {
             </div>
           ) : (
             <>
-              <AnimatedList animation="slideUp" delay={300} staggerDelay={75}>
+              <AnimatedList animation="slideUp" delay={100} staggerDelay={30}>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {currentUnits.map((unit: NetworkUnit) => (
                     <Card key={unit.id} className="shadow-lg rounded-xl border bg-[var(--bg-cream-lighter)] overflow-hidden flex flex-col h-full" style={{borderColor: '#dbdbdb'}}>
