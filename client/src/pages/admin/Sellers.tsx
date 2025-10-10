@@ -11,14 +11,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/admin/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/admin/ui/dropdown-menu";
 import { useLocation } from "wouter";
-import { Plus, Search, Edit, Trash2, Eye, Copy, Check, Loader2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Copy, Check, Loader2, FileText, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getQueryOptions } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmDialog } from "@/hooks/admin/use-confirm-dialog";
 import { useMasks } from "@/hooks/admin/use-masks";
+import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 
 interface Seller {
   id: string;
@@ -47,12 +54,25 @@ interface Seller {
   updatedAt?: string;
 }
 
+const allColumns = [
+  "Nome",
+  "Email",
+  "CPF",
+  "Cidade",
+  "CPA",
+  "Recorrente",
+  "Ações",
+] as const;
+
 export default function Sellers() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
+  const { visibleColumns, toggleColumn } = useColumnPreferences('sellers.columns', allColumns);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const confirmDialog = useConfirmDialog();
@@ -69,6 +89,13 @@ export default function Sellers() {
     seller.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     seller.cpf?.includes(searchQuery)
   );
+
+  // Calculate pagination
+  const totalSellers = filteredSellers.length;
+  const totalPages = Math.ceil(totalSellers / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const displaySellers = filteredSellers.slice(startIndex, endIndex);
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -229,6 +256,34 @@ export default function Sellers() {
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                style={{
+                  borderColor: 'var(--border-gray)',
+                  background: 'white'
+                }}
+              >
+                <MoreHorizontal className="h-4 w-4 mr-2" />
+                Colunas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {allColumns.map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column}
+                  checked={visibleColumns.includes(column)}
+                  onCheckedChange={() => toggleColumn(column)}
+                  className="mb-1"
+                >
+                  {column}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -239,70 +294,131 @@ export default function Sellers() {
           <Table className="w-full">
             <TableHeader>
               <TableRow className="bg-white border-b border-[#eaeaea]">
-                <TableHead className="w-[200px] bg-white">Nome</TableHead>
-                <TableHead className="w-[180px] bg-white">Email</TableHead>
-                <TableHead className="w-[120px] bg-white">CPF</TableHead>
-                <TableHead className="w-[120px] bg-white">Cidade</TableHead>
-                <TableHead className="w-[120px] bg-white">Comissão CPA</TableHead>
-                <TableHead className="w-[150px] bg-white">Comissão Recorrente</TableHead>
-                <TableHead className="w-[200px] bg-white">Ações</TableHead>
+                {visibleColumns.includes("Nome") && <TableHead className="w-[200px] bg-white">Nome</TableHead>}
+                {visibleColumns.includes("Email") && <TableHead className="w-[180px] bg-white">Email</TableHead>}
+                {visibleColumns.includes("CPF") && <TableHead className="w-[120px] bg-white">CPF</TableHead>}
+                {visibleColumns.includes("Cidade") && <TableHead className="w-[120px] bg-white">Cidade</TableHead>}
+                {visibleColumns.includes("CPA") && <TableHead className="w-[120px] bg-white">Comissão CPA</TableHead>}
+                {visibleColumns.includes("Recorrente") && <TableHead className="w-[150px] bg-white">Comissão Recorrente</TableHead>}
+                {visibleColumns.includes("Ações") && <TableHead className="w-[200px] bg-white">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 [...Array(5)].map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell colSpan={7} className="text-center py-6">
+                    <TableCell colSpan={visibleColumns.length} className="text-center py-6">
                       <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
                     </TableCell>
                   </TableRow>
                 ))
-              ) : filteredSellers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    Nenhum vendedor encontrado
+              ) : displaySellers.length === 0 ? (
+                <TableRow className="bg-white border-b border-[#eaeaea]">
+                  <TableCell colSpan={visibleColumns.length} className="text-center py-12 bg-white">
+                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      {searchQuery.length >= 2
+                        ? "Nenhum vendedor encontrado para a busca."
+                        : "Nenhum vendedor cadastrado ainda."
+                      }
+                    </p>
+                    {searchQuery.length < 2 && (
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="mt-4"
+                        onClick={() => setLocation("/vendedores/novo")}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Cadastrar Primeiro Vendedor
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredSellers.map((seller) => (
+                displaySellers.map((seller) => (
                   <TableRow key={seller.id} className="bg-white border-b border-[#eaeaea]">
-                    <TableCell className="font-medium whitespace-nowrap bg-white">{seller.fullName}</TableCell>
-                    <TableCell className="whitespace-nowrap bg-white">{seller.email}</TableCell>
-                    <TableCell className="whitespace-nowrap bg-white">{cpfMask(seller.cpf)}</TableCell>
-                    <TableCell className="whitespace-nowrap bg-white">{seller.city}</TableCell>
-                    <TableCell className="whitespace-nowrap bg-white">{seller.cpaPercentage}%</TableCell>
-                    <TableCell className="whitespace-nowrap bg-white">{seller.recurringCommissionPercentage}%</TableCell>
-                    <TableCell className="whitespace-nowrap bg-white">
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewDetails(seller)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(seller)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {visibleColumns.includes("Nome") && <TableCell className="font-medium whitespace-nowrap bg-white">{seller.fullName}</TableCell>}
+                    {visibleColumns.includes("Email") && <TableCell className="whitespace-nowrap bg-white">{seller.email}</TableCell>}
+                    {visibleColumns.includes("CPF") && <TableCell className="whitespace-nowrap bg-white">{cpfMask(seller.cpf)}</TableCell>}
+                    {visibleColumns.includes("Cidade") && <TableCell className="whitespace-nowrap bg-white">{seller.city}</TableCell>}
+                    {visibleColumns.includes("CPA") && <TableCell className="whitespace-nowrap bg-white">{seller.cpaPercentage}%</TableCell>}
+                    {visibleColumns.includes("Recorrente") && <TableCell className="whitespace-nowrap bg-white">{seller.recurringCommissionPercentage}%</TableCell>}
+                    {visibleColumns.includes("Ações") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <div className="flex items-center space-x-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(seller)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(seller)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
         </div>
+
+        {/* Pagination */}
+        {totalSellers > 10 && (
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              <div className="flex items-center space-x-2">
+                <p className="text-sm font-medium">
+                  {totalSellers > 0 ? (
+                    <>Mostrando {startIndex + 1} a {Math.min(endIndex, totalSellers)} de {totalSellers} vendedores</>
+                  ) : (
+                    "Nenhum vendedor encontrado"
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Anterior
+              </Button>
+              <div className="flex items-center space-x-1">
+                <span className="text-sm font-medium">
+                  Página {currentPage} de {totalPages}
+                </span>
+              </div>
+              <Button
+                variant="admin-action"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+              >
+                Próximo
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Details Dialog */}
