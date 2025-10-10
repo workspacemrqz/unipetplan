@@ -81,6 +81,7 @@ export default function Administration() {
   const [userToDelete, setUserToDelete] = useState<{ id: string; username: string } | null>(null);
   const [deletePassword, setDeletePassword] = useState("");
   const [deletePasswordError, setDeletePasswordError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const { visibleColumns, toggleColumn } = useColumnPreferences('administration.users.columns', allColumns);
   const { visibleColumns: visibleNetworkColumns, toggleColumn: toggleNetworkColumn } = useColumnPreferences('administration.network.columns', networkColumns);
   const [userCurrentPage, setUserCurrentPage] = useState(1);
@@ -278,6 +279,7 @@ export default function Administration() {
       return;
     }
 
+    setIsDeleting(true);
     try {
       // Verify password
       const response = await apiRequest("POST", "/admin/api/admin/verify-password", {
@@ -286,6 +288,7 @@ export default function Administration() {
 
       if (!response.valid) {
         setDeletePasswordError("Senha incorreta");
+        setIsDeleting(false);
         return;
       }
 
@@ -294,8 +297,10 @@ export default function Administration() {
       setDeleteDialogOpen(false);
       setDeletePassword("");
       setUserToDelete(null);
+      setIsDeleting(false);
     } catch (error) {
       setDeletePasswordError("Erro ao verificar senha");
+      setIsDeleting(false);
     }
   };
 
@@ -1182,11 +1187,11 @@ export default function Administration() {
             </Button>
             <Button
               onClick={confirmDelete}
-              disabled={!deletePassword || deleteMutation.isPending}
+              disabled={!deletePassword || isDeleting || deleteMutation.isPending}
               data-testid="button-confirm-delete"
               className="min-w-[100px]"
             >
-              {deleteMutation.isPending ? (
+              {isDeleting || deleteMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Excluir"

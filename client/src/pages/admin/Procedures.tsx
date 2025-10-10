@@ -115,6 +115,7 @@ export default function Procedures() {
   const [itemToDelete, setItemToDelete] = useState<string>("");
   const [deletePassword, setDeletePassword] = useState("");
   const [deletePasswordError, setDeletePasswordError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const { visibleColumns, toggleColumn } = useColumnPreferences('procedures.columns', allColumns);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -774,6 +775,7 @@ export default function Procedures() {
   };
 
   const confirmDelete = async () => {
+    setIsDeleting(true);
     try {
       // Verificar senha
       const response = await apiRequest("POST", "/admin/api/admin/verify-password", {
@@ -782,6 +784,7 @@ export default function Procedures() {
       
       if (!response.valid) {
         setDeletePasswordError("Senha incorreta");
+        setIsDeleting(false);
         return;
       }
 
@@ -791,8 +794,10 @@ export default function Procedures() {
       setDeletePassword("");
       setDeletePasswordError("");
       setItemToDelete("");
+      setIsDeleting(false);
     } catch (error) {
       setDeletePasswordError("Senha incorreta");
+      setIsDeleting(false);
     }
   };
 
@@ -1563,10 +1568,10 @@ export default function Procedures() {
             </Button>
             <Button
               onClick={confirmDelete}
-              disabled={!deletePassword || deleteMutation.isPending}
+              disabled={!deletePassword || isDeleting || deleteMutation.isPending}
               className="min-w-[100px]"
             >
-              {deleteMutation.isPending ? (
+              {isDeleting || deleteMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Excluir"
