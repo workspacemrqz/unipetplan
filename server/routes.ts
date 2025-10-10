@@ -1689,6 +1689,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const guideData = insertGuideSchema.parse(req.body);
       
+      // Convert Brazilian decimal format (10,00) to numeric format (10.00)
+      if (guideData.value && typeof guideData.value === 'string') {
+        guideData.value = guideData.value.replace('.', '').replace(',', '.');
+      }
+      
       console.log(`📝 [ADMIN] Creating new guide:`, guideData);
       
       const newGuide = await storage.createGuide(guideData);
@@ -1742,6 +1747,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/admin/api/guides/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const guideData = insertGuideSchema.partial().parse(req.body);
+      
+      // Convert Brazilian decimal format (10,00) to numeric format (10.00)
+      if (guideData.value && typeof guideData.value === 'string') {
+        guideData.value = guideData.value.replace('.', '').replace(',', '.');
+      }
+      
       const updatedGuide = await storage.updateGuide(req.params.id, guideData);
       
       if (!updatedGuide) {
