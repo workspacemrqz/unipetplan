@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Badge } from "@/components/admin/ui/badge";
@@ -88,6 +88,7 @@ export default function Guides() {
   const { toast } = useToast();
   const confirmDialog = useConfirmDialog();
   const passwordDialog = usePasswordDialog();
+  const queryClient = useQueryClient();
 
   const [dateFilter, setDateFilter] = useState<{
     startDate: CalendarDate | null;
@@ -177,8 +178,9 @@ export default function Guides() {
       setEditOpen(false);
       setEditingGuide(null);
       
-      // Recarregar os dados
-      window.location.reload();
+      // Invalidar as queries para recarregar os dados
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/guides/with-network-units"] });
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/guides"] });
     } catch (error) {
       toast({
         title: "Erro",
