@@ -293,6 +293,12 @@ export const queryOptions = {
     users: {
       staleTime: 15 * 60 * 1000, // 15 minutos
       gcTime: 30 * 60 * 1000, // 30 minutos
+    },
+    
+    // Sellers data
+    sellers: {
+      staleTime: 10 * 60 * 1000, // 10 minutos
+      gcTime: 30 * 60 * 1000, // 30 minutos
     }
   }
 };
@@ -366,6 +372,11 @@ export const queryKeys = {
   contactSubmissions: {
     all: () => ["/admin/api/contact-submissions"] as const,
     detail: (id: string) => ["/admin/api/contact-submissions", id] as const,
+  },
+  
+  sellers: {
+    all: () => ["/admin/api/sellers"] as const,
+    detail: (id: string) => ["/admin/api/sellers", id] as const,
   },
 } as const;
 

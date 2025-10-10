@@ -58,7 +58,7 @@ export default function Sellers() {
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { ConfirmDialog, confirm } = useConfirmDialog();
+  const confirmDialog = useConfirmDialog();
   const { applyCPFMask: cpfMask, applyPhoneMask: phoneMask, applyCEPMask: cepMask } = useMasks();
 
   // Form state
@@ -220,15 +220,16 @@ export default function Sellers() {
     }
   };
 
-  const handleDelete = async (seller: Seller) => {
-    const confirmed = await confirm({
+  const handleDelete = (seller: Seller) => {
+    confirmDialog.openDialog({
       title: "Confirmar exclusão",
       description: `Deseja realmente excluir o vendedor ${seller.fullName}?`,
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+      onConfirm: () => {
+        deleteMutation.mutate(seller.id);
+      },
     });
-
-    if (confirmed) {
-      deleteMutation.mutate(seller.id);
-    }
   };
 
   return (
@@ -611,7 +612,23 @@ export default function Sellers() {
         </DialogContent>
       </Dialog>
 
-      <ConfirmDialog />
+      {/* Confirm Dialog */}
+      <Dialog open={confirmDialog.isOpen} onOpenChange={confirmDialog.closeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{confirmDialog.title}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600 mb-4">{confirmDialog.description}</p>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={confirmDialog.closeDialog}>
+              {confirmDialog.cancelText || "Cancelar"}
+            </Button>
+            <Button type="button" onClick={confirmDialog.confirm} disabled={confirmDialog.isLoading}>
+              {confirmDialog.confirmText || "Confirmar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
