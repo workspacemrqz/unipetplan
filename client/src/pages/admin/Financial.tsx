@@ -56,7 +56,7 @@ const paymentMethodLabels: Record<string, string> = {
 
 const statusLabels: Record<string, string> = {
   generated: "Gerado",
-  downloaded: "Baixado",
+  downloaded: "Concluído",
   sent: "Enviado",
 };
 
