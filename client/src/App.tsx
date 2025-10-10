@@ -85,6 +85,7 @@ import { SellerAuthProvider } from './contexts/SellerAuthContext';
 // Import seller pages
 import SellerLogin from './pages/seller-login';
 import SellerDashboard from './pages/seller-dashboard';
+import SellerLink from './pages/seller-link';
 import SellerReferral from './pages/seller-referral';
 
 // AdminRouter - handles all admin routes with base="/admin"
@@ -190,6 +191,7 @@ function Router() {
         {/* Seller Area Routes */}
         <Route path="/vendedor/login" component={SellerLogin} />
         <Route path="/vendedor/dashboard" component={SellerDashboard} />
+        <Route path="/vendedor/link" component={SellerLink} />
         <Route path="/vendedor/:slug" component={SellerReferral} />
         
         {/* Unit Routes - specific paths first */}

@@ -5,7 +5,7 @@ import {
   Home,
   Users,
   FileText,
-  ClipboardList,
+  Clipboard,
   LogOut
 } from "lucide-react";
 
@@ -25,7 +25,7 @@ export default function UnitSidebar() {
       items: [
         { name: "Guias de Atendimento", href: `/unidade/${slug}/guias`, icon: FileText },
         { name: "Clientes & Pets", href: `/unidade/${slug}/clientes`, icon: Users },
-        { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: ClipboardList }
+        { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard }
       ]
     }
   ];
