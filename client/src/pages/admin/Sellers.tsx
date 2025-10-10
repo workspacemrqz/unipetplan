@@ -250,8 +250,6 @@ export default function Sellers() {
         </DialogContent>
       </Dialog>
 
-      </Dialog>
-
       {/* Confirm Dialog */}
       <Dialog open={confirmDialog.isOpen} onOpenChange={confirmDialog.closeDialog}>
         <DialogContent>
