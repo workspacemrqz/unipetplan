@@ -1280,10 +1280,16 @@ export default function Procedures() {
           
           {viewingItem && (
             <div className="space-y-6">
-              {/* Nome do Procedimento */}
-              <div>
-                <label className="text-sm font-medium text-foreground">Nome do Procedimento</label>
+              {/* Nome do Procedimento e Categoria */}
+              <div className="border-b pb-4">
+                <label className="text-sm font-medium text-muted-foreground">Nome do Procedimento</label>
                 <h3 className="text-lg font-medium mt-1">{viewingItem.name ?? ''}</h3>
+                {viewingItem.category && (
+                  <div className="mt-3">
+                    <label className="text-sm font-medium text-muted-foreground">Categoria</label>
+                    <p className="text-base mt-1">{viewingItem.category}</p>
+                  </div>
+                )}
                 {viewingItem.description && (
                   <p className="text-sm text-muted-foreground mt-2">{viewingItem.description}</p>
                 )}
@@ -1292,29 +1298,72 @@ export default function Procedures() {
                 </Badge>
               </div>
 
-              {/* Tipo de Procedimento */}
-
-              {/* Planos Vinculados */}
+              {/* Planos Vinculados com todos os campos */}
               <div>
-                <label className="text-sm font-medium text-foreground">Planos Vinculados</label>
+                <label className="text-sm font-medium text-foreground mb-3 block">Planos Vinculados</label>
                 <div className="mt-2">
                   {viewingProcedurePlans && Array.isArray(viewingProcedurePlans) && viewingProcedurePlans.length > 0 ? (
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       {viewingProcedurePlans.map((planItem: any) => {
                         const plan = Array.isArray(plans) ? plans.find((p: any) => p.id === planItem.planId) : null;
                         return (
-                          <div key={planItem.planId} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
-                            <div>
-                              <p className="font-medium">{plan?.name || 'Plano não encontrado'}</p>
+                          <div key={planItem.planId} className="border rounded-lg p-4 bg-muted/10">
+                            {/* Nome do Plano */}
+                            <div className="mb-4 pb-3 border-b">
+                              <p className="font-semibold text-base text-primary">{plan?.name || 'Plano não encontrado'}</p>
                               {plan?.description && (
-                                <p className="text-sm text-muted-foreground">{plan.description}</p>
+                                <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
                               )}
                             </div>
-                            <div className="text-right">
-                              <p className="font-medium text-lg">
-                                R$ {(planItem.price / 100).toFixed(2).replace('.', ',')}
-                              </p>
-                              <p className="text-xs text-muted-foreground">Preço no plano</p>
+                            
+                            {/* Grid com todos os campos */}
+                            <div className="grid grid-cols-2 gap-4">
+                              {/* Valor Integral */}
+                              <div>
+                                <label className="text-xs text-muted-foreground">Valor Integral</label>
+                                <p className="font-medium text-base mt-1">
+                                  R$ {(planItem.price / 100).toFixed(2).replace('.', ',')}
+                                </p>
+                              </div>
+
+                              {/* Pagar (R$) */}
+                              <div>
+                                <label className="text-xs text-muted-foreground">Pagar (R$)</label>
+                                <p className="font-medium text-base text-green-600 mt-1">
+                                  R$ {planItem.payValue ? (planItem.payValue / 100).toFixed(2).replace('.', ',') : '0,00'}
+                                </p>
+                              </div>
+
+                              {/* Coparticipação */}
+                              <div>
+                                <label className="text-xs text-muted-foreground">Coparticipação</label>
+                                <p className="font-medium text-base text-orange-600 mt-1">
+                                  {planItem.coparticipacao > 0 
+                                    ? `R$ ${(planItem.coparticipacao / 100).toFixed(2).replace('.', ',')}` 
+                                    : 'Sem coparticipação'}
+                                </p>
+                              </div>
+
+                              {/* Carência */}
+                              <div>
+                                <label className="text-xs text-muted-foreground">Carência</label>
+                                <p className="font-medium text-base mt-1">
+                                  {planItem.carencia || 'Sem carência'}
+                                </p>
+                              </div>
+
+                              {/* Limites Anuais */}
+                              <div className="col-span-2">
+                                <label className="text-xs text-muted-foreground">Limites Anuais</label>
+                                <p className="font-medium text-base mt-1">
+                                  {planItem.limitesAnuais || 'Sem limites anuais'}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Nota no final de cada plano */}
+                            <div className="mt-3 pt-3 border-t">
+                              <p className="text-xs text-muted-foreground text-center">Preço no plano</p>
                             </div>
                           </div>
                         );
