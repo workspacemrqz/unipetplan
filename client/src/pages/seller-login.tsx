@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from "framer-motion";
 import { Lock, Mail, CreditCard, Loader2 } from "lucide-react";
-import LoadingDots from '@/components/ui/LoadingDots';
 
 // Simple CPF mask function
 const cpfMask = (value: string = ""): string => {
