@@ -3292,6 +3292,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedPlanData = whitelistedPlanData;
       const validatedAddressData = whitelistedAddressData;
       
+      // Extract seller referral ID if present (for commission tracking)
+      const sellerId = req.body.sellerId || null;
+      if (sellerId) {
+        console.log(`🏷️ [CHECKOUT] Venda referenciada pelo vendedor: ${sellerId}`);
+      }
+      
       if (!validatedPaymentData || !validatedPlanData || !paymentMethod) {
         return res.status(400).json({ 
           error: "Dados incompletos - paymentData, planData e paymentMethod são obrigatórios" 
@@ -3605,6 +3611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               clientId: client.id,
               planId: planData.planId,
               petId: pet.id,
+              sellerId: sellerId, // Add seller referral for commission tracking
               contractNumber: `UNIPET-${Date.now()}-${pet.id.substring(0, 4).toUpperCase()}`,
               billingPeriod: validatedBillingPeriod,
               status: 'active' as const,
@@ -3732,6 +3739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 
                 const unifiedReceiptData = {
                   contractId: contracts[0].id, // Use first contract as reference
+                  sellerId: sellerId, // Add seller referral for commission tracking
                   cieloPaymentId: paymentResult.payment.paymentId,
                   clientName: client.fullName,
                   clientEmail: client.email,
@@ -3979,6 +3987,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               clientId: client.id,
               petId: pet.id,
               planId: selectedPlan.id,
+              sellerId: sellerId, // Add seller referral for commission tracking
               contractNumber: `UNIPET-${Date.now()}-${pet.id.substring(0, 4).toUpperCase()}`,
               billingPeriod: validatedBillingPeriod,
               status: 'active' as const,
@@ -4115,6 +4124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             const unifiedPixReceiptData = {
               contractId: contractsPix[0].id,
+              sellerId: sellerId, // Add seller referral for commission tracking
               cieloPaymentId: pixPaymentResult.payment.paymentId,
               clientName: client.fullName,
               clientEmail: client.email,

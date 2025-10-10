@@ -17,6 +17,7 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useSpecies } from "@/hooks/use-species";
 import { logger } from "@/utils/logger";
+import { getSellerReferral } from "@/lib/sellerReferral";
 
 interface Plan {
   id: string;
@@ -708,6 +709,9 @@ export default function Checkout() {
       const completeRegistrationData = await completeRegistrationResponse.json();
 
       // Processar pagamento usando endpoint atualizado com suporte a múltiplos pets
+      // Check for active seller referral for commission tracking
+      const activeReferral = getSellerReferral();
+      
       const paymentRequestData = {
         addressData: {
           address: customerData.address,
@@ -739,7 +743,8 @@ export default function Checkout() {
           billingPeriod: 'monthly' // Pode ser alterado conforme necessário
         },
         paymentMethod: paymentData.method,
-        coupon: appliedCoupon?.code // Adicionar código do cupom se aplicado
+        coupon: appliedCoupon?.code, // Adicionar código do cupom se aplicado
+        sellerId: activeReferral?.sellerId || null // Add seller referral for commission tracking
       };
 
       const response = await fetch('/api/checkout/simple-process', {
