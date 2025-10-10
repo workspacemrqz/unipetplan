@@ -88,7 +88,6 @@ const allColumns = [
   "CPF",
   "Cidade",
   "Data",
-  "Rede Criadora",
   "Ações",
 ] as const;
 
@@ -354,7 +353,6 @@ export default function Clients() {
               {visibleColumns.includes("CPF") && <TableHead className="w-[120px] bg-white">CPF</TableHead>}
               {visibleColumns.includes("Cidade") && <TableHead className="w-[120px] bg-white">Cidade</TableHead>}
               {visibleColumns.includes("Data") && <TableHead className="w-[120px] bg-white">Data</TableHead>}
-              {visibleColumns.includes("Rede Criadora") && <TableHead className="w-[150px] bg-white">Rede Criadora</TableHead>}
               {visibleColumns.includes("Ações") && <TableHead className="w-[200px] bg-white">Ações</TableHead>}
             </TableRow>
           </TableHeader>
@@ -398,11 +396,6 @@ export default function Clients() {
                   {visibleColumns.includes("Data") && (
                     <TableCell className="whitespace-nowrap bg-white">
                       {client.createdAt && format(new Date(client.createdAt), "dd/MM/yyyy", { locale: ptBR })}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Rede Criadora") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      {client.createdByUnitName || "-"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Ações") && (
