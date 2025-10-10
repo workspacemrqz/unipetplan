@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { useEffect, useState, useRef } from "react";
 
 interface AuthGuardProps {
@@ -34,7 +33,6 @@ const clearAuthCache = () => {
 };
 
 export default function AuthGuard({ children }: AuthGuardProps) {
-  const [, navigate] = useLocation();
   const [retryCount, setRetryCount] = useState(0);
   const hasRedirected = useRef(false);
 
@@ -105,7 +103,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         console.log("🚀 [AUTH-GUARD] Redirecionando para login");
         clearAuthCache();
         hasRedirected.current = true;
-        navigate("/admin/login");
+        window.location.href = "/admin/login";
       }
       
       return;
