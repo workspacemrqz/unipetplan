@@ -201,50 +201,119 @@ export default function Sellers() {
 
       {/* Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Detalhes do Vendedor</DialogTitle>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" hideCloseButton>
+          <DialogHeader className="flex flex-row items-center justify-between pr-2">
+            <DialogTitle className="flex items-center space-x-2">
+              <Eye className="h-5 w-5 text-primary" />
+              <span>Detalhes do Vendedor</span>
+            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline" 
+                onClick={() => setDetailsOpen(false)}
+                className="h-8"
+              >
+                Fechar
+              </Button>
+            </div>
           </DialogHeader>
           {selectedSeller && (
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Dados Fiscais</h3>
-                <p><strong>Nome Completo:</strong> {selectedSeller.fullName}</p>
-                <p><strong>CPF:</strong> {cpfMask(selectedSeller.cpf)}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Contato</h3>
-                <p><strong>Email:</strong> {selectedSeller.email}</p>
-                <p><strong>Celular:</strong> {phoneMask(selectedSeller.phone)}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Endereço</h3>
-                <p><strong>CEP:</strong> {cepMask(selectedSeller.cep)}</p>
-                <p><strong>Endereço:</strong> {selectedSeller.address}, {selectedSeller.number}</p>
-                {selectedSeller.complement && <p><strong>Complemento:</strong> {selectedSeller.complement}</p>}
-                <p><strong>Bairro:</strong> {selectedSeller.district}</p>
-                <p><strong>Cidade/Estado:</strong> {selectedSeller.city}/{selectedSeller.state}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Dados de Pagamento</h3>
-                <p><strong>Chave PIX:</strong> {selectedSeller.pixKey}</p>
-                <p><strong>Tipo de Chave PIX:</strong> {selectedSeller.pixKeyType}</p>
-                <p><strong>Banco:</strong> {selectedSeller.bank}</p>
-                <p><strong>Conta Corrente:</strong> {selectedSeller.accountNumber}</p>
-                <p><strong>Agência:</strong> {selectedSeller.agency}</p>
-                <p><strong>Nome Completo (Conta):</strong> {selectedSeller.fullNameForPayment}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Comissões</h3>
-                <p><strong>CPA:</strong> {selectedSeller.cpaPercentage}%</p>
-                <p><strong>Comissão Recorrente:</strong> {selectedSeller.recurringCommissionPercentage}%</p>
-              </div>
-              {selectedSeller.whitelabelUrl && (
+            <div className="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Whitelabel</h3>
-                  <p><strong>URL:</strong> {selectedSeller.whitelabelUrl}</p>
+                  <h4 className="font-semibold text-foreground mb-2">Dados Fiscais</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Nome Completo:</strong> <span className="text-foreground">{selectedSeller.fullName}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">CPF:</strong> <span className="text-foreground">{cpfMask(selectedSeller.cpf)}</span></span>
+                    </div>
+                  </div>
                 </div>
-              )}
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Contato</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Email:</strong> <span className="text-foreground">{selectedSeller.email}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Celular:</strong> <span className="text-foreground">{phoneMask(selectedSeller.phone)}</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Endereço</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">CEP:</strong> <span className="text-foreground">{cepMask(selectedSeller.cep)}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Endereço:</strong> <span className="text-foreground">{selectedSeller.address}, {selectedSeller.number}</span></span>
+                    </div>
+                    {selectedSeller.complement && (
+                      <div className="flex items-center space-x-2">
+                        <span><strong className="text-primary">Complemento:</strong> <span className="text-foreground">{selectedSeller.complement}</span></span>
+                      </div>
+                    )}
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Bairro:</strong> <span className="text-foreground">{selectedSeller.district}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Cidade/Estado:</strong> <span className="text-foreground">{selectedSeller.city}/{selectedSeller.state}</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Dados de Pagamento</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Chave PIX:</strong> <span className="text-foreground">{selectedSeller.pixKey}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Tipo de Chave PIX:</strong> <span className="text-foreground">{selectedSeller.pixKeyType}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Banco:</strong> <span className="text-foreground">{selectedSeller.bank}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Conta Corrente:</strong> <span className="text-foreground">{selectedSeller.accountNumber}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Agência:</strong> <span className="text-foreground">{selectedSeller.agency}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Nome Completo (Conta):</strong> <span className="text-foreground">{selectedSeller.fullNameForPayment}</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Comissões</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">CPA:</strong> <span className="text-foreground">{selectedSeller.cpaPercentage}%</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Comissão Recorrente:</strong> <span className="text-foreground">{selectedSeller.recurringCommissionPercentage}%</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                {selectedSeller.whitelabelUrl && (
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Whitelabel</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <span><strong className="text-primary">URL:</strong> <span className="text-foreground">{selectedSeller.whitelabelUrl}</span></span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>
