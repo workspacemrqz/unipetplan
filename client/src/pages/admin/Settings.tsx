@@ -922,9 +922,10 @@ export default function Settings() {
                                   <Input 
                                     {...field}
                                     type="number" 
-                                    placeholder="Ex: 50" 
+                                    placeholder="Ex: 50 ou 0.5" 
                                     min="0" 
                                     max="100"
+                                    step="0.01"
                                     value={field.value || ""}
                                     onChange={(e) => {
                                       const value = e.target.value === "" ? "" : Number(e.target.value);
@@ -951,9 +952,10 @@ export default function Settings() {
                                   <Input 
                                     {...field}
                                     type="number" 
-                                    placeholder="Ex: 10" 
+                                    placeholder="Ex: 10 ou 0.5" 
                                     min="0" 
                                     max="100"
+                                    step="0.01"
                                     value={field.value || ""}
                                     onChange={(e) => {
                                       const value = e.target.value === "" ? "" : Number(e.target.value);
