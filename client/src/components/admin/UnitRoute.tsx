@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import UnitDashboard from "@/pages/admin/UnitDashboard";
 import NotFound from "@/pages/admin/not-found";
 import { apiRequest } from "@/lib/admin/queryClient";
+import LoadingDots from "@/components/ui/LoadingDots";
 
 // Component to handle dynamic unit routes
 export default function UnitRoute() {
@@ -49,7 +50,7 @@ export default function UnitRoute() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <LoadingDots size="md" color="#0e7074" className="mb-2" />
           <p className="mt-2 text-muted-foreground">Carregando...</p>
         </div>
       </div>

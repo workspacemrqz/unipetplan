@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import UnitDashboard from "@/pages/UnitDashboard";
 import NotFound from "@/pages/not-found";
+import LoadingDots from "@/components/ui/LoadingDots";
 
 // Component to handle dynamic unit routes
 export default function UnitRoute() {
@@ -15,7 +16,7 @@ export default function UnitRoute() {
 
   const checkUnitRoute = async () => {
     // Extract slug from current path and remove query parameters
-    const pathWithoutQuery = location.split('?')[0]; // Remove query parameters
+    const pathWithoutQuery = location.split('?')[0] || ''; // Remove query parameters
     const slug = pathWithoutQuery.substring(1); // Remove leading slash
     
     // Skip known admin routes
@@ -57,7 +58,7 @@ export default function UnitRoute() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <LoadingDots size="md" color="#0e7074" className="mb-2" />
           <p className="mt-2 text-muted-foreground">Carregando...</p>
         </div>
       </div>
