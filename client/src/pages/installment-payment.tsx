@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { ArrowLeft, CreditCard, Scan, Loader2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, Loader2, QrCode } from 'lucide-react';
 import { CopyButton } from '@/components/ui/copy-button';
 
 interface InstallmentData {
@@ -789,7 +789,7 @@ export default function InstallmentPayment() {
                     background: paymentMethod === 'pix' ? 'var(--bg-cream-light)' : 'white'
                   }}
                 >
-                  <Scan className="w-6 h-6 mx-auto mb-2" 
+                  <QrCode className="w-6 h-6 mx-auto mb-2" 
                     style={{color: paymentMethod === 'pix' ? 'var(--text-teal)' : 'var(--text-dark-secondary)'}} />
                   <span style={{color: 'var(--text-dark-primary)'}}>PIX</span>
                 </button>
@@ -867,7 +867,7 @@ export default function InstallmentPayment() {
 
                 {paymentMethod === 'pix' && (
                   <div className="p-4 rounded-lg" style={{background: 'var(--bg-cream-light)'}}>
-                    <Scan className="w-12 h-12 mx-auto mb-3" style={{color: 'var(--text-teal)'}} />
+                    <QrCode className="w-12 h-12 mx-auto mb-3" style={{color: 'var(--text-teal)'}} />
                     <p className="text-center" style={{color: 'var(--text-dark-secondary)'}}>
                       Ao clicar em "Pagar com PIX", será gerado um QR Code para pagamento.
                       O código tem validade de 30 minutos.
