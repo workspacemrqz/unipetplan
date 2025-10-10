@@ -3,6 +3,8 @@ import { Phone, Mail, Facebook, Instagram, Linkedin, Youtube } from "lucide-reac
 import { FaWhatsapp } from "react-icons/fa";
 import { useSiteSettingsWithDefaults } from "@/hooks/use-site-settings";
 import { useWhatsAppRedirect } from "@/hooks/use-whatsapp-redirect";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Footer() {
   const { settings, shouldShow } = useSiteSettingsWithDefaults();
@@ -16,13 +18,14 @@ export default function Footer() {
     { name: "FAQ", href: "/faq" },
   ];
 
-  const services = [
-    "Consultas Veterinárias",
-    "Cirurgias",
-    "Exames Laboratoriais", 
-    "Emergências 24h",
-    "Telemedicina",
-  ];
+  // Buscar planos ativos
+  const { data: plans = [] } = useQuery({
+    queryKey: ["/api/plans"],
+    queryFn: async () => {
+      const response = await apiRequest("/api/plans", "GET");
+      return response as Array<{ id: string; name: string; isActive: boolean }>;
+    },
+  });
 
   return (
     <footer className="border-t border-t-accent bg-muted py-12">
@@ -83,17 +86,28 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Plans */}
           <div>
-            <h4 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6 text-primary">Serviços</h4>
+            <h4 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6 text-primary">Planos</h4>
             <ul className="space-y-2 sm:space-y-3">
-              {services.map((service) => (
-                <li key={service}>
-                  <span className="cursor-default text-sm sm:text-base text-foreground">
-                    {service}
+              {plans.length > 0 ? (
+                plans.map((plan) => (
+                  <li key={plan.id}>
+                    <Link
+                      href="/planos"
+                      className="transition-colors text-sm sm:text-base text-foreground hover:text-primary"
+                    >
+                      {plan.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li>
+                  <span className="text-sm sm:text-base text-foreground">
+                    Carregando planos...
                   </span>
                 </li>
-              ))}
+              )}
             </ul>
           </div>
 
