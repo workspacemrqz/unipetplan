@@ -372,6 +372,16 @@ export default function Sellers() {
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            title="Acessar página de login de parceiros"
+                          >
+                            <a href="/vendedor/login" target="_blank" rel="noopener noreferrer">
+                              <Globe className="h-4 w-4" />
+                            </a>
+                          </Button>
                         </div>
                       </TableCell>
                     )}
