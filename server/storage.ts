@@ -14,6 +14,8 @@ import {
   type InsertChatSettings,
   type Client,
   type InsertClient,
+  type Seller,
+  type InsertSeller,
   type Species,
   type InsertSpecies,
   type Pet,
@@ -39,6 +41,7 @@ import {
   siteSettings,
   chatSettings,
   clients,
+  sellers,
   species,
   pets,
   contracts,
@@ -110,6 +113,14 @@ export interface IStorage {
   updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined>;
   deleteClient(id: string): Promise<boolean>;
   getAllClients(): Promise<Client[]>;
+
+  // Sellers
+  getSellerByEmail(email: string): Promise<Seller | undefined>;
+  getSellerById(id: string): Promise<Seller | undefined>;
+  createSeller(seller: InsertSeller): Promise<Seller>;
+  updateSeller(id: string, seller: Partial<InsertSeller>): Promise<Seller | undefined>;
+  deleteSeller(id: string): Promise<boolean>;
+  getAllSellers(): Promise<Seller[]>;
 
   // === NEW TABLE METHODS ===
 
@@ -294,6 +305,12 @@ export class InMemoryStorage implements IStorage {
   async updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined> { return undefined; }
   async deleteClient(id: string): Promise<boolean> { return true; }
   async getAllClients(): Promise<Client[]> { return []; }
+  async getSellerByEmail(email: string): Promise<Seller | undefined> { return undefined; }
+  async getSellerById(id: string): Promise<Seller | undefined> { return undefined; }
+  async createSeller(seller: InsertSeller): Promise<Seller> { return seller as any; }
+  async updateSeller(id: string, seller: Partial<InsertSeller>): Promise<Seller | undefined> { return undefined; }
+  async deleteSeller(id: string): Promise<boolean> { return true; }
+  async getAllSellers(): Promise<Seller[]> { return []; }
   async createPet(pet: InsertPet): Promise<Pet> { return pet as any; }
   async updatePet(id: string, pet: Partial<InsertPet>): Promise<Pet | undefined> { return undefined; }
   async getPet(id: string): Promise<Pet | undefined> { return undefined; }
@@ -834,6 +851,79 @@ export class DatabaseStorage implements IStorage {
       return clientsList;
     } catch (error) {
       console.error('❌ Error fetching all clients:', error);
+      return [];
+    }
+  }
+
+  // Sellers
+  async getSellerByEmail(email: string): Promise<Seller | undefined> {
+    try {
+      const [seller] = await db
+        .select()
+        .from(sellers)
+        .where(eq(sellers.email, email))
+        .limit(1);
+      return seller;
+    } catch (error) {
+      console.error('❌ Error fetching seller by email:', error);
+      return undefined;
+    }
+  }
+
+  async getSellerById(id: string): Promise<Seller | undefined> {
+    try {
+      const [seller] = await db
+        .select()
+        .from(sellers)
+        .where(eq(sellers.id, id))
+        .limit(1);
+      return seller;
+    } catch (error) {
+      console.error('❌ Error fetching seller by id:', error);
+      return undefined;
+    }
+  }
+
+  async createSeller(seller: InsertSeller): Promise<Seller> {
+    const [newSeller] = await db
+      .insert(sellers)
+      .values(seller as any)
+      .returning();
+    return newSeller;
+  }
+
+  async updateSeller(id: string, seller: Partial<InsertSeller>): Promise<Seller | undefined> {
+    try {
+      const [updatedSeller] = await db
+        .update(sellers)
+        .set({ ...seller, updatedAt: new Date() })
+        .where(eq(sellers.id, id))
+        .returning();
+      return updatedSeller;
+    } catch (error) {
+      console.error('❌ Error updating seller:', error);
+      return undefined;
+    }
+  }
+
+  async deleteSeller(id: string): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(sellers)
+        .where(eq(sellers.id, id));
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error('❌ Error deleting seller:', error);
+      return false;
+    }
+  }
+
+  async getAllSellers(): Promise<Seller[]> {
+    try {
+      const sellersList = await db.select().from(sellers);
+      return sellersList;
+    } catch (error) {
+      console.error('❌ Error fetching all sellers:', error);
       return [];
     }
   }

@@ -1136,6 +1136,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==== ADMIN SELLERS ROUTES ====
+  // Get all sellers
+  app.get("/admin/api/sellers", requireAdmin, async (req, res) => {
+    try {
+      const sellers = await storage.getAllSellers();
+      res.json(sellers);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching sellers:", error);
+      res.status(500).json({ error: "Erro ao buscar vendedores" });
+    }
+  });
+
+  // Get single seller
+  app.get("/admin/api/sellers/:id", requireAdmin, async (req, res) => {
+    try {
+      const seller = await storage.getSellerById(req.params.id);
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      res.json(seller);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching seller:", error);
+      res.status(500).json({ error: "Erro ao buscar vendedor" });
+    }
+  });
+
+  // Create new seller
+  app.post("/admin/api/sellers", requireAdmin, validateCsrf, async (req, res) => {
+    try {
+      const { insertSellerSchema } = await import("../shared/schema.js");
+      const sellerData = insertSellerSchema.parse(req.body);
+      
+      // Hash CPF for authentication
+      const cpfHash = await bcrypt.hash(sellerData.cpf.replace(/\D/g, ''), 10);
+      
+      // Generate unique whitelabel URL (using seller's name)
+      const baseSlug = sellerData.fullName
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // Remove accents
+        .replace(/[^a-z0-9\s-]/g, "") // Remove special chars
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/-+/g, "-") // Remove duplicate hyphens
+        .trim();
+      
+      // Add random suffix to ensure uniqueness
+      const whitelabelUrl = `${baseSlug}-${Date.now().toString(36)}`;
+      
+      const dbSellerData = {
+        ...sellerData,
+        cpfHash,
+        whitelabelUrl,
+        cpaPercentage: sellerData.cpaPercentage.toString(),
+        recurringCommissionPercentage: sellerData.recurringCommissionPercentage.toString()
+      };
+      
+      const newSeller = await storage.createSeller(dbSellerData);
+      console.log("✅ [ADMIN] Seller created:", newSeller.id);
+      res.status(201).json(newSeller);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error creating seller:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos",
+          ...(process.env.NODE_ENV === "development" && { details: error.errors }) 
+        });
+      }
+      res.status(500).json({ error: "Erro ao criar vendedor" });
+    }
+  });
+
+  // Update seller
+  app.put("/admin/api/sellers/:id", requireAdmin, async (req, res) => {
+    try {
+      const { updateSellerSchema } = await import("../shared/schema.js");
+      const sellerData = updateSellerSchema.parse(req.body);
+      
+      const dbSellerData: any = { ...sellerData };
+      
+      // Hash CPF if it's being updated
+      if (sellerData.cpf) {
+        dbSellerData.cpfHash = await bcrypt.hash(sellerData.cpf.replace(/\D/g, ''), 10);
+      }
+      
+      // Convert percentages to strings if present
+      if (sellerData.cpaPercentage !== undefined) {
+        dbSellerData.cpaPercentage = sellerData.cpaPercentage.toString();
+      }
+      if (sellerData.recurringCommissionPercentage !== undefined) {
+        dbSellerData.recurringCommissionPercentage = sellerData.recurringCommissionPercentage.toString();
+      }
+      
+      const updatedSeller = await storage.updateSeller(req.params.id, dbSellerData);
+      
+      if (!updatedSeller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      console.log("✅ [ADMIN] Seller updated:", req.params.id);
+      res.json(updatedSeller);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error updating seller:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos",
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: "Erro ao atualizar vendedor" });
+    }
+  });
+
+  // Delete seller
+  app.delete("/admin/api/sellers/:id", requireAdmin, async (req, res) => {
+    try {
+      const success = await storage.deleteSeller(req.params.id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      console.log("✅ [ADMIN] Seller deleted:", req.params.id);
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("❌ [ADMIN] Error deleting seller:", error);
+      res.status(500).json({ error: "Erro ao excluir vendedor" });
+    }
+  });
+
   // ==== ADMIN PAYMENT RECEIPTS ROUTES ====
   // Get all payment receipts
   app.get("/admin/api/payment-receipts", requireAdmin, async (req, res) => {
@@ -6173,6 +6302,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Client profile image upload removed - images now served from Supabase Storage only
+
+  // ==== SELLER AUTHENTICATION ROUTES ====
+  
+  // Seller Login (email + CPF)
+  app.post("/api/sellers/login", loginLimiter, async (req, res) => {
+    try {
+      const { sellerLoginSchema } = await import("../shared/schema.js");
+      const parsed = sellerLoginSchema.parse(req.body);
+      
+      // Find seller by email
+      const seller = await storage.getSellerByEmail(parsed.email);
+      
+      if (!seller) {
+        return res.status(401).json({ error: "Email ou CPF inválidos" });
+      }
+      
+      // Verify CPF with bcrypt (password field contains CPF)
+      const cpfClean = parsed.password.replace(/\D/g, '');
+      const isValidAuth = await bcrypt.compare(cpfClean, seller.cpfHash);
+      
+      if (!isValidAuth) {
+        return res.status(401).json({ error: "Email ou CPF inválidos" });
+      }
+      
+      // Regenerate session to prevent session fixation attacks
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("❌ [SELLER-LOGIN] Erro ao regenerar sessão:", err);
+          return res.status(500).json({ error: "Erro ao criar sessão segura" });
+        }
+        
+        // Store seller in session
+        (req.session as any).seller = {
+          id: seller.id,
+          fullName: seller.fullName,
+          email: seller.email,
+          whitelabelUrl: seller.whitelabelUrl
+        };
+        
+        // Save session explicitly
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("❌ [SELLER-LOGIN] Erro ao salvar sessão:", saveErr);
+            return res.status(500).json({ error: "Erro ao salvar sessão" });
+          }
+          
+          // Don't return cpfHash in response (security)
+          const { cpfHash: _, ...sellerResponse } = seller;
+          
+          console.log("✅ [SELLER-LOGIN] Seller logged in:", seller.email);
+          res.json({ 
+            message: "Login realizado com sucesso", 
+            seller: sellerResponse 
+          });
+        });
+      });
+      
+    } catch (error: any) {
+      console.error("❌ [SELLER-LOGIN] Error during seller login:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "Dados inválidos", 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Seller Logout
+  app.post("/api/sellers/logout", (req, res) => {
+    (req.session as any).seller = undefined;
+    res.json({ message: "Logout realizado com sucesso" });
+  });
+
+  // Get Current Seller
+  app.get("/api/sellers/me", async (req, res) => {
+    try {
+      const sellerId = (req.session as any).seller?.id;
+      
+      if (!sellerId) {
+        return res.status(401).json({ error: "Vendedor não autenticado" });
+      }
+      
+      const seller = await storage.getSellerById(sellerId);
+      
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+
+      // Remove cpfHash from response
+      const { cpfHash: _, ...sellerWithoutPassword } = seller;
+
+      res.json({ 
+        seller: sellerWithoutPassword,
+        message: "Vendedor autenticado"
+      });
+    } catch (error) {
+      console.error("❌ [SELLER-ME] Error fetching seller data:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
 
   // CUSTOMER AREA - 9 COMPREHENSIVE FUNCTIONALITIES
 

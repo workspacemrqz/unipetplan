@@ -17,7 +17,8 @@ import {
   File,
   Star,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  UserCheck
 } from "lucide-react";
 import { createCacheManager } from "@/lib/admin/cacheUtils";
 
@@ -49,6 +50,12 @@ const navigation = [
       { name: "Rede Credenciada", href: "/rede", icon: Building },
       { name: "Formulários", href: "/formularios", icon: Mail },
       { name: "Avaliações", href: "/avaliacoes", icon: Star }
+    ]
+  },
+  {
+    name: "Parceiros",
+    items: [
+      { name: "Vendedores", href: "/vendedores", icon: UserCheck }
     ]
   },
   {

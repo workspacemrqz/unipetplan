@@ -76,8 +76,14 @@ import AdminFinancial from './pages/admin/Financial';
 import AdminContracts from './pages/admin/Contracts';
 import AdminCoupons from './pages/admin/Coupons';
 import AdminEvaluations from './pages/admin/Evaluations';
+import AdminSellers from './pages/admin/Sellers';
 import AdminNotFound from './pages/admin/not-found';
 import { AuthProvider } from './contexts/AuthContext';
+import { SellerAuthProvider } from './contexts/SellerAuthContext';
+
+// Import seller pages
+import SellerLogin from './pages/seller-login';
+import SellerDashboard from './pages/seller-dashboard';
 
 // AdminRouter - handles all admin routes with base="/admin"
 function AdminRouter() {
@@ -113,6 +119,9 @@ function AdminRouter() {
             <Route path="/rede" component={AdminNetwork} />
             <Route path="/rede/novo" component={AdminNetworkForm} />
             <Route path="/rede/:id/editar" component={AdminNetworkForm} />
+            
+            {/* Seller management routes */}
+            <Route path="/vendedores" component={AdminSellers} />
             
             {/* Financial and Contracts routes */}
             <Route path="/financeiro" component={AdminFinancial} />
@@ -173,6 +182,10 @@ function Router() {
         <Route path="/cliente/renovacao" component={() => (<><RenewalCheckout /><ChatAI /></>)} />
         <Route path="/cliente/pagamento" component={() => (<><InstallmentPayment /><ChatAI /></>)} />
         <Route path="/cliente/telemedicina" component={() => (<><TelemedicinePage /><ChatAI /></>)} />
+        
+        {/* Seller Area Routes */}
+        <Route path="/vendedor/login" component={SellerLogin} />
+        <Route path="/vendedor/dashboard" component={SellerDashboard} />
         
         {/* Unit Routes - specific paths first */}
         <Route path="/unidade/:slug/painel" component={UnitDashboard} />
@@ -336,8 +349,10 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
-            <Router />
-            <ReactQueryDevtools initialIsOpen={false} />
+            <SellerAuthProvider>
+              <Router />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </SellerAuthProvider>
           </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>

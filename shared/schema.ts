@@ -32,6 +32,9 @@ export const receiptStatusEnum = pgEnum("receipt_status_enum", ["generated", "do
 // Enum para tipo de cupom
 export const couponTypeEnum = pgEnum("coupon_type_enum", ["percentage", "fixed_value"]);
 
+// Enum para tipo de chave PIX
+export const pixKeyTypeEnum = pgEnum("pix_key_type_enum", ["cpf", "cnpj", "email", "phone", "random"]);
+
 // === ADMIN-SPECIFIC TABLES ===
 
 // Users table for authentication and administration (Admin only)
@@ -177,6 +180,42 @@ export const clients = pgTable("clients", {
   image: text("image"), // Dados da imagem em base64
   imageUrl: text("image_url"), // URL da imagem
   createdByUnitId: varchar("created_by_unit_id"), // Track which unit created this client
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Sellers table for partner management
+export const sellers = pgTable("sellers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Dados fiscais
+  fullName: text("full_name").notNull(),
+  cpf: text("cpf").notNull(),
+  cpfHash: text("cpf_hash").notNull(), // CPF hasheado para autenticação (senha)
+  // Contato
+  email: text("email").notNull().unique(),
+  phone: text("phone").notNull(),
+  // Endereço
+  cep: text("cep").notNull(),
+  address: text("address").notNull(),
+  number: text("number").notNull(),
+  complement: text("complement"),
+  district: text("district").notNull(), // Bairro
+  state: text("state").notNull(),
+  city: text("city").notNull(),
+  // Dados de pagamento
+  pixKey: text("pix_key").notNull(),
+  pixKeyType: pixKeyTypeEnum("pix_key_type").notNull(),
+  bank: text("bank").notNull(),
+  accountNumber: text("account_number").notNull(),
+  fullNameForPayment: text("full_name_for_payment").notNull(), // Nome completo para conta
+  agency: text("agency").notNull(), // Agência
+  // Comissões
+  cpaPercentage: decimal("cpa_percentage", { precision: 5, scale: 2 }).notNull(), // Porcentagem CPA (ex: 30.00)
+  recurringCommissionPercentage: decimal("recurring_commission_percentage", { precision: 5, scale: 2 }).notNull(), // Porcentagem comissão recorrente (ex: 5.00)
+  // Whitelabel
+  whitelabelUrl: text("whitelabel_url").unique(), // URL única para página do vendedor
+  // Status e timestamps
+  isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -639,6 +678,42 @@ export const clientLoginSchema = z.object({
   password: z.string().min(1, "Senha é obrigatória"),
 });
 
+// Seller schemas
+export const insertSellerSchema = z.object({
+  fullName: z.string().min(1, "Nome completo é obrigatório"),
+  cpf: z.string().min(11, "CPF é obrigatório"),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  phone: z.string().min(1, "Celular é obrigatório"),
+  cep: z.string().min(1, "CEP é obrigatório"),
+  address: z.string().min(1, "Endereço é obrigatório"),
+  number: z.string().min(1, "Número é obrigatório"),
+  complement: z.string().optional(),
+  district: z.string().min(1, "Bairro é obrigatório"),
+  state: z.string().min(1, "Estado é obrigatório"),
+  city: z.string().min(1, "Cidade é obrigatório"),
+  pixKey: z.string().min(1, "Chave PIX é obrigatória"),
+  pixKeyType: z.enum(["cpf", "cnpj", "email", "phone", "random"], { required_error: "Tipo de chave PIX é obrigatório" }),
+  bank: z.string().min(1, "Banco é obrigatório"),
+  accountNumber: z.string().min(1, "Conta corrente é obrigatória"),
+  fullNameForPayment: z.string().min(1, "Nome completo para pagamento é obrigatório"),
+  agency: z.string().min(1, "Agência é obrigatória"),
+  cpaPercentage: z.string().or(z.number()).refine((val) => {
+    const num = typeof val === 'string' ? parseFloat(val) : val;
+    return !isNaN(num) && num >= 0 && num <= 100;
+  }, { message: "CPA deve ser entre 0 e 100%" }),
+  recurringCommissionPercentage: z.string().or(z.number()).refine((val) => {
+    const num = typeof val === 'string' ? parseFloat(val) : val;
+    return !isNaN(num) && num >= 0 && num <= 100;
+  }, { message: "Comissão recorrente deve ser entre 0 e 100%" }),
+});
+
+export const updateSellerSchema = insertSellerSchema.partial();
+
+export const sellerLoginSchema = z.object({
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  password: z.string().min(1, "CPF é obrigatório"), // Password is CPF
+});
+
 export const updateUserSchema = z.object({
   username: z.string().optional(),
   password: z.string().optional(),
@@ -884,6 +959,9 @@ export type Client = typeof clients.$inferSelect;
 export type InsertClient = typeof clients.$inferInsert;
 export type ClientLogin = z.infer<typeof clientLoginSchema>;
 export type AdminLogin = z.infer<typeof adminLoginSchema>;
+export type Seller = typeof sellers.$inferSelect;
+export type InsertSeller = typeof sellers.$inferInsert;
+export type SellerLogin = z.infer<typeof sellerLoginSchema>;
 export type Species = typeof species.$inferSelect;
 export type InsertSpecies = typeof species.$inferInsert;
 export type Pet = typeof pets.$inferSelect;
