@@ -284,6 +284,7 @@ export const contracts = pgTable("contracts", {
   clientId: varchar("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
   planId: varchar("plan_id").notNull().references(() => plans.id),
   petId: varchar("pet_id").notNull().references(() => pets.id, { onDelete: "cascade" }),
+  sellerId: varchar("seller_id").references(() => sellers.id), // Vendedor responsável pela venda
   contractNumber: text("contract_number").notNull().unique(),
   status: contractStatusEnum("status").default("active").notNull(),
   startDate: timestamp("start_date").defaultNow().notNull(),
@@ -364,6 +365,7 @@ export const satisfactionSurveys = pgTable("satisfaction_surveys", {
 export const paymentReceipts = pgTable("payment_receipts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   contractId: varchar("contract_id").references(() => contracts.id),
+  sellerId: varchar("seller_id").references(() => sellers.id), // Vendedor responsável pela venda
   cieloPaymentId: text("cielo_payment_id").notNull().unique(), // ✅ UNIQUE constraint para idempotência
   receiptNumber: text("receipt_number").notNull().unique(),
   paymentAmount: decimal("payment_amount", { precision: 10, scale: 2 }).notNull(),
