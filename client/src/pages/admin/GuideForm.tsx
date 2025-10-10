@@ -278,8 +278,8 @@ export default function GuideForm() {
                     <Button
                       type="button"
                       onClick={searchClientByCpf}
-                      variant="outline"
-                      style={{ backgroundColor: '#FFFFFF' }}
+                      variant="admin-action"
+                      className="h-10"
                     >
                       Buscar
                     </Button>
