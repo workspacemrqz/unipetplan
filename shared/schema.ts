@@ -28,17 +28,6 @@ export const serviceStatusEnum = pgEnum("service_status_enum", ["requested", "ap
 export const protocolStatusEnum = pgEnum("protocol_status_enum", ["open", "in_progress", "resolved", "closed"]);
 export const protocolTypeEnum = pgEnum("protocol_type_enum", ["complaint", "information", "plan_change", "cancellation", "emergency", "other"]);
 export const receiptStatusEnum = pgEnum("receipt_status_enum", ["generated", "downloaded", "sent"]);
-export const procedureTypeEnum = pgEnum("procedure_type_enum", [
-  "consultas",
-  "exames_laboratoriais", 
-  "especialistas",
-  "vacinas",
-  "cirurgias",
-  "exames_de_imagem",
-  "exames_laboratoriais_complexos",
-  "procedimentos_ambulatoriais",
-  "beneficios_especiais"
-]);
 
 // Enum para tipo de cupom
 export const couponTypeEnum = pgEnum("coupon_type_enum", ["percentage", "fixed_value"]);
@@ -404,15 +393,12 @@ export const contractInstallments = pgTable("contract_installments", {
 
 // === UNIFIED PROCEDURES SYSTEM ===
 
-// Unified procedures table (includes both UNIPET category and Admin procedureType)
+// Unified procedures table
 export const procedures = pgTable("procedures", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   description: text("description"),
-  // UNIPET fields
   category: text("category"), // consultation, exam, surgery, emergency, etc.
-  // Admin fields
-  procedureType: procedureTypeEnum("procedure_type").default("consultas"),
   isActive: boolean("is_active").default(true).notNull(),
   displayOrder: integer("display_order").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
