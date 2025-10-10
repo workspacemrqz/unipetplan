@@ -63,7 +63,7 @@ export default function GuideForm() {
     clientId: z.string().min(1, "Cliente é obrigatório"),
     petId: z.string().min(1, "Pet é obrigatório"),
     procedure: z.string().min(1, "Procedimento é obrigatório"),
-    networkUnitId: z.string().optional(),
+    networkUnitId: z.string().min(1, "Rede credenciada é obrigatória"),
     generalNotes: z.string().optional(),
     value: z.string().optional(),
     status: z.string().optional(),
@@ -475,7 +475,7 @@ export default function GuideForm() {
                     name="networkUnitId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Rede Credenciada</FormLabel>
+                        <FormLabel>Rede Credenciada *</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
                           value={field.value}
