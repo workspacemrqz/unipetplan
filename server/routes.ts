@@ -1683,6 +1683,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new guide
+  app.post("/admin/api/guides", requireAdmin, adminCRUDLimiter, async (req, res) => {
+    try {
+      const guideData = insertGuideSchema.parse(req.body);
+      
+      console.log(`📝 [ADMIN] Creating new guide:`, guideData);
+      
+      const newGuide = await storage.createGuide(guideData);
+      
+      // Automatically register procedure usage when guide is created
+      if (guideData.petId && guideData.procedure) {
+        try {
+          const year = new Date().getFullYear();
+          
+          // Get pet's plan to check procedure limits
+          const pet = await storage.getPet(guideData.petId);
+          if (pet && pet.planId) {
+            // Find procedure in plan to get procedureId and limit
+            const planProcedures = await storage.getPlanProceduresWithDetails(pet.planId);
+            const procedureInPlan = planProcedures.find((p: any) => p.name === guideData.procedure);
+            
+            if (procedureInPlan && procedureInPlan.procedureId && procedureInPlan.annualLimit) {
+              // Get current usage
+              const usageRecords = await storage.getProcedureUsageByPet(guideData.petId, year);
+              const currentUsage = usageRecords.find((u: any) => u.procedureId === procedureInPlan.procedureId && u.planId === pet.planId);
+              const used = currentUsage?.usageCount || 0;
+              const remaining = procedureInPlan.annualLimit - used;
+              
+              // Only register if there's remaining limit
+              if (remaining > 0) {
+                await storage.incrementProcedureUsage(guideData.petId, procedureInPlan.procedureId, pet.planId);
+                console.log(`✅ [ADMIN] Procedure usage automatically registered for pet ${guideData.petId}, procedure ${procedureInPlan.procedureId}`);
+              } else {
+                console.log(`⚠️ [ADMIN] Procedure limit reached for pet ${guideData.petId}, procedure ${procedureInPlan.procedureId}`);
+              }
+            }
+          }
+        } catch (error) {
+          // Log error but don't fail the guide creation
+          console.error("❌ [ADMIN] Error registering procedure usage:", error);
+        }
+      }
+      
+      console.log(`✅ [ADMIN] Guide created:`, newGuide.id);
+      res.status(201).json(newGuide);
+    } catch (error: any) {
+      console.error("❌ [ADMIN] Error creating guide:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      res.status(500).json({ error: "Erro ao criar guia" });
+    }
+  });
+
+  // Update guide
+  app.put("/admin/api/guides/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
+    try {
+      const guideData = insertGuideSchema.partial().parse(req.body);
+      const updatedGuide = await storage.updateGuide(req.params.id, guideData);
+      
+      if (!updatedGuide) {
+        return res.status(404).json({ error: "Guia não encontrado" });
+      }
+      
+      console.log(`✅ [ADMIN] Guide updated:`, updatedGuide.id);
+      res.json(updatedGuide);
+    } catch (error: any) {
+      console.error("❌ [ADMIN] Error updating guide:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      res.status(500).json({ error: "Erro ao atualizar guia" });
+    }
+  });
+
+  // Delete guide
+  app.delete("/admin/api/guides/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
+    try {
+      const success = await storage.deleteGuide(req.params.id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Guia não encontrado" });
+      }
+      
+      console.log(`✅ [ADMIN] Guide deleted:`, req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("❌ [ADMIN] Error deleting guide:", error);
+      res.status(500).json({ error: "Erro ao deletar guia" });
+    }
+  });
+
   // Admin plans routes
   app.get("/admin/api/plans", requireAdmin, async (req, res) => {
     try {
