@@ -77,6 +77,7 @@ import AdminContracts from './pages/admin/Contracts';
 import AdminCoupons from './pages/admin/Coupons';
 import AdminEvaluations from './pages/admin/Evaluations';
 import AdminSellers from './pages/admin/Sellers';
+import AdminSellerForm from './pages/admin/SellerForm';
 import AdminNotFound from './pages/admin/not-found';
 import { AuthProvider } from './contexts/AuthContext';
 import { SellerAuthProvider } from './contexts/SellerAuthContext';
@@ -123,6 +124,8 @@ function AdminRouter() {
             
             {/* Seller management routes */}
             <Route path="/vendedores" component={AdminSellers} />
+            <Route path="/vendedores/novo" component={AdminSellerForm} />
+            <Route path="/vendedores/:id/editar" component={AdminSellerForm} />
             
             {/* Financial and Contracts routes */}
             <Route path="/financeiro" component={AdminFinancial} />
