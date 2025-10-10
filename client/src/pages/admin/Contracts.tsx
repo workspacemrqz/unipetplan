@@ -714,8 +714,13 @@ export default function Contracts() {
                 <Button
                   onClick={handleSaveEdit}
                   disabled={updateContractMutation.isPending}
+                  className="min-w-[100px]"
                 >
-                  {updateContractMutation.isPending ? "Salvando..." : "Salvar"}
+                  {updateContractMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Salvar"
+                  )}
                 </Button>
               </div>
             </div>
