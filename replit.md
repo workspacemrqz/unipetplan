@@ -34,6 +34,7 @@ Preferred communication style: Simple, everyday language.
     -   Preenchimento automático de coparticipação baseado no procedimento selecionado
     -   Validação de limites anuais e período de carência antes de exibir procedimentos
     -   Exibição visual de "Sem coparticipação" quando valor é zero, mantendo valor numérico (0,00) para API
+    -   **Seleção de cliente/pet por CPF (Outubro 2025)**: Sistema de busca de cliente por CPF exato com seleção de pet associado, endpoint otimizado `/admin/api/clients/cpf/:cpf`, suporte a CPF formatado e não formatado, reset automático de petId ao trocar cliente, auto-seleção quando apenas 1 pet disponível, carregamento correto em modo de edição
 -   **Performance**: Optimized login and navigation, reduced database queries, `AuthContext` with `sessionStorage` caching for client authentication data.
 -   **Security Audit (October 2025 - COMPLETA)**: 
     -   **Fase 1 (12 vulnerabilidades corrigidas)**: Admin bypass removed, cookies secure (sameSite=strict), logs sanitized, webhook authentication (HMAC-SHA256), session regeneration on all logins, CORS restricted, JWT secret enforcement, file upload validation with Sharp, error messages sanitized in production, session fixation prevention, API request timeouts (30s), CSP headers strengthened
