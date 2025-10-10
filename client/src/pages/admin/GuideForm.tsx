@@ -63,6 +63,7 @@ export default function GuideForm() {
     clientId: z.string().min(1, "Cliente é obrigatório"),
     petId: z.string().min(1, "Pet é obrigatório"),
     procedure: z.string().min(1, "Procedimento é obrigatório"),
+    networkUnitId: z.string().optional(),
     generalNotes: z.string().optional(),
     value: z.string().optional(),
     status: z.string().optional(),
@@ -75,6 +76,7 @@ export default function GuideForm() {
       clientId: urlClientId || "",
       petId: urlPetId || "",
       procedure: "",
+      networkUnitId: "",
       generalNotes: "",
       value: "",
       status: "open",
@@ -89,12 +91,18 @@ export default function GuideForm() {
     enabled: Boolean(petIdToFetch),
   });
 
+  // Fetch network units (redes credenciadas)
+  const { data: networkUnits = [], isLoading: networkUnitsLoading } = useQuery<any[]>({
+    queryKey: ["/admin/api/network-units"],
+  });
+
   useEffect(() => {
     if (guide) {
       form.reset({
         clientId: guide.clientId || "",
         petId: guide.petId || "",
         procedure: guide.procedure || "",
+        networkUnitId: guide.networkUnitId || "",
         generalNotes: guide.generalNotes || "",
         value: guide.value || "",
         status: guide.status || "open",
@@ -367,36 +375,115 @@ export default function GuideForm() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="procedure"
-                  render={({ field }) => {
-                    // Filtrar procedimentos baseado na busca
-                    const filteredProcedures = availableProcedures?.procedures?.filter((proc: any) => 
-                      proc.name.toLowerCase().includes(procedureSearch.toLowerCase())
-                    ) || [];
+                {/* Procedimento e Rede Credenciada juntos */}
+                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="procedure"
+                    render={({ field }) => {
+                      // Filtrar procedimentos baseado na busca
+                      const filteredProcedures = availableProcedures?.procedures?.filter((proc: any) => 
+                        proc.name.toLowerCase().includes(procedureSearch.toLowerCase())
+                      ) || [];
 
-                    return (
+                      return (
+                        <FormItem>
+                          <FormLabel>Procedimento *</FormLabel>
+                          <Select 
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              setProcedureSearch(""); // Limpar busca após seleção
+                              // Atualizar coparticipação quando procedimento for selecionado
+                              const selectedProc = availableProcedures?.procedures?.find((p: any) => p.name === value);
+                              if (selectedProc) {
+                                const coparticipationValue = selectedProc.coparticipation || 0;
+                                // Sempre armazenar um valor numérico formatado, mesmo quando for zero
+                                form.setValue("value", coparticipationValue.toFixed(2).replace('.', ','));
+                              }
+                            }} 
+                            value={field.value} 
+                            disabled={!petIdToFetch || proceduresLoading}
+                          >
+                            <FormControl>
+                              <SelectTrigger 
+                                data-testid="select-procedure"
+                                className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+                                style={{
+                                  borderColor: 'var(--border-gray)',
+                                  background: 'white'
+                                }}
+                              >
+                                <SelectValue placeholder={
+                                  !petIdToFetch ? "Selecione um pet primeiro" : 
+                                  proceduresLoading ? "Carregando procedimentos..." :
+                                  availableProcedures?.procedures?.length === 0 ? "Nenhum procedimento disponível" :
+                                  "Selecione o procedimento"
+                                } />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {/* Campo de busca */}
+                              <div className="p-2 border-b">
+                                <Input
+                                  placeholder="Digite para buscar..."
+                                  value={procedureSearch}
+                                  onChange={(e) => setProcedureSearch(e.target.value)}
+                                  className="h-8"
+                                  onClick={(e) => e.stopPropagation()}
+                                  onKeyDown={(e) => e.stopPropagation()}
+                                />
+                              </div>
+                              
+                              {filteredProcedures.length > 0 ? (
+                                filteredProcedures.flatMap((proc: any, index: number, array: any[]) => [
+                                  <SelectItem 
+                                    key={proc.id} 
+                                    value={proc.name} 
+                                    className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                                  >
+                                    <div className="flex flex-col">
+                                      <span>{proc.name}</span>
+                                      <span className="text-xs">
+                                        Limite: {proc.remaining}/{proc.annualLimit} restantes
+                                      </span>
+                                    </div>
+                                  </SelectItem>,
+                                  ...(index < array.length - 1 ? [<Separator key={`separator-${proc.id}`} />] : [])
+                                ])
+                              ) : (
+                                <div className="p-4 text-sm text-muted-foreground">
+                                  {!petIdToFetch ? "Selecione um pet primeiro" :
+                                   procedureSearch ? "Nenhum procedimento encontrado" :
+                                   availableProcedures?.message || "Nenhum procedimento disponível"}
+                                </div>
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          {field.value && (
+                            <p className="text-sm text-primary mt-1">
+                              Coparticipação: {form.getValues("value") === "0,00" ? "Sem coparticipação" : `R$ ${form.getValues("value")}`}
+                            </p>
+                          )}
+                        </FormItem>
+                      );
+                    }}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="networkUnitId"
+                    render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Procedimento *</FormLabel>
+                        <FormLabel>Rede Credenciada</FormLabel>
                         <Select 
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            setProcedureSearch(""); // Limpar busca após seleção
-                            // Atualizar coparticipação quando procedimento for selecionado
-                            const selectedProc = availableProcedures?.procedures?.find((p: any) => p.name === value);
-                            if (selectedProc) {
-                              const coparticipationValue = selectedProc.coparticipation || 0;
-                              // Sempre armazenar um valor numérico formatado, mesmo quando for zero
-                              form.setValue("value", coparticipationValue.toFixed(2).replace('.', ','));
-                            }
-                          }} 
-                          value={field.value} 
-                          disabled={!petIdToFetch || proceduresLoading}
+                          onValueChange={field.onChange} 
+                          value={field.value}
+                          disabled={networkUnitsLoading}
                         >
                           <FormControl>
                             <SelectTrigger 
-                              data-testid="select-procedure"
+                              data-testid="select-network-unit"
                               className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                               style={{
                                 borderColor: 'var(--border-gray)',
@@ -404,61 +491,36 @@ export default function GuideForm() {
                               }}
                             >
                               <SelectValue placeholder={
-                                !petIdToFetch ? "Selecione um pet primeiro" : 
-                                proceduresLoading ? "Carregando procedimentos..." :
-                                availableProcedures?.procedures?.length === 0 ? "Nenhum procedimento disponível" :
-                                "Selecione o procedimento"
+                                networkUnitsLoading ? "Carregando redes..." :
+                                networkUnits.length === 0 ? "Nenhuma rede disponível" :
+                                "Selecione a rede credenciada"
                               } />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {/* Campo de busca */}
-                            <div className="p-2 border-b">
-                              <Input
-                                placeholder="Digite para buscar..."
-                                value={procedureSearch}
-                                onChange={(e) => setProcedureSearch(e.target.value)}
-                                className="h-8"
-                                onClick={(e) => e.stopPropagation()}
-                                onKeyDown={(e) => e.stopPropagation()}
-                              />
-                            </div>
-                            
-                            {filteredProcedures.length > 0 ? (
-                              filteredProcedures.flatMap((proc: any, index: number, array: any[]) => [
+                            {networkUnits.length > 0 ? (
+                              networkUnits.flatMap((unit: any, index: number, array: any[]) => [
                                 <SelectItem 
-                                  key={proc.id} 
-                                  value={proc.name} 
+                                  key={unit.id} 
+                                  value={unit.id}
                                   className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
                                 >
-                                  <div className="flex flex-col">
-                                    <span>{proc.name}</span>
-                                    <span className="text-xs">
-                                      Limite: {proc.remaining}/{proc.annualLimit} restantes
-                                    </span>
-                                  </div>
+                                  {unit.name}
                                 </SelectItem>,
-                                ...(index < array.length - 1 ? [<Separator key={`separator-${proc.id}`} />] : [])
+                                ...(index < array.length - 1 ? [<Separator key={`separator-${unit.id}`} />] : [])
                               ])
                             ) : (
                               <div className="p-4 text-sm text-muted-foreground">
-                                {!petIdToFetch ? "Selecione um pet primeiro" :
-                                 procedureSearch ? "Nenhum procedimento encontrado" :
-                                 availableProcedures?.message || "Nenhum procedimento disponível"}
+                                Nenhuma rede credenciada cadastrada
                               </div>
                             )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
-                        {field.value && (
-                          <p className="text-sm text-primary mt-1">
-                            Coparticipação: {form.getValues("value") === "0,00" ? "Sem coparticipação" : `R$ ${form.getValues("value")}`}
-                          </p>
-                        )}
                       </FormItem>
-                    );
-                  }}
-                />
+                    )}
+                  />
+                </div>
 
                 {/* Campo oculto para manter o valor de coparticipação */}
                 <FormField
