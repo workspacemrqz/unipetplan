@@ -20,7 +20,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2 } from "lucide-react";
+import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2, Plus } from "lucide-react";
+import { useLocation } from "wouter";
 
 // Types for guides data
 interface GuideWithNetworkUnit {
@@ -75,6 +76,7 @@ const allColumns = [
 ] as const;
 
 export default function Guides() {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -337,33 +339,44 @@ export default function Guides() {
           </Select>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              style={{
-                borderColor: 'var(--border-gray)',
-                background: 'white'
-              }}
-            >
-              <MoreHorizontal className="h-4 w-4 mr-2" />
-              Colunas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            {allColumns.map((col) => (
-              <DropdownMenuCheckboxItem
-                key={col}
-                checked={visibleColumns.includes(col)}
-                onCheckedChange={() => toggleColumn(col)}
-                className="mb-1"
+        <div className="flex gap-2">
+          <Button 
+            variant="admin-action"
+            size="sm"
+            onClick={() => setLocation("/guias/novo")}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                style={{
+                  borderColor: 'var(--border-gray)',
+                  background: 'white'
+                }}
               >
-                {col}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <MoreHorizontal className="h-4 w-4 mr-2" />
+                Colunas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {allColumns.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col}
+                  checked={visibleColumns.includes(col)}
+                  onCheckedChange={() => toggleColumn(col)}
+                  className="mb-1"
+                >
+                  {col}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Modern Table Container */}
