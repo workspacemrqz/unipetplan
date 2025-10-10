@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import {
-  Layout,
+  Home,
   Users,
   Building,
   HelpCircle,
@@ -14,15 +14,15 @@ import {
   Star,
   FileText,
   Heart,
-  Tag,
-  FileCheck
+  CreditCard,
+  File
 } from "lucide-react";
 
 const navigation = [
   {
     name: "Principal",
     items: [
-      { name: "Dashboard", href: "/", icon: Layout }
+      { name: "Dashboard", href: "/", icon: Home }
     ]
   },
   {
@@ -30,14 +30,14 @@ const navigation = [
     items: [
       { name: "Clientes & Pets", href: "/clientes", icon: Users },
       { name: "Contratos", href: "/contratos", icon: FileText },
-      { name: "Guias de Atendimento", href: "/guias", icon: FileCheck }
+      { name: "Guias de Atendimento", href: "/guias", icon: File }
     ]
   },
   {
     name: "Financeiro",
     items: [
       { name: "Pagamentos", href: "/financeiro", icon: DollarSign },
-      { name: "Cupons", href: "/cupons", icon: Tag }
+      { name: "Cupons", href: "/cupons", icon: CreditCard }
     ]
   },
   {
