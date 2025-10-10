@@ -197,92 +197,112 @@ export default function Sellers() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Vendedores</h1>
-        <Button onClick={() => setLocation("/vendedores/novo")} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Vendedor
-        </Button>
-      </div>
-
-      <div className="mb-4 flex items-center gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Buscar por nome, email, cidade ou CPF..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Vendedores</h1>
+          <p className="text-sm text-muted-foreground">Gerencie vendedores e comissões</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>CPF</TableHead>
-              <TableHead>Cidade</TableHead>
-              <TableHead>Comissão CPA</TableHead>
-              <TableHead>Comissão Recorrente</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  Carregando...
-                </TableCell>
+      {/* Filters and Actions */}
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-80"
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <Button 
+            variant="admin-action"
+            size="sm"
+            onClick={() => setLocation("/vendedores/novo")}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar
+          </Button>
+        </div>
+      </div>
+
+      {/* Modern Table Container */}
+      <div className="container my-10 space-y-4 border border-[#eaeaea] rounded-lg bg-white shadow-sm">
+        {/* Table */}
+        <div className="rounded-lg overflow-hidden">
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow className="bg-white border-b border-[#eaeaea]">
+                <TableHead className="w-[200px] bg-white">Nome</TableHead>
+                <TableHead className="w-[180px] bg-white">Email</TableHead>
+                <TableHead className="w-[120px] bg-white">CPF</TableHead>
+                <TableHead className="w-[120px] bg-white">Cidade</TableHead>
+                <TableHead className="w-[120px] bg-white">Comissão CPA</TableHead>
+                <TableHead className="w-[150px] bg-white">Comissão Recorrente</TableHead>
+                <TableHead className="w-[200px] bg-white">Ações</TableHead>
               </TableRow>
-            ) : filteredSellers.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                  Nenhum vendedor encontrado
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredSellers.map((seller) => (
-                <TableRow key={seller.id}>
-                  <TableCell className="font-medium">{seller.fullName}</TableCell>
-                  <TableCell>{seller.email}</TableCell>
-                  <TableCell>{cpfMask(seller.cpf)}</TableCell>
-                  <TableCell>{seller.city}</TableCell>
-                  <TableCell>{seller.cpaPercentage}%</TableCell>
-                  <TableCell>{seller.recurringCommissionPercentage}%</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewDetails(seller)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(seller)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell colSpan={7} className="text-center py-6">
+                      <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : filteredSellers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    Nenhum vendedor encontrado
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                filteredSellers.map((seller) => (
+                  <TableRow key={seller.id} className="bg-white border-b border-[#eaeaea]">
+                    <TableCell className="font-medium whitespace-nowrap bg-white">{seller.fullName}</TableCell>
+                    <TableCell className="whitespace-nowrap bg-white">{seller.email}</TableCell>
+                    <TableCell className="whitespace-nowrap bg-white">{cpfMask(seller.cpf)}</TableCell>
+                    <TableCell className="whitespace-nowrap bg-white">{seller.city}</TableCell>
+                    <TableCell className="whitespace-nowrap bg-white">{seller.cpaPercentage}%</TableCell>
+                    <TableCell className="whitespace-nowrap bg-white">{seller.recurringCommissionPercentage}%</TableCell>
+                    <TableCell className="whitespace-nowrap bg-white">
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewDetails(seller)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(seller)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Details Dialog */}
