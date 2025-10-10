@@ -753,6 +753,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // CSRF Token endpoint - clients need to get this token before making POST/PUT/DELETE requests
   app.get("/api/csrf-token", getCsrfToken);
 
+  // Public endpoint to get seller by whitelabel URL (for referral tracking)
+  app.get("/api/seller/referral/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const seller = await storage.getSellerByWhitelabelUrl(slug);
+      
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+
+      // Return only public seller information (no sensitive data)
+      res.json({
+        id: seller.id,
+        fullName: seller.fullName,
+        whitelabelUrl: seller.whitelabelUrl,
+      });
+    } catch (error) {
+      console.error("❌ [SELLER-REFERRAL] Error fetching seller by slug:", error);
+      res.status(500).json({ error: "Erro ao buscar vendedor" });
+    }
+  });
+
   // CRITICAL: Dashboard aggregated data endpoint (required by admin dashboard)
   app.get("/admin/api/dashboard/all", requireAdmin, async (req, res) => {
     

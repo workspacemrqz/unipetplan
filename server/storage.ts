@@ -117,6 +117,7 @@ export interface IStorage {
   // Sellers
   getSellerByEmail(email: string): Promise<Seller | undefined>;
   getSellerById(id: string): Promise<Seller | undefined>;
+  getSellerByWhitelabelUrl(whitelabelUrl: string): Promise<Seller | undefined>;
   createSeller(seller: InsertSeller): Promise<Seller>;
   updateSeller(id: string, seller: Partial<InsertSeller>): Promise<Seller | undefined>;
   deleteSeller(id: string): Promise<boolean>;
@@ -307,6 +308,7 @@ export class InMemoryStorage implements IStorage {
   async getAllClients(): Promise<Client[]> { return []; }
   async getSellerByEmail(email: string): Promise<Seller | undefined> { return undefined; }
   async getSellerById(id: string): Promise<Seller | undefined> { return undefined; }
+  async getSellerByWhitelabelUrl(whitelabelUrl: string): Promise<Seller | undefined> { return undefined; }
   async createSeller(seller: InsertSeller): Promise<Seller> { return seller as any; }
   async updateSeller(id: string, seller: Partial<InsertSeller>): Promise<Seller | undefined> { return undefined; }
   async deleteSeller(id: string): Promise<boolean> { return true; }
@@ -880,6 +882,20 @@ export class DatabaseStorage implements IStorage {
       return seller;
     } catch (error) {
       console.error('❌ Error fetching seller by id:', error);
+      return undefined;
+    }
+  }
+
+  async getSellerByWhitelabelUrl(whitelabelUrl: string): Promise<Seller | undefined> {
+    try {
+      const [seller] = await db
+        .select()
+        .from(sellers)
+        .where(eq(sellers.whitelabelUrl, whitelabelUrl))
+        .limit(1);
+      return seller;
+    } catch (error) {
+      console.error('❌ Error fetching seller by whitelabel URL:', error);
       return undefined;
     }
   }
