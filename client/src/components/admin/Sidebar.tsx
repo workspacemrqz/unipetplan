@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/admin/utils";
+import { useState } from "react";
 import {
   Home,
   Users,
@@ -14,8 +15,9 @@ import {
   Clipboard,
   DollarSign,
   File,
-  Ticket,
-  Star
+  Star,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 import { createCacheManager } from "@/lib/admin/cacheUtils";
 
@@ -38,7 +40,7 @@ const navigation = [
     name: "Financeiro",
     items: [
       { name: "Pagamentos", href: "/financeiro", icon: DollarSign },
-      { name: "Cupons", href: "/cupom", icon: Ticket }
+      { name: "Cupons", href: "/cupom", icon: CreditCard }
     ]
   },
   {
@@ -65,6 +67,22 @@ export default function Sidebar() {
   const [location] = useLocation();
   const queryClient = useQueryClient();
   const cacheManager = createCacheManager(queryClient);
+  
+  // Estado para controlar quais seções estão expandidas
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+
+  // Função para alternar a expansão de uma seção
+  const toggleSection = (sectionName: string) => {
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionName)) {
+        newSet.delete(sectionName);
+      } else {
+        newSet.add(sectionName);
+      }
+      return newSet;
+    });
+  };
 
   // Map navigation paths to prefetch page types
   const getPageTypeFromPath = (href: string): 'clients' | 'guides' | 'plans' | 'dashboard' | null => {
@@ -95,13 +113,26 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 px-4 pb-6 space-y-8 overflow-y-auto">
-        {navigation.map((section) => (
-          <div key={section.name}>
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 px-3">
-              {section.name}
-            </h3>
-            <div className="space-y-1">
+      <nav className="flex-1 px-4 pb-6 space-y-4 overflow-y-auto">
+        {navigation.map((section) => {
+          const isExpanded = expandedSections.has(section.name);
+          
+          return (
+            <div key={section.name}>
+              <button
+                onClick={() => toggleSection(section.name)}
+                className="w-full flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-3 py-1 hover:text-gray-600 transition-colors rounded-lg"
+              >
+                <span>{section.name}</span>
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+              
+              {isExpanded && (
+                <div className="space-y-1">
               {section.items.map((item) => {
                 // Use startsWith for nested routes to highlight parent sections
                 const isActive = item.href === '/' 
@@ -128,9 +159,11 @@ export default function Sidebar() {
                   </Link>
                 );
               })}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
     </div>
   );
