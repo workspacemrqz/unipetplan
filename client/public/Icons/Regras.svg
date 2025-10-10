@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg921"
+   xml:space="preserve"
+   width="682.66669"
+   height="682.66669"
+   viewBox="0 0 682.66669 682.66669"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs925"><clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath935"><path
+         d="M 0,512 H 512 V 0 H 0 Z"
+         id="path933" /></clipPath></defs><g
+     id="g927"
+     transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)"><g
+       id="g929"><g
+         id="g931"
+         clip-path="url(#clipPath935)"><g
+           id="g937"
+           transform="translate(219.1859,475.8631)"><path
+             d="m 0,0 -198.372,-397.131 c -16.42,-28.393 4.068,-63.911 36.868,-63.911 h 396.743 c 32.8,0 53.289,35.518 36.868,63.911 L 73.735,0 C 57.336,28.357 16.399,28.357 0,0 Z"
+             style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path939" /></g><g
+           id="g941"
+           transform="translate(277.4047,205.9539)"><path
+             d="m 0,0 11.365,128.381 c 1.54,19.159 -13.612,35.546 -32.832,35.51 -19.267,-0.037 -34.374,-16.56 -32.687,-35.754 L -41.736,-0.155 C -40.78,-11.028 -31.634,-19.344 -20.72,-19.264 -9.864,-19.183 -0.87,-10.821 0,0 Z"
+             style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path943" /></g><g
+           id="g945"
+           transform="translate(284.3558,101.4617)"><path
+             d="m 0,0 c 0,-15.66 -12.695,-28.355 -28.355,-28.355 -15.661,0 -28.356,12.695 -28.356,28.355 0,15.66 12.695,28.355 28.356,28.355 C -12.695,28.355 0,15.66 0,0 Z"
+             style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path947" /></g></g></g></g></svg>
