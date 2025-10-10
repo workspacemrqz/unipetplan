@@ -332,7 +332,7 @@ export default function Contracts() {
             }}
           >
             <SelectTrigger 
-              className="w-48"
+              className="w-48 [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
               style={{
                 borderColor: 'var(--border-gray)',
                 background: 'white'
@@ -679,7 +679,7 @@ export default function Contracts() {
                 <label className="text-sm font-medium text-foreground">Status</label>
                 <Select value={editStatus} onValueChange={setEditStatus}>
                   <SelectTrigger 
-                    className="w-full"
+                    className="w-full [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                     style={{
                       borderColor: 'var(--border-gray)',
                       background: 'white'

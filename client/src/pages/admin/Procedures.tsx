@@ -956,7 +956,7 @@ export default function Procedures() {
                                     onValueChange={(value) => updatePlanId(index, value)}
                                   >
                                     <SelectTrigger 
-                                      className={planErrors[index] && !selectedPlan.planId ? 'border-destructive' : ''}
+                                      className={`${planErrors[index] && !selectedPlan.planId ? 'border-destructive' : ''} [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start`}
                                       style={{
                                         borderColor: planErrors[index] && !selectedPlan.planId ? undefined : 'var(--border-gray)',
                                         backgroundColor: '#FFFFFF'

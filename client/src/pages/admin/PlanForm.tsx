@@ -260,6 +260,7 @@ export default function PlanForm() {
                         <FormControl>
                           <SelectTrigger 
                             data-testid="select-plan-type"
+                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'

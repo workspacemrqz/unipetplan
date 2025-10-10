@@ -200,6 +200,7 @@ export default function PetForm() {
                         <FormControl>
                           <SelectTrigger 
                             data-testid="select-species"
+                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'
@@ -266,6 +267,7 @@ export default function PetForm() {
                         <FormControl>
                           <SelectTrigger 
                             data-testid="select-sex"
+                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'
@@ -359,6 +361,7 @@ export default function PetForm() {
                         <FormControl>
                           <SelectTrigger 
                             data-testid="select-plan"
+                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'

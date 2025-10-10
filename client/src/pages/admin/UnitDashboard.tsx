@@ -1007,6 +1007,7 @@ export default function UnitDashboard() {
                           onValueChange={handleClientChange}
                         >
                           <SelectTrigger
+                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'
@@ -1035,6 +1036,7 @@ export default function UnitDashboard() {
                           disabled={!guideForm.clientId}
                         >
                           <SelectTrigger
+                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'
@@ -1069,6 +1071,7 @@ export default function UnitDashboard() {
                           disabled={!guideForm.petId || loadingProcedures}
                         >
                           <SelectTrigger
+                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'
@@ -1489,7 +1492,7 @@ export default function UnitDashboard() {
                         <Label htmlFor="status-filter" className="text-sm font-medium">Filtrar por Cobertura</Label>
                         <Select value={coverageStatusFilter} onValueChange={setCoverageStatusFilter}>
                           <SelectTrigger 
-                            className="w-full p-3 rounded-lg border text-sm mt-1"
+                            className="w-full p-3 rounded-lg border text-sm mt-1 [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                             style={{
                               borderColor: 'var(--border-gray)',
                               background: 'white'

@@ -295,6 +295,7 @@ export default function Coupons() {
                   }
                 >
                   <SelectTrigger
+                    className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                     style={{
                       borderColor: 'var(--border-gray)',
                       background: 'white'

@@ -128,7 +128,7 @@ export function ProceduresTab() {
       <div className="w-full sm:w-[250px]">
         <Select value={selectedPet} onValueChange={setSelectedPet}>
           <SelectTrigger 
-            className="w-full p-3 rounded-lg border text-sm"
+            className="w-full p-3 rounded-lg border text-sm [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
             style={{
               borderColor: 'var(--border-gray)',
               background: 'white'

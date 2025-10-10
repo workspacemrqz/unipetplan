@@ -1153,7 +1153,7 @@ export default function Checkout() {
                                 </label>
                                 <Select value={pet.species} onValueChange={(value) => updatePet(index, 'species', value)}>
                                   <SelectTrigger 
-                                    className="w-full p-3 rounded-lg border text-sm"
+                                    className="w-full p-3 rounded-lg border text-sm [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                                     style={{
                                       borderColor: 'var(--border-gray)',
                                       background: 'white'
@@ -1207,7 +1207,7 @@ export default function Checkout() {
                                 </label>
                                 <Select value={pet.sex || ''} onValueChange={(value) => updatePet(index, 'sex', value)}>
                                   <SelectTrigger 
-                                    className="w-full p-3 rounded-lg border text-sm"
+                                    className="w-full p-3 rounded-lg border text-sm [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                                     style={{
                                       borderColor: 'var(--border-gray)',
                                       background: 'white'
@@ -1782,7 +1782,7 @@ export default function Checkout() {
                             disabled={!!selectedPlan && ['BASIC', 'INFINITY'].some(type => selectedPlan.name.toUpperCase().includes(type))}
                           >
                             <SelectTrigger 
-                              className="w-full p-3 rounded-lg border text-sm"
+                              className="w-full p-3 rounded-lg border text-sm [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                               style={{
                                 borderColor: 'var(--border-gray)',
                                 background: 'white'

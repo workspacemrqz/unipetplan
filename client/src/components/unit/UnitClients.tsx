@@ -906,7 +906,7 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
                   setGuideFormData({ ...guideFormData, clientId: value, petId: "" });
                   loadGuidePets(value);
                 }} disabled>
-                  <SelectTrigger>
+                  <SelectTrigger className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start">
                     <SelectValue placeholder="Selecione um cliente" />
                   </SelectTrigger>
                   <SelectContent>
@@ -924,7 +924,7 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
                 <Select value={guideFormData.petId} onValueChange={(value) => {
                   setGuideFormData({ ...guideFormData, petId: value });
                 }} disabled>
-                  <SelectTrigger>
+                  <SelectTrigger className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start">
                     <SelectValue placeholder="Selecione um pet" />
                   </SelectTrigger>
                   <SelectContent>
@@ -949,7 +949,7 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
                   receber: selectedProcedure?.payValue?.toString() || selectedProcedure?.price?.toString() || "0"
                 });
               }}>
-                <SelectTrigger>
+                <SelectTrigger className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start">
                   <SelectValue placeholder="Selecione um procedimento" />
                 </SelectTrigger>
                 <SelectContent>

@@ -456,6 +456,7 @@ export default function Administration() {
                           <FormControl>
                             <SelectTrigger 
                               data-testid="select-user-role"
+                              className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                               style={{
                                 borderColor: 'var(--border-gray)',
                                 background: 'white'

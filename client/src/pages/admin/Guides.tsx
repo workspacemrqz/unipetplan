@@ -274,7 +274,7 @@ export default function Guides() {
             setCurrentPage(1); // Reset para página 1 ao filtrar
           }}>
             <SelectTrigger 
-              className="w-48" 
+              className="w-48 [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start" 
               data-testid="select-status-filter"
               style={{
                 borderColor: 'var(--border-gray)',

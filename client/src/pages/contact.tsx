@@ -200,7 +200,7 @@ export default function Contact() {
                               <FormLabel>Tipo de Animal</FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="mobile-form-input">
+                                  <SelectTrigger className="mobile-form-input [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start">
                                     <SelectValue placeholder="Selecione..." />
                                   </SelectTrigger>
                                 </FormControl>
@@ -232,7 +232,7 @@ export default function Contact() {
                               <FormLabel>Idade do Pet</FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="mobile-form-input">
+                                  <SelectTrigger className="mobile-form-input [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start">
                                     <SelectValue placeholder="Selecione..." />
                                   </SelectTrigger>
                                 </FormControl>
@@ -260,7 +260,7 @@ export default function Contact() {
                             <FormLabel>Plano de Interesse</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value || ""}>
                               <FormControl>
-                                <SelectTrigger className="mobile-form-input">
+                                <SelectTrigger className="mobile-form-input [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start">
                                   <SelectValue placeholder="Selecione um plano..." />
                                 </SelectTrigger>
                               </FormControl>
