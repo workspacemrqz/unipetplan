@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertSiteSettingsSchema, insertRulesSettingsSchema, insertChatSettingsSchema } from "@shared/schema";
-import { Save, Loader2, Phone } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SiteSettingsImageUpload } from "@/components/admin/ui/site-settings-image-upload";
 import { ChatImageUpload } from "@/components/admin/ui/chat-image-upload";
@@ -324,7 +324,6 @@ export default function Settings() {
                   {/* Contact Information */}
                   <AccordionItem value="contact" data-testid="accordion-contact">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4" />
                       <div>
                         <span>Informações de Contato</span>
                       </div>
@@ -438,7 +437,6 @@ export default function Settings() {
                   {/* Social Media */}
                   <AccordionItem value="social" data-testid="accordion-social">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Redes Sociais" className="h-4 w-4" />
                       <div>
                         <span>Redes Sociais</span>
                       </div>
@@ -507,7 +505,6 @@ export default function Settings() {
                   {/* Content */}
                   <AccordionItem value="content" data-testid="accordion-content">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Conteudo" className="h-4 w-4" />
                       <div>
                         <span>Conteúdo</span>
                       </div>
@@ -560,7 +557,6 @@ export default function Settings() {
                   {/* Images */}
                   <AccordionItem value="images" data-testid="accordion-images">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Imagem" className="h-4 w-4" />
                       <div>
                         <span>Imagens</span>
                       </div>
@@ -914,7 +910,6 @@ export default function Settings() {
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="plans" data-testid="accordion-plans">
                         <AccordionTrigger className="flex items-center space-x-2">
-                          <CustomIcon name="Regras" className="h-4 w-4" />
                           <div>
                             <span>Planos & Procedimentos</span>
                           </div>
@@ -982,7 +977,6 @@ export default function Settings() {
 
                       <AccordionItem value="commissions" data-testid="accordion-commissions">
                         <AccordionTrigger className="flex items-center space-x-2">
-                          <CustomIcon name="Regras" className="h-4 w-4" />
                           <div>
                             <span>Comissões</span>
                           </div>
