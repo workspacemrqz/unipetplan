@@ -1279,96 +1279,69 @@ export default function Procedures() {
           </DialogHeader>
           
           {viewingItem && (
-            <div className="space-y-6">
-              {/* Nome do Procedimento e Categoria */}
-              <div className="border-b pb-4">
+            <div className="space-y-4">
+              {/* Nome do Procedimento */}
+              <div>
                 <label className="text-sm font-medium text-muted-foreground">Nome do Procedimento</label>
                 <h3 className="text-lg font-medium mt-1">{viewingItem.name ?? ''}</h3>
-                {viewingItem.category && (
-                  <div className="mt-3">
-                    <label className="text-sm font-medium text-muted-foreground">Categoria</label>
-                    <p className="text-base mt-1">{viewingItem.category}</p>
-                  </div>
-                )}
-                {viewingItem.description && (
-                  <p className="text-sm text-muted-foreground mt-2">{viewingItem.description}</p>
-                )}
                 <Badge variant="neutral" className="mt-2">
                   {viewingItem.isActive ? "Ativo" : "Inativo"}
                 </Badge>
               </div>
 
-              {/* Planos Vinculados com todos os campos */}
+              {/* Planos Vinculados */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-3 block">Planos Vinculados</label>
-                <div className="mt-2">
+                <label className="text-sm font-medium text-muted-foreground">Planos Vinculados</label>
+                <div className="mt-2 space-y-3">
                   {viewingProcedurePlans && Array.isArray(viewingProcedurePlans) && viewingProcedurePlans.length > 0 ? (
-                    <div className="space-y-4">
-                      {viewingProcedurePlans.map((planItem: any) => {
-                        const plan = Array.isArray(plans) ? plans.find((p: any) => p.id === planItem.planId) : null;
-                        return (
-                          <div key={planItem.planId} className="border rounded-lg p-4 bg-muted/10">
-                            {/* Nome do Plano */}
-                            <div className="mb-4 pb-3 border-b">
-                              <p className="font-semibold text-base text-primary">{plan?.name || 'Plano não encontrado'}</p>
-                              {plan?.description && (
-                                <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
-                              )}
-                            </div>
-                            
-                            {/* Grid com todos os campos */}
-                            <div className="grid grid-cols-2 gap-4">
-                              {/* Valor Integral */}
-                              <div>
-                                <label className="text-xs text-muted-foreground">Valor Integral</label>
-                                <p className="font-medium text-base mt-1">
-                                  R$ {(planItem.price / 100).toFixed(2).replace('.', ',')}
-                                </p>
-                              </div>
-
-                              {/* Pagar (R$) */}
-                              <div>
-                                <label className="text-xs text-muted-foreground">Pagar (R$)</label>
-                                <p className="font-medium text-base text-green-600 mt-1">
-                                  R$ {planItem.payValue ? (planItem.payValue / 100).toFixed(2).replace('.', ',') : '0,00'}
-                                </p>
-                              </div>
-
-                              {/* Coparticipação */}
-                              <div>
-                                <label className="text-xs text-muted-foreground">Coparticipação</label>
-                                <p className="font-medium text-base text-orange-600 mt-1">
-                                  {planItem.coparticipacao > 0 
-                                    ? `R$ ${(planItem.coparticipacao / 100).toFixed(2).replace('.', ',')}` 
-                                    : 'Sem coparticipação'}
-                                </p>
-                              </div>
-
-                              {/* Carência */}
-                              <div>
-                                <label className="text-xs text-muted-foreground">Carência</label>
-                                <p className="font-medium text-base mt-1">
-                                  {planItem.carencia || 'Sem carência'}
-                                </p>
-                              </div>
-
-                              {/* Limites Anuais */}
-                              <div className="col-span-2">
-                                <label className="text-xs text-muted-foreground">Limites Anuais</label>
-                                <p className="font-medium text-base mt-1">
-                                  {planItem.limitesAnuais || 'Sem limites anuais'}
-                                </p>
-                              </div>
+                    viewingProcedurePlans.map((planItem: any) => {
+                      const plan = Array.isArray(plans) ? plans.find((p: any) => p.id === planItem.planId) : null;
+                      return (
+                        <div key={planItem.planId} className="border border-[#eaeaea] rounded-lg p-4 bg-white">
+                          {/* Nome do Plano e Categoria */}
+                          <div className="mb-3">
+                            <p className="font-semibold text-base">{plan?.name || 'Plano não encontrado'}</p>
+                            {plan?.description && (
+                              <p className="text-sm text-muted-foreground">{plan.description}</p>
+                            )}
+                          </div>
+                          
+                          {/* Grid 2x3 com os 6 campos */}
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Valor Integral</p>
+                              <p className="font-medium">R$ {(planItem.price / 100).toFixed(2).replace('.', ',')}</p>
                             </div>
 
-                            {/* Nota no final de cada plano */}
-                            <div className="mt-3 pt-3 border-t">
-                              <p className="text-xs text-muted-foreground text-center">Preço no plano</p>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Pagar (R$)</p>
+                              <p className="font-medium">R$ {planItem.payValue ? (planItem.payValue / 100).toFixed(2).replace('.', ',') : '0,00'}</p>
+                            </div>
+
+                            <div>
+                              <p className="text-xs text-muted-foreground">Coparticipação</p>
+                              <p className="font-medium">
+                                {planItem.coparticipacao > 0 
+                                  ? `R$ ${(planItem.coparticipacao / 100).toFixed(2).replace('.', ',')}` 
+                                  : 'Sem coparticipação'}
+                              </p>
+                            </div>
+
+                            <div>
+                              <p className="text-xs text-muted-foreground">Carência</p>
+                              <p className="font-medium">{planItem.carencia || '60 dias'}</p>
+                            </div>
+
+                            <div className="col-span-2">
+                              <p className="text-xs text-muted-foreground">Limites Anuais</p>
+                              <p className="font-medium">{planItem.limitesAnuais || '10 vezes no ano'}</p>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
+
+                          <p className="text-xs text-muted-foreground text-center mt-3 pt-3 border-t border-[#eaeaea]">Preço no plano</p>
+                        </div>
+                      );
+                    })
                   ) : (
                     <p className="text-sm text-muted-foreground py-4">
                       Nenhum plano vinculado a este procedimento.
@@ -1376,7 +1349,6 @@ export default function Procedures() {
                   )}
                 </div>
               </div>
-              
             </div>
           )}
         </DialogContent>
