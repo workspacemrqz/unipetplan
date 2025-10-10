@@ -926,7 +926,7 @@ export default function Settings() {
                                     min="0" 
                                     max="100"
                                     step="0.01"
-                                    value={field.value || ""}
+                                    value={field.value ?? ""}
                                     onChange={(e) => {
                                       const value = e.target.value === "" ? "" : Number(e.target.value);
                                       field.onChange(value);
@@ -956,7 +956,7 @@ export default function Settings() {
                                     min="0" 
                                     max="100"
                                     step="0.01"
-                                    value={field.value || ""}
+                                    value={field.value ?? ""}
                                     onChange={(e) => {
                                       const value = e.target.value === "" ? "" : Number(e.target.value);
                                       field.onChange(value);
@@ -995,7 +995,7 @@ export default function Settings() {
                                     min="0" 
                                     max="100"
                                     step="0.01"
-                                    value={field.value || ""}
+                                    value={field.value ?? ""}
                                     onChange={(e) => {
                                       const value = e.target.value === "" ? "" : Number(e.target.value);
                                       field.onChange(value);
@@ -1025,7 +1025,7 @@ export default function Settings() {
                                     min="0" 
                                     max="100"
                                     step="0.01"
-                                    value={field.value || ""}
+                                    value={field.value ?? ""}
                                     onChange={(e) => {
                                       const value = e.target.value === "" ? "" : Number(e.target.value);
                                       field.onChange(value);
