@@ -1070,7 +1070,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new client
-  app.post("/admin/api/clients", requireAdmin, validateCsrf, async (req, res) => {
+  app.post("/admin/api/clients", requireAdmin, async (req, res) => {
     try {
       const clientData = insertClientSchema.parse(req.body);
       
@@ -1185,7 +1185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new seller
-  app.post("/admin/api/sellers", requireAdmin, validateCsrf, async (req, res) => {
+  app.post("/admin/api/sellers", requireAdmin, async (req, res) => {
     try {
       const { insertSellerSchema } = await import("../shared/schema.js");
       const sellerData = insertSellerSchema.parse(req.body);
