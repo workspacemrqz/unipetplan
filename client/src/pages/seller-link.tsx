@@ -119,25 +119,6 @@ export default function SellerLink() {
                 </div>
               </div>
 
-              {/* Share Instructions */}
-              <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-                <h3 className="font-semibold text-gray-900">Dicas para Compartilhar</h3>
-                <div className="space-y-3 text-sm text-gray-600">
-                  <p>
-                    <strong className="text-gray-900">WhatsApp:</strong> Cole o link em suas conversas ou status
-                  </p>
-                  <p>
-                    <strong className="text-gray-900">Redes Sociais:</strong> Compartilhe em posts, stories ou biografias
-                  </p>
-                  <p>
-                    <strong className="text-gray-900">Email:</strong> Inclua o link em suas mensagens e assinaturas
-                  </p>
-                  <p>
-                    <strong className="text-gray-900">Site/Blog:</strong> Adicione como botão ou banner em suas páginas
-                  </p>
-                </div>
-              </div>
-
               {/* Performance Stats */}
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="bg-white rounded-lg shadow-sm p-6">
