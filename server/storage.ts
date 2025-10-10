@@ -42,6 +42,7 @@ import {
   chatSettings,
   clients,
   sellers,
+  sellerAnalytics,
   species,
   pets,
   contracts,
@@ -123,6 +124,11 @@ export interface IStorage {
   updateSeller(id: string, seller: Partial<InsertSeller>): Promise<Seller | undefined>;
   deleteSeller(id: string): Promise<boolean>;
   getAllSellers(): Promise<Seller[]>;
+  
+  // Seller Analytics
+  trackSellerClick(sellerId: string): Promise<void>;
+  trackSellerConversion(sellerId: string, revenue?: number): Promise<void>;
+  getSellerAnalytics(sellerId: string): Promise<{clicks: number, conversions: number, conversionRate: number}>;
 
   // === NEW TABLE METHODS ===
 
@@ -315,6 +321,11 @@ export class InMemoryStorage implements IStorage {
   async updateSeller(id: string, seller: Partial<InsertSeller>): Promise<Seller | undefined> { return undefined; }
   async deleteSeller(id: string): Promise<boolean> { return true; }
   async getAllSellers(): Promise<Seller[]> { return []; }
+  async trackSellerClick(sellerId: string): Promise<void> {}
+  async trackSellerConversion(sellerId: string, revenue?: number): Promise<void> {}
+  async getSellerAnalytics(sellerId: string): Promise<{clicks: number, conversions: number, conversionRate: number}> {
+    return { clicks: 0, conversions: 0, conversionRate: 0 };
+  }
   async createPet(pet: InsertPet): Promise<Pet> { return pet as any; }
   async updatePet(id: string, pet: Partial<InsertPet>): Promise<Pet | undefined> { return undefined; }
   async getPet(id: string): Promise<Pet | undefined> { return undefined; }
@@ -944,6 +955,125 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('❌ Error fetching all sellers:', error);
       return [];
+    }
+  }
+
+  // Seller Analytics
+  async trackSellerClick(sellerId: string): Promise<void> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Check if analytics record exists for today
+      const [existing] = await db
+        .select()
+        .from(sellerAnalytics)
+        .where(
+          and(
+            eq(sellerAnalytics.sellerId, sellerId),
+            sql`DATE(${sellerAnalytics.date}) = DATE(${today})`
+          )
+        )
+        .limit(1);
+      
+      if (existing) {
+        // Increment clicks
+        await db
+          .update(sellerAnalytics)
+          .set({ 
+            clicks: existing.clicks + 1,
+            updatedAt: new Date() 
+          })
+          .where(eq(sellerAnalytics.id, existing.id));
+      } else {
+        // Create new record for today
+        await db.insert(sellerAnalytics).values({
+          sellerId,
+          date: today,
+          clicks: 1,
+          conversions: 0,
+          revenue: '0.00'
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error tracking seller click:', error);
+    }
+  }
+
+  async trackSellerConversion(sellerId: string, revenue?: number): Promise<void> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Check if analytics record exists for today
+      const [existing] = await db
+        .select()
+        .from(sellerAnalytics)
+        .where(
+          and(
+            eq(sellerAnalytics.sellerId, sellerId),
+            sql`DATE(${sellerAnalytics.date}) = DATE(${today})`
+          )
+        )
+        .limit(1);
+      
+      if (existing) {
+        // Increment conversions and add revenue
+        const currentRevenue = parseFloat(existing.revenue || '0');
+        const newRevenue = currentRevenue + (revenue || 0);
+        
+        await db
+          .update(sellerAnalytics)
+          .set({ 
+            conversions: existing.conversions + 1,
+            revenue: newRevenue.toFixed(2),
+            updatedAt: new Date() 
+          })
+          .where(eq(sellerAnalytics.id, existing.id));
+      } else {
+        // Create new record for today
+        await db.insert(sellerAnalytics).values({
+          sellerId,
+          date: today,
+          clicks: 0,
+          conversions: 1,
+          revenue: (revenue || 0).toFixed(2)
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error tracking seller conversion:', error);
+    }
+  }
+
+  async getSellerAnalytics(sellerId: string): Promise<{clicks: number, conversions: number, conversionRate: number}> {
+    try {
+      // Get aggregated analytics for this seller across all time
+      const result = await db
+        .select({
+          totalClicks: sql<number>`COALESCE(SUM(${sellerAnalytics.clicks}), 0)`,
+          totalConversions: sql<number>`COALESCE(SUM(${sellerAnalytics.conversions}), 0)`
+        })
+        .from(sellerAnalytics)
+        .where(eq(sellerAnalytics.sellerId, sellerId));
+      
+      const totalClicks = result[0]?.totalClicks || 0;
+      const totalConversions = result[0]?.totalConversions || 0;
+      const conversionRate = totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0;
+      
+      console.log(`📊 [ANALYTICS] Seller ${sellerId} stats:`, {
+        clicks: totalClicks,
+        conversions: totalConversions,
+        conversionRate: conversionRate.toFixed(2)
+      });
+      
+      return {
+        clicks: totalClicks,
+        conversions: totalConversions,
+        conversionRate: parseFloat(conversionRate.toFixed(2))
+      };
+    } catch (error) {
+      console.error('❌ Error fetching seller analytics:', error);
+      return { clicks: 0, conversions: 0, conversionRate: 0 };
     }
   }
 

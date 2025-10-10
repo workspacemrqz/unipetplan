@@ -222,6 +222,18 @@ export const sellers = pgTable("sellers", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Seller Analytics - Track clicks and conversions for seller links
+export const sellerAnalytics = pgTable("seller_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sellerId: varchar("seller_id").notNull().references(() => sellers.id),
+  date: timestamp("date").notNull().default(sql`CURRENT_TIMESTAMP`),
+  clicks: integer("clicks").notNull().default(0),
+  conversions: integer("conversions").notNull().default(0),
+  revenue: decimal("revenue", { precision: 10, scale: 2 }).default("0.00"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Unified pets table (UNIPET version with all fields)
 export const pets = pgTable("pets", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

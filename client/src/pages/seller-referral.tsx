@@ -29,6 +29,17 @@ export default function SellerReferral() {
         // Save referral to localStorage
         setSellerReferral(seller.id, seller.whitelabelUrl);
         
+        // Track the click
+        fetch("/api/seller/track-click", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sellerId: seller.id }),
+        }).catch(error => {
+          console.error("[Referral] Error tracking click:", error);
+        });
+        
         // Redirect to home page
         console.log(`[Referral] Referral captured for seller: ${seller.fullName}`);
         navigate("/");

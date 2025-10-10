@@ -1287,6 +1287,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==== SELLER ANALYTICS ROUTES ====
+  // Track seller link click
+  app.post("/api/seller/track-click", async (req, res) => {
+    try {
+      const { sellerId } = req.body;
+      
+      if (!sellerId) {
+        return res.status(400).json({ error: "sellerId é obrigatório" });
+      }
+      
+      // Verify seller exists
+      const seller = await storage.getSellerById(sellerId);
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      // Track the click
+      await storage.trackSellerClick(sellerId);
+      console.log("✅ [ANALYTICS] Click tracked for seller:", sellerId);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("❌ [ANALYTICS] Error tracking seller click:", error);
+      res.status(500).json({ error: "Erro ao rastrear clique" });
+    }
+  });
+  
+  // Track seller conversion (called during checkout)
+  app.post("/api/seller/track-conversion", async (req, res) => {
+    try {
+      const { sellerId, revenue } = req.body;
+      
+      if (!sellerId) {
+        return res.status(400).json({ error: "sellerId é obrigatório" });
+      }
+      
+      // Verify seller exists
+      const seller = await storage.getSellerById(sellerId);
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      // Track the conversion
+      await storage.trackSellerConversion(sellerId, revenue);
+      console.log("✅ [ANALYTICS] Conversion tracked for seller:", sellerId, "Revenue:", revenue);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("❌ [ANALYTICS] Error tracking seller conversion:", error);
+      res.status(500).json({ error: "Erro ao rastrear conversão" });
+    }
+  });
+  
+  // Get seller analytics
+  app.get("/api/seller/analytics/:sellerId", async (req, res) => {
+    try {
+      const { sellerId } = req.params;
+      
+      // Verify seller exists
+      const seller = await storage.getSellerById(sellerId);
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      // Get analytics
+      const analytics = await storage.getSellerAnalytics(sellerId);
+      
+      res.json(analytics);
+    } catch (error) {
+      console.error("❌ [ANALYTICS] Error fetching seller analytics:", error);
+      res.status(500).json({ error: "Erro ao buscar estatísticas" });
+    }
+  });
+
   // ==== ADMIN PAYMENT RECEIPTS ROUTES ====
   // Get all payment receipts
   app.get("/admin/api/payment-receipts", requireAdmin, async (req, res) => {
@@ -3643,6 +3717,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const contract = await storage.createContract(contractData);
               contracts.push(contract);
               console.log(`✅ [SIMPLE] Contrato criado para pet ${pet.name}: ${contract.id}`);
+              
+              // Track conversion for seller if present
+              if (sellerId) {
+                const revenue = isAnnualPlan ? parseFloat(contractAnnualAmount.toFixed(2)) : parseFloat(contractMonthlyAmount.toFixed(2));
+                await storage.trackSellerConversion(sellerId, revenue);
+                console.log(`📈 [ANALYTICS] Conversão rastreada para vendedor ${sellerId}, valor: ${revenue}`);
+              }
             } catch (contractError) {
               console.error(`⚠️ [SIMPLE] Erro ao criar contrato para pet ${pet.name}:`, contractError);
             }
@@ -4021,6 +4102,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const contract = await storage.createContract(contractData);
               contractsPix.push(contract);
               console.log(`✅ [SIMPLE-PIX] Contrato criado para pet ${pet.name}: ${contract.id}`);
+              
+              // Track conversion for seller if present
+              if (sellerId) {
+                const revenue = isAnnualPlan ? parseFloat(contractAnnualAmount.toFixed(2)) : parseFloat(contractMonthlyAmount.toFixed(2));
+                await storage.trackSellerConversion(sellerId, revenue);
+                console.log(`📈 [ANALYTICS] Conversão rastreada para vendedor ${sellerId}, valor: ${revenue}`);
+              }
             } catch (contractError: any) {
               console.error(`❌ [SIMPLE-PIX] Erro ao criar contrato para pet ${pet.name}:`, contractError);
             }
