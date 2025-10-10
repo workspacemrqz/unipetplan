@@ -6,7 +6,7 @@ interface CustomIconProps {
   color?: 'gray' | 'primary' | 'teal' | 'white';
 }
 
-const CustomIcon: React.FC<CustomIconProps> = ({ name, className = "h-5 w-5", color = 'gray' }) => {
+const CustomIcon: React.FC<CustomIconProps> = ({ name, className = "h-5 w-5", color }) => {
   // Define os filtros CSS para cada cor baseados nos ícones lucide-react originais
   const getColorFilter = () => {
     switch (color) {
@@ -23,7 +23,9 @@ const CustomIcon: React.FC<CustomIconProps> = ({ name, className = "h-5 w-5", co
         // Para ícones brancos
         return 'brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)';
       default:
-        return 'none';
+        // Quando não tem cor especificada, aplica filtro gray por padrão
+        // mas permite override via CSS com a classe custom-icon-auto
+        return 'brightness(0) saturate(100%) invert(30%) sepia(11%) saturate(478%) hue-rotate(176deg) brightness(98%) contrast(84%)';
     }
   };
 
@@ -31,7 +33,7 @@ const CustomIcon: React.FC<CustomIconProps> = ({ name, className = "h-5 w-5", co
     <img 
       src={`/Icons/${name}.svg`} 
       alt={name}
-      className={className}
+      className={`custom-icon-auto ${className}`}
       style={{ filter: getColorFilter() }}
     />
   );

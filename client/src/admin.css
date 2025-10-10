@@ -72,6 +72,11 @@ body.admin-area,
 ======================================== */
 
 @layer components {
+  /* Ícones customizados herdam cor branca quando em botões ativos */
+  [data-state="active"] .custom-icon-auto {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%) !important;
+  }
+  
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50;
     @apply [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0;
