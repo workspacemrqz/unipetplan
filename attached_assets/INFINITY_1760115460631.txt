@@ -1,0 +1,426 @@
+Procedimento: Consulta Clinica Geral Categoria do procedimento: CONSULTA - 1 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Retorno Clinico Categoria do procedimento: CONSULTA - 1 Plano: INFINITY Coparticipação (R$): R$ 0,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Atestado de Saúde Categoria do procedimento: CONSULTA - 2 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Cardiologista Categoria do procedimento: CONSULTA - 2 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Dentista Categoria do procedimento: CONSULTA - 2 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Dermatologista Categoria do procedimento: CONSULTA - 2 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Oncologista Categoria do procedimento: CONSULTA - 2 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Ortopedista Categoria do procedimento: CONSULTA - 2 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Plantão Categoria do procedimento: CONSULTA - 2 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Nefrologista Categoria do procedimento: CONSULTA - 3 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Consulta Neurologista Categoria do procedimento: CONSULTA - 3 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: TAXA DE RETORNO Categoria do procedimento: CONSULTA - 3 Plano: INFINITY Coparticipação (R$): R$ 55,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Alanina Aminotransferase (TGP/ALT) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Albumina Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Aspartato Aminotransferase  (TGO/AST) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Bilirrubinas - totais e frações Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Creatinina Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Fosfatase Alcalina (prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Fósforo UV (prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Gama Glutamil Transferase (GGT) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Hemograma( prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 27,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Parasitológico de Fezes (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Proteínas Totais Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Relação Proteína / Creatinina Urinária (UPC)(prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Sumário de Urina (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Teste de Glicemia Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Teste de Glicemia (Aparelho) Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Uréia Categoria do procedimento: EXAMES LABORATORIAIS - 1 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Cálcio sérico ou urinário Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cálculo renal Análise físico química Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 40,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Citologia do Ouvido (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Citologia Vaginal (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 62,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Colesterol total Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Curva Glicêmica Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Dosagem de Cálcio Iônico (prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 30,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: FIBRINOGÊNIO (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 15,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Função hepática (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Função renal( prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Hemograma com contagem de reticulócitos( prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Lipidograma (Colesterol + HDL + LDL + Triglicerídeos)(prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Microscopia para Sarna (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Pesquisa de hemoparasitas( prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Pesquisa de Microfilárias Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Tricograma Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Triglicerídeos Categoria do procedimento: EXAMES LABORATORIAIS - 2 Plano: INFINITY Coparticipação (R$): R$ 12,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Analise de Liquido Cavitário (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 45,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Analise de líquor (LCR)( prazo para laudo 24 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 60,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Biópsia / histopatológico (prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Biópsia de pele (prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 225,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Citologia / CAAF - nódulo superficial ( prazo para laudo 7 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 70,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CITOLOGIA DE LAVADO BRONCOALVEOLAR Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Citologia de pele (Fungo e Bactéria) (prazo para laudo 07 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Compatibilidade sanguinea (doador adicional) (prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 30,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cortisol Pós Supressão Dexametasona (prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 220,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cortisol Pré e Pós Dexametasona (prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ELISA (LEISHMANIOSE CANINA ) LEISH IDEXX ( prazo 06 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Lactato (prazo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Mielograma (prazo para laudo 10 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Necropsia (05 até 15kg)( prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Necropsia (acima de 15kg)( prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Necropsia (até 05kg) (prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Necropsia Estética (05kg até 15kg) (prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Necropsia Estética (acima de 15kg) (prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Necropsia Estética (até 05kg) (prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: NT PROBNP CANINO (prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 175,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: PERFIL HEMOGASOMETRIA/ELETRÓLITOS Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 115,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Pesquisa/parasitologico para Leishmania (pele, medula e linfonodo) (prazo para laudo 15 dias úteis) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: SOROLOGIA PARA CORONA VIROSE Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste de compatibilidade sanguínea(prazo para laudo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TESTE FELV Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 40,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TESTE FIV FELV PRODVET/BIOCLIN ( prazo 06 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TESTE RAPIDO CINOMOSE E PARVOVIROSE ACCUVET (prazo 06 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste rápido de cinomose/antígeno (ALERE)(prazo 06 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 37,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste Rapido de Erliquiose (Immunocombo IGG) (prazo 06 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste Rapido de Erliquiose SNAP 4DX (IDEXX) (prazo 06 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 107,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste Rapido de Fiv/Felv  (IDEXX) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 92,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TESTE RAPIDO LEISHMANIOSE AC ACCUVET (prazo 01 dia útil) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste rápido para cinomose e parvovirose (IGM)(prazo 06 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste Rápido Parvo/Corona (ALERE) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 42,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TESTE RAPIDO TOXOPLASMOSE IGG/IGM ACCUVET (prazo 12 horas) Categoria do procedimento: EXAMES LABORATORIAIS COMPLEXOS Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Ultrassonografia (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 1 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Ultrassonografia Guiada Categoria do procedimento: EXAMES IMAGEM - 1 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cistocentese guiada para coleta de urina Categoria do procedimento: EXAMES IMAGEM - 2 Plano: INFINITY Coparticipação (R$): R$ 40,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ECG (Eletrocardiograma) canino / felino prazo 2 dias uteis Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DA COLUNA (CAUDAL) (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DA COLUNA (CERVICAL) (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DA COLUNA (CERVICOTORAXICA)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DA COLUNA (LOMBOSACRAL)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DA COLUNA (TOROCOLOMBAR)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DE PELVE (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DE RADIOLOGICO DE TRAQUEIA Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO DO PESCOÇO (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 135,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS ( ARTICULAÇÃO FÊMOROTIBIAPATELAR /JOELHO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS ( FÊMUR) (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS ( PATELA /SOMENTE A PARTE DO JOELHO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS ( TÍBIA E FÍBULA /CANELA)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS (COXOFEMORAL)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS (FALANGES /DEDO, COXINS, ALMOFADA)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS (METATARSO/PATA ATÉ OS DEDOS)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS PELVICOS (TARSO/CALCANHAR)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS ( ARTICULAÇÃO ESCÁPULO-UMERAL/OMBRO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS ( CARPO/OSSO DO PUNHO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS (ARTICULAÇÃO ÚMERORADIOULNAR /COTOVELO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS (ESCÁPULA)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS (FALANGES /DEDO, COXINS, ALMOFADA)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS (METACARPO /PATA COMPLETA ATÉ OS DEDOS)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS (RÁDIO E ULNA/ANTEBRAÇO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO MEMBROS TORACICOS (ÚMERO/BRAÇO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: Estudo Radiográfico de Abdomem (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ESTUDO RADIOGRÁFICO DE ANIMAL SILVESTRE Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: Estudo Radiográfico de Crânio (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 135,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: Estudo Radiográfico de Torax (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 110,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: Estudo Radiológico do Esôfago (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ULTRASSOM GUIADA PARA CAAF Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: ULTRASSONOGRAFIA CONTROLE (PARA ACOMPANHAMENTO DE LOCAL ESPECIFICO)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 45,00 Carência (Dias): 60 Limites Anuais: 
+Procedimento: Ultrassonografia Ocular (prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 3 Plano: INFINITY Coparticipação (R$): R$ 97,50 Carência (Dias): 60 Limites Anuais: 
+Procedimento: BRONCOSCOPIA E LAVADO BRONQUEOALVEOLAR Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 425,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: COLONOSCOPIA DIAGNOSTICA Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 540,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Contraste para Estudo Tomográfico (APLICAÇÃO INTRATECAL) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Contraste para Estudo Tomográfico (APLICAÇÃO IV ATE 15 KG) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ECO (Ecocardiograma) prazo 2 dias uteis Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 115,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ELETROQUIMIOTERAPIA Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 900,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Eletroretinograma Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Enema de bário / Lavagem intestinal Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 57,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ESOFAGOSCOPIA COM RETIRADA DE CORPO ESTRANHO Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ESOFAGOSCOPIA DIAGNÓSTICA Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ESTUDO DE MEMBROS PELVICOS COXOFEMURAL( p/ avaliação de displasia coxofemural)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 135,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ESTUDO TOMOGRAFICO EM ANIMAL SILVESTRE (prazo 05 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exame Radiográfico Contrastado ( Esofagograma ) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exame Radiográfico Contrastado ( gastrointestinal) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exame Radiográfico Contrastado (gastografia) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exame Radiológico Odontológico Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exame Radiológico simples (cada película) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 45,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: GASTROSCOPIA COM RETIRADA DE CORPO ESTRANHO Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 420,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: GASTROSCOPIA DIAGNÓSTICA Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 420,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: LARINGOTRAQUESCOPIA Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: MIELOGRAFIA CONTRASTADA Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 350,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Otoscopia pavilhão auricular direito e esquerdo Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Projeção Adicional de Estudo Tomográfico (prazo 03 dias úteis) obs: imagens disponíveis após o exame Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Projeção de Estudo Tomográfico (prazo 03 dias úteis) obs: as imagens ficam disponíveis após o exame Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: RINOSCOPIA DA CAVIDADE NASAL (COLETA DE EXAMES) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TAXA DE ANTECIPAÇÃO DE LAUDO RX/US (12 HORAS ÚTEIS) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 40,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ULTRASSONOGRAFIA GESTACIONAL (PACOTE COM 03 US)(prazo 02 dias úteis) Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 165,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: URETROCISTOGRAFIA RETRÓGRADA Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Urografia dupla contraste Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 140,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Urografia excretora Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Urografia retrógada Categoria do procedimento: EXAMES IMAGEM - 4 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Ablação de bolsa escrotal Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Ablação Escrotal (grande) (acima de 15kg) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Amputação da falange (Falangectomia) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 450,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Amputação de Digito /  Ergot (até 60 dias) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Amputação de Membro Locomotor em Animais Silvestres Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Bandagem Robert Jhones, Velpeau, Ehmer Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 195,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Blefaroplastia Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cateterismo Vesical (cadela) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cateterismo Vesical (cão) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cateterismo Vesical (gato) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 180,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Caudectomia Patológica Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 360,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CIRURGIA RECONSTRUTIVA SIMPLES Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cistocentese Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de atresia anal Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de fimose Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de fístula oro-nasal Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hérnia Umbilical (até 60 dias) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção Hérnia Umbilical (acima de 60 dias) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Corte de bico Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Desobstrução dos canalículos lacrimais Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 125,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Drenagem Nasolacrimal Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 125,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Enucleação / exenteração do globo ocular Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Esplenectomia acima de 15kg Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 550,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Esplenectomia até 15 kg Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 450,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Excisão parcial da cartilagem da 3ª pálpebra Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exodontia de decíduos Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 120,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exodontia de permanentes Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Imobilização (rádio e una/tibia ) filhotes Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 210,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Lavagem Gástrica Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Lavagem Otológica Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Onicectomia patológica felina / canina Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 210,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Periodontia simples Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de luxação fechada coxo femural Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Sondagem nasoesofágica Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Sutura de pele simples Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Uretroplastia / prolapso de uretra  (acima de 15kg) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Uretroplastia / prolapso de uretra (até 15kg) Categoria do procedimento: CIRURGIAS SIMPLES Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: COLETA DE EXAMES DE SANGUE Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 1 Plano: INFINITY Coparticipação (R$): R$ 10,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Aferição da Pressão arterial Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 35,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Aplicação IM, SC, IV (sem material) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 10,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Aplicação IM, SC, IV (sem material/domicilio) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 15,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: AVALIAÇÃO PARA CIRURGIA Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 35,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Avaliação para Internação Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 35,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Limpeza de pós-operatório (ouvido, lesão cirúrgica, etc) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 22,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Nebulização Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 5,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Oxigenioterapia Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste de Fluoresceína Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 30,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Teste de Schirmer Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 30,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Tratamento miíase (remoção) grande Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Tratamento miíase (remoção) pequena Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 2 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Abdominocentese (5KG a 15 kg) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Abdominocentese (acima de 15 kg) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Abdominocentese (até 5KG) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Acupuntura (na clinica) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 60,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Aferição da Pressão Intra Ocular Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 57,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Aplicação de medicamentos especiais (quimioterápicos) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 87,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Assistência ao parto na clínica (até 3 horas) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Bomba de infusão Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 7,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cauterização grande Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cauterização pequena Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: COLETA DE LAVADO BRONCOALVEOLAR Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Coleta de liquor Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Coleta de medula ossea Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 50,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Contraste para Estudo Tomográfico (APLICAÇÃO IV ACIMA DE 30 KG) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Contraste para Estudo Tomográfico (APLICAÇÃO IV DE 15 KG A 30KG) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Criocirurgia Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Curativo com resina acrílica (aves e quelônios) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 87,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: DIÁRIA EM FREEZER Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 15,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Diaria Hospitalar Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 40,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: DILATAÇÃO ESOFÁGICA Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Enemas Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 15,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Eutanásia na clinica Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Fluidoterapia (serviço) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 25,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Fluidoterapia acompanhada do proprietário Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Hora de Terapia Intensiva Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 120,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Limpeza da glândula perianal Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 75,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Pacote Acupuntura (05 sessões) Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Pericardiocentese Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção de Ar Subcutâneo Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 125,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Retirada de ponto Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 5,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Taxa de destino do corpo Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 8,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Toraconcentese Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 175,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Transfusão de sangue Categoria do procedimento: INTERNAÇÃO - AMBULATORIAL - 3 Plano: INFINITY Coparticipação (R$): R$ 180,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Drenagem abscesso / hematoma Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 120,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Drenagem de otohematoma unilateral Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Orquiectomia (até 15kg) Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Orquiectomia (gato) Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Orquiectomia / Ablação  (acima de 15kg) Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: OSH / ovariohisterectomia (acima de 15kg) Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: OSH / ovariohisterectomia (gata) Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: OSH / ovariohisterectomia (logomorfo/ coelhos e similares) Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: OSH ovariohisterectomia (até 15kg) Categoria do procedimento: CIRURGIA ELETIVA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ALONGAMENTO DO CALCÂNEO COMUM Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.080,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Alongamento do calcâneo comum + Fixação externa temporária Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.800,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ALUGUEL DE SALA ( CENTRO CIRÚRGICO) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 180,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Amputação de Dígito / Ergot ( acima de 60 dias) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 360,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Amputação de membro pélvico/torácico Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 780,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Amputação do Pavilhão Auricular Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Amputação total do pênis + orquiectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Artrodese cotovelo, pancarpal, pantarsal s/ implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.800,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: BIOPSIA  ÓSSEA (prazo para laudo 15 dias úteis) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Celiotomia Exploratória Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 720,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Ceratectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cesariana  (acima de 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cesariana ( até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cesariana (gata) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cílio Ectopio Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cirurgia das glândulas/ductos salivares (Mucocele) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 660,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CIRURGIA DE CATARATA POR FACOEMULSIFICAÇÃO Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cirurgia Luxação de Disjunção Sacroilíaca Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.140,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cirurgia Luxação de Patela Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CIRURGIA OSH MINIMAMENTE INVASIVA ACIMA DE 15 KG Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cirurgia para Displasia de Cotovelo Unilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 2.000,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CIRURGIA RECONSTRUTIVA COMPLEXA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cistotomia  (acima 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Cistotomia  (até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 450,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Citologia / CAAF - coleta de órgão ( prazo para laudo 7 dias úteis) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 90,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Colecistectomia  ate 15kg Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Colecistectomia acima de 15kg Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 900,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: COLETA DE BIOPSIA COM SUTURA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 240,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Colocação de Stent Traqueal Extraluminal (Colapso Traqueia) S/ Implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 670,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Colocefalectomia (Artrotomia / ressecção cabeça de fêmur) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Conchectomia Patológica  Bilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Conchectomia Patológica Unilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Disjunção de Sinfíse Mandibular Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Disjunção Sacro Iliaca Bilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Disjunção Sacro Iliaca Unilateral S/ Implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 780,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CORREÇÃO DE DISTIQUÍASE Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 262,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Fenda Palatina Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 360,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de fístula perianal Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hérnia Inguinal (acima de 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hérnia Inguinal (até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hernia Perineal bilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 780,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hernia Perineal bilateral + orquiectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 960,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hernia Perineal unilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hernia Perineal unilateral + orquiectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hernias Diafragmáticas  (acima de 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Hernias Diafragmáticas (até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CORREÇÃO DE PARALISIA DE LARINGE Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção de Ruptura do Ligamento Cruzado Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CORREÇÃO DE SEQUESTRO CORNEANO Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: CORREÇÃO DO ARRANCAMENTO DE ESCÁPULA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção Hiperplasia da mucosa vaginal Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correçao Luxação de Mandibula Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 720,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção Ruptura do Ligamento Cruzado Cranial (sutura fabelo-tibial) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Correção Ruptura do Ligamento Cruzado Cranial (TPLO) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 2.000,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Debridamento de Ferida Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: DENERVAÇÃO ACETABULAR UNILATERAL Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: DENERVAÇÃO DE ACETABULAR BILATERAL Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: DESCOMPRESSÃO CIÁTICO Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.560,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Desvio do conduto auditivo externo (unilateral) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Enterotomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Entrópio / Ectrópio Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Enxerto Conjuntival Pedicular Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Esofagotomia cervical Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Estafilectomia +  rinoplastia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Evisceração do globo ocular Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Excisão artroplastica da cabeça e colo femoral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.000,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exenteração do globo ocular Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exerese de glândula perianal (bilateral) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exerese de higroma cotovelo / bilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exerese de higroma cotovelo / unilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exerese de higroma occipital Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exerese de tumor de Sticker (fêmea) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exerese de tumor de Sticker (macho) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Exerese nódulo em lábio ( P) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: EXPLANTAÇÃO DE PLACA + PARAFUSO Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 840,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: FACECTOMIA EXTRACAPSULAR/FEC Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: FACECTOMIA INTRACAPSULAR/FIC Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Fecaloma / ENTERETOMIA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Flap conjuntival Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Flap da 3ª pálpebra Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Fraturas Articulares Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.680,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Fraturas de Alta Complexidade Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.680,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Frenestração / lamicectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 900,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Gastrotomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Glossectomia ( Remoção parte da língua) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: IMPLANTAÇÃO DE DUPLO J Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 2.800,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: IMPLANTE DUPLO J Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 350,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: IRIDECTOMIA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Laparotomia / celiotomia exploratória Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 720,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Mandibulectomia Parcial Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 780,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Mandibulectomia Total Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 900,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Mastectomia unilateral (acima de 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Mastectomia unilateral (animal pequeno) (até 05kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Mastectomia unilateral (até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Mastectomia unilateral (gata) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: MAXILECTOMIA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: MEMBRANA BIOLOGICA PARA ENXERTO OFTALMICO Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 115,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Nefrectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Neoplasia da cavidade oral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Nodulectomia da 3ª pálpebra bilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Nodulectomia da pálpebra Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ORQUIECTOMIA (logomorfo/ coelhos e similares) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Orquiectomia-criptorquidia abdominal/ unilateral/ bilate Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: OSTECTOMIA PROXIMAL DINAMICA DE ULNA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 2.000,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Osteossíntese Mandibular (Fratura de Sífise Mandibular) S/implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 550,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Osteossíntese Mandibular(Fratura Ramo Mandibular) S/implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 720,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Osteossíntese Pelve Unilateral S/implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 840,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Osteossíntese Úmero, Radio e Ulna, Fêmur e Tíbia S/ Implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 720,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Osteotomia/Ostectomia Coronoide (Displasia de Cotovelo) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Osteotomia/Ostectomia Ulnar (Displasia de Cotovelo) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Pectinectomia  unilateral ou bilateral Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Penectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Periodontia complexa Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Persistência do ducto arterioso Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.900,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Prolapso de reto(redução) + colopexia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 650,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Prostatectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Queiloplastia (plásticas dos lábios) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de evisceração / eventração Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de fratura complexa Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de Fratura Fechada + Bandagem (Filhotes) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de fraturas / Osteossíntese  (acima de 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.080,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de fraturas / Osteossintese (até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de luxação aberta Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de luxação de patela Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de prolapso retal Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de prolapso retal (amputação) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Redução de prolapso uterino / vaginal + OSH Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: REMOÇÃO DE CIMENTO OSSEO Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.000,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção de corpo estranho (estomago) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção de corpo estranho (oral) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção de Implantes Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção de mucocele / Ranula Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção de tumor cutâneo (Grande) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoçao de tumor da laringe Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção tumor cutâneo (Pequeno) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Remoção/Retirada de pino Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Reposição do globo ocular Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Ressecção e anastomose de anel traqueal Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 630,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: RESSECÇÃO TARSOCONJUNTIVAL UNILATERAL Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 262,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Retirada de dermoide Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Ritidectomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 420,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Sepultamento da glândula da 3ª pálpebra Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Sondagem esofágica Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Sutura de pele complexa Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Sutura Ílio Trocanterica bilateral (EACC) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.750,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Tarsorrafia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Taxa Adicional Domingo Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Taxa Adicional Noturno/Feriado Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 250,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TENORRAFIA DE AQUILES( RUPTURA DE LIGAMENTO) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Toalete Cirurgico Osteocondrite Dissecante – OCD (Por articulação) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 650,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Toracotomia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 960,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Torção dilatação gástrica / redução e gastropexia (Volvulo Gástrico Emergêncial) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 900,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TPLO MODIFICADA Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 2.000,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Trânsito intestinal Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 105,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Transposição  da cartilagem cricoide e aratenoide Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 630,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Transposição Cornoconjutival Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Traqueorrafia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Triaquiase Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 262,50 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Triquiase da Carúncula Nasal Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: TTTT BILATERAL Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 1.850,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Uretrostomia  (até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Uretrostomia (acima de 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Uretrostomia (gato) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 600,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Vasectomia (animal grande) (acima de 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Vasectomia (animal pequeno/médio) (até 15kg) Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 400,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Vulvoplastia Categoria do procedimento: CIRURGIA COMPLEXA Plano: INFINITY Coparticipação (R$): R$ 500,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia local / Tranquilização Categoria do procedimento: ANESTESIA - 1 Plano: INFINITY Coparticipação (R$): R$ 105,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: ADICIONAL HORA CIRURGICA Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Epidural Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 120,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Geral Endovenosa Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 150,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Inalatoria (5kg a 15kg) Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 240,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Inalatoria (5kg a 15kg) com 40% Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 340,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Inalatoria (acima de 15kg) Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 315,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Inalatoria (acima de 15kg) com 40% Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 420,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Inalatoria (até 5kg) Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 180,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia Inalatoria (até 5kg) com 40% Categoria do procedimento: ANESTESIA - 2 Plano: INFINITY Coparticipação (R$): R$ 255,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Anestesia para Estudo Tomográfico Categoria do procedimento: ANESTESIA - 3 Plano: INFINITY Coparticipação (R$): R$ 200,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: ANESTESIA SHUNT ATE 5KG Categoria do procedimento: ANESTESIA - 3 Plano: INFINITY Coparticipação (R$): R$ 300,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Bloqueios ( Epidural, plexo Braqueal) Categoria do procedimento: ANESTESIA - 3 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Infusão Analgésica Categoria do procedimento: ANESTESIA - 3 Plano: INFINITY Coparticipação (R$): R$ 100,00 Carência (Dias): 30 Limites Anuais: 
+Procedimento: Vacina de Raiva Categoria do procedimento: VACINAS - 1 Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Vacina Polivalente (V7, V8, V10) Categoria do procedimento: VACINAS - 1 Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Vacina Quadrupla v4 Categoria do procedimento: VACINAS - 1 Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Vacina Triplice (V3) Categoria do procedimento: VACINAS - 1 Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Vacina de Gripe Categoria do procedimento: VACINAS - 2 Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Vacina Giardia Categoria do procedimento: VACINAS - 3 Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 0 Limites Anuais: 
+Procedimento: Vacina Quintupla ( V5, v3 ou v4+felv ) Categoria do procedimento: VACINAS - 3 Plano: INFINITY Coparticipação (R$): R$ 80,00 Carência (Dias): 0 Limites Anuais: 
