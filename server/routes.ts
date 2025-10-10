@@ -18,6 +18,7 @@ import {
   updatePetSchema,
   insertCouponSchema,
   updateCouponSchema,
+  insertGuideSchema,
   type InsertNetworkUnit,
   type InsertSiteSettings,
   type InsertClient,
