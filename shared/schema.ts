@@ -234,6 +234,17 @@ export const sellerAnalytics = pgTable("seller_analytics", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Seller Payments - Track payments made to sellers
+export const sellerPayments = pgTable("seller_payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sellerId: varchar("seller_id").notNull().references(() => sellers.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentDate: timestamp("payment_date").notNull().defaultNow(),
+  description: text("description"), // Optional description/notes
+  createdBy: text("created_by").notNull(), // Admin who created the payment
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Unified pets table (UNIPET version with all fields)
 export const pets = pgTable("pets", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -739,6 +750,17 @@ export const sellerLoginSchema = z.object({
   password: z.string().min(1, "CPF é obrigatório"), // Password is CPF
 });
 
+export const insertSellerPaymentSchema = z.object({
+  sellerId: z.string().min(1, "ID do vendedor é obrigatório"),
+  amount: z.string().or(z.number()).refine((val) => {
+    const num = typeof val === 'string' ? parseFloat(val) : val;
+    return !isNaN(num) && num > 0;
+  }, { message: "Valor deve ser maior que zero" }),
+  paymentDate: z.date().optional(),
+  description: z.string().optional(),
+  createdBy: z.string().min(1, "Criador é obrigatório"),
+});
+
 export const updateUserSchema = z.object({
   username: z.string().optional(),
   password: z.string().optional(),
@@ -1001,6 +1023,8 @@ export type AdminLogin = z.infer<typeof adminLoginSchema>;
 export type Seller = typeof sellers.$inferSelect;
 export type InsertSeller = typeof sellers.$inferInsert;
 export type SellerLogin = z.infer<typeof sellerLoginSchema>;
+export type SellerPayment = typeof sellerPayments.$inferSelect;
+export type InsertSellerPayment = z.infer<typeof insertSellerPaymentSchema>;
 export type Species = typeof species.$inferSelect;
 export type InsertSpecies = typeof species.$inferInsert;
 export type Pet = typeof pets.$inferSelect;
