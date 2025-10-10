@@ -21,7 +21,7 @@ import {
 } from "@/components/admin/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { PLAN_TYPES } from "@/lib/constants";
 import { z } from "zod";
 
@@ -403,9 +403,13 @@ export default function PlanForm() {
               size="sm"
               disabled={mutation.isPending}
               data-testid="button-save"
-              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
+              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base min-w-[120px]"
             >
-              {mutation.isPending ? "Salvando..." : isEdit ? "Atualizar" : "Criar Plano"}
+              {mutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                isEdit ? "Atualizar" : "Criar Plano"
+              )}
             </Button>
           </div>
         </form>

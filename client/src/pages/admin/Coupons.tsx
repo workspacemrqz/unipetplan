@@ -408,8 +408,17 @@ export default function Coupons() {
                 <Button type="button" variant="outline" onClick={handleCloseDialog}>
                   Cancelar
                 </Button>
-                <Button type="submit" variant="admin-action">
-                  {editingCoupon ? 'Atualizar' : 'Criar'}
+                <Button 
+                  type="submit" 
+                  variant="admin-action"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="min-w-[100px]"
+                >
+                  {(createMutation.isPending || updateMutation.isPending) ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    editingCoupon ? 'Atualizar' : 'Criar'
+                  )}
                 </Button>
               </div>
             </form>

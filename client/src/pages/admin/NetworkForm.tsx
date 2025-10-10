@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertNetworkUnitSchema } from "@shared/schema";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
 import { NetworkUnitImageUpload } from "@/components/ui/network-unit-image-upload";
 import { generateSlug } from "@/lib/utils";
 
@@ -453,9 +453,13 @@ export default function NetworkForm() {
               size="sm"
               disabled={mutation.isPending}
               data-testid="button-save"
-              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
+              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base min-w-[120px]"
             >
-              {mutation.isPending ? "Salvando..." : isEdit ? "Atualizar" : "Cadastrar"}
+              {mutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                isEdit ? "Atualizar" : "Cadastrar"
+              )}
             </Button>
           </div>
         </form>

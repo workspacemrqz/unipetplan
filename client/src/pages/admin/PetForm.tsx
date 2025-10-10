@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertPetSchema } from "@shared/schema";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useSpecies } from "@/hooks/use-species";
 
 export default function PetForm() {
@@ -513,11 +513,15 @@ export default function PetForm() {
               type="submit"
               variant="admin-action"
               size="sm"
-              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
+              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base min-w-[120px]"
               disabled={mutation.isPending || !form.formState.isValid || (!form.watch('name') || !form.watch('species') || !form.watch('sex'))}
               data-testid="button-save"
             >
-              {mutation.isPending ? "Salvando..." : isEdit ? "Atualizar" : "Cadastrar"}
+              {mutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                isEdit ? "Atualizar" : "Cadastrar"
+              )}
             </Button>
           </div>
         </form>

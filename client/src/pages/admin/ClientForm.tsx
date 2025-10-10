@@ -11,7 +11,7 @@ import { InputMasked } from "@/components/ui/input-masked";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertClientAdminSchema } from "@shared/schema";
-import { ArrowLeft, Plus, Edit } from "lucide-react";
+import { ArrowLeft, Plus, Edit, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function ClientForm() {
@@ -347,9 +347,13 @@ export default function ClientForm() {
                   size="sm"
                   disabled={mutation.isPending || !form.formState.isValid || (!form.watch('full_name') || !form.watch('email') || !form.watch('phone') || !form.watch('cpf'))}
                   data-testid="button-save"
-                  className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
+                  className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base min-w-[120px]"
                 >
-                  {mutation.isPending ? "Salvando..." : isEdit ? "Atualizar" : "Cadastrar"}
+                  {mutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    isEdit ? "Atualizar" : "Cadastrar"
+                  )}
                 </Button>
               </div>
             </form>

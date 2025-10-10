@@ -567,8 +567,13 @@ export default function Administration() {
                     size="sm"
                     disabled={createMutation.isPending}
                     data-testid="button-save"
+                    className="min-w-[100px]"
                   >
-                    {createMutation.isPending ? "Salvando..." : editingUser ? "Atualizar" : "Criar"}
+                    {createMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      editingUser ? "Atualizar" : "Criar"
+                    )}
                   </Button>
                 </div>
               </form>

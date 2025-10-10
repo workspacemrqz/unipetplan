@@ -669,11 +669,15 @@ export default function GuideForm() {
               type="submit"
               variant="admin-action"
               size="sm"
-              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
+              className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base min-w-[120px]"
               disabled={mutation.isPending || !form.formState.isValid || !form.getValues('procedure')}
               data-testid="button-save"
             >
-              {mutation.isPending ? "Salvando..." : isEdit ? "Atualizar" : "Criar Guia"}
+              {mutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                isEdit ? "Atualizar" : "Criar Guia"
+              )}
             </Button>
           </div>
         </form>
