@@ -34,6 +34,7 @@ import { useNetworkPageData } from "@/hooks/use-parallel-data";
 import { AnimatedSection } from "@/components/ui/animated-section";
 import { AnimatedList } from "@/components/ui/animated-list";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
+import CustomIcon from "@/components/admin/ui/CustomIcon";
 // ByteaImageDisplay removed - now using Supabase Storage images
 
 // Estilos e scripts removidos para simplificar o build
@@ -308,20 +309,18 @@ export default function Network() {
                         </h3>
                         <div className="space-y-3 mb-6">
                           <div className="flex items-start space-x-3">
-                            <img 
-                              src="/Icons/Localização.svg" 
-                              alt="Localização"
+                            <CustomIcon 
+                              name="Localização" 
+                              color="teal"
                               className="h-4 w-4 mt-1 flex-shrink-0"
-                              style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
                             />
                             <span className="text-[var(--text-dark-primary)] text-sm">{unit.address}</span>
                           </div>
                           <div className="flex items-center space-x-3">
-                            <img 
-                              src="/Icons/Emergencia.svg" 
-                              alt="Emergência"
+                            <CustomIcon 
+                              name="Emergencia" 
+                              color="teal"
                               className="h-4 w-4 flex-shrink-0"
-                              style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
                             />
                             <span className="text-[var(--text-dark-primary)] text-sm font-medium">{formatBrazilianPhoneForDisplay(unit.phone)}</span>
                           </div>
@@ -367,11 +366,10 @@ export default function Network() {
                               }}
                               data-testid={`button-location-unit-${unit.id}`}
                             >
-                              <img 
-                                src="/Icons/Localização.svg" 
-                                alt="Localização"
+                              <CustomIcon 
+                                name="Localização" 
+                                color="teal"
                                 className="h-4 w-4"
-                                style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
                               />
                             </Button>
                           )}

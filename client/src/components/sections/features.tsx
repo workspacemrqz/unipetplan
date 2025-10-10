@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { AnimatedSection } from "@/components/ui/animated-section";
 import { useSiteSettingsWithDefaults } from "@/hooks/use-site-settings";
 import { cn } from "@/lib/utils";
+import CustomIcon from "@/components/admin/ui/CustomIcon";
 
 type NetworkFeature = {
   iconName?: string;
@@ -135,11 +136,10 @@ export default function Features() {
                   return (
                     <div key={index} className="flex items-center space-x-3">
                       {item.iconName ? (
-                        <img 
-                          src={`/Icons/${item.iconName}.svg`} 
-                          alt={item.iconName}
+                        <CustomIcon 
+                          name={item.iconName} 
+                          color="teal"
                           className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
-                          style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
                         />
                       ) : item.icon ? (
                         (() => {

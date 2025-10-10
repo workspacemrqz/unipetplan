@@ -147,9 +147,10 @@ export default function Sidebar() {
                   >
                     <CustomIcon 
                       name={item.iconName} 
+                      color={isActive ? "white" : "gray"}
                       className={cn(
                         "h-5 w-5 mr-3 transition-transform duration-200",
-                        !isActive && "group-hover:scale-110"
+                        !isActive && "group-hover:scale-110 group-hover:brightness-110"
                       )} 
                     />
                     <span className="font-medium">{item.name}</span>
