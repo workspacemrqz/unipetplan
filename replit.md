@@ -14,85 +14,29 @@ Preferred communication style: Simple, everyday language.
 -   **Styling**: Tailwind CSS, Radix UI components, shadcn/ui.
 -   **State Management**: TanStack React Query.
 -   **Forms**: React Hook Form with Zod validation.
--   **Animation**: Framer Motion.
--   **Responsiveness**: Dynamic grid adjustments for various content sections.
--   **Image Handling**: Conditional rendering of images on public pages.
--   **Admin UI Consistency (October 2025)**: All admin pages (Plans, Coupons, Evaluations) follow unified design pattern with `@/components/admin/ui`, border-[#eaeaea], bg-white tables, column visibility controls, and admin-action button variants.
--   **Dropdown Standardization (October 2025)**: All 21 dropdown (Select) components across /admin routes standardized to match "Função *" field pattern from Administration.tsx: SelectTrigger with border-gray color and white background (inline style), SelectItem with py-3 pl-10 pr-4 padding and primary color selection, Separator components between items using .flatMap() pattern. Files: GuideForm, PetForm, Procedures, PlanForm, Contracts, Guides, Coupons, Settings, UnitDashboard.
--   **Button Standardization (October 2025)**: Admin form buttons standardized to use `@/components/admin/ui/button` for consistent styling across all admin pages (GuideForm now matches ClientForm button appearance).
--   **Delete Confirmation Button Standardization (October 2025)**: All delete confirmation dialogs across admin pages now use unified "Excluir" button text instead of context-specific labels (e.g., "Excluir Cupom", "Excluir Procedimento"). Applied to 5 admin pages: Coupons, Procedures, Administration, Network Units, and FAQ.
--   **Legal Pages Navigation (October 2025)**: Added "← Voltar ao Início" back buttons on /politica-privacidade and /termos-uso pages with consistent design (teal text, white background, rounded border). Fixed Header overlap issue with pt-24 padding to compensate for fixed Header (z-50). Back button aligned to the left edge on desktop without internal padding.
--   **Loading Animations (October 2025)**: 
-    -   **Button Loading States**: Standardized all button loading states across login pages and customer routes using Loader2 spinner from lucide-react. Pattern: `{isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Button Text"}`. Replaced text-based loading indicators ("Salvando...", "Processando...", "Enviando...") with animated spinners. Implemented in: customer-login, unit-login, admin-login, customer-profile, customer-surveys, customer-pets, checkout, renewal-checkout, installment-payment. Maintains button layout stability with consistent sizing.
-    -   **Page Loading States (October 2025)**: Created reusable `LoadingDots` component (`@/components/ui/LoadingDots.tsx`) with 3-dot pulse animation matching admin authentication screen. Global `pulse-scale` animation defined in `index.css` (1.4s ease-in-out, scale 1→1.5→1, opacity 1→0.6→1). Component accepts size (sm/md/lg) and color props for context-specific customization. Standardized across ALL full-page loading states in the entire application: unit pages (unit-login, unit-dashboard, UnitDashboard, GuiasPage, ClientesPage, ProcedimentosPage), customer pages (telemedicine, customer-financial, customer-procedures), ProceduresTab component, and UnitRoute components (admin and public). Eliminates ALL circular spinners (border-b-2 pattern) and ensures complete visual consistency throughout the application with zero spinner duplication.
-    -   **Instant Admin Loading (October 2025)**: Removed loading screen from admin authentication flow. `/admin/login` renders instantly without any loading state. `/admin` redirects immediately to login when unauthenticated (no 3-dot animation shown). Admin login redirects to dashboard instantly without 1-second delay. System now matches `/cliente/login` instant loading behavior.
+-   **Animation**: Framer Motion, with standardized button and page loading states using `Loader2` and a custom `LoadingDots` component.
+-   **Responsiveness**: Dynamic grid adjustments.
+-   **Admin UI Consistency**: Unified design patterns across all admin pages, consistent navigation structure, standardized dropdowns, and standardized button components (including delete confirmations).
+-   **Admin Navigation Menu (October 2025)**: Menu lateral administrativo (`client/src/components/admin/Sidebar.tsx`) reorganizado. "Rede Credenciada" foi movida da seção "Comunicação" para a seção "Parceiros" junto com "Vendedores" para agrupar recursos relacionados a parceiros de negócio.
+-   **Legal Pages Navigation**: Consistent back buttons and header overlap fixes.
+-   **Instant Admin Loading**: Optimized admin authentication flow for instant rendering and redirection.
 
 ### Technical Implementations
 -   **Backend**: Node.js with Express.js, TypeScript, ES modules.
 -   **Database**: PostgreSQL with Drizzle ORM.
--   **Authentication**: Session-based for Admin, JWT, bcrypt, Express sessions.
--   **Security**: Helmet, CORS, rate limiting, input sanitization, CSRF, XSS, SQL injection prevention, comprehensive mass assignment protection.
+-   **Authentication**: Session-based for Admin, JWT, bcrypt, Express sessions. Client authentication uses email + hashed CPF.
+-   **Security**: Helmet, CORS, rate limiting, input sanitization, CSRF, XSS, SQL injection prevention, mass assignment protection, comprehensive admin endpoint protection (`requireAdmin`), IDOR prevention, and secure credential handling. Client login migrated to CPF hashing with automatic gradual migration for legacy clients.
 -   **Image Management**: Supabase Storage for uploads, Sharp for processing.
--   **Feature Highlights**: Admin management (FAQs, Site Settings, Network Units, Procedures, Clients, Coupons, Evaluations/Satisfaction Surveys, Sellers), customer dashboard (pets, procedures, financial, surveys), Unit Portal (client, pet management, guide creation), intelligent duplicate pet prevention, Brazilian phone formatting, password-protected deletions in admin, comprehensive coupon/discount system, differentiated billing logic (annual/monthly), strict billing period validation, customizable payment receipt PDFs, annual plan renewal countdown, customer satisfaction tracking with admin review panel, and seller management with whitelabel pages and commission tracking.
--   **Seller Management System (October 2025)**:
-    -   Complete seller registration system with 25 database fields including fiscal data (CPF, full name), contact info (email, phone), address (CEP, street, number, district, city, state), payment details (PIX key with type enum, bank info, account number, agency), and commission structure (CPA percentage, recurring commission percentage)
-    -   Automatic whitelabel URL generation for each seller upon registration (e.g., `/vendedor/nome-do-vendedor`)
-    -   Seller authentication using email (username) + CPF (hashed with bcrypt as password) for secure login
-    -   Dedicated seller dashboard (`/vendedor/dashboard`) displaying personalized sales performance and commission data using same chart components as admin dashboard
-    -   Admin CRUD interface in `/admin/vendedores` with table view, search, create/edit forms, delete with password confirmation, and active/inactive status toggle
-    -   Complete separation of seller authentication context from admin/client contexts using session-based auth with `SellerAuthContext`
-    -   API routes: `/admin/api/sellers` (CRUD with requireAdmin), `/api/seller/login` (email + CPF auth), `/api/seller/me` (session validation), `/api/seller/logout`
-    -   Integrated into admin sidebar under new "PARCEIROS" category with "Vendedores" menu item
-    -   **Referral Tracking System (October 2025)**:
-        -   Sellers receive unique referral links in dedicated "Link" tab of dashboard (e.g., `/vendedor/nome-do-vendedor`)
-        -   Public referral capture page (`/vendedor/:slug`) that saves seller reference to localStorage with 7-day expiration
-        -   Referral persists across page navigation using `sellerReferral` utility library (`client/src/lib/sellerReferral.ts`)
-        -   Checkout automatically includes `sellerId` when active referral exists in localStorage
-        -   Backend tracks seller commissions via `seller_id` fields in `contracts` and `payment_receipts` tables
-        -   Public API endpoint (`/api/seller/referral/:slug`) returns only public seller data (id, name, whitelabel URL)
-        -   Complete data flow: referral link → localStorage → checkout → backend → database commission tracking
--   **Guide Management (October 2025)**: 
-    -   Formulário de guias com filtro inteligente de procedimentos disponíveis por pet
-    -   Campo de procedimento mostra apenas procedimentos do plano do pet com uso disponível
-    -   Preenchimento automático de coparticipação baseado no procedimento selecionado
-    -   Validação de limites anuais e período de carência antes de exibir procedimentos
-    -   Exibição visual de "Sem coparticipação" quando valor é zero, mantendo valor numérico (0,00) para API
-    -   **Seleção de cliente/pet por CPF (Outubro 2025)**: Sistema de busca de cliente por CPF exato com seleção de pet associado, endpoint otimizado `/admin/api/clients/cpf/:cpf`, suporte a CPF formatado e não formatado, reset automático de petId ao trocar cliente, auto-seleção quando apenas 1 pet disponível, carregamento correto em modo de edição
--   **Performance**: Optimized login and navigation, reduced database queries, `AuthContext` with `sessionStorage` caching for client authentication data. 
-    -   **Instant Admin Redirect (October 2025)**: Removed 2-second delay when redirecting unauthenticated users from `/admin` to `/admin/login`. Redirect is now instantaneous with no loading screen visible.
-    -   **Network Units Page Optimization (October 2025)**: Implemented skeleton loaders for better perceived performance, reduced animation delays (title: 0ms, filters: 50ms, cards: 100ms with 30ms stagger), replaced basic loading text with 6-card skeleton grid. Page now appears ~250ms faster with better UX.
--   **Data Updates (October 2025)**: Sistema completamente migrado de `window.location.reload()` para React Query invalidation (`queryClient.invalidateQueries()`) em todas as rotas /admin e páginas públicas. Proporciona atualizações de dados sem reload de página, melhorando significativamente a UX. Implementado em: Guides.tsx (edição de status), plans.tsx e plans-section.tsx (atualização de planos).
--   **Security Audit (October 2025 - COMPLETA)**: 
-    -   **Fase 1 (12 vulnerabilidades corrigidas)**: Admin bypass removed, cookies secure (sameSite=strict), logs sanitized, webhook authentication (HMAC-SHA256), session regeneration on all logins, CORS restricted, JWT secret enforcement, file upload validation with Sharp, error messages sanitized in production, session fixation prevention, API request timeouts (30s), CSP headers strengthened
-    -   **Fase 2 (9 vulnerabilidades corrigidas)**:
-        -   ✅ **CRÍTICA**: 101 endpoints admin protegidos com `requireAdmin` (51 V0 + 50 auditoria completa)
-        -   ✅ **ALTAS**: IDOR prevenido em endpoints admin, credenciais filtradas em `/api/network-units` (login, senhaHash), rate limiting implementado em 11 endpoints públicos críticos (checkout, login, registro, contato, validação, CEP, cupom, pagamentos)
-        -   ✅ **MÉDIAS/BAIXAS**: User enumeration mitigado, logging sanitizado, tokens gerenciados com segurança, XSS protegido, error disclosure minimizado
-    -   **Fase 3 (Correções finais - Outubro 2025)**:
-        -   ✅ **Cliente Login**: Migrado de senha para CPF hasheado - clientes autenticam com email + CPF (bcrypt 12 rounds)
-        -   ✅ **Admin Login**: CSRF removido (frontend não configurado), aceita texto plano em dev com warning, exige bcrypt em produção
-        -   ✅ **Schema DB**: Coluna `clients.password` → `clients.cpfHash` (segurança aprimorada)
-        -   ✅ **Checkout**: Agora gera hash bcrypt do CPF ao criar cliente (anteriormente cpfHash era null)
-        -   ✅ **Migração Gradual Automática**: Clientes legados sem cpfHash recebem hash automaticamente no primeiro login (compara CPF limpo e gera hash se válido)
-    -   **Score de Segurança**: 98/100 (EXCELENTE) - Sistema seguro E funcional, com migração automática de dados legados
-    -   **Próximos passos**: Testes automatizados (regression), monitoramento de rate-limits
+-   **Feature Highlights**: Admin management (FAQs, Site Settings, Network Units, Procedures, Clients, Coupons, Surveys, Sellers), customer dashboard (pets, procedures, financial, surveys), Unit Portal (client, pet management, guide creation), duplicate pet prevention, Brazilian phone formatting, password-protected deletions in admin, comprehensive coupon/discount system, differentiated billing logic, strict billing period validation, customizable payment receipt PDFs, annual plan renewal countdown, customer satisfaction tracking, and seller management with whitelabel pages and commission tracking.
+-   **Seller Management System**: Complete seller registration, automatic whitelabel URL generation, seller authentication (email + CPF), dedicated seller dashboard, admin CRUD interface, and a referral tracking system integrated into the checkout process for commission tracking.
+-   **Guide Management**: Intelligent guide form with procedure filtering by pet's plan and usage, automatic coparticipation filling, and validation of annual limits/grace periods. Client/pet selection via exact CPF search with optimized endpoint.
+-   **Performance**: Optimized login and navigation, reduced database queries, `AuthContext` with `sessionStorage` caching. Instant admin redirects and optimized network units page with skeleton loaders.
+-   **Data Updates**: Migrated all data updates from `window.location.reload()` to React Query invalidation for improved UX.
 
 ### System Design Choices
 -   **API Design**: RESTful with structured error handling.
 -   **Performance**: Code splitting, lazy loading, optimized bundle sizes, connection pooling, query optimization, response compression.
--   **Deployment**: Separate client/server builds, Node.js 18+ environment, health checks, graceful shutdown.
-    -   **Port Configuration (October 2025)**: 
-        -   Development: Backend (port 3000), Frontend (port 5000) - separate servers
-        -   Production: Unified server on port 5000 via `unified-server.ts`
-        -   Deploy script: `PORT=5000 NODE_ENV=production npm start`
-        -   Fixed deployment port mapping issue ensuring port 5000 is properly opened
-    -   **CORS & Security Fix (October 2025)**:
-        -   Fixed CORS blocking on deployed domain `https://unipet.replit.app/`
-        -   Added security middleware (`configureSecurityMiddleware`) to `unified-server.ts` 
-        -   Allowed Replit domains (`.replit.app`, `.replit.dev`) in CORS configuration
-        -   Fixed same-origin requests (no origin header) to work in production
-        -   Updated CSP to allow necessary inline scripts/styles for deployment
-        -   Ensured both dev (`server/index.ts`) and production (`unified-server.ts`) servers use same security config
+-   **Deployment**: Separate client/server builds for development, unified server for production. Standardized port configuration (5000 in production). Enhanced CORS and security configurations for Replit deployment, ensuring proper handling of `.replit.app` and `.replit.dev` domains.
 
 ## External Dependencies
 

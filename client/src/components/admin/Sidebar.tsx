@@ -47,7 +47,6 @@ const navigation = [
   {
     name: "Comunicação",
     items: [
-      { name: "Rede Credenciada", href: "/rede", icon: Building },
       { name: "Formulários", href: "/formularios", icon: Mail },
       { name: "Avaliações", href: "/avaliacoes", icon: Star }
     ]
@@ -55,6 +54,7 @@ const navigation = [
   {
     name: "Parceiros",
     items: [
+      { name: "Rede Credenciada", href: "/rede", icon: Building },
       { name: "Vendedores", href: "/vendedores", icon: UserCheck }
     ]
   },
