@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useEffect, useState, useRef } from "react";
-import LoadingDots from "@/components/ui/LoadingDots";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -14,106 +13,36 @@ interface AuthStatusResponse {
   };
 }
 
-// Session storage keys for caching
-const AUTH_CACHE_KEY = 'admin_auth_status';
-const AUTH_CACHE_TIMESTAMP_KEY = 'admin_auth_timestamp';
+// SECURITY: Only use in-memory cache, never sessionStorage for auth
+// sessionStorage can be tampered with by the client
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes cache duration
 
-// Memory cache to avoid multiple checks in the same session
+// Memory cache to avoid multiple checks in the same session (cannot be tampered with)
 let memoryAuthCache: { authenticated: boolean; timestamp: number } | null = null;
 
-// Track if this is the initial auth check for the session
-let isInitialAuthCheck = true;
-
-// Componente de loading global - apenas para verificação inicial
-function AuthLoading() {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50" style={{background: 'linear-gradient(135deg, var(--bg-teal) 0%, var(--bg-teal-dark) 100%)'}}>
-      <div className="text-center">
-        <LoadingDots size="md" color="white" className="mb-8" />
-        
-        <div className="text-lg text-white font-light tracking-wide opacity-90">
-          Verificando autenticação
-          <span className="inline-block animate-pulse">...</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Utility functions for session storage cache
-const getCachedAuthStatus = (): AuthStatusResponse | null => {
-  try {
-    const cached = sessionStorage.getItem(AUTH_CACHE_KEY);
-    const timestamp = sessionStorage.getItem(AUTH_CACHE_TIMESTAMP_KEY);
-    
-    if (!cached || !timestamp) return null;
-    
-    const age = Date.now() - parseInt(timestamp);
-    if (age > CACHE_DURATION) {
-      // Cache expired
-      sessionStorage.removeItem(AUTH_CACHE_KEY);
-      sessionStorage.removeItem(AUTH_CACHE_TIMESTAMP_KEY);
-      return null;
-    }
-    
-    return JSON.parse(cached);
-  } catch {
-    return null;
-  }
-};
-
+// Utility functions for in-memory cache only
 const setCachedAuthStatus = (status: AuthStatusResponse) => {
-  try {
-    sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(status));
-    sessionStorage.setItem(AUTH_CACHE_TIMESTAMP_KEY, Date.now().toString());
-    
-    // Update memory cache as well
-    memoryAuthCache = {
-      authenticated: status.authenticated,
-      timestamp: Date.now()
-    };
-  } catch {
-    // Silently fail if sessionStorage is not available
-  }
+  // Only use in-memory cache for performance, not for access control
+  memoryAuthCache = {
+    authenticated: status.authenticated,
+    timestamp: Date.now()
+  };
 };
 
 const clearAuthCache = () => {
-  try {
-    sessionStorage.removeItem(AUTH_CACHE_KEY);
-    sessionStorage.removeItem(AUTH_CACHE_TIMESTAMP_KEY);
-    memoryAuthCache = null;
-  } catch {
-    // Silently fail if sessionStorage is not available
-  }
+  memoryAuthCache = null;
 };
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const [, navigate] = useLocation();
-  const [showLoading, setShowLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
   const hasRedirected = useRef(false);
 
-  // Check memory cache first for instant response on subsequent navigations
-  const getMemoryCachedAuth = (): AuthStatusResponse | null => {
-    if (!memoryAuthCache) return null;
-    
-    const age = Date.now() - memoryAuthCache.timestamp;
-    if (age > CACHE_DURATION) {
-      memoryAuthCache = null;
-      return null;
-    }
-    
-    return { 
-      authenticated: memoryAuthCache.authenticated,
-      admin: memoryAuthCache.authenticated ? { login: 'admin' } : undefined
-    };
-  };
+  // SECURITY NOTE: Memory cache is only used for query optimization hints
+  // It is never used to bypass server authentication checks
 
-  // Get initial data from cache
-  const initialData = getCachedAuthStatus() || getMemoryCachedAuth();
-  
   // Query para verificar autenticação com retry robusto
+  // SECURITY: Never use cached data as initialData/placeholderData to prevent client-side auth bypass
   const { data: authStatus, isLoading, error, isFetching, refetch } = useQuery<AuthStatusResponse>({
     queryKey: ['/admin/api/auth/status'],
     queryFn: async () => {
@@ -130,7 +59,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       const result = await response.json();
       console.log("📋 [AUTH-GUARD] Resultado da autenticação:", result);
       
-      // Cache the successful result
+      // Cache the successful result for UX hints only (not for access control)
       if (result.authenticated) {
         setCachedAuthStatus(result);
       } else {
@@ -148,35 +77,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     gcTime: 5 * 60 * 1000, // 5 minutes - keep in cache for 5 minutes
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
     refetchOnMount: true, // Do refetch on mount for security
-    ...(initialData ? { initialData } : {}), // Use cached data as initial data only if available
-    ...(initialData ? { placeholderData: initialData } : {}), // Use cached data as placeholder while fetching only if available
   });
-
-  // Handle loading state with intelligent timing
-  useEffect(() => {
-    // Priority 1: If authenticated, always hide loading
-    if (authStatus?.authenticated) {
-      if (showLoading) {
-        setShowLoading(false);
-      }
-      return;
-    }
-    
-    // Priority 2: If we have any auth data (even if not authenticated), hide loading
-    if (authStatus !== undefined && authStatus !== null) {
-      if (showLoading) {
-        setShowLoading(false);
-      }
-      return;
-    }
-    
-    // Priority 3: Show loading only if actively loading and no data
-    if ((isLoading || isFetching) && !authStatus) {
-      if (!showLoading) {
-        setShowLoading(true);
-      }
-    }
-  }, [isLoading, isFetching, authStatus, showLoading]);
 
   // Handle authentication status with immediate redirect
   useEffect(() => {
@@ -192,7 +93,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     // If we have authentication data and user is authenticated, we're good
     if (authStatus?.authenticated) {
       console.log("✅ [AUTH-GUARD] Usuário autenticado com sucesso");
-      setShowLoading(false);
       return;
     }
 
@@ -205,7 +105,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         console.log("🚀 [AUTH-GUARD] Redirecionando para login");
         clearAuthCache();
         hasRedirected.current = true;
-        window.location.href = "/admin/login";
+        navigate("/admin/login");
       }
       
       return;
@@ -221,40 +121,20 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }
   }, [authStatus, isLoading, error, isFetching, retryCount, refetch]);
 
-  // No cleanup needed anymore since we removed the timeout
-
-  // Background indicator for when auth is being refetched (optional)
-  const showBackgroundRefresh = isFetching && authStatus?.authenticated && !isLoading;
-
-  // Show loading only on initial auth check when no cached data is available
-  if (showLoading) {
-    return <AuthLoading />;
-  }
-
-  // If we have auth data (from cache or query) and user is not authenticated, redirect immediately
-  // Don't show loading screen - just redirect
+  // SECURITY: Only render protected content after server confirms authentication
+  // Do NOT rely on cached data for access control - only server response
+  
+  // If we have auth data and user is not authenticated, redirect immediately
   if (error || (authStatus && !authStatus.authenticated)) {
     return null; // Return null while redirecting happens
   }
 
-  // If we have cached data showing user is authenticated, render children immediately
-  // even if background refetch is happening
+  // Only render children if server has confirmed authentication
   if (authStatus?.authenticated) {
-    return (
-      <>
-        {/* Optional: Show subtle background refresh indicator */}
-        {showBackgroundRefresh && (
-          <div className="fixed top-4 right-4 z-50 bg-white/10 backdrop-blur-sm rounded-full p-2">
-            <div className="w-4 h-4 border-2 border-t-transparent border-teal-600 rounded-full animate-spin"></div>
-          </div>
-        )}
-        {children}
-      </>
-    );
+    return <>{children}</>;
   }
 
-  // Fallback loading state (should rarely be reached with caching)
-  // Note: There's a timing issue where authStatus can be undefined after loading completes
-  // This fallback prevents infinite loading but needs investigation for proper auth flow
-  return <AuthLoading />;
+  // While checking auth (no server response yet), return null for instant loading
+  // This prevents flash of content but also prevents unauthorized access
+  return null;
 }

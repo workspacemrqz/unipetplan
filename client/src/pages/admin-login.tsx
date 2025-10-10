@@ -40,18 +40,18 @@ export default function AdminLoginPage() {
       const result = await response.json();
 
       if (response.ok) {
-        console.log("✅ [LOGIN] Login successful, invalidating cache and redirecting...");
+        console.log("✅ [LOGIN] Login successful, redirecting instantly...");
+        
+        // SECURITY: Do NOT store auth status in sessionStorage - it can be tampered with
+        // Let the server session handle authentication verification
         
         // Limpar qualquer cache de autenticação antigo
         queryClient.invalidateQueries({ queryKey: ['/admin/api/auth/status'] });
         queryClient.removeQueries({ queryKey: ['/admin/api/auth/status'] });
         
-        // Aguardar 1 segundo para garantir que a sessão foi estabelecida completamente
-        setTimeout(() => {
-          console.log("🚀 [LOGIN] Redirecionando para /admin");
-          // Use window.location for a hard redirect to ensure clean state
-          window.location.href = '/admin';
-        }, 1000);
+        // Redirect immediately - no delay
+        console.log("🚀 [LOGIN] Redirecionando para /admin");
+        window.location.href = '/admin';
       } else {
         console.error("❌ [LOGIN] Login failed:", result);
         setSubmitError(result.error || 'Erro no login');
