@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { motion } from "framer-motion";
-import { Lock, User } from "lucide-react";
+import { Lock, User, Loader2 } from "lucide-react";
 
 export default function UnitLoginPage() {
   const { slug } = useParams();
@@ -165,11 +165,7 @@ export default function UnitLoginPage() {
                 }}
               >
                 {isSubmitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 rounded-full animate-spin" 
-                      style={{borderColor: 'var(--text-light)', borderTopColor: 'transparent'}}></div>
-                    <span>Entrando...</span>
-                  </>
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <span className="flex items-center space-x-2">
                     <Lock className="w-5 h-5" />

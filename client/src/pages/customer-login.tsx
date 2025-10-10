@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { clientLoginSchema } from "../../../shared/schema";
@@ -178,11 +178,7 @@ export default function CustomerLoginPage() {
                   }}
                 >
                   {isLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 rounded-full animate-spin" 
-                        style={{borderColor: 'var(--text-light)', borderTopColor: 'transparent'}}></div>
-                      <span>Entrando...</span>
-                    </>
+                    <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <>
                       <Lock className="w-5 h-5" />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Lock, User } from "lucide-react";
+import { Lock, User, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { adminLoginSchema } from "../../../shared/schema";
@@ -156,11 +156,7 @@ export default function AdminLoginPage() {
                 data-testid="button-admin-login"
               >
                 {isLoading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 rounded-full animate-spin" 
-                      style={{borderColor: 'var(--text-light)', borderTopColor: 'transparent'}}></div>
-                    <span>Entrando...</span>
-                  </>
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <span className="flex items-center space-x-2">
                     <Lock className="w-5 h-5" />
