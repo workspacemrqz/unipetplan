@@ -273,21 +273,21 @@ export default function Settings() {
             value="site" 
             className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
-            <CustomIcon name="Conteudo" color="gray" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+            <CustomIcon name="Conteudo" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             <span className="truncate">Geral</span>
           </TabsTrigger>
           <TabsTrigger 
             value="chat" 
             className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
-            <CustomIcon name="Chat" color="gray" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+            <CustomIcon name="Chat" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             <span className="truncate">Chat</span>
           </TabsTrigger>
           <TabsTrigger 
             value="rules" 
             className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
-            <CustomIcon name="Regras" color="gray" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+            <CustomIcon name="Regras" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             <span className="truncate">Regras</span>
           </TabsTrigger>
         </TabsList>
@@ -312,7 +312,7 @@ export default function Settings() {
             <Card className="border-[#eaeaea] bg-white shadow-sm">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center space-x-2">
-                  <CustomIcon name="Conteudo" color="gray" className="h-5 w-5" />
+                  <CustomIcon name="Conteudo" className="h-5 w-5" />
                   <span>Configurações Gerais</span>
                 </CardTitle>
               </CardHeader>
@@ -324,7 +324,7 @@ export default function Settings() {
                   {/* Contact Information */}
                   <AccordionItem value="contact" data-testid="accordion-contact">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Conteudo" color="gray" className="h-4 w-4" />
+                      <CustomIcon name="Conteudo" className="h-4 w-4" />
                       <div>
                         <span>Informações de Contato</span>
                       </div>
@@ -438,7 +438,7 @@ export default function Settings() {
                   {/* Social Media */}
                   <AccordionItem value="social" data-testid="accordion-social">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Redes Sociais" color="gray" className="h-4 w-4" />
+                      <CustomIcon name="Redes Sociais" className="h-4 w-4" />
                       <div>
                         <span>Redes Sociais</span>
                       </div>
@@ -507,7 +507,7 @@ export default function Settings() {
                   {/* Content */}
                   <AccordionItem value="content" data-testid="accordion-content">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Conteudo" color="gray" className="h-4 w-4" />
+                      <CustomIcon name="Conteudo" className="h-4 w-4" />
                       <div>
                         <span>Conteúdo</span>
                       </div>
@@ -560,7 +560,7 @@ export default function Settings() {
                   {/* Images */}
                   <AccordionItem value="images" data-testid="accordion-images">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Imagem" color="gray" className="h-4 w-4" />
+                      <CustomIcon name="Imagem" className="h-4 w-4" />
                       <div>
                         <span>Imagens</span>
                       </div>
@@ -673,7 +673,7 @@ export default function Settings() {
             <Card className="border-[#eaeaea] bg-white shadow-sm">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center space-x-2">
-                  <CustomIcon name="Chat" color="gray" className="h-5 w-5" />
+                  <CustomIcon name="Chat" className="h-5 w-5" />
                   <span>Configurações do Chat</span>
                 </CardTitle>
               </CardHeader>
@@ -906,7 +906,7 @@ export default function Settings() {
                 <Card className="border-[#eaeaea] bg-white shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-foreground flex items-center space-x-2">
-                      <CustomIcon name="Regras" color="gray" className="h-5 w-5" />
+                      <CustomIcon name="Regras" className="h-5 w-5" />
                       <span>Configurações de Regras</span>
                     </CardTitle>
                   </CardHeader>
@@ -914,7 +914,7 @@ export default function Settings() {
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="plans" data-testid="accordion-plans">
                         <AccordionTrigger className="flex items-center space-x-2">
-                          <CustomIcon name="Regras" color="gray" className="h-4 w-4" />
+                          <CustomIcon name="Regras" className="h-4 w-4" />
                           <div>
                             <span>Planos & Procedimentos</span>
                           </div>
@@ -982,7 +982,7 @@ export default function Settings() {
 
                       <AccordionItem value="commissions" data-testid="accordion-commissions">
                         <AccordionTrigger className="flex items-center space-x-2">
-                          <CustomIcon name="Regras" color="gray" className="h-4 w-4" />
+                          <CustomIcon name="Regras" className="h-4 w-4" />
                           <div>
                             <span>Comissões</span>
                           </div>
