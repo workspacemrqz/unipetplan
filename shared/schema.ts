@@ -936,10 +936,22 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true, creat
 export const insertProcedureSchema = createInsertSchema(procedures).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertProcedurePlanSchema = createInsertSchema(procedurePlans).omit({ id: true, createdAt: true, isIncluded: true, displayOrder: true });
 export const insertRulesSettingsSchema = createInsertSchema(rulesSettings).omit({ id: true, createdAt: true, updatedAt: true }).extend({
-  fixedPercentage: z.string().or(z.number()).transform(val => typeof val === 'string' ? parseFloat(val) : val).pipe(z.number().min(0, "Porcentagem deve ser pelo menos 0").max(100, "Porcentagem deve ser no máximo 100")).optional(),
-  coparticipationPercentage: z.string().or(z.number()).transform(val => typeof val === 'string' ? parseFloat(val) : val).pipe(z.number().min(0, "Porcentagem deve ser pelo menos 0").max(100, "Porcentagem deve ser no máximo 100")).optional(),
-  defaultCpaPercentage: z.string().or(z.number()).transform(val => typeof val === 'string' ? parseFloat(val) : val).pipe(z.number().min(0, "Porcentagem CPA deve ser pelo menos 0").max(100, "Porcentagem CPA deve ser no máximo 100")).optional(),
-  defaultRecurringCommissionPercentage: z.string().or(z.number()).transform(val => typeof val === 'string' ? parseFloat(val) : val).pipe(z.number().min(0, "Porcentagem de comissão recorrente deve ser pelo menos 0").max(100, "Porcentagem de comissão recorrente deve ser no máximo 100")).optional()
+  fixedPercentage: z.union([
+    z.string().transform(val => val === "" ? undefined : parseFloat(val)),
+    z.number()
+  ]).optional().refine(val => val === undefined || (val >= 0 && val <= 100), "Porcentagem deve estar entre 0 e 100"),
+  coparticipationPercentage: z.union([
+    z.string().transform(val => val === "" ? undefined : parseFloat(val)),
+    z.number()
+  ]).optional().refine(val => val === undefined || (val >= 0 && val <= 100), "Porcentagem deve estar entre 0 e 100"),
+  defaultCpaPercentage: z.union([
+    z.string().transform(val => val === "" ? undefined : parseFloat(val)),
+    z.number()
+  ]).optional().refine(val => val === undefined || (val >= 0 && val <= 100), "Porcentagem CPA deve estar entre 0 e 100"),
+  defaultRecurringCommissionPercentage: z.union([
+    z.string().transform(val => val === "" ? undefined : parseFloat(val)),
+    z.number()
+  ]).optional().refine(val => val === undefined || (val >= 0 && val <= 100), "Porcentagem de comissão recorrente deve estar entre 0 e 100")
 });
 export const insertGuideSchema = createInsertSchema(guides).omit({ id: true, createdAt: true, updatedAt: true });
 
