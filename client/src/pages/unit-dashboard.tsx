@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import UnitLayout from '@/components/unit/UnitLayout';
 import { FileText, Users, Clipboard } from "lucide-react";
+import LoadingDots from '@/components/ui/LoadingDots';
 
 interface DashboardStats {
   totalGuides: number;
@@ -92,7 +93,7 @@ export default function UnitDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg-cream-light)]">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#0e7074] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <LoadingDots size="lg" color="#0e7074" className="mb-4" />
           <p className="text-gray-600">Carregando...</p>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useEffect, useState, useRef } from "react";
+import LoadingDots from "@/components/ui/LoadingDots";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -29,49 +30,13 @@ function AuthLoading() {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50" style={{background: 'linear-gradient(135deg, var(--bg-teal) 0%, var(--bg-teal-dark) 100%)'}}>
       <div className="text-center">
-        {/* Modern animated dots loader */}
-        <div className="flex items-center justify-center space-x-3 mb-8">
-          <div 
-            className="w-4 h-4 bg-white rounded-full"
-            style={{
-              animation: 'pulse-scale 1.4s ease-in-out infinite',
-              animationDelay: '0s'
-            }}
-          ></div>
-          <div 
-            className="w-4 h-4 bg-white rounded-full"
-            style={{
-              animation: 'pulse-scale 1.4s ease-in-out infinite',
-              animationDelay: '0.2s'
-            }}
-          ></div>
-          <div 
-            className="w-4 h-4 bg-white rounded-full"
-            style={{
-              animation: 'pulse-scale 1.4s ease-in-out infinite',
-              animationDelay: '0.4s'
-            }}
-          ></div>
-        </div>
+        <LoadingDots size="md" color="white" className="mb-8" />
         
         <div className="text-lg text-white font-light tracking-wide opacity-90">
           Verificando autenticação
           <span className="inline-block animate-pulse">...</span>
         </div>
       </div>
-      
-      <style>{`
-        @keyframes pulse-scale {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-          50% {
-            transform: scale(1.5);
-            opacity: 0.6;
-          }
-        }
-      `}</style>
     </div>
   );
 }

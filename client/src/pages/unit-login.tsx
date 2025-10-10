@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { motion } from "framer-motion";
 import { Lock, User, Loader2 } from "lucide-react";
+import LoadingDots from '@/components/ui/LoadingDots';
 
 export default function UnitLoginPage() {
   const { slug } = useParams();
@@ -68,7 +69,7 @@ export default function UnitLoginPage() {
     return (
       <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <LoadingDots size="lg" color="#0e7074" className="mb-4" />
           <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>

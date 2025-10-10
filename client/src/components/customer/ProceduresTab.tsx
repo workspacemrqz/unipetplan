@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AlertCircle, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import LoadingDots from '@/components/ui/LoadingDots';
 
 interface Procedure {
   id: string;
@@ -103,7 +104,7 @@ export function ProceduresTab() {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <LoadingDots size="md" color="#0e7074" className="mb-2" />
           <p className="mt-2 text-muted-foreground">Carregando procedimentos...</p>
         </div>
       </div>

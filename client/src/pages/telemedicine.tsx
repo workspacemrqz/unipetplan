@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Monitor
 } from "lucide-react";
+import LoadingDots from "@/components/ui/LoadingDots";
 
 interface EligibilityResult {
   eligible: boolean;
@@ -136,8 +137,7 @@ export default function TelemedicinePage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{background: 'var(--bg-cream-light)'}}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 rounded-full animate-spin mx-auto mb-4" 
-            style={{borderColor: 'var(--border-teal)', borderTopColor: 'transparent'}}></div>
+          <LoadingDots size="lg" color="#0e7074" className="mb-4" />
           <p style={{color: 'var(--text-dark-secondary)'}}>Verificando sua elegibilidade...</p>
         </div>
       </div>

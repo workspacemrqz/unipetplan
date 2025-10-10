@@ -6,6 +6,7 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { ProceduresTab } from "@/components/customer/ProceduresTab";
 import { useAuth } from "@/contexts/AuthContext";
+import LoadingDots from "@/components/ui/LoadingDots";
 
 export default function CustomerProcedures() {
   const [, navigate] = useLocation();
@@ -24,8 +25,7 @@ export default function CustomerProcedures() {
         <Header />
         <div className="min-h-screen pt-16 flex items-center justify-center" style={{ background: 'var(--bg-cream-light)' }}>
           <div className="text-center">
-            <div className="w-8 h-8 border-4 rounded-full animate-spin mx-auto mb-4" 
-              style={{borderColor: 'var(--text-teal)', borderTopColor: 'transparent'}}></div>
+            <LoadingDots size="md" color="#0e7074" className="mb-4" />
             <p style={{ color: 'var(--text-dark-secondary)' }}>Carregando...</p>
           </div>
         </div>
