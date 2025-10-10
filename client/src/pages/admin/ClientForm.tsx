@@ -255,7 +255,8 @@ export default function ClientForm() {
                         <InputMasked 
                           mask="cep"
                           {...field} 
-                          data-testid="input-cep" 
+                          data-testid="input-cep"
+                          onBlur={(e) => handleCEPLookup(e.target.value)}
                         />
                       </FormControl>
                       <FormMessage />
