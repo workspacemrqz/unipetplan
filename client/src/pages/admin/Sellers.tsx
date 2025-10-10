@@ -18,12 +18,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
 import { useLocation } from "wouter";
-import { Plus, Search, Edit, Trash2, Eye, Copy, Check, Loader2, FileText, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Edit, Eye, Copy, Check, Loader2, FileText, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { Switch } from "@/components/admin/ui/switch";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getQueryOptions } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useConfirmDialog } from "@/hooks/admin/use-confirm-dialog";
 import { useMasks } from "@/hooks/admin/use-masks";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 
@@ -61,6 +61,7 @@ const allColumns = [
   "Cidade",
   "CPA",
   "Recorrente",
+  "Status",
   "Ações",
 ] as const;
 
@@ -75,7 +76,6 @@ export default function Sellers() {
   const pageSize = 10;
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const confirmDialog = useConfirmDialog();
   const { applyCPFMask: cpfMask, applyPhoneMask: phoneMask, applyCEPMask: cepMask } = useMasks();
 
   const { data: sellers = [], isLoading } = useQuery<Seller[]>({
@@ -97,25 +97,34 @@ export default function Sellers() {
   const endIndex = startIndex + pageSize;
   const displaySellers = filteredSellers.slice(startIndex, endIndex);
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
+  // Toggle status mutation
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
       const response = await fetch(`/admin/api/sellers/${id}`, {
-        method: "DELETE",
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
+        body: JSON.stringify({ isActive }),
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Erro ao excluir vendedor");
+        throw new Error(error.error || "Erro ao atualizar status do vendedor");
       }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/sellers"] });
-      toast({ title: "Vendedor excluído com sucesso!" });
+      toast({
+        title: "Status atualizado",
+        description: "Status do vendedor foi atualizado.",
+      });
     },
-    onError: (error: Error) => {
-      toast({ title: "Erro ao excluir vendedor", description: error.message, variant: "destructive" });
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar status do vendedor.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -124,16 +133,8 @@ export default function Sellers() {
     setDetailsOpen(true);
   };
 
-  const handleDelete = (seller: Seller) => {
-    confirmDialog.openDialog({
-      title: "Confirmar exclusão",
-      description: `Deseja realmente excluir o vendedor ${seller.fullName}?`,
-      confirmText: "Excluir",
-      cancelText: "Cancelar",
-      onConfirm: () => {
-        deleteMutation.mutate(seller.id);
-      },
-    });
+  const handleToggleStatus = (id: string, newStatus: boolean) => {
+    toggleStatusMutation.mutate({ id, isActive: newStatus });
   };
 
   const generateSellerText = () => {
@@ -300,7 +301,8 @@ export default function Sellers() {
                 {visibleColumns.includes("Cidade") && <TableHead className="w-[120px] bg-white">Cidade</TableHead>}
                 {visibleColumns.includes("CPA") && <TableHead className="w-[120px] bg-white">Comissão CPA</TableHead>}
                 {visibleColumns.includes("Recorrente") && <TableHead className="w-[150px] bg-white">Comissão Recorrente</TableHead>}
-                {visibleColumns.includes("Ações") && <TableHead className="w-[200px] bg-white">Ações</TableHead>}
+                {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
+                {visibleColumns.includes("Ações") && <TableHead className="w-[150px] bg-white">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -344,6 +346,15 @@ export default function Sellers() {
                     {visibleColumns.includes("Cidade") && <TableCell className="whitespace-nowrap bg-white">{seller.city}</TableCell>}
                     {visibleColumns.includes("CPA") && <TableCell className="whitespace-nowrap bg-white">{seller.cpaPercentage}%</TableCell>}
                     {visibleColumns.includes("Recorrente") && <TableCell className="whitespace-nowrap bg-white">{seller.recurringCommissionPercentage}%</TableCell>}
+                    {visibleColumns.includes("Status") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <Switch
+                          checked={seller.isActive}
+                          onCheckedChange={(checked) => handleToggleStatus(seller.id, checked)}
+                          disabled={toggleStatusMutation.isPending}
+                        />
+                      </TableCell>
+                    )}
                     {visibleColumns.includes("Ações") && (
                       <TableCell className="whitespace-nowrap bg-white">
                         <div className="flex items-center space-x-1">
@@ -360,13 +371,6 @@ export default function Sellers() {
                             onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
                           >
                             <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(seller)}
-                          >
-                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
