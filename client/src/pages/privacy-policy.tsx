@@ -187,20 +187,20 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-cream-light)' }}>
-      {/* Back Button - With top margin to clear fixed header */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-4">
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium transition-colors bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          Voltar ao Início
-        </Link>
-      </div>
-
-      {/* Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         <div className="max-w-4xl mx-auto">
+          {/* Back Button - Aligned with content text */}
+          <div className="mb-4 pl-8">
+            <Link 
+              href="/" 
+              className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium transition-colors bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              Voltar ao Início
+            </Link>
+          </div>
+
+          {/* Content */}
           <div className="rounded-lg shadow-sm border p-8" style={{ backgroundColor: 'var(--bg-cream-lighter)', borderColor: 'var(--border-gray)' }}>
             {formatContent(content)}
           </div>
