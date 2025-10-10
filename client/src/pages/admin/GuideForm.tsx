@@ -145,12 +145,20 @@ export default function GuideForm() {
         await apiRequest("POST", "/admin/api/guides", data);
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/admin/api/guides"] });
+    onSuccess: async () => {
+      // Invalidar todas as queries relacionadas a guias para atualizar a lista (em paralelo)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["/admin/api/guides"] }),
+        queryClient.invalidateQueries({ queryKey: ["/admin/api/guides/with-network-units"] }),
+        queryClient.invalidateQueries({ queryKey: ["/admin/api/dashboard/all"] })
+      ]);
+      
       toast({
         title: isEdit ? "Guia atualizada" : "Guia criada",
         description: isEdit ? "Guia foi atualizada com sucesso." : "Guia foi criada com sucesso.",
       });
+      
+      // Redirecionar imediatamente após invalidar as queries
       setLocation("/guias");
     },
     onError: () => {
