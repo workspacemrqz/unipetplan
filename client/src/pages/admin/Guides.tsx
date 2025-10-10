@@ -279,7 +279,7 @@ export default function Guides() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "open": return "Aberta";
-      case "closed": return "Fechada";
+      case "closed": return "Concluída";
       case "cancelled": return "Cancelada";
       default: return status;
     }
@@ -338,7 +338,7 @@ export default function Guides() {
               {[
                 { value: "all", label: "Todos os status" },
                 { value: "open", label: "Abertas" },
-                { value: "closed", label: "Fechadas" },
+                { value: "closed", label: "Concluídas" },
                 { value: "cancelled", label: "Canceladas" }
               ].flatMap((status, index, array) => [
                 <SelectItem key={status.value} value={status.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
@@ -639,7 +639,7 @@ export default function Guides() {
                 <SelectContent>
                   {[
                     { value: "open", label: "Aberta" },
-                    { value: "closed", label: "Fechada" },
+                    { value: "closed", label: "Concluída" },
                     { value: "cancelled", label: "Cancelada" }
                   ].flatMap((status, index, array) => [
                     <SelectItem 

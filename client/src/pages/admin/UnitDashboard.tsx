@@ -616,7 +616,7 @@ export default function UnitDashboard() {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       open: { label: "Aberta" },
-      closed: { label: "Fechada" },
+      closed: { label: "Concluída" },
       cancelled: { label: "Cancelada" }
     };
     
@@ -784,7 +784,7 @@ export default function UnitDashboard() {
                 <Tabs defaultValue="open" className="space-y-4">
                   <TabsList className="grid w-full grid-cols-3 gap-1">
                     <TabsTrigger value="open">Abertas</TabsTrigger>
-                    <TabsTrigger value="closed">Fechadas</TabsTrigger>
+                    <TabsTrigger value="closed">Concluídas</TabsTrigger>
                     <TabsTrigger value="cancelled">Canceladas</TabsTrigger>
                   </TabsList>
 
@@ -863,7 +863,7 @@ export default function UnitDashboard() {
                               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                               <h3 className="text-lg font-medium text-gray-900 mb-2">
                                 Nenhuma guia {status === "open" ? "aberta" : 
-                                              status === "closed" ? "fechada" :
+                                              status === "closed" ? "concluída" :
                                               status === "cancelled" ? "cancelada" : "encontrada"}
                               </h3>
                               <p className="text-gray-500">
@@ -1313,7 +1313,7 @@ export default function UnitDashboard() {
                 <Card className="bg-green-50">
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-green-600">{guides.filter(g => g.unitStatus === 'closed').length}</div>
-                    <div className="text-sm text-green-600">Guias Fechadas</div>
+                    <div className="text-sm text-green-600">Guias Concluídas</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-yellow-50">

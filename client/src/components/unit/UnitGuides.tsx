@@ -236,7 +236,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "open": return "Aberta";
-      case "closed": return "Fechada";
+      case "closed": return "Concluída";
       case "cancelled": return "Cancelada";
       default: return status;
     }
@@ -294,7 +294,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
             <SelectContent>
               <SelectItem value="all" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Todos os status</SelectItem>
               <SelectItem value="open" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Aberta</SelectItem>
-              <SelectItem value="closed" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Fechada</SelectItem>
+              <SelectItem value="closed" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Concluída</SelectItem>
               <SelectItem value="cancelled" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">Cancelada</SelectItem>
             </SelectContent>
           </Select>

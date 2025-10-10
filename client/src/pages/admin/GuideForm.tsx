@@ -558,7 +558,7 @@ export default function GuideForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {[{value: "open", label: "Aberta"}, {value: "closed", label: "Fechada"}, {value: "cancelled", label: "Cancelada"}].flatMap((status, index, array) => [
+                            {[{value: "open", label: "Aberta"}, {value: "closed", label: "Concluída"}, {value: "cancelled", label: "Cancelada"}].flatMap((status, index, array) => [
                               <SelectItem key={status.value} value={status.value} className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
                                 {status.label}
                               </SelectItem>,
