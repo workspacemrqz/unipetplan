@@ -2431,6 +2431,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Erro ao buscar procedimentos" });
     }
   });
+
+  // Get procedure categories
+  app.get("/admin/api/procedure-categories", requireAdmin, async (req, res) => {
+    try {
+      const categories = await storage.getProcedureCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching procedure categories:", error);
+      res.status(500).json({ error: "Erro ao buscar categorias" });
+    }
+  });
   
   // Create new procedure
   app.post("/admin/api/procedures", requireAdmin, async (req, res) => {

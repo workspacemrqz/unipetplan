@@ -96,6 +96,7 @@ type ProcedurePlan = {
 const insertProcedureSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional(),
+  category: z.string().optional(),
   isActive: z.boolean().default(true),
 });
 
@@ -144,6 +145,10 @@ export default function Procedures() {
     queryKey: ["/admin/api/plans/active"],
   });
 
+  const { data: categories } = useQuery({
+    queryKey: ["/admin/api/procedure-categories"],
+  });
+
   // Buscar configurações de regras para cálculo automático de porcentagem
   const { data: rulesSettings } = useQuery({
     queryKey: ["/admin/api/settings/rules"],
@@ -167,6 +172,7 @@ export default function Procedures() {
     defaultValues: {
       name: "",
       description: "",
+      category: "",
       isActive: true,
     },
   });
@@ -671,6 +677,7 @@ export default function Procedures() {
     form.reset({
       name: item.name ?? "",
       description: item.description ?? "",
+      category: item.category ?? "",
       isActive: item.isActive ?? true,
     });
     setDialogOpen(true);
@@ -919,6 +926,36 @@ export default function Procedures() {
                               }}
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-primary">Categoria</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger
+                                style={{
+                                  borderColor: 'var(--border-gray)',
+                                  backgroundColor: '#FFFFFF'
+                                }}
+                              >
+                                <SelectValue placeholder="Selecione uma categoria" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {categories && Array.isArray(categories) && categories.map((category: any) => (
+                                <SelectItem key={category.id} value={category.name}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}

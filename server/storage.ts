@@ -56,7 +56,8 @@ import {
   rulesSettings,
   coupons,
   contractInstallments,
-  procedureUsage
+  procedureUsage,
+  procedureCategories
 } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, desc, asc, and, sql } from "drizzle-orm";
@@ -151,6 +152,7 @@ export interface IStorage {
   getActiveProcedures(): Promise<Procedure[]>;
   getProceduresWithCoparticipation(planId?: string): Promise<any[]>;
   deleteProcedure(id: string): Promise<boolean>;
+  getProcedureCategories(): Promise<any[]>;
 
   // Plan Procedures
   createPlanProcedure(planProcedure: InsertPlanProcedure): Promise<PlanProcedure>;
@@ -335,6 +337,7 @@ export class InMemoryStorage implements IStorage {
   async getActiveProcedures(): Promise<any[]> { return []; }
   async getProceduresWithCoparticipation(planId?: string): Promise<any[]> { return []; }
   async deleteProcedure(id: string): Promise<boolean> { return true; }
+  async getProcedureCategories(): Promise<any[]> { return []; }
   async createPlanProcedure(planProcedure: InsertPlanProcedure): Promise<PlanProcedure> { return planProcedure as any; }
   async getPlanProcedures(planId: string): Promise<PlanProcedure[]> { return []; }
   async deletePlanProcedure(planId: string, procedureId: string): Promise<boolean> { return true; }
@@ -1077,6 +1080,11 @@ export class DatabaseStorage implements IStorage {
 
   async getAllProcedures(): Promise<Procedure[]> {
     return await db.select().from(procedures);
+  }
+
+  async getProcedureCategories(): Promise<any[]> {
+    const categories = await db.select().from(procedureCategories).where(eq(procedureCategories.isActive, true)).orderBy(procedureCategories.displayOrder);
+    return categories;
   }
 
   async getActiveProcedures(): Promise<any[]> {

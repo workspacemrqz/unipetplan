@@ -436,6 +436,15 @@ export const contractInstallments = pgTable("contract_installments", {
 
 // === UNIFIED PROCEDURES SYSTEM ===
 
+// Procedure categories table
+export const procedureCategories = pgTable("procedure_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull().unique(),
+  displayOrder: integer("display_order").default(0).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Unified procedures table
 export const procedures = pgTable("procedures", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
