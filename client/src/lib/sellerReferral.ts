@@ -4,7 +4,7 @@
  */
 
 const REFERRAL_KEY = "unipet_seller_referral";
-const REFERRAL_EXPIRY_DAYS = 30; // Referência válida por 30 dias
+const REFERRAL_EXPIRY_DAYS = 7; // Referência válida por 7 dias
 
 export interface SellerReferral {
   sellerId: string;

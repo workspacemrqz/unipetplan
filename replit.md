@@ -43,6 +43,14 @@ Preferred communication style: Simple, everyday language.
     -   Complete separation of seller authentication context from admin/client contexts using session-based auth with `SellerAuthContext`
     -   API routes: `/admin/api/sellers` (CRUD with requireAdmin), `/api/seller/login` (email + CPF auth), `/api/seller/me` (session validation), `/api/seller/logout`
     -   Integrated into admin sidebar under new "PARCEIROS" category with "Vendedores" menu item
+    -   **Referral Tracking System (October 2025)**:
+        -   Sellers receive unique referral links in dedicated "Link" tab of dashboard (e.g., `/vendedor/nome-do-vendedor`)
+        -   Public referral capture page (`/vendedor/:slug`) that saves seller reference to localStorage with 7-day expiration
+        -   Referral persists across page navigation using `sellerReferral` utility library (`client/src/lib/sellerReferral.ts`)
+        -   Checkout automatically includes `sellerId` when active referral exists in localStorage
+        -   Backend tracks seller commissions via `seller_id` fields in `contracts` and `payment_receipts` tables
+        -   Public API endpoint (`/api/seller/referral/:slug`) returns only public seller data (id, name, whitelabel URL)
+        -   Complete data flow: referral link → localStorage → checkout → backend → database commission tracking
 -   **Guide Management (October 2025)**: 
     -   Formulário de guias com filtro inteligente de procedimentos disponíveis por pet
     -   Campo de procedimento mostra apenas procedimentos do plano do pet com uso disponível
