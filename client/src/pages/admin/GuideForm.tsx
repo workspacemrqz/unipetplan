@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { z } from "zod";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 
 export default function GuideForm() {
   const [, setLocation] = useLocation();
@@ -24,6 +24,7 @@ export default function GuideForm() {
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [clientPets, setClientPets] = useState<any[]>([]);
   const [procedureSearch, setProcedureSearch] = useState("");
+  const [isSearchingClient, setIsSearchingClient] = useState(false);
 
   // Função para formatar CPF
   const formatCpf = (value: string) => {
@@ -183,6 +184,8 @@ export default function GuideForm() {
       return;
     }
 
+    setIsSearchingClient(true); // Start loading
+    
     try {
       const client = await apiRequest("GET", `/admin/api/clients/cpf/${sanitizedCpf}`);
       setSelectedClient(client);
@@ -214,6 +217,8 @@ export default function GuideForm() {
       setClientPets([]);
       form.setValue("clientId", "");
       form.setValue("petId", "");
+    } finally {
+      setIsSearchingClient(false); // Stop loading
     }
   };
 
@@ -299,8 +304,16 @@ export default function GuideForm() {
                       onClick={searchClientByCpf}
                       variant="admin-action"
                       className="h-9 px-4"
+                      disabled={isSearchingClient}
                     >
-                      Buscar
+                      {isSearchingClient ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Buscando...
+                        </>
+                      ) : (
+                        "Buscar"
+                      )}
                     </Button>
                   </div>
                   {selectedClient && (
