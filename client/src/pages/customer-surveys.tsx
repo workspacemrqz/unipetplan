@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, Star, Check, X } from "lucide-react";
+import { ArrowLeft, Star, Check, X, Loader2 } from "lucide-react";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -284,10 +284,14 @@ export default function CustomerSurveys() {
               <button
                 onClick={submitCreateSurvey}
                 disabled={isCreating || createForm.rating === 0}
-                className="px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                className="px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50 min-w-[160px]"
                 style={{ background: 'var(--btn-ver-planos-bg)', color: 'var(--btn-ver-planos-text)' }}
               >
-                {isCreating ? 'Enviando...' : 'Enviar Feedback'}
+                {isCreating ? (
+                  <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                ) : (
+                  'Enviar Feedback'
+                )}
               </button>
             </div>
           </motion.div>

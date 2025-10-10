@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, MapPin, Stethoscope, Edit, Save, X, Camera, Upload, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, Heart, MapPin, Stethoscope, Edit, Save, X, Camera, Upload, FileText, Trash2, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -778,7 +778,7 @@ export default function CustomerPets() {
                         <button
                           onClick={() => saveChanges(pet.id)}
                           disabled={isSaving}
-                          className="flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors"
+                          className="flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors min-w-[110px]"
                           style={{ 
                             background: 'var(--btn-ver-planos-bg)', 
                             color: 'var(--btn-ver-planos-text)',
@@ -786,11 +786,13 @@ export default function CustomerPets() {
                           }}
                         >
                           {isSaving ? (
-                            <div className="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin"></div>
+                            <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            <Save className="w-4 h-4" />
+                            <>
+                              <Save className="w-4 h-4" />
+                              <span>Atualizar</span>
+                            </>
                           )}
-                          <span>{isSaving ? 'Salvando...' : 'Atualizar'}</span>
                         </button>
                         <button
                           onClick={cancelEditing}

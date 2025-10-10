@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, User, Edit, Save, X, Camera } from "lucide-react";
+import { ArrowLeft, User, Edit, Save, X, Camera, Loader2 } from "lucide-react";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -608,7 +608,7 @@ export default function CustomerProfile() {
                   <button
                     onClick={saveChanges}
                     disabled={isSaving}
-                    className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors"
+                    className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors min-w-[100px]"
                     style={{ 
                       background: 'var(--btn-ver-planos-bg)', 
                       color: 'var(--btn-ver-planos-text)',
@@ -616,11 +616,13 @@ export default function CustomerProfile() {
                     }}
                   >
                     {isSaving ? (
-                      <div className="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin"></div>
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Save className="w-4 h-4" />
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>Salvar</span>
+                      </>
                     )}
-                    <span>{isSaving ? 'Salvando...' : 'Salvar'}</span>
                   </button>
                   <button
                     onClick={cancelEditing}
