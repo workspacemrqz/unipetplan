@@ -337,57 +337,119 @@ export default function GuideForm() {
                   )}
                 </div>
 
-                {/* Pet Selection Field */}
-                <FormField
-                  control={form.control}
-                  name="petId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pet *</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                        disabled={!selectedClient || clientPets.length === 0}
-                      >
-                        <FormControl>
-                          <SelectTrigger 
-                            style={{
-                              borderColor: 'var(--border-gray)',
-                              background: 'white'
-                            }}
-                          >
-                            <SelectValue placeholder={
-                              !selectedClient ? "Busque um cliente primeiro" :
-                              clientPets.length === 0 ? "Cliente sem pets cadastrados" :
-                              "Selecione o pet"
-                            } />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {clientPets.flatMap((pet, index) => [
-                            <SelectItem 
-                              key={pet.id} 
-                              value={pet.id}
-                              className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                {/* Pet Selection Field - Only show if client is selected */}
+                {selectedClient && (
+                  <FormField
+                    control={form.control}
+                    name="petId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pet *</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value}
+                          disabled={!selectedClient || clientPets.length === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger 
+                              style={{
+                                borderColor: 'var(--border-gray)',
+                                background: 'white'
+                              }}
                             >
-                              {pet.name} ({pet.species})
-                            </SelectItem>,
-                            ...(index < clientPets.length - 1 ? [<Separator key={`separator-${pet.id}`} />] : [])
-                          ])}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                              <SelectValue placeholder={
+                                !selectedClient ? "Busque um cliente primeiro" :
+                                clientPets.length === 0 ? "Cliente sem pets cadastrados" :
+                                "Selecione o pet"
+                              } />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {clientPets.flatMap((pet, index) => [
+                              <SelectItem 
+                                key={pet.id} 
+                                value={pet.id}
+                                className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                              >
+                                {pet.name} ({pet.species})
+                              </SelectItem>,
+                              ...(index < clientPets.length - 1 ? [<Separator key={`separator-${pet.id}`} />] : [])
+                            ])}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                {/* Procedimento e Rede Credenciada juntos */}
-                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Rede Credenciada - Only show if pet is selected */}
+                {form.watch("petId") && (
+                  <FormField
+                    control={form.control}
+                    name="networkUnitId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rede Credenciada *</FormLabel>
+                        <Select 
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Reset procedure when network unit changes
+                            form.setValue("procedure", "");
+                            form.setValue("value", "");
+                          }} 
+                          value={field.value}
+                          disabled={networkUnitsLoading}
+                        >
+                          <FormControl>
+                            <SelectTrigger 
+                              data-testid="select-network-unit"
+                              className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+                              style={{
+                                borderColor: 'var(--border-gray)',
+                                background: 'white'
+                              }}
+                            >
+                              <SelectValue placeholder={
+                                networkUnitsLoading ? "Carregando redes..." :
+                                networkUnits.length === 0 ? "Nenhuma rede disponível" :
+                                "Selecione a rede credenciada"
+                              } />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {networkUnits.length > 0 ? (
+                              networkUnits.flatMap((unit: any, index: number, array: any[]) => [
+                                <SelectItem 
+                                  key={unit.id} 
+                                  value={unit.id}
+                                  className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                                >
+                                  {unit.name}
+                                </SelectItem>,
+                                ...(index < array.length - 1 ? [<Separator key={`separator-${unit.id}`} />] : [])
+                              ])
+                            ) : (
+                              <div className="p-4 text-sm text-muted-foreground">
+                                Nenhuma rede credenciada cadastrada
+                              </div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {/* Procedimento - Only show if network unit is selected */}
+                {form.watch("networkUnitId") && (
                   <FormField
                     control={form.control}
                     name="procedure"
                     render={({ field }) => {
-                      // Filtrar procedimentos baseado na busca
+                      // TODO: Filter procedures based on selected network unit
+                      // For now, we'll show all available procedures for the pet
                       const filteredProcedures = availableProcedures?.procedures?.filter((proc: any) => 
                         proc.name.toLowerCase().includes(procedureSearch.toLowerCase())
                       ) || [];
@@ -398,12 +460,11 @@ export default function GuideForm() {
                           <Select 
                             onValueChange={(value) => {
                               field.onChange(value);
-                              setProcedureSearch(""); // Limpar busca após seleção
-                              // Atualizar coparticipação quando procedimento for selecionado
+                              setProcedureSearch(""); // Clear search after selection
+                              // Update coparticipation when procedure is selected
                               const selectedProc = availableProcedures?.procedures?.find((p: any) => p.name === value);
                               if (selectedProc) {
                                 const coparticipationValue = selectedProc.coparticipation || 0;
-                                // Sempre armazenar um valor numérico formatado, mesmo quando for zero
                                 form.setValue("value", coparticipationValue.toFixed(2).replace('.', ','));
                               }
                             }} 
@@ -428,7 +489,7 @@ export default function GuideForm() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {/* Campo de busca */}
+                              {/* Search field */}
                               <div className="p-2 border-b">
                                 <Input
                                   placeholder="Digite para buscar..."
@@ -475,58 +536,7 @@ export default function GuideForm() {
                       );
                     }}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="networkUnitId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Rede Credenciada *</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value}
-                          disabled={networkUnitsLoading}
-                        >
-                          <FormControl>
-                            <SelectTrigger 
-                              data-testid="select-network-unit"
-                              className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
-                              style={{
-                                borderColor: 'var(--border-gray)',
-                                background: 'white'
-                              }}
-                            >
-                              <SelectValue placeholder={
-                                networkUnitsLoading ? "Carregando redes..." :
-                                networkUnits.length === 0 ? "Nenhuma rede disponível" :
-                                "Selecione a rede credenciada"
-                              } />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {networkUnits.length > 0 ? (
-                              networkUnits.flatMap((unit: any, index: number, array: any[]) => [
-                                <SelectItem 
-                                  key={unit.id} 
-                                  value={unit.id}
-                                  className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
-                                >
-                                  {unit.name}
-                                </SelectItem>,
-                                ...(index < array.length - 1 ? [<Separator key={`separator-${unit.id}`} />] : [])
-                              ])
-                            ) : (
-                              <div className="p-4 text-sm text-muted-foreground">
-                                Nenhuma rede credenciada cadastrada
-                              </div>
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                )}
 
                 {/* Campo oculto para manter o valor de coparticipação */}
                 <FormField
@@ -582,26 +592,29 @@ export default function GuideForm() {
                     )}
                   />
                 )}
-              </div>
 
-              <div className="mt-6 space-y-4">
-                <FormField
-                  control={form.control}
-                  name="generalNotes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Anotações Gerais</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          {...field} 
-                          placeholder="Observações gerais sobre a guia..."
-                          data-testid="textarea-general-notes" 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Anotações Gerais - Only show if procedure is selected */}
+                {form.watch("procedure") && (
+                  <div className="md:col-span-2">
+                    <FormField
+                      control={form.control}
+                      name="generalNotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Anotações Gerais</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              {...field} 
+                              placeholder="Observações gerais sobre a guia..."
+                              data-testid="textarea-general-notes" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
