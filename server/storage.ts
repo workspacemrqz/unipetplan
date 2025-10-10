@@ -1287,7 +1287,6 @@ export class DatabaseStorage implements IStorage {
       .select({
         procedureId: planProcedures.procedureId,
         procedureName: procedures.name,
-        procedureType: procedures.procedureType,
         price: planProcedures.price,
         payValue: planProcedures.payValue,
         coparticipacao: planProcedures.coparticipacao,

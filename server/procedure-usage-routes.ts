@@ -80,7 +80,6 @@ export function setupProcedureUsageRoutes(app: Express, storage: IStorage) {
               return {
                 id: pp.procedureId,
                 name: pp.procedureName,
-                type: pp.procedureType,
                 annualLimit: annualLimit,
                 used: usedCount,
                 remaining: remaining,

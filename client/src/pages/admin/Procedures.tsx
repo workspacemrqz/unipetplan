@@ -40,7 +40,6 @@ import { Plus, Search, Edit, Trash2, Clipboard, Eye, X, MoreHorizontal, ChevronL
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
-import { PROCEDURE_TYPES, PROCEDURE_TYPE_LABELS } from "@/lib/constants";
 import { z } from "zod";
 
 // Definir tipos locais
@@ -49,8 +48,6 @@ type Procedure = {
   name: string;
   description?: string | null;
   category?: string | null;
-  procedureType?: string;
-  procedure_type?: string;
   isActive: boolean;
   displayOrder: number;
   createdAt: string;
@@ -100,13 +97,11 @@ type ProcedurePlan = {
 const insertProcedureSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional(),
-  procedureType: z.string().default("consultas"),
   isActive: z.boolean().default(true),
 });
 
 const allColumns = [
   "Nome",
-  "Tipo",
   "Status", 
   "Ações",
 ] as const;
@@ -172,7 +167,6 @@ export default function Procedures() {
     defaultValues: {
       name: "",
       description: "",
-      procedureType: "consultas",
       isActive: true,
     },
   });
@@ -677,7 +671,6 @@ export default function Procedures() {
     form.reset({
       name: item.name ?? "",
       description: item.description ?? "",
-      procedureType: item.procedureType ?? "consultas",
       isActive: item.isActive ?? true,
     });
     setDialogOpen(true);
@@ -702,7 +695,6 @@ export default function Procedures() {
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
     text += `Nome: ${viewingItem.name ?? ''}\n`;
-    text += `Tipo: ${PROCEDURE_TYPE_LABELS[viewingItem.procedureType as keyof typeof PROCEDURE_TYPE_LABELS] ?? 'Consultas'}\n`;
     text += `Status: ${viewingItem.isActive ? 'Ativo' : 'Inativo'}\n`;
     if (viewingItem.description) {
       text += `Descrição: ${viewingItem.description}\n`;
@@ -928,37 +920,6 @@ export default function Procedures() {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="procedureType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-primary">Tipo de Procedimento *</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger 
-                                data-testid="select-procedure-type"
-                                style={{
-                                  borderColor: 'var(--border-gray)',
-                                  background: 'white'
-                                }}
-                              >
-                                <SelectValue placeholder="Selecione o tipo" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {PROCEDURE_TYPES.flatMap((type, index, array) => [
-                                <SelectItem key={type} value={type} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                                  {PROCEDURE_TYPE_LABELS[type as keyof typeof PROCEDURE_TYPE_LABELS]}
-                                </SelectItem>,
-                                ...(index < array.length - 1 ? [<Separator key={`separator-${type}`} />] : [])
-                              ])}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </div>
                 </div>
 
@@ -1287,12 +1248,6 @@ export default function Procedures() {
               </div>
 
               {/* Tipo de Procedimento */}
-              <div>
-                <label className="text-sm font-medium text-foreground">Tipo de Procedimento</label>
-                <p className="text-base mt-1">
-                  {PROCEDURE_TYPE_LABELS[viewingItem.procedureType as keyof typeof PROCEDURE_TYPE_LABELS] ?? 'Consultas'}
-                </p>
-              </div>
 
               {/* Planos Vinculados */}
               <div>
@@ -1421,9 +1376,6 @@ export default function Procedures() {
                 {visibleColumns.includes("Nome") && (
                   <TableHead className="bg-white">Nome</TableHead>
                 )}
-                {visibleColumns.includes("Tipo") && (
-                  <TableHead className="bg-white">Tipo</TableHead>
-                )}
                 {visibleColumns.includes("Status") && (
                   <TableHead className="bg-white">Status</TableHead>
                 )}
@@ -1445,13 +1397,6 @@ export default function Procedures() {
                           {item.description}
                         </div>
                       )}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Tipo") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      <Badge variant="neutral" className="text-xs">
-                        {PROCEDURE_TYPE_LABELS[item.procedureType as keyof typeof PROCEDURE_TYPE_LABELS] ?? (item.procedureType ?? '')}
-                      </Badge>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Status") && (

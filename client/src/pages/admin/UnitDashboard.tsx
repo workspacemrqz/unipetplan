@@ -78,7 +78,6 @@ interface Procedure {
   id: string;
   name: string;
   description?: string;
-  procedureType: string;
   isActive: boolean;
 }
 
@@ -104,7 +103,6 @@ interface Coverage {
     id: string;
     name: string;
     description?: string;
-    procedureType: string;
   };
   planCoverage: {
     planId: string;
@@ -169,7 +167,6 @@ export default function UnitDashboard() {
   
   // Coverage functionality state
   const [coverageSearch, setCoverageSearch] = useState("");
-  const [coverageTypeFilter, setCoverageTypeFilter] = useState("all");
   const [coverageStatusFilter, setCoverageStatusFilter] = useState("all");
 
   // CPF search functionality
@@ -645,9 +642,6 @@ export default function UnitDashboard() {
         item.procedure.name.toLowerCase().includes(coverageSearch.toLowerCase()) ||
         (item.procedure.description && item.procedure.description.toLowerCase().includes(coverageSearch.toLowerCase()));
       
-      // Type filter
-      const typeMatch = coverageTypeFilter === 'all' || item.procedure.procedureType === coverageTypeFilter;
-      
       // Status filter
       let statusMatch = true;
       if (coverageStatusFilter === 'included') {
@@ -656,9 +650,9 @@ export default function UnitDashboard() {
         statusMatch = item.planCoverage.every(plan => !plan.isIncluded);
       }
       
-      return searchMatch && typeMatch && statusMatch;
+      return searchMatch && statusMatch;
     });
-  }, [coverage, coverageSearch, coverageTypeFilter, coverageStatusFilter]);
+  }, [coverage, coverageSearch, coverageStatusFilter]);
 
   if (loading) {
     return (
@@ -1490,37 +1484,6 @@ export default function UnitDashboard() {
                           />
                         </div>
                       </div>
-                      
-                      {/* Type Filter */}
-                      <div className="min-w-[200px]">
-                        <Label htmlFor="type-filter" className="text-sm font-medium">Filtrar por Tipo</Label>
-                        <Select value={coverageTypeFilter} onValueChange={setCoverageTypeFilter}>
-                          <SelectTrigger 
-                            className="w-full p-3 rounded-lg border text-sm mt-1"
-                            style={{
-                              borderColor: 'var(--border-gray)',
-                              background: 'white'
-                            }}
-                          >
-                            <SelectValue placeholder="Todos os tipos" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[
-                              { value: "all", label: "Todos os tipos" },
-                              ...Array.from(new Set(coverage.map(item => item.procedure.procedureType))).map(type => ({
-                                value: type,
-                                label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-                              }))
-                            ].flatMap((item, index, array) => [
-                              <SelectItem key={item.value} value={item.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                                {item.label}
-                              </SelectItem>,
-                              ...(index < array.length - 1 ? [<Separator key={`separator-${item.value}`} />] : [])
-                            ])}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
                       {/* Status Filter */}
                       <div className="min-w-[200px]">
                         <Label htmlFor="status-filter" className="text-sm font-medium">Filtrar por Cobertura</Label>
@@ -1588,9 +1551,6 @@ export default function UnitDashboard() {
                             <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 border-b">
                               Procedimento
                             </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 border-b">
-                              Categoria
-                            </th>
                             {coverage.length > 0 && coverage[0].planCoverage.map(plan => (
                               <th key={plan.planId} className="px-6 py-3 text-center text-sm font-medium text-gray-900 border-b">
                                 <div className="flex flex-col">
@@ -1611,11 +1571,6 @@ export default function UnitDashboard() {
                                     <div className="text-xs text-gray-500 mt-1 max-w-xs">{item.procedure.description}</div>
                                   )}
                                 </div>
-                              </td>
-                              <td className="px-4 py-4">
-                                <Badge variant="neutral" className="text-xs">
-                                  {item.procedure.procedureType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                </Badge>
                               </td>
                               {item.planCoverage.map(plan => (
                                 <td key={plan.planId} className="px-6 py-4">

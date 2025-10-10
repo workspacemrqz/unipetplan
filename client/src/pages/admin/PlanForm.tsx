@@ -22,7 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { ArrowLeft } from "lucide-react";
-import { PLAN_TYPES, PROCEDURE_TYPE_LABELS } from "@/lib/constants";
+import { PLAN_TYPES } from "@/lib/constants";
 import { z } from "zod";
 
 // Schema de validação do formulário
@@ -315,82 +315,63 @@ export default function PlanForm() {
               </CardHeader>
               <CardContent>
                 {Array.isArray(planProcedures) && planProcedures.length > 0 ? (
-                  <div className="space-y-6">
-                    {(() => {
-                      // Group procedures by type
-                      const groupedProcedures = planProcedures.reduce((groups: any, item: any) => {
-                        const type = item.procedureType || 'consultas';
-                        if (!groups[type]) {
-                          groups[type] = [];
-                        }
-                        groups[type].push(item);
-                        return groups;
-                      }, {});
-
-                      // Render each group
-                      return Object.entries(groupedProcedures).map(([type, procedures]: [string, any]) => (
-                        <div key={type} className="space-y-3">
-                          <h3 className="text-lg font-semibold text-foreground">
-                            {PROCEDURE_TYPE_LABELS[type as keyof typeof PROCEDURE_TYPE_LABELS]}
-                          </h3>
-                          
-                          {/* Tabela simples estilo página de Clientes */}
-                          <div className="rounded-lg overflow-hidden border border-[#eaeaea]">
-                            <Table className="w-full">
-                              <TableHeader>
-                                <TableRow className="bg-white border-b border-[#eaeaea]">
-                                  <TableHead className="bg-white">Procedimento</TableHead>
-                                  <TableHead className="bg-white">Incluído</TableHead>
-                                  <TableHead className="bg-white">Receber (R$)</TableHead>
-                                  <TableHead className="bg-white">Pagar (R$)</TableHead>
-                                  <TableHead className="bg-white">Coparticipação (R$)</TableHead>
-                                  <TableHead className="bg-white">Carência</TableHead>
-                                  <TableHead className="bg-white">Limites Anuais</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {procedures.map((item: any) => (
-                                  <TableRow key={item.id} className="bg-white border-b border-[#eaeaea]">
-                                    <TableCell className="bg-white">
-                                      <div>
-                                        <p className="font-medium">{item.procedureName}</p>
-                                        {item.procedureDescription && (
-                                          <p className="text-sm text-muted-foreground">{item.procedureDescription}</p>
-                                        )}
-                                      </div>
-                                    </TableCell>
-                                    <TableCell className="bg-white">
-                                      {item.isIncluded ? 'Sim' : 'Não'}
-                                    </TableCell>
-                                    <TableCell className="bg-white">
-                                      R$ {(item.price / 100).toFixed(2).replace('.', ',')}
-                                    </TableCell>
-                                    <TableCell className="bg-white">
-                                      R$ {(item.payValue / 100).toFixed(2).replace('.', ',')}
-                                    </TableCell>
-                                    <TableCell className="bg-white">
-                                      {item.coparticipacao > 0 
-                                        ? `R$ ${(item.coparticipacao / 100).toFixed(2).replace('.', ',')}`
-                                        : '-'}
-                                    </TableCell>
-                                    <TableCell className="bg-white">
-                                      {item.carencia && item.carencia !== '0 dias' 
-                                        ? item.carencia 
-                                        : '-'}
-                                    </TableCell>
-                                    <TableCell className="bg-white">
-                                      {item.limitesAnuais && item.limitesAnuais !== '0' && item.limitesAnuais !== '0 vezes no ano' 
-                                        ? item.limitesAnuais 
-                                        : '-'}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        </div>
-                      ));
-                    })()}
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-foreground">Guias</h3>
+                    
+                    {/* Tabela simples estilo página de Clientes */}
+                    <div className="rounded-lg overflow-hidden border border-[#eaeaea]">
+                      <Table className="w-full">
+                        <TableHeader>
+                          <TableRow className="bg-white border-b border-[#eaeaea]">
+                            <TableHead className="bg-white">Procedimento</TableHead>
+                            <TableHead className="bg-white">Incluído</TableHead>
+                            <TableHead className="bg-white">Receber (R$)</TableHead>
+                            <TableHead className="bg-white">Pagar (R$)</TableHead>
+                            <TableHead className="bg-white">Coparticipação (R$)</TableHead>
+                            <TableHead className="bg-white">Carência</TableHead>
+                            <TableHead className="bg-white">Limites Anuais</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {planProcedures.map((item: any) => (
+                            <TableRow key={item.id} className="bg-white border-b border-[#eaeaea]">
+                              <TableCell className="bg-white">
+                                <div>
+                                  <p className="font-medium">{item.procedureName}</p>
+                                  {item.procedureDescription && (
+                                    <p className="text-sm text-muted-foreground">{item.procedureDescription}</p>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell className="bg-white">
+                                {item.isIncluded ? 'Sim' : 'Não'}
+                              </TableCell>
+                              <TableCell className="bg-white">
+                                R$ {(item.price / 100).toFixed(2).replace('.', ',')}
+                              </TableCell>
+                              <TableCell className="bg-white">
+                                R$ {(item.payValue / 100).toFixed(2).replace('.', ',')}
+                              </TableCell>
+                              <TableCell className="bg-white">
+                                {item.coparticipacao > 0 
+                                  ? `R$ ${(item.coparticipacao / 100).toFixed(2).replace('.', ',')}`
+                                  : '-'}
+                              </TableCell>
+                              <TableCell className="bg-white">
+                                {item.carencia && item.carencia !== '0 dias' 
+                                  ? item.carencia 
+                                  : '-'}
+                              </TableCell>
+                              <TableCell className="bg-white">
+                                {item.limitesAnuais && item.limitesAnuais !== '0' && item.limitesAnuais !== '0 vezes no ano' 
+                                  ? item.limitesAnuais 
+                                  : '-'}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">

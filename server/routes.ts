@@ -1408,7 +1408,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return {
           id: pp.procedureId,
           name: pp.procedureName,
-          type: pp.procedureType,
           annualLimit: annualLimit,
           used: usedCount,
           remaining: remaining,
@@ -6048,7 +6047,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: procedure.id,
           name: procedure.name,
           description: procedure.description || 'Procedimento veterinário especializado',
-          procedureType: procedure.category || 'geral',
           coparticipationValue: formatCoparticipationValue(procedure.coparticipacao),
           coveragePercentage: formatCoveragePercentage(100), // Default coverage percentage
           isActive: procedure.is_active,
@@ -6059,11 +6057,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       });
 
-      // Sort by procedure type and name
+      // Sort by name
       proceduresWithDetails.sort((a, b) => {
-        if (a.procedureType !== b.procedureType) {
-          return a.procedureType.localeCompare(b.procedureType);
-        }
         return a.name.localeCompare(b.name);
       });
 

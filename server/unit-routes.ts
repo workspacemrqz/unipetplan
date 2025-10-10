@@ -269,7 +269,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           name: proc.name,
           description: proc.description,
           price: parseFloat(proc.price || '0'),
-          category: proc.procedureType || 'Outros',
+          category: proc.category || 'Guia',
           isActive: proc.isActive
         }));
       
