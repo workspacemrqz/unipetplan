@@ -644,7 +644,7 @@ export default function Network() {
                   Excluindo...
                 </div>
               ) : (
-                "Excluir Unidade"
+                "Excluir"
               )}
             </Button>
           </AlertDialogFooter>

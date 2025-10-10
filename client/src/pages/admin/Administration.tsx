@@ -1192,7 +1192,7 @@ export default function Administration() {
                   Excluindo...
                 </div>
               ) : (
-                "Excluir Usuário"
+                "Excluir"
               )}
             </Button>
           </AlertDialogFooter>

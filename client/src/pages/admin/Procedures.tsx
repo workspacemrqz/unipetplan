@@ -1572,7 +1572,7 @@ export default function Procedures() {
                   Excluindo...
                 </div>
               ) : (
-                "Excluir Procedimento"
+                "Excluir"
               )}
             </Button>
           </AlertDialogFooter>

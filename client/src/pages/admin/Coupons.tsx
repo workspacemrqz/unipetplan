@@ -655,7 +655,7 @@ export default function Coupons() {
                   Excluindo...
                 </>
               ) : (
-                "Excluir Cupom"
+                "Excluir"
               )}
             </Button>
           </AlertDialogFooter>

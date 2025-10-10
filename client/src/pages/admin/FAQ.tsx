@@ -589,7 +589,7 @@ export default function FAQ() {
                   Excluindo...
                 </div>
               ) : (
-                "Excluir Pergunta"
+                "Excluir"
               )}
             </Button>
           </AlertDialogFooter>
