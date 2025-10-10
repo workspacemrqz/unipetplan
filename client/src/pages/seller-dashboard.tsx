@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Users, TrendingUp, LogOut, Link2, BarChart3, Copy, Check } from "lucide-react";
+import { DollarSign, Users, Percent, LogOut, Link, Home, Copy, Check } from "lucide-react";
 
 export default function SellerDashboard() {
   const [, setLocation] = useLocation();
@@ -76,11 +75,11 @@ export default function SellerDashboard() {
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="mb-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
+              <Home className="h-4 w-4" />
               Dashboard
             </TabsTrigger>
             <TabsTrigger value="link" className="flex items-center gap-2">
-              <Link2 className="h-4 w-4" />
+              <Link className="h-4 w-4" />
               Link
             </TabsTrigger>
           </TabsList>
@@ -106,7 +105,7 @@ export default function SellerDashboard() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Comissão Recorrente</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <Percent className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{seller.recurringCommissionPercentage || '0'}%</div>
@@ -152,7 +151,7 @@ export default function SellerDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Link2 className="h-5 w-5" />
+                  <Link className="h-5 w-5" />
                   Seu Link de Referência
                 </CardTitle>
               </CardHeader>
