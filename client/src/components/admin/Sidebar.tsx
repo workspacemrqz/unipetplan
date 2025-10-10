@@ -3,69 +3,56 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/admin/utils";
 import { useState } from "react";
 import {
-  Home,
-  Users,
-  FileText,
-  CreditCard,
-  Building,
-  HelpCircle,
-  Mail,
-  User,
-  Settings,
-  Clipboard,
-  DollarSign,
-  File,
-  Star,
   ChevronDown,
   ChevronRight,
-  UserCheck
 } from "lucide-react";
 import { createCacheManager } from "@/lib/admin/cacheUtils";
+import CustomIcon from "@/components/admin/ui/CustomIcon";
 
 const navigation = [
   {
     name: "Principal",
     items: [
-      { name: "Dashboard", href: "/", icon: Home }
+      { name: "Dashboard", href: "/", iconName: "Dashboard" }
     ]
   },
   {
     name: "Clientes",
     items: [
-      { name: "Clientes & Pets", href: "/clientes", icon: Users },
-      { name: "Contratos", href: "/contratos", icon: File },
-      { name: "Guias de Atendimento", href: "/guias", icon: FileText }
+      { name: "Clientes & Pets", href: "/clientes", iconName: "Cliente e Pet" },
+      { name: "Contratos", href: "/contratos", iconName: "Contrato" },
+      { name: "Guias de Atendimento", href: "/guias", iconName: "Guia" }
     ]
   },
   {
     name: "Financeiro",
     items: [
-      { name: "Pagamentos", href: "/financeiro", icon: DollarSign },
-      { name: "Cupons", href: "/cupom", icon: CreditCard }
+      { name: "Pagamentos", href: "/financeiro", iconName: "Pagamento" },
+      { name: "Cupons", href: "/cupom", iconName: "Cupom" }
     ]
   },
   {
     name: "Comunicação",
     items: [
-      { name: "Formulários", href: "/formularios", icon: Mail },
-      { name: "Avaliações", href: "/avaliacoes", icon: Star }
+      { name: "Formulários", href: "/formularios", iconName: "Formularios" },
+      { name: "Avaliações", href: "/avaliacoes", iconName: "Avaliação" }
     ]
   },
   {
     name: "Parceiros",
     items: [
-      { name: "Rede Credenciada", href: "/rede", icon: Building },
-      { name: "Vendedores", href: "/vendedores", icon: UserCheck }
+      { name: "Rede Credenciada", href: "/rede", iconName: "Rede Credenciada" },
+      { name: "Vendedores", href: "/vendedores", iconName: "Vendedor" }
     ]
   },
   {
     name: "Configurações",
     items: [
-      { name: "Planos de Saúde", href: "/planos", icon: CreditCard },
-      { name: "Procedimentos", href: "/procedimentos", icon: Clipboard },
-      { name: "FAQ", href: "/perguntas-frequentes", icon: HelpCircle },
-      { name: "Administração", href: "/administracao", icon: User },
-      { name: "Configurações", href: "/configuracoes", icon: Settings }
+      { name: "Planos de Saúde", href: "/planos", iconName: "Plano de saúde" },
+      { name: "Procedimentos", href: "/procedimentos", iconName: "Procedimento" },
+      { name: "FAQ", href: "/perguntas-frequentes", iconName: "FAQ" },
+      { name: "Administração", href: "/administracao", iconName: "Admin" },
+      { name: "Configurações", href: "/configuracoes", iconName: "Configurações" }
     ]
   }
 ];
@@ -158,10 +145,13 @@ export default function Sidebar() {
                     data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     onMouseEnter={() => handleNavigationHover(item.href)}
                   >
-                    <item.icon className={cn(
-                      "h-5 w-5 mr-3 transition-transform duration-200",
-                      !isActive && "group-hover:scale-110"
-                    )} />
+                    <CustomIcon 
+                      name={item.iconName} 
+                      className={cn(
+                        "h-5 w-5 mr-3 transition-transform duration-200",
+                        !isActive && "group-hover:scale-110"
+                      )} 
+                    />
                     <span className="font-medium">{item.name}</span>
                   </Link>
                 );
