@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import type { Client, Plan, Pet, GuideWithNetworkUnit } from "@shared/schema";
+import type { Client, Plan, Pet } from "@shared/schema";
 
 // Cache invalidation utilities for intelligent cache management
 export class CacheManager {

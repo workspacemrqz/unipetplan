@@ -25,7 +25,6 @@ interface Guide {
   id: string;
   clientId: string;
   petId: string;
-  type: string;
   procedure: string;
   procedureNotes?: string;
   generalNotes?: string;
@@ -145,7 +144,6 @@ export default function UnitDashboard() {
   const [guideForm, setGuideForm] = useState({
     clientId: "",
     petId: "",
-    type: "",
     procedure: "",
     procedureId: "",
     procedureNotes: "",
@@ -550,7 +548,7 @@ export default function UnitDashboard() {
   };
 
   const createGuide = async () => {
-    if (!guideForm.clientId || !guideForm.petId || !guideForm.type || !guideForm.procedureId) {
+    if (!guideForm.clientId || !guideForm.petId || !guideForm.procedureId) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
@@ -564,7 +562,6 @@ export default function UnitDashboard() {
         body: JSON.stringify({
           clientId: guideForm.clientId,
           petId: guideForm.petId,
-          type: guideForm.type,
           procedure: guideForm.procedure,
           procedureNotes: guideForm.procedureNotes,
           generalNotes: guideForm.generalNotes,
@@ -579,7 +576,6 @@ export default function UnitDashboard() {
         setGuideForm({
           clientId: "",
           petId: "",
-          type: "",
           procedure: "",
           procedureId: "",
           procedureNotes: "",
@@ -1067,43 +1063,8 @@ export default function UnitDashboard() {
                       </div>
                     </div>
 
-                    {/* Service Type and Procedure */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="type" className="text-sm font-medium">
-                          Tipo de Atendimento <span className="text-red-500">*</span>
-                        </Label>
-                        <Select 
-                          value={guideForm.type} 
-                          onValueChange={(value) => setGuideForm(prev => ({ ...prev, type: value }))}
-                        >
-                          <SelectTrigger
-                            style={{
-                              borderColor: 'var(--border-gray)',
-                              background: 'white'
-                            }}
-                          >
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[
-                              { value: "consulta", label: "Consulta" },
-                              { value: "exames", label: "Exames" },
-                              { value: "cirurgia", label: "Cirurgia" },
-                              { value: "internacao", label: "Internação" },
-                              { value: "emergencia", label: "Emergência" },
-                              { value: "procedimento", label: "Procedimento" },
-                              { value: "reembolso", label: "Reembolso" }
-                            ].flatMap((type, index, array) => [
-                              <SelectItem key={type.value} value={type.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                                {type.label}
-                              </SelectItem>,
-                              ...(index < array.length - 1 ? [<Separator key={`separator-${type.value}`} />] : [])
-                            ])}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
+                    {/* Procedure Selection */}
+                    <div className="grid grid-cols-1 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="procedure" className="text-sm font-medium">
                           Procedimento <span className="text-red-500">*</span>
@@ -1307,7 +1268,6 @@ export default function UnitDashboard() {
                           setGuideForm({
                             clientId: "",
                             petId: "",
-                            type: "",
                             procedure: "",
                             procedureId: "",
                             procedureNotes: "",
@@ -1326,7 +1286,7 @@ export default function UnitDashboard() {
                         type="submit" 
                         variant="admin-action"
                         size="sm"
-                        disabled={submittingGuide || !guideForm.clientId || !guideForm.petId || !guideForm.type || !guideForm.procedureId}
+                        disabled={submittingGuide || !guideForm.clientId || !guideForm.petId || !guideForm.procedureId}
                       >
                         {submittingGuide ? (
                           <>
@@ -1780,11 +1740,6 @@ export default function UnitDashboard() {
                   </div>
                 </div>
                 
-                <div>
-                  <Label className="text-sm font-medium text-primary">Tipo de Atendimento</Label>
-                  <p className="text-sm text-foreground">{selectedGuide.type}</p>
-                </div>
-
                 {selectedGuide.procedureNotes && (
                   <div>
                     <Label className="text-sm font-medium text-primary">Observações do Procedimento</Label>

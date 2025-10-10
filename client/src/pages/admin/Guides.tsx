@@ -28,8 +28,6 @@ interface GuideWithNetworkUnit {
   id: string;
   procedure: string;
   procedureName?: string;
-  type: string;
-  guideType?: string;
   status: string;
   value?: string;
   createdAt?: string;
@@ -61,14 +59,12 @@ import { usePasswordDialog } from "@/hooks/admin/use-password-dialog";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
-import { GUIDE_TYPES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { getQueryOptions } from "@/lib/admin/queryClient";
 
 const allColumns = [
   "Procedimento",
   "Unidade",
-  "Tipo",
   "Valor",
   "Status",
   "Data",
@@ -79,7 +75,6 @@ export default function Guides() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
   const [selectedGuide, setSelectedGuide] = useState<GuideWithNetworkUnit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
@@ -123,7 +118,6 @@ export default function Guides() {
     limit: pageSize.toString(),
     ...(searchQuery && { search: searchQuery }),
     ...(statusFilter !== "all" && { status: statusFilter }),
-    ...(typeFilter !== "all" && { type: typeFilter }),
     ...dateParams
   };
 
@@ -159,7 +153,6 @@ export default function Guides() {
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
     text += `Nome do Procedimento: ${selectedGuide.procedure || selectedGuide.procedureName || 'Não informado'}\n`;
-    text += `Tipo de Guia: ${selectedGuide.type || selectedGuide.guideType || 'Não informado'}\n`;
     text += `Status: ${getStatusLabel(selectedGuide.status)}\n`;
     text += `Valor: R$ ${selectedGuide.value || 'Não informado'}\n\n`;
 
@@ -241,16 +234,6 @@ export default function Guides() {
     }
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "consulta": return "Consulta";
-      case "exames": return "Exames";
-      case "internacao": return "Internação";
-      case "reembolso": return "Reembolso";
-      default: return type;
-    }
-  };
-
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -286,29 +269,6 @@ export default function Guides() {
               data-testid="input-search-guides"
             />
           </div>
-          <Select value={typeFilter} onValueChange={(value) => {
-            setTypeFilter(value);
-            setCurrentPage(1); // Reset para página 1 ao filtrar
-          }}>
-            <SelectTrigger 
-              className="w-48" 
-              data-testid="select-type-filter"
-              style={{
-                borderColor: 'var(--border-gray)',
-                background: 'white'
-              }}
-            >
-              <SelectValue placeholder="Filtrar por tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              {[{ value: "all", label: "Todos os tipos" }, ...GUIDE_TYPES.map(type => ({ value: type, label: getTypeLabel(type) }))].flatMap((item, index, array) => [
-                <SelectItem key={item.value} value={item.value} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                  {item.label}
-                </SelectItem>,
-                ...(index < array.length - 1 ? [<Separator key={`separator-${item.value}`} />] : [])
-              ])}
-            </SelectContent>
-          </Select>
           <Select value={statusFilter} onValueChange={(value) => {
             setStatusFilter(value);
             setCurrentPage(1); // Reset para página 1 ao filtrar
@@ -389,7 +349,6 @@ export default function Guides() {
             <TableRow className="bg-white border-b border-[#eaeaea]">
               {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
               {visibleColumns.includes("Unidade") && <TableHead className="w-[180px] bg-white">Unidade</TableHead>}
-              {visibleColumns.includes("Tipo") && <TableHead className="w-[120px] bg-white">Tipo</TableHead>}
               {visibleColumns.includes("Valor") && <TableHead className="w-[120px] bg-white">Valor</TableHead>}
               {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
               {visibleColumns.includes("Data") && <TableHead className="w-[120px] bg-white">Data</TableHead>}
@@ -416,11 +375,6 @@ export default function Guides() {
                   {visibleColumns.includes("Unidade") && (
                     <TableCell className="whitespace-nowrap bg-white">
                       {guide.networkUnit?.name || "Não informada"}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Tipo") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      {getTypeLabel(guide.type)}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Valor") && (
@@ -461,7 +415,7 @@ export default function Guides() {
                 <TableCell colSpan={visibleColumns.length} className="text-center py-12 bg-white">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">
-                    {searchQuery || typeFilter !== "all" || statusFilter !== "all" 
+                    {searchQuery || statusFilter !== "all" 
                       ? "Nenhuma guia encontrada com os filtros aplicados." 
                       : "Nenhuma guia foi gerada pelas unidades da rede ainda."
                     }
@@ -557,9 +511,6 @@ export default function Guides() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Procedimento:</strong> <span className="text-foreground">{selectedGuide.procedure || 'Não informado'}</span></span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Tipo:</strong> <span className="text-foreground">{getTypeLabel(selectedGuide.type)}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Valor:</strong> <span className="text-foreground">R$ {parseFloat(selectedGuide.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>

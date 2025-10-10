@@ -48,13 +48,6 @@ export const PROCEDURE_SECTIONS = [
   "Especialistas"
 ];
 
-export const GUIDE_TYPES = [
-  "consulta",
-  "exames", 
-  "internacao",
-  "reembolso"
-];
-
 export const PLAN_TYPES = [
   "with_waiting_period",
   "without_waiting_period"

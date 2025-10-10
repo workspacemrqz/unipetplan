@@ -1596,7 +1596,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || '';
       const status = (req.query.status as string) || 'all';
-      const type = (req.query.type as string) || 'all';
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
       
@@ -1619,11 +1618,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Status filter
       if (status && status !== 'all') {
         filteredGuides = filteredGuides.filter(guide => guide.status === status);
-      }
-      
-      // Type filter
-      if (type && type !== 'all') {
-        filteredGuides = filteredGuides.filter(guide => guide.type === type);
       }
       
       // Date filters

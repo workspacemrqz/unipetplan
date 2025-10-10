@@ -15,7 +15,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertGuideSchema } from "@shared/schema";
 import { ArrowLeft } from "lucide-react";
-import { GUIDE_TYPES } from "@/lib/constants";
 
 export default function GuideForm() {
   const [, setLocation] = useLocation();
@@ -50,7 +49,6 @@ export default function GuideForm() {
     defaultValues: {
       clientId: urlClientId || "",
       petId: urlPetId || "",
-      type: "",
       procedure: "",
       procedureNotes: "",
       generalNotes: "",
@@ -72,7 +70,6 @@ export default function GuideForm() {
       form.reset({
         clientId: guide.clientId || "",
         petId: guide.petId || "",
-        type: guide.type || "",
         procedure: guide.procedure || "",
         procedureNotes: guide.procedureNotes || "",
         generalNotes: guide.generalNotes || "",
@@ -203,15 +200,6 @@ export default function GuideForm() {
     mutation.mutate(data);
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "consulta": return "Guia de Consulta";
-      case "exames": return "Guia de Exames";
-      case "internacao": return "Guia de Internação";
-      case "reembolso": return "Guia de Reembolso";
-      default: return type;
-    }
-  };
 
   if (isEdit && guideLoading) {
     return (
@@ -327,38 +315,6 @@ export default function GuideForm() {
                               {pet.name} ({pet.species})
                             </SelectItem>,
                             ...(index < clientPets.length - 1 ? [<Separator key={`separator-${pet.id}`} />] : [])
-                          ])}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de Guia *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger 
-                            data-testid="select-guide-type"
-                            style={{
-                              borderColor: 'var(--border-gray)',
-                              background: 'white'
-                            }}
-                          >
-                            <SelectValue placeholder="Selecione o tipo de guia" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {GUIDE_TYPES.flatMap((type, index) => [
-                            <SelectItem key={type} value={type} className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                              {getTypeLabel(type)}
-                            </SelectItem>,
-                            ...(index < GUIDE_TYPES.length - 1 ? [<Separator key={`separator-${type}`} />] : [])
                           ])}
                         </SelectContent>
                       </Select>
@@ -550,7 +506,7 @@ export default function GuideForm() {
               variant="admin-action"
               size="sm"
               className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
-              disabled={mutation.isPending || !form.formState.isValid || !form.getValues('type') || !form.getValues('procedure')}
+              disabled={mutation.isPending || !form.formState.isValid || !form.getValues('procedure')}
               data-testid="button-save"
             >
               {mutation.isPending ? "Salvando..." : isEdit ? "Atualizar" : "Criar Guia"}

@@ -23,7 +23,6 @@ import {
 } from "@/components/admin/ui/dialog";
 import { Search, Eye, MoreHorizontal, FileText, ChevronLeft, ChevronRight, Copy, Check, Loader2, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
-import { GUIDE_TYPES } from "@/lib/constants";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import { format } from "date-fns";
@@ -109,7 +108,6 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
   const [guideFormData, setGuideFormData] = useState({
     clientId: "",
     petId: "",
-    type: "",
     procedure: "",
     procedureNotes: "",
     generalNotes: "",
@@ -233,7 +231,6 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
     setGuideFormData({
       clientId,
       petId,
-      type: "",
       procedure: "",
       procedureNotes: "",
       generalNotes: "",
@@ -251,7 +248,6 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
     setGuideFormData({
       clientId: "",
       petId: "",
-      type: "",
       procedure: "",
       procedureNotes: "",
       generalNotes: "",
@@ -262,7 +258,7 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
   };
 
   const handleCreateGuide = async () => {
-    if (!guideFormData.clientId || !guideFormData.petId || !guideFormData.type || !guideFormData.procedure) {
+    if (!guideFormData.clientId || !guideFormData.petId || !guideFormData.procedure) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -308,15 +304,6 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
     }
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'consulta': return 'Consulta';
-      case 'exames': return 'Exames';
-      case 'internacao': return 'Internação';
-      case 'reembolso': return 'Reembolso';
-      default: return type;
-    }
-  };
 
   const handleViewDetails = (client: Client) => {
     setSelectedClient(client);
@@ -951,48 +938,28 @@ export default function UnitClients({ unitSlug }: { unitSlug: string }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Tipo de Guia *</label>
-                <Select value={guideFormData.type} onValueChange={(value) => {
-                  setGuideFormData({ ...guideFormData, type: value });
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {GUIDE_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {getTypeLabel(type)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Procedimento *</label>
-                <Select value={guideFormData.procedure} onValueChange={(value) => {
-                  const selectedProcedure = procedures.find(p => p.name === value);
-                  setGuideFormData({ 
-                    ...guideFormData, 
-                    procedure: value,
-                    coparticipacao: selectedProcedure?.coparticipacao?.toString() || "0",
-                    receber: selectedProcedure?.payValue?.toString() || selectedProcedure?.price?.toString() || "0"
-                  });
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um procedimento" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {procedures.map((proc) => (
-                      <SelectItem key={proc.id} value={proc.name}>
-                        {proc.name} - R$ {proc.price ? proc.price.toFixed(2) : '0.00'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Procedimento *</label>
+              <Select value={guideFormData.procedure} onValueChange={(value) => {
+                const selectedProcedure = procedures.find(p => p.name === value);
+                setGuideFormData({ 
+                  ...guideFormData, 
+                  procedure: value,
+                  coparticipacao: selectedProcedure?.coparticipacao?.toString() || "0",
+                  receber: selectedProcedure?.payValue?.toString() || selectedProcedure?.price?.toString() || "0"
+                });
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um procedimento" />
+                </SelectTrigger>
+                <SelectContent>
+                  {procedures.map((proc) => (
+                    <SelectItem key={proc.id} value={proc.name}>
+                      {proc.name} - R$ {proc.price ? proc.price.toFixed(2) : '0.00'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -469,7 +469,6 @@ export const guides = pgTable("guides", {
   clientId: varchar("client_id").notNull().references(() => clients.id),
   petId: varchar("pet_id").notNull().references(() => pets.id),
   networkUnitId: varchar("network_unit_id").references(() => networkUnits.id),
-  type: text("type").notNull(), // 'consulta', 'exames', 'internacao', 'reembolso'
   procedure: text("procedure").notNull(),
   procedureNotes: text("procedure_notes"),
   generalNotes: text("general_notes"),
