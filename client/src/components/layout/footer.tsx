@@ -19,15 +19,11 @@ export default function Footer() {
   ];
 
   // Buscar planos ativos
-  const { data: plans, isLoading } = useQuery({
+  const { data: plans = [], isLoading } = useQuery<Array<{ id: string; name: string; isActive: boolean }>>({
     queryKey: ["/api/plans"],
-    queryFn: async () => {
-      const response = await apiRequest("/api/plans", "GET");
-      return response as Array<{ id: string; name: string; isActive: boolean }>;
-    },
   });
 
-  const activePlans = plans?.filter((plan) => plan.isActive !== false) || [];
+  const activePlans = Array.isArray(plans) ? plans.filter((plan) => plan.isActive === true) : [];
 
   return (
     <footer className="border-t border-t-accent bg-muted py-12">
