@@ -146,6 +146,23 @@ export default function GuideForm() {
     loadClientAndPets();
   }, [guide?.clientId, urlClientId, selectedClient]);
 
+  // Auto-search when CPF has 11 digits
+  useEffect(() => {
+    const sanitizedCpf = cpfSearch.replace(/\D/g, '');
+    
+    // If CPF has exactly 11 digits, search automatically
+    if (sanitizedCpf.length === 11) {
+      searchClientByCpf();
+    } 
+    // If CPF is cleared or modified (less than 11 digits), clear the client data
+    else if (sanitizedCpf.length < 11 && selectedClient) {
+      setSelectedClient(null);
+      setClientPets([]);
+      form.setValue("clientId", "");
+      form.setValue("petId", "");
+    }
+  }, [cpfSearch]);
+
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       if (isEdit) {
@@ -295,7 +312,7 @@ export default function GuideForm() {
                 {/* CPF Search Field */}
                 <div className="space-y-2">
                   <FormLabel>Cliente (CPF) *</FormLabel>
-                  <div className="flex gap-2">
+                  <div className="relative">
                     <Input
                       placeholder="000.000.000-00"
                       value={cpfSearch}
@@ -307,22 +324,11 @@ export default function GuideForm() {
                         background: 'white'
                       }}
                     />
-                    <Button
-                      type="button"
-                      onClick={searchClientByCpf}
-                      variant="admin-action"
-                      className="h-12 px-4"
-                      disabled={isSearchingClient}
-                    >
-                      {isSearchingClient ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Buscando...
-                        </>
-                      ) : (
-                        "Buscar"
-                      )}
-                    </Button>
+                    {isSearchingClient && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      </div>
+                    )}
                   </div>
                   {selectedClient && (
                     <p className="text-sm text-primary">
