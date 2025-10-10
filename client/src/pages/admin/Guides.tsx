@@ -20,7 +20,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2, Plus } from "lucide-react";
+import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2, Plus, Edit } from "lucide-react";
 import { useLocation } from "wouter";
 
 // Types for guides data
@@ -77,6 +77,10 @@ export default function Guides() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedGuide, setSelectedGuide] = useState<GuideWithNetworkUnit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingGuide, setEditingGuide] = useState<GuideWithNetworkUnit | null>(null);
+  const [newStatus, setNewStatus] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
   const { visibleColumns, toggleColumn } = useColumnPreferences('guides.columns', allColumns);
   const [currentPage, setCurrentPage] = useState(1);
@@ -137,6 +141,53 @@ export default function Guides() {
   const handleViewDetails = (guide: GuideWithNetworkUnit) => {
     setSelectedGuide(guide);
     setDetailsOpen(true);
+  };
+
+  const handleEdit = (guide: GuideWithNetworkUnit) => {
+    setEditingGuide(guide);
+    setNewStatus(guide.status);
+    setEditOpen(true);
+  };
+
+  const handleSaveStatus = async () => {
+    if (!editingGuide) return;
+    
+    setIsSaving(true);
+    
+    try {
+      const response = await fetch(`/admin/api/guides/${editingGuide.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar status");
+      }
+
+      toast({
+        title: "Status atualizado",
+        description: "O status da guia foi atualizado com sucesso.",
+      });
+
+      setEditOpen(false);
+      setEditingGuide(null);
+      
+      // Recarregar os dados
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o status. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const generateGuideText = () => {
@@ -405,6 +456,14 @@ export default function Guides() {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(guide)}
+                          data-testid={`button-edit-${guide.id}`}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   )}
@@ -554,6 +613,72 @@ export default function Guides() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Status Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Status da Guia</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Status</label>
+              <Select value={newStatus} onValueChange={setNewStatus}>
+                <SelectTrigger 
+                  className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+                  style={{
+                    borderColor: 'var(--border-gray)',
+                    background: 'white'
+                  }}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[
+                    { value: "open", label: "Aberta" },
+                    { value: "closed", label: "Fechada" },
+                    { value: "cancelled", label: "Cancelada" }
+                  ].flatMap((status, index, array) => [
+                    <SelectItem 
+                      key={status.value} 
+                      value={status.value}
+                      className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                    >
+                      {status.label}
+                    </SelectItem>,
+                    ...(index < array.length - 1 ? [<Separator key={`separator-${status.value}`} />] : [])
+                  ])}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setEditOpen(false)}
+              disabled={isSaving}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="admin-action"
+              onClick={handleSaveStatus}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                "Salvar"
+              )}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
