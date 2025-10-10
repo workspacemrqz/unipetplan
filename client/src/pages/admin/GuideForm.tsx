@@ -24,6 +24,26 @@ export default function GuideForm() {
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [clientPets, setClientPets] = useState<any[]>([]);
 
+  // Função para formatar CPF
+  const formatCpf = (value: string) => {
+    // Remove todos os caracteres não numéricos
+    const numbers = value.replace(/\D/g, '');
+    
+    // Limita a 11 dígitos
+    const limited = numbers.slice(0, 11);
+    
+    // Aplica a formatação XXX.XXX.XXX-XX
+    if (limited.length <= 3) {
+      return limited;
+    } else if (limited.length <= 6) {
+      return `${limited.slice(0, 3)}.${limited.slice(3)}`;
+    } else if (limited.length <= 9) {
+      return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6)}`;
+    } else {
+      return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6, 9)}-${limited.slice(9)}`;
+    }
+  };
+
   const isEdit = Boolean(params['id']);
   
   // Extract query parameters from URL
@@ -255,9 +275,9 @@ export default function GuideForm() {
                   <FormLabel>Cliente (CPF) *</FormLabel>
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Digite o CPF do cliente"
+                      placeholder="000.000.000-00"
                       value={cpfSearch}
-                      onChange={(e) => setCpfSearch(e.target.value)}
+                      onChange={(e) => setCpfSearch(formatCpf(e.target.value))}
                       maxLength={14}
                       style={{
                         borderColor: 'var(--border-gray)',
