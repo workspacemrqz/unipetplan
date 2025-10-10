@@ -89,6 +89,11 @@ export default function Sellers() {
     ...getQueryOptions('sellers'),
   });
 
+  const { data: rulesSettings } = useQuery({
+    queryKey: ["/admin/api/settings/rules"],
+    ...getQueryOptions('settings'),
+  });
+
   const filteredSellers = sellers.filter(seller =>
     seller.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     seller.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -187,6 +192,13 @@ export default function Sellers() {
   };
 
   const resetForm = () => {
+    const defaultCpaPercentage = rulesSettings?.defaultCpaPercentage 
+      ? String(rulesSettings.defaultCpaPercentage) 
+      : "0";
+    const defaultRecurringCommissionPercentage = rulesSettings?.defaultRecurringCommissionPercentage 
+      ? String(rulesSettings.defaultRecurringCommissionPercentage) 
+      : "0";
+
     setFormData({
       fullName: "",
       cpf: "",
@@ -205,8 +217,8 @@ export default function Sellers() {
       accountNumber: "",
       fullNameForPayment: "",
       agency: "",
-      cpaPercentage: "0",
-      recurringCommissionPercentage: "0",
+      cpaPercentage: defaultCpaPercentage,
+      recurringCommissionPercentage: defaultRecurringCommissionPercentage,
     });
   };
 

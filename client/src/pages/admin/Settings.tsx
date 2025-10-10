@@ -77,6 +77,8 @@ export default function Settings() {
     defaultValues: {
       fixedPercentage: 0,
       coparticipationPercentage: 10,
+      defaultCpaPercentage: 0,
+      defaultRecurringCommissionPercentage: 0,
     },
   });
 
@@ -193,6 +195,8 @@ export default function Settings() {
       const mergedRulesSettings = {
         fixedPercentage: Number((rulesSettings as any).fixedPercentage ?? 0),
         coparticipationPercentage: Number((rulesSettings as any).coparticipationPercentage ?? 10),
+        defaultCpaPercentage: Number((rulesSettings as any).defaultCpaPercentage ?? 0),
+        defaultRecurringCommissionPercentage: Number((rulesSettings as any).defaultRecurringCommissionPercentage ?? 0),
       };
       
       rulesForm.reset(mergedRulesSettings);
@@ -968,6 +972,76 @@ export default function Settings() {
                                 <FormMessage />
                                 <p className="text-sm text-muted-foreground">
                                   Porcentagem que será aplicada automaticamente no campo "Coparticipação" quando habilitado, baseado no "Valor integral"
+                                </p>
+                              </FormItem>
+                            )}
+                          />
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="commissions" data-testid="accordion-commissions">
+                        <AccordionTrigger className="flex items-center space-x-2">
+                          <FileText className="h-4 w-4" />
+                          <div>
+                            <span>Comissões</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-4">
+                          <FormField
+                            control={rulesForm.control}
+                            name="defaultCpaPercentage"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>CPA Padrão (%)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field}
+                                    type="number" 
+                                    placeholder="Ex: 10" 
+                                    min="0" 
+                                    max="100"
+                                    step="0.01"
+                                    value={field.value || ""}
+                                    onChange={(e) => {
+                                      const value = e.target.value === "" ? "" : Number(e.target.value);
+                                      field.onChange(value);
+                                    }}
+                                    data-testid="input-default-cpa-percentage"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                                <p className="text-sm text-muted-foreground">
+                                  Porcentagem de CPA que será aplicada automaticamente ao criar um novo vendedor
+                                </p>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={rulesForm.control}
+                            name="defaultRecurringCommissionPercentage"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Comissão Recorrente Padrão (%)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    {...field}
+                                    type="number" 
+                                    placeholder="Ex: 5" 
+                                    min="0" 
+                                    max="100"
+                                    step="0.01"
+                                    value={field.value || ""}
+                                    onChange={(e) => {
+                                      const value = e.target.value === "" ? "" : Number(e.target.value);
+                                      field.onChange(value);
+                                    }}
+                                    data-testid="input-default-recurring-commission-percentage"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                                <p className="text-sm text-muted-foreground">
+                                  Porcentagem de comissão recorrente que será aplicada automaticamente ao criar um novo vendedor
                                 </p>
                               </FormItem>
                             )}
