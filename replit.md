@@ -33,7 +33,16 @@ Preferred communication style: Simple, everyday language.
 -   **Authentication**: Session-based for Admin, JWT, bcrypt, Express sessions.
 -   **Security**: Helmet, CORS, rate limiting, input sanitization, CSRF, XSS, SQL injection prevention, comprehensive mass assignment protection.
 -   **Image Management**: Supabase Storage for uploads, Sharp for processing.
--   **Feature Highlights**: Admin management (FAQs, Site Settings, Network Units, Procedures, Clients, Coupons, Evaluations/Satisfaction Surveys), customer dashboard (pets, procedures, financial, surveys), Unit Portal (client, pet management, guide creation), intelligent duplicate pet prevention, Brazilian phone formatting, password-protected deletions in admin, comprehensive coupon/discount system, differentiated billing logic (annual/monthly), strict billing period validation, customizable payment receipt PDFs, annual plan renewal countdown, and customer satisfaction tracking with admin review panel.
+-   **Feature Highlights**: Admin management (FAQs, Site Settings, Network Units, Procedures, Clients, Coupons, Evaluations/Satisfaction Surveys, Sellers), customer dashboard (pets, procedures, financial, surveys), Unit Portal (client, pet management, guide creation), intelligent duplicate pet prevention, Brazilian phone formatting, password-protected deletions in admin, comprehensive coupon/discount system, differentiated billing logic (annual/monthly), strict billing period validation, customizable payment receipt PDFs, annual plan renewal countdown, customer satisfaction tracking with admin review panel, and seller management with whitelabel pages and commission tracking.
+-   **Seller Management System (October 2025)**:
+    -   Complete seller registration system with 25 database fields including fiscal data (CPF, full name), contact info (email, phone), address (CEP, street, number, district, city, state), payment details (PIX key with type enum, bank info, account number, agency), and commission structure (CPA percentage, recurring commission percentage)
+    -   Automatic whitelabel URL generation for each seller upon registration (e.g., `/vendedor/nome-do-vendedor`)
+    -   Seller authentication using email (username) + CPF (hashed with bcrypt as password) for secure login
+    -   Dedicated seller dashboard (`/vendedor/dashboard`) displaying personalized sales performance and commission data using same chart components as admin dashboard
+    -   Admin CRUD interface in `/admin/vendedores` with table view, search, create/edit forms, delete with password confirmation, and active/inactive status toggle
+    -   Complete separation of seller authentication context from admin/client contexts using session-based auth with `SellerAuthContext`
+    -   API routes: `/admin/api/sellers` (CRUD with requireAdmin), `/api/seller/login` (email + CPF auth), `/api/seller/me` (session validation), `/api/seller/logout`
+    -   Integrated into admin sidebar under new "PARCEIROS" category with "Vendedores" menu item
 -   **Guide Management (October 2025)**: 
     -   Formulário de guias com filtro inteligente de procedimentos disponíveis por pet
     -   Campo de procedimento mostra apenas procedimentos do plano do pet com uso disponível
