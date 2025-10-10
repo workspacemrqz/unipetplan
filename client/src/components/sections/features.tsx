@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Rocket, DollarSign, CalendarCheck, Heart, MapPin, UserCheck, Microscope, Phone } from "lucide-react";
+import { Rocket, DollarSign, CalendarCheck, Heart, UserCheck, Microscope } from "lucide-react";
 import { useLocation } from "wouter";
 import { AnimatedSection } from "@/components/ui/animated-section";
 import { useSiteSettingsWithDefaults } from "@/hooks/use-site-settings";
@@ -34,7 +34,7 @@ export default function Features() {
 
   const networkFeatures = [
     {
-      icon: MapPin,
+      iconName: "Localização",
       text: "Unidades em teresina e região"
     },
     {
@@ -46,7 +46,7 @@ export default function Features() {
       text: "Equipamentos de última geração"
     },
     {
-      icon: Phone,
+      iconName: "Emergencia",
       text: "Atendimento de emergência"
     }
   ];
@@ -126,10 +126,21 @@ export default function Features() {
             <AnimatedSection animation="slideLeft" delay={700}>
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 {networkFeatures.map((item, index) => {
-                  const Icon = item.icon;
                   return (
                     <div key={index} className="flex items-center space-x-3">
-                      <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--icon-teal)] flex-shrink-0" />
+                      {item.iconName ? (
+                        <img 
+                          src={`/Icons/${item.iconName}.svg`} 
+                          alt={item.iconName}
+                          className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
+                          style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
+                        />
+                      ) : item.icon ? (
+                        (() => {
+                          const Icon = item.icon;
+                          return <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--icon-teal)] flex-shrink-0" />;
+                        })()
+                      ) : null}
                       <span className="text-[var(--text-dark-primary)] text-sm sm:text-base">{item.text}</span>
                     </div>
                   );

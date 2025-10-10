@@ -4,8 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  MapPin, 
-  Phone, 
   Search,
   X,
   ChevronLeft,
@@ -310,11 +308,21 @@ export default function Network() {
                         </h3>
                         <div className="space-y-3 mb-6">
                           <div className="flex items-start space-x-3">
-                            <MapPin className="h-4 w-4 text-[var(--icon-teal)] mt-1 flex-shrink-0" />
+                            <img 
+                              src="/Icons/Localização.svg" 
+                              alt="Localização"
+                              className="h-4 w-4 mt-1 flex-shrink-0"
+                              style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
+                            />
                             <span className="text-[var(--text-dark-primary)] text-sm">{unit.address}</span>
                           </div>
                           <div className="flex items-center space-x-3">
-                            <Phone className="h-4 w-4 text-[var(--icon-teal)] flex-shrink-0" />
+                            <img 
+                              src="/Icons/Emergencia.svg" 
+                              alt="Emergência"
+                              className="h-4 w-4 flex-shrink-0"
+                              style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
+                            />
                             <span className="text-[var(--text-dark-primary)] text-sm font-medium">{formatBrazilianPhoneForDisplay(unit.phone)}</span>
                           </div>
                         </div>
@@ -359,7 +367,12 @@ export default function Network() {
                               }}
                               data-testid={`button-location-unit-${unit.id}`}
                             >
-                              <MapPin className="h-4 w-4" style={{ color: 'var(--icon-teal)' }} />
+                              <img 
+                                src="/Icons/Localização.svg" 
+                                alt="Localização"
+                                className="h-4 w-4"
+                                style={{ filter: 'brightness(0) saturate(100%) invert(59%) sepia(38%) saturate(1280%) hue-rotate(131deg) brightness(93%) contrast(90%)' }}
+                              />
                             </Button>
                           )}
                         </div>
