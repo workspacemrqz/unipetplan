@@ -1,9 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Rocket, DollarSign, CalendarCheck, Heart, UserCheck, Microscope } from "lucide-react";
+import { Rocket, DollarSign, CalendarCheck, Heart, UserCheck, Microscope, LucideIcon } from "lucide-react";
 import { useLocation } from "wouter";
 import { AnimatedSection } from "@/components/ui/animated-section";
 import { useSiteSettingsWithDefaults } from "@/hooks/use-site-settings";
 import { cn } from "@/lib/utils";
+
+type NetworkFeature = {
+  iconName?: string;
+  icon?: LucideIcon;
+  text: string;
+}
 
 export default function Features() {
   const [, setLocation] = useLocation();
@@ -32,7 +38,7 @@ export default function Features() {
     }
   ];
 
-  const networkFeatures = [
+  const networkFeatures: NetworkFeature[] = [
     {
       iconName: "Localização",
       text: "Unidades em teresina e região"
