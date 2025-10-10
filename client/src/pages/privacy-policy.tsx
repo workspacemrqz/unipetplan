@@ -143,8 +143,7 @@ export default function PrivacyPolicy() {
   const { data: settings } = useQuery<SiteSettings>({
     queryKey: ["site-settings"],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/site-settings");
-      return await res.json();
+      return await apiRequest("GET", "/api/site-settings");
     },
   });
 
@@ -188,16 +187,19 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-cream-light)' }}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center transition-colors" style={{ color: 'var(--text-teal)' }}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar ao Início
-          </Link>
-        </div>
+      {/* Back Button - With top margin to clear fixed header */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-4">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium transition-colors bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          Voltar ao Início
+        </Link>
+      </div>
 
-        {/* Content */}
+      {/* Content */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="rounded-lg shadow-sm border p-8" style={{ backgroundColor: 'var(--bg-cream-lighter)', borderColor: 'var(--border-gray)' }}>
             {formatContent(content)}
