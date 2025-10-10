@@ -6369,6 +6369,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Email ou CPF inválidos" });
       }
       
+      // Check if seller is active
+      if (!seller.isActive) {
+        return res.status(403).json({ error: "Sua conta está inativa. Entre em contato com o administrador." });
+      }
+      
       // Regenerate session to prevent session fixation attacks
       req.session.regenerate((err) => {
         if (err) {
@@ -6433,6 +6438,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!seller) {
         return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      // Check if seller is still active
+      if (!seller.isActive) {
+        // Clear session if seller was deactivated
+        (req.session as any).seller = undefined;
+        return res.status(403).json({ error: "Sua conta está inativa. Entre em contato com o administrador." });
       }
 
       // Remove cpfHash from response
