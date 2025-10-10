@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertSiteSettingsSchema, insertRulesSettingsSchema, insertChatSettingsSchema } from "@shared/schema";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, Phone } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SiteSettingsImageUpload } from "@/components/admin/ui/site-settings-image-upload";
 import { ChatImageUpload } from "@/components/admin/ui/chat-image-upload";
@@ -324,7 +324,7 @@ export default function Settings() {
                   {/* Contact Information */}
                   <AccordionItem value="contact" data-testid="accordion-contact">
                     <AccordionTrigger className="flex items-center space-x-2">
-                      <CustomIcon name="Conteudo" className="h-4 w-4" />
+                      <Phone className="h-4 w-4" />
                       <div>
                         <span>Informações de Contato</span>
                       </div>
