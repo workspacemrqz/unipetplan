@@ -17,6 +17,7 @@ import { useParallelData } from "@/hooks/use-parallel-data";
 import { autoScrollToAnchor } from "@/lib/scroll-utils";
 import PlansSection from "@/components/sections/plans-section";
 import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 
@@ -43,6 +44,7 @@ const getPlanBySection = (sectionType: string, plansData: Plan[]): Plan | null =
 
 export default function Plans() {
   const [showFloatingButton, setShowFloatingButton] = useState(false);
+  const queryClient = useQueryClient();
 
 
 
@@ -139,7 +141,7 @@ export default function Plans() {
           <h2 className="text-2xl font-bold mb-4">Planos em Breve!</h2>
           <p className="text-lg mb-6">Estamos preparando os melhores planos para seu pet. Volte em breve!</p>
           <button 
-            onClick={() => window.location.reload()} 
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['plans'] })} 
             className="bg-gold text-primary px-6 py-3 rounded-lg font-semibold hover:bg-gold-darker active:bg-gold-darker transition-colors"
           >
             Atualizar Página

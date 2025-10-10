@@ -12,6 +12,7 @@ interface Plan {
   displayOrder?: number;
 }
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useParallelData } from "@/hooks/use-parallel-data";
 import { AnimatedSection } from "@/components/ui/animated-section";
@@ -52,6 +53,7 @@ export default function PlansSection({
   removePadding = false 
 }: PlansSectionProps) {
   const [location, navigate] = useLocation();
+  const queryClient = useQueryClient();
 
   // Função para scroll suave para detalhes do plano
   const scrollToPlanDetails = (planName: string) => {
@@ -125,7 +127,7 @@ export default function PlansSection({
           <h2 className="text-2xl font-bold mb-4">Planos em Breve!</h2>
           <p className="text-lg mb-6">Estamos preparando os melhores planos para seu pet. Volte em breve!</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['plans'] })}
             className="bg-[var(--bg-gold)] text-[var(--text-teal)] px-6 py-3 rounded-lg font-semibold transition-colors"
           >
             Atualizar Página
