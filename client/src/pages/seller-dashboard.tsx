@@ -15,6 +15,15 @@ interface DashboardStats {
   conversionRate: number;
 }
 
+interface CommissionData {
+  totalToReceive: string;
+  totalCPA: string;
+  totalRecurring: string;
+  contractsCount: number;
+  cpaPercentage: string;
+  recurringPercentage: string;
+}
+
 export default function SellerDashboard() {
   const [, setLocation] = useLocation();
   const { seller, isLoading: authLoading } = useSellerAuth();
@@ -27,6 +36,14 @@ export default function SellerDashboard() {
     clicks: 0,
     conversions: 0,
     conversionRate: 0
+  });
+  const [commissions, setCommissions] = useState<CommissionData>({
+    totalToReceive: '0.00',
+    totalCPA: '0.00',
+    totalRecurring: '0.00',
+    contractsCount: 0,
+    cpaPercentage: '0',
+    recurringPercentage: '0'
   });
 
   useEffect(() => {
@@ -59,9 +76,29 @@ export default function SellerDashboard() {
         console.error("Erro ao buscar estatísticas:", error);
       }
       
+      // Buscar dados de comissões
+      let commissionsData = {
+        totalToReceive: '0.00',
+        totalCPA: '0.00',
+        totalRecurring: '0.00',
+        contractsCount: 0,
+        cpaPercentage: seller.cpaPercentage || '0',
+        recurringPercentage: seller.recurringCommissionPercentage || '0'
+      };
+      try {
+        const response = await fetch(`/api/seller/commissions/${seller.id}`);
+        if (response.ok) {
+          commissionsData = await response.json();
+        }
+      } catch (error) {
+        console.error("Erro ao buscar comissões:", error);
+      }
+      
+      setCommissions(commissionsData);
+      
       setStats({
         totalClients: 0, // TODO: Implementar busca de clientes do vendedor
-        totalSales: 0, // TODO: Implementar busca de vendas do vendedor
+        totalSales: commissionsData.contractsCount, // Use contracts count as total sales
         cpaPercentage: Number(seller.cpaPercentage) || 0,
         recurringPercentage: Number(seller.recurringCommissionPercentage) || 0,
         clicks: analytics.clicks,
@@ -99,6 +136,32 @@ export default function SellerDashboard() {
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Dashboard</h1>
             <p className="text-sm text-muted-foreground">Bem-vindo, {seller.fullName}</p>
           </div>
+        </div>
+        
+        {/* Commission to Receive Card - Featured */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Valor a Receber</p>
+              <p className="text-4xl font-bold text-gray-900 mt-2">
+                R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <div className="mt-3 space-y-1">
+                <p className="text-xs text-gray-500">
+                  CPA: R$ {parseFloat(commissions.totalCPA).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Recorrente: R$ {parseFloat(commissions.totalRecurring).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+            <div className="p-4 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
+              <DollarSign className="h-8 w-8" style={{ color: '#257273' }} />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-4 border-t pt-3">
+            Baseado em {commissions.contractsCount} {commissions.contractsCount === 1 ? 'venda realizada' : 'vendas realizadas'}
+          </p>
         </div>
 
         {/* Stats Cards */}
