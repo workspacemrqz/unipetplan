@@ -429,34 +429,22 @@ export default function GuideForm() {
                         </SelectContent>
                       </Select>
                       <FormMessage />
+                      {field.value && (
+                        <p className="text-sm text-primary mt-1">
+                          Coparticipação: {form.getValues("value") === "0,00" ? "Sem coparticipação" : `R$ ${form.getValues("value")}`}
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
 
+                {/* Campo oculto para manter o valor de coparticipação */}
                 <FormField
                   control={form.control}
                   name="value"
-                  render={({ field }) => {
-                    // Mostrar "Sem coparticipação" visualmente quando o valor for "0,00"
-                    const displayValue = field.value === "0,00" ? "Sem coparticipação" : field.value;
-                    
-                    return (
-                      <FormItem>
-                        <FormLabel>Coparticipação</FormLabel>
-                        <FormControl>
-                          <Input 
-                            value={displayValue}
-                            onChange={field.onChange}
-                            readOnly
-                            placeholder="Selecione um procedimento"
-                            data-testid="input-coparticipation"
-                            className="bg-gray-50 cursor-not-allowed"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
+                  render={({ field }) => (
+                    <input type="hidden" {...field} />
+                  )}
                 />
 
                 <FormField
