@@ -183,35 +183,26 @@ export default function Evaluations() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="border border-[#eaeaea] rounded-lg bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Total de Avaliações</p>
-              <p className="text-2xl font-bold text-foreground">{surveys.length}</p>
-            </div>
-            <MessageSquare className="h-8 w-8 text-primary" />
+          <div>
+            <p className="text-sm text-muted-foreground">Total de Avaliações</p>
+            <p className="text-2xl font-bold text-foreground">{surveys.length}</p>
           </div>
         </div>
         
         <div className="border border-[#eaeaea] rounded-lg bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Média de Avaliação</p>
-              <div className="flex items-center gap-2">
-                <p className="text-2xl font-bold text-foreground">{calculateAverageRating()}</p>
-                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-              </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Média de Avaliação</p>
+            <div className="flex items-center gap-2">
+              <p className="text-2xl font-bold text-foreground">{calculateAverageRating()}</p>
+              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
             </div>
-            <Star className="h-8 w-8 text-primary" />
           </div>
         </div>
         
         <div className="border border-[#eaeaea] rounded-lg bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Taxa de Recomendação</p>
-              <p className="text-2xl font-bold text-foreground">{calculateRecommendationRate()}%</p>
-            </div>
-            <Star className="h-8 w-8 text-primary" />
+          <div>
+            <p className="text-sm text-muted-foreground">Taxa de Recomendação</p>
+            <p className="text-2xl font-bold text-foreground">{calculateRecommendationRate()}%</p>
           </div>
         </div>
       </div>
