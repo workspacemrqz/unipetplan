@@ -43,16 +43,6 @@ export default function GuideForm() {
     queryKey: ["/admin/api/plans/active"],
   });
 
-  // Fetch client and pet information if IDs are provided
-  const { data: client } = useQuery<any>({
-    queryKey: ["/admin/api/clients", urlClientId || guide?.clientId],
-    enabled: Boolean(urlClientId || guide?.clientId),
-  });
-
-  const { data: pet } = useQuery<any>({
-    queryKey: ["/admin/api/pets", urlPetId || guide?.petId],
-    enabled: Boolean(urlPetId || guide?.petId),
-  });
 
   const form = useForm({
     resolver: zodResolver(insertGuideSchema),
@@ -99,16 +89,26 @@ export default function GuideForm() {
   // Load client and pets when editing or URL params are present
   useEffect(() => {
     const loadClientAndPets = async () => {
-      const clientId = guide?.clientId || urlClientId || client?.id;
+      const clientId = guide?.clientId || urlClientId;
       
       if (clientId && !selectedClient) {
         try {
           const loadedClient = await apiRequest("GET", `/admin/api/clients/${clientId}`);
           setSelectedClient(loadedClient);
           setCpfSearch(loadedClient.cpf || "");
+          form.setValue("clientId", loadedClient.id);
           
           const pets = await apiRequest("GET", `/admin/api/clients/${clientId}/pets`);
           setClientPets(pets);
+          
+          // Set the petId if it's provided in URL or guide
+          const petId = guide?.petId || urlPetId;
+          if (petId) {
+            form.setValue("petId", petId);
+          } else if (pets.length === 1) {
+            // Auto-select if only one pet
+            form.setValue("petId", pets[0].id);
+          }
         } catch (error) {
           console.error("Error loading client and pets:", error);
         }
@@ -116,7 +116,7 @@ export default function GuideForm() {
     };
     
     loadClientAndPets();
-  }, [guide?.clientId, urlClientId, client?.id, selectedClient]);
+  }, [guide?.clientId, urlClientId, selectedClient]);
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
@@ -235,13 +235,6 @@ export default function GuideForm() {
         <p className="text-sm sm:text-base text-muted-foreground">
           {isEdit ? "Atualize as informações da guia" : "Crie uma nova guia de atendimento"}
         </p>
-        {(client || pet) && (
-          <div className="mt-2 text-sm text-primary">
-            {client && <span>Cliente: {client.fullName}</span>}
-            {client && pet && <span> | </span>}
-            {pet && <span>Pet: {pet.name} ({pet.species})</span>}
-          </div>
-        )}
       </div>
 
       {/* Back Button */}
