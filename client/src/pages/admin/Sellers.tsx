@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
 import { useLocation } from "wouter";
-import { Plus, Search, Edit, Eye, Copy, Check, Loader2, FileText, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Edit, Eye, Copy, Check, Loader2, FileText, MoreHorizontal, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { Switch } from "@/components/admin/ui/switch";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
