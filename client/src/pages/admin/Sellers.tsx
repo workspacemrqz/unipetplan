@@ -12,13 +12,11 @@ import {
   TableRow,
 } from "@/components/admin/ui/table";
 import { useLocation } from "wouter";
-import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Copy, Check, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getQueryOptions } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Label } from "@/components/admin/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
 import { useConfirmDialog } from "@/hooks/admin/use-confirm-dialog";
 import { useMasks } from "@/hooks/admin/use-masks";
 
@@ -54,6 +52,7 @@ export default function Sellers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const confirmDialog = useConfirmDialog();
@@ -108,6 +107,93 @@ export default function Sellers() {
         deleteMutation.mutate(seller.id);
       },
     });
+  };
+
+  const generateSellerText = () => {
+    if (!selectedSeller) return "";
+
+    let text = "";
+    
+    // Cabeçalho
+    text += "=".repeat(50) + "\n";
+    text += "INFORMAÇÕES DO VENDEDOR\n";
+    text += "=".repeat(50) + "\n\n";
+
+    // Dados Fiscais
+    text += "DADOS FISCAIS:\n";
+    text += "-".repeat(25) + "\n";
+    text += `Nome Completo: ${selectedSeller.fullName}\n`;
+    text += `CPF: ${cpfMask(selectedSeller.cpf)}\n\n`;
+
+    // Contato
+    text += "CONTATO:\n";
+    text += "-".repeat(15) + "\n";
+    text += `Email: ${selectedSeller.email}\n`;
+    text += `Celular: ${phoneMask(selectedSeller.phone)}\n\n`;
+
+    // Endereço
+    text += "ENDEREÇO:\n";
+    text += "-".repeat(15) + "\n";
+    text += `CEP: ${cepMask(selectedSeller.cep)}\n`;
+    text += `Endereço: ${selectedSeller.address}, ${selectedSeller.number}\n`;
+    if (selectedSeller.complement) {
+      text += `Complemento: ${selectedSeller.complement}\n`;
+    }
+    text += `Bairro: ${selectedSeller.district}\n`;
+    text += `Cidade/Estado: ${selectedSeller.city}/${selectedSeller.state}\n\n`;
+
+    // Dados de Pagamento
+    text += "DADOS DE PAGAMENTO:\n";
+    text += "-".repeat(25) + "\n";
+    text += `Chave PIX: ${selectedSeller.pixKey}\n`;
+    text += `Tipo de Chave PIX: ${selectedSeller.pixKeyType}\n`;
+    text += `Banco: ${selectedSeller.bank}\n`;
+    text += `Conta Corrente: ${selectedSeller.accountNumber}\n`;
+    text += `Agência: ${selectedSeller.agency}\n`;
+    text += `Nome Completo (Conta): ${selectedSeller.fullNameForPayment}\n\n`;
+
+    // Comissões
+    text += "COMISSÕES:\n";
+    text += "-".repeat(15) + "\n";
+    text += `CPA: ${selectedSeller.cpaPercentage}%\n`;
+    text += `Comissão Recorrente: ${selectedSeller.recurringCommissionPercentage}%\n\n`;
+
+    // Whitelabel
+    if (selectedSeller.whitelabelUrl) {
+      text += "WHITELABEL:\n";
+      text += "-".repeat(15) + "\n";
+      text += `URL: ${selectedSeller.whitelabelUrl}\n\n`;
+    }
+
+    // Rodapé
+    text += "=".repeat(50) + "\n";
+    text += `Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}\n`;
+    text += "=".repeat(50);
+
+    return text;
+  };
+
+  const handleCopyToClipboard = async () => {
+    if (copyState !== 'idle') return;
+    
+    try {
+      setCopyState('copying');
+      const text = generateSellerText();
+      await navigator.clipboard.writeText(text);
+      
+      setCopyState('copied');
+      
+      setTimeout(() => {
+        setCopyState('idle');
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar as informações para a área de transferência",
+        variant: "destructive"
+      });
+      setCopyState('idle');
+    }
   };
 
   return (
@@ -208,6 +294,20 @@ export default function Sellers() {
               <span>Detalhes do Vendedor</span>
             </DialogTitle>
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleCopyToClipboard}
+                disabled={copyState === 'copying'}
+                className={`gap-2 h-8 transition-all duration-300 ${
+                  copyState === 'copied' ? 'bg-[#e6f4f4] border-[#277677] text-[#277677]' : ''
+                }`}
+                data-testid="button-copy-seller-details"
+              >
+                {copyState === 'copying' && <Loader2 className="h-4 w-4 animate-spin" />}
+                {copyState === 'copied' && <Check className="h-4 w-4" />}
+                {copyState === 'idle' && <Copy className="h-4 w-4" />}
+                {copyState === 'copying' ? 'Copiando...' : copyState === 'copied' ? 'Copiado!' : 'Copiar'}
+              </Button>
               <Button
                 variant="outline" 
                 onClick={() => setDetailsOpen(false)}

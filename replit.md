@@ -16,10 +16,11 @@ Preferred communication style: Simple, everyday language.
 -   **Forms**: React Hook Form with Zod validation.
 -   **Animation**: Framer Motion, with standardized button and page loading states using `Loader2` and a custom `LoadingDots` component.
 -   **Responsiveness**: Dynamic grid adjustments.
--   **Admin UI Consistency**: Unified design patterns across all admin pages, consistent navigation structure, standardized dropdowns, and standardized button components (including delete confirmations).
+-   **Admin UI Consistency**: Unified design patterns across all admin pages, consistent navigation structure, standardized dropdowns, and standardized button components (including delete confirmations). Detail popups (Client and Seller) have identical styling and features including copy-to-clipboard functionality.
 -   **Admin Navigation Menu (October 2025)**: Menu lateral administrativo (`client/src/components/admin/Sidebar.tsx`) reorganizado. "Rede Credenciada" foi movida da seção "Comunicação" para a seção "Parceiros" junto com "Vendedores" para agrupar recursos relacionados a parceiros de negócio.
 -   **Legal Pages Navigation**: Consistent back buttons and header overlap fixes.
 -   **Instant Admin Loading**: Optimized admin authentication flow for instant rendering and redirection.
+-   **Decimal Percentage Support (October 2025)**: Admin Rules settings now support decimal percentages (e.g., 0.5%, 1.25%) with proper handling of zero values using nullish coalescing operator (??) instead of logical OR (||).
 
 ### Technical Implementations
 -   **Backend**: Node.js with Express.js, TypeScript, ES modules.
