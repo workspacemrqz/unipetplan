@@ -280,6 +280,59 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
 
+  // Get unit procedures with plan details (authenticated)
+  app.get("/api/unit/:slug/procedures-with-plans", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      // Get all active procedures from database
+      const allProcedures = await storage.getAllProcedures();
+      
+      // Get all plans
+      const allPlans = await storage.getPlans();
+      const plansMap = new Map(allPlans.map((plan: any) => [plan.id, plan]));
+      
+      // Get all plan procedures (associations)
+      const allPlanProcedures = await storage.getAllPlanProcedures();
+      
+      // Group plan procedures by procedure id
+      const planProceduresByProcedureId = allPlanProcedures.reduce((acc: any, pp: any) => {
+        if (!acc[pp.procedureId]) {
+          acc[pp.procedureId] = [];
+        }
+        const plan = plansMap.get(pp.planId);
+        if (plan) {
+          acc[pp.procedureId].push({
+            planId: pp.planId,
+            planName: plan.name,
+            price: pp.price || 0, // Valor integral
+            payValue: pp.payValue || 0, // Valor a pagar
+            coparticipacao: pp.coparticipacao || 0,
+            carencia: pp.carencia || '',
+            limitesAnuais: pp.limitesAnuais || '',
+            isIncluded: pp.isIncluded
+          });
+        }
+        return acc;
+      }, {});
+      
+      // Filter only active procedures and map to expected format with plan details
+      const proceduresWithPlans = allProcedures
+        .filter((proc: any) => proc.isActive)
+        .map((proc: any) => ({
+          id: proc.id,
+          name: proc.name,
+          description: proc.description,
+          category: proc.category || 'Guia',
+          isActive: proc.isActive,
+          plans: planProceduresByProcedureId[proc.id] || []
+        }));
+      
+      res.json(proceduresWithPlans);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching procedures with plans:", error);
+      res.status(500).json({ error: "Erro ao buscar procedimentos com planos" });
+    }
+  });
+
   // Create client (authenticated)
   app.post("/api/unit/:slug/clients", requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
