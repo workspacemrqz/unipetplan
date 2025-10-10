@@ -53,29 +53,6 @@ export const PLAN_TYPES = [
   "without_waiting_period"
 ];
 
-export const PROCEDURE_TYPES = [
-  "consultas",
-  "exames_laboratoriais", 
-  "especialistas",
-  "vacinas",
-  "cirurgias",
-  "exames_de_imagem",
-  "exames_laboratoriais_complexos",
-  "procedimentos_ambulatoriais",
-  "beneficios_especiais"
-];
-
-export const PROCEDURE_TYPE_LABELS = {
-  "consultas": "Consultas",
-  "exames_laboratoriais": "Exames Laboratoriais", 
-  "especialistas": "Especialistas",
-  "vacinas": "Vacinas",
-  "cirurgias": "Cirurgias",
-  "exames_de_imagem": "Exames de Imagem",
-  "exames_laboratoriais_complexos": "Exames Laboratoriais Complexos",
-  "procedimentos_ambulatoriais": "Procedimentos Ambulatoriais",
-  "beneficios_especiais": "Benefícios Especiais"
-};
 
 export const PAYMENT_METHODS = [
   "PIX",
