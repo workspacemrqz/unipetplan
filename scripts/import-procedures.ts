@@ -60,12 +60,12 @@ function parseInlineFile(content: string): ProcedureData[] {
   for (const line of lines) {
     if (!line.trim()) continue;
     
-    const nameMatch = line.match(/Procedimento:\s*([^C]+?)\s*Categoria do procedimento:/);
-    const categoryMatch = line.match(/Categoria do procedimento:\s*([^P]+?)\s*Plano:/);
-    const planMatch = line.match(/Plano:\s*([^C]+?)\s*Coparticipação/);
-    const coparticipacaoMatch = line.match(/Coparticipação \(R\$\):\s*([^C]+?)\s*Carência/);
-    const carenciaMatch = line.match(/Carência \(Dias\):\s*([^L]+?)\s*Limites Anuais:/);
-    const limitesMatch = line.match(/Limites Anuais:\s*(.+?)$/);
+    const nameMatch = line.match(/Procedimento:\s*(.+?)\s+Categoria do procedimento:/);
+    const categoryMatch = line.match(/Categoria do procedimento:\s*(.+?)\s+Plano:/);
+    const planMatch = line.match(/Plano:\s*(.+?)\s+Coparticipação/);
+    const coparticipacaoMatch = line.match(/Coparticipação \(R\$\):\s*(.+?)\s+Carência/);
+    const carenciaMatch = line.match(/Carência \(Dias\):\s*(.+?)\s+Limites Anuais:/);
+    const limitesMatch = line.match(/Limites Anuais:\s*(.*)$/);
     
     if (nameMatch && categoryMatch && planMatch) {
       procedures.push({
