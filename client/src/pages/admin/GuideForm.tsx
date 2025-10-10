@@ -447,37 +447,51 @@ export default function GuideForm() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger 
-                            data-testid="select-status"
-                            style={{
-                              borderColor: 'var(--border-gray)',
-                              background: 'white'
-                            }}
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {[{value: "open", label: "Aberta"}, {value: "closed", label: "Fechada"}, {value: "cancelled", label: "Cancelada"}].flatMap((status, index, array) => [
-                            <SelectItem key={status.value} value={status.value} className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                              {status.label}
-                            </SelectItem>,
-                            ...(index < array.length - 1 ? [<Separator key={`separator-${status.value}`} />] : [])
-                          ])}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Campo Status - apenas visível na edição */}
+                {isEdit && (
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger 
+                              data-testid="select-status"
+                              style={{
+                                borderColor: 'var(--border-gray)',
+                                background: 'white'
+                              }}
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {[{value: "open", label: "Aberta"}, {value: "closed", label: "Fechada"}, {value: "cancelled", label: "Cancelada"}].flatMap((status, index, array) => [
+                              <SelectItem key={status.value} value={status.value} className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                                {status.label}
+                              </SelectItem>,
+                              ...(index < array.length - 1 ? [<Separator key={`separator-${status.value}`} />] : [])
+                            ])}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {/* Campo oculto Status para criação */}
+                {!isEdit && (
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <input type="hidden" {...field} value="open" />
+                    )}
+                  />
+                )}
               </div>
 
               <div className="mt-6 space-y-4">
