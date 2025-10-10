@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,8 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { FileText, User, Heart, MapPin, Clock, DollarSign, CheckCircle, XCircle, Eye, Users, CreditCard, Plus, Settings, Search, AlertCircle, Info } from "lucide-react";
-import { Link } from "wouter";
+import { FileText, User, Heart, MapPin, Clock, DollarSign, CheckCircle, XCircle, Eye, Users, CreditCard, Plus, Settings, Search, AlertCircle, Info, Loader2 } from "lucide-react";
 import DigitalCard from "@/components/DigitalCard";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 
@@ -1284,12 +1283,10 @@ export default function UnitDashboard() {
                         variant="admin-action"
                         size="sm"
                         disabled={submittingGuide || !guideForm.clientId || !guideForm.petId || !guideForm.procedureId}
+                        className="min-w-[100px]"
                       >
                         {submittingGuide ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            Criando...
-                          </>
+                          <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <>
                             <Plus className="h-4 w-4 mr-2" />
@@ -1372,7 +1369,7 @@ export default function UnitDashboard() {
                     .filter(pet => {
                       const clientCpf = pet.client.cpf.replace(/[^0-9]/g, '');
                       const searchCpf = searchedCpf.replace(/[^0-9]/g, '');
-                      return clientCpf === searchCpf;
+                      return clientCpf === searchCpf && pet.plan;
                     })
                     .map(pet => (
                       <div key={pet.id} className="flex justify-center">
@@ -1381,17 +1378,17 @@ export default function UnitDashboard() {
                             id: pet.id,
                             name: pet.name,
                             species: pet.species,
-                            breed: pet.breed,
+                            breed: pet.breed || 'N/A',
                             sex: pet.sex || 'N/A',
-                            age: pet.age
+                            age: pet.age || 'N/A'
                           }}
                           client={{
                             id: pet.client.id,
                             fullName: pet.client.fullName,
                             phone: formatBrazilianPhoneForDisplay(pet.client.phone),
-                            city: pet.client.city
+                            city: pet.client.city || 'N/A'
                           }}
-                          plan={pet.plan}
+                          plan={pet.plan!}
                           unit={{
                             id: authState.unit!.id,
                             name: authState.unit!.name,
@@ -1554,7 +1551,7 @@ export default function UnitDashboard() {
                             <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 border-b">
                               Procedimento
                             </th>
-                            {coverage.length > 0 && coverage[0].planCoverage.map(plan => (
+                            {coverage.length > 0 && coverage[0]?.planCoverage.map(plan => (
                               <th key={plan.planId} className="px-6 py-3 text-center text-sm font-medium text-gray-900 border-b">
                                 <div className="flex flex-col">
                                   <span className="font-semibold">{plan.planName}</span>
