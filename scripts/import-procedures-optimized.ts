@@ -179,7 +179,7 @@ async function main() {
     console.log(`🔗 Relações já existentes no banco: ${existingRelations.length}\n`);
     
     // Preparar todas as relações para inserção
-    const relationsToInsert = [];
+    const relationsToInsert: Array<typeof planProcedures.$inferInsert> = [];
     
     for (const [procName, procInfo] of uniqueProceduresMap) {
       const procedureId = existingProceduresMap.get(procName);
