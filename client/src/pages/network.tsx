@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -184,7 +184,7 @@ export default function Network() {
                   <div className="network-filter-field">
                     <Select value={selectedCity} onValueChange={setSelectedCity}>
                       <SelectTrigger 
-                        className="w-full p-3 rounded-lg border text-sm"
+                        className="w-full p-3 rounded-lg border text-sm [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                         style={{
                           borderColor: 'var(--border-gray)',
                           background: 'white'
@@ -210,7 +210,7 @@ export default function Network() {
                   <div className="network-filter-field">
                     <Select value={selectedService} onValueChange={setSelectedService}>
                       <SelectTrigger 
-                        className="w-full p-3 rounded-lg border text-sm"
+                        className="w-full p-3 rounded-lg border text-sm [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                         style={{
                           borderColor: 'var(--border-gray)',
                           background: 'white'
