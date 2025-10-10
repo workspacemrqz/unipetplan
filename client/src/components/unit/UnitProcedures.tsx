@@ -15,26 +15,38 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
-import { Search, Eye, MoreHorizontal, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, MoreHorizontal, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+
+interface PlanDetail {
+  planId: string;
+  planName: string;
+  price: number;
+  payValue: number;
+  coparticipacao: number;
+  carencia: string;
+  limitesAnuais: string;
+  isIncluded: boolean;
+}
 
 interface Procedure {
   id: string;
   name: string;
   description: string;
-  price: number;
   category: string;
   isActive: boolean;
+  plans: PlanDetail[];
 }
 
 const allColumns = [
   "Procedimento",
   "Categoria",
-  "Descrição",
-  "Valor",
-  "Status",
-  "Ações"
+  "Plano",
+  "Valor Integral",
+  "Pagar (R$)",
+  "Coparticipação",
+  "Carência",
+  "Limites Anuais"
 ] as const;
 
 export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
@@ -42,8 +54,6 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedProcedure, setSelectedProcedure] = useState<Procedure | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const { visibleColumns, toggleColumn } = useColumnPreferences('unit.procedures.columns', allColumns);
   const pageSize = 10;
 
@@ -54,7 +64,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
   const fetchProcedures = async () => {
     try {
       const token = localStorage.getItem('unit-token');
-      const response = await fetch(`/api/unit/${unitSlug}/procedures`, {
+      const response = await fetch(`/api/unit/${unitSlug}/procedures-with-plans`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -71,11 +81,35 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
     }
   };
 
-  const filteredProcedures = procedures.filter(procedure => {
+  // Create expanded rows for procedures with plans
+  const expandProceduresWithPlans = (procedures: Procedure[]) => {
+    const expanded: any[] = [];
+    procedures.forEach(procedure => {
+      if (procedure.plans && procedure.plans.length > 0) {
+        procedure.plans.forEach(plan => {
+          expanded.push({
+            ...procedure,
+            plan: plan
+          });
+        });
+      } else {
+        expanded.push({
+          ...procedure,
+          plan: null
+        });
+      }
+    });
+    return expanded;
+  };
+
+  const expandedProcedures = expandProceduresWithPlans(procedures);
+
+  const filteredProcedures = expandedProcedures.filter(item => {
     const searchLower = searchQuery.toLowerCase();
-    return procedure.name.toLowerCase().includes(searchLower) ||
-           procedure.category.toLowerCase().includes(searchLower) ||
-           (procedure.description && procedure.description.toLowerCase().includes(searchLower));
+    return item.name.toLowerCase().includes(searchLower) ||
+           item.category.toLowerCase().includes(searchLower) ||
+           (item.plan && item.plan.planName.toLowerCase().includes(searchLower)) ||
+           (item.description && item.description.toLowerCase().includes(searchLower));
   });
 
   const totalProcedures = filteredProcedures.length;
@@ -88,7 +122,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(price);
+    }).format(price / 100); // Convert from cents to reais
   };
 
   return (
@@ -97,7 +131,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Procedimentos</h1>
-          <p className="text-sm text-muted-foreground">Visualize todos os procedimentos disponíveis</p>
+          <p className="text-sm text-muted-foreground">Visualize todos os procedimentos disponíveis com detalhes dos planos</p>
         </div>
       </div>
 
@@ -133,7 +167,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                 Colunas
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuContent align="end" className="w-48">
               {allColumns.map((col) => (
                 <DropdownMenuCheckboxItem
                   key={col}
@@ -153,16 +187,18 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
       <div className="container my-10 space-y-4 border border-[#eaeaea] rounded-lg bg-white shadow-sm">
 
         {/* Table */}
-        <div className="rounded-lg overflow-hidden">
+        <div className="rounded-lg overflow-x-auto">
           <Table className="w-full">
             <TableHeader>
               <TableRow className="bg-white border-b border-[#eaeaea]">
-                {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
-                {visibleColumns.includes("Categoria") && <TableHead className="w-[140px] bg-white">Categoria</TableHead>}
-                {visibleColumns.includes("Descrição") && <TableHead className="w-[250px] bg-white">Descrição</TableHead>}
-                {visibleColumns.includes("Valor") && <TableHead className="w-[100px] bg-white">Valor</TableHead>}
-                {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
-                {visibleColumns.includes("Ações") && <TableHead className="w-[80px] bg-white">Ações</TableHead>}
+                {visibleColumns.includes("Procedimento") && <TableHead className="min-w-[200px] bg-white">Procedimento</TableHead>}
+                {visibleColumns.includes("Categoria") && <TableHead className="min-w-[140px] bg-white">Categoria</TableHead>}
+                {visibleColumns.includes("Plano") && <TableHead className="min-w-[150px] bg-white">Plano</TableHead>}
+                {visibleColumns.includes("Valor Integral") && <TableHead className="min-w-[120px] bg-white">Valor Integral</TableHead>}
+                {visibleColumns.includes("Pagar (R$)") && <TableHead className="min-w-[120px] bg-white">Pagar (R$)</TableHead>}
+                {visibleColumns.includes("Coparticipação") && <TableHead className="min-w-[130px] bg-white">Coparticipação</TableHead>}
+                {visibleColumns.includes("Carência") && <TableHead className="min-w-[100px] bg-white">Carência</TableHead>}
+                {visibleColumns.includes("Limites Anuais") && <TableHead className="min-w-[150px] bg-white">Limites Anuais</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -175,53 +211,68 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                   </TableRow>
                 ))
               ) : displayProcedures && displayProcedures.length > 0 ? (
-                displayProcedures.map((procedure: Procedure) => (
-                  <TableRow key={procedure.id} className="bg-white border-b border-[#eaeaea]">
+                displayProcedures.map((item: any, index: number) => (
+                  <TableRow key={`${item.id}-${item.plan?.planId || index}`} className="bg-white border-b border-[#eaeaea] hover:bg-gray-50">
                     {visibleColumns.includes("Procedimento") && (
                       <TableCell className="font-medium whitespace-nowrap bg-white">
-                        {procedure.name}
+                        {item.name}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Categoria") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        {procedure.category}
+                        {item.category}
                       </TableCell>
                     )}
-                    {visibleColumns.includes("Descrição") && (
+                    {visibleColumns.includes("Plano") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {item.plan ? (
+                          <span className="font-medium text-primary">
+                            {item.plan.planName}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Valor Integral") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {item.plan ? formatPrice(item.plan.price) : '-'}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Pagar (R$)") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {item.plan ? (
+                          <span className="font-semibold text-green-600">
+                            {formatPrice(item.plan.payValue)}
+                          </span>
+                        ) : '-'}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Coparticipação") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {item.plan && item.plan.coparticipacao > 0 ? (
+                          <span className="text-orange-600">
+                            {formatPrice(item.plan.coparticipacao)}
+                          </span>
+                        ) : '-'}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Carência") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {item.plan && item.plan.carencia ? (
+                          <span className="text-sm">
+                            {item.plan.carencia}
+                          </span>
+                        ) : '-'}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Limites Anuais") && (
                       <TableCell className="bg-white">
-                        <span className="line-clamp-2">
-                          {procedure.description || "Não informada"}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Valor") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        {formatPrice(procedure.price)}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Status") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          procedure.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {procedure.isActive ? 'Ativo' : 'Inativo'}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Ações") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedProcedure(procedure);
-                            setDetailsOpen(true);
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        {item.plan && item.plan.limitesAnuais ? (
+                          <span className="text-sm line-clamp-2">
+                            {item.plan.limitesAnuais}
+                          </span>
+                        ) : '-'}
                       </TableCell>
                     )}
                   </TableRow>
@@ -250,7 +301,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
               <div className="flex items-center space-x-2">
                 <p className="text-sm font-medium">
                   {totalProcedures > 0 ? (
-                    <>Mostrando {startIndex + 1} a {Math.min(endIndex, totalProcedures)} de {totalProcedures} procedimentos</>
+                    <>Mostrando {startIndex + 1} a {Math.min(endIndex, totalProcedures)} de {totalProcedures} registros</>
                   ) : (
                     "Nenhum procedimento encontrado"
                   )}
@@ -285,57 +336,6 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
           </div>
         )}
       </div>
-
-      {/* Details Dialog */}
-      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent hideCloseButton className="overflow-y-auto max-h-[75vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <span>Detalhes do Procedimento</span>
-            </DialogTitle>
-          </DialogHeader>
-          
-          {selectedProcedure && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <h4 className="font-semibold text-foreground mb-2">Informações</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground">{selectedProcedure.name}</span></span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Categoria:</strong> <span className="text-foreground">{selectedProcedure.category}</span></span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Valor:</strong> <span className="text-foreground">{formatPrice(selectedProcedure.price)}</span></span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Status:</strong> <span className="text-foreground">{selectedProcedure.isActive ? 'Ativo' : 'Inativo'}</span></span>
-                    </div>
-                    {selectedProcedure.description && (
-                      <div className="space-y-1">
-                        <span className="block"><strong className="text-primary">Descrição:</strong></span>
-                        <span className="text-foreground block">{selectedProcedure.description}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                <Button
-                  variant="outline" 
-                  onClick={() => setDetailsOpen(false)}
-                >
-                  Fechar
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
