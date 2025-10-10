@@ -261,14 +261,34 @@ export default function Coupons() {
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Cupons</h1>
           <p className="text-sm text-muted-foreground">Gerencie os cupons de desconto</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="admin-action">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Cupom
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
+      </div>
+
+      {/* Filters and Column Controls */}
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-10 w-80"
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="admin-action" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
                 {editingCoupon ? 'Editar Cupom' : 'Novo Cupom'}
@@ -390,26 +410,7 @@ export default function Coupons() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
 
-      {/* Filters and Column Controls */}
-      <div className="flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex gap-2 flex-wrap">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-10 w-80"
-            />
-          </div>
-        </div>
-
-        <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
@@ -477,10 +478,7 @@ export default function Coupons() {
                         {coupon.type === 'percentage' ? (
                           <span>Porcentagem</span>
                         ) : (
-                          <span className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-1" />
-                            Valor Fixo
-                          </span>
+                          <span>Valor Fixo</span>
                         )}
                       </TableCell>
                     )}
