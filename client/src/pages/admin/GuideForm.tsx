@@ -293,7 +293,7 @@ export default function GuideForm() {
                       value={cpfSearch}
                       onChange={(e) => setCpfSearch(formatCpf(e.target.value))}
                       maxLength={14}
-                      className="h-9"
+                      className="h-12"
                       style={{
                         borderColor: 'var(--border-gray)',
                         background: 'white'
@@ -303,7 +303,7 @@ export default function GuideForm() {
                       type="button"
                       onClick={searchClientByCpf}
                       variant="admin-action"
-                      className="h-9 px-4"
+                      className="h-12 px-4"
                       disabled={isSearchingClient}
                     >
                       {isSearchingClient ? (
