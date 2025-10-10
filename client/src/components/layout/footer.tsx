@@ -19,13 +19,15 @@ export default function Footer() {
   ];
 
   // Buscar planos ativos
-  const { data: plans = [] } = useQuery({
+  const { data: plans, isLoading } = useQuery({
     queryKey: ["/api/plans"],
     queryFn: async () => {
       const response = await apiRequest("/api/plans", "GET");
       return response as Array<{ id: string; name: string; isActive: boolean }>;
     },
   });
+
+  const activePlans = plans?.filter((plan) => plan.isActive !== false) || [];
 
   return (
     <footer className="border-t border-t-accent bg-muted py-12">
@@ -90,8 +92,14 @@ export default function Footer() {
           <div>
             <h4 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6 text-primary">Planos</h4>
             <ul className="space-y-2 sm:space-y-3">
-              {plans.length > 0 ? (
-                plans.map((plan) => (
+              {isLoading ? (
+                <li>
+                  <span className="text-sm sm:text-base text-foreground">
+                    Carregando planos...
+                  </span>
+                </li>
+              ) : activePlans.length > 0 ? (
+                activePlans.map((plan) => (
                   <li key={plan.id}>
                     <Link
                       href="/planos"
@@ -104,7 +112,7 @@ export default function Footer() {
               ) : (
                 <li>
                   <span className="text-sm sm:text-base text-foreground">
-                    Carregando planos...
+                    Nenhum plano disponível
                   </span>
                 </li>
               )}
