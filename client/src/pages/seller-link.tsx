@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
-import { Link as LinkIcon, Copy, Check } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
 import { Input } from "@/components/ui/input";
@@ -14,11 +14,6 @@ export default function SellerLink() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [analytics, setAnalytics] = useState({
-    clicks: 0,
-    conversions: 0,
-    conversionRate: 0
-  });
 
   useEffect(() => {
     checkAuthentication();
@@ -32,20 +27,6 @@ export default function SellerLink() {
     
     if (seller) {
       setLoading(false);
-      // Fetch analytics when seller is authenticated
-      fetchAnalytics(seller.id);
-    }
-  };
-  
-  const fetchAnalytics = async (sellerId: string) => {
-    try {
-      const response = await fetch(`/api/seller/analytics/${sellerId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setAnalytics(data);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar estatísticas:", error);
     }
   };
 
@@ -135,48 +116,6 @@ export default function SellerLink() {
                       <li>• Ao finalizarem uma compra, você receberá a comissão automaticamente</li>
                     </ul>
                   </div>
-                </div>
-              </div>
-
-              {/* Performance Stats */}
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Cliques no link</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">{analytics.clicks}</p>
-                    </div>
-                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                      <LinkIcon className="h-6 w-6" style={{ color: '#257273' }} />
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-3">Total de acessos</p>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Conversões</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">{analytics.conversions}</p>
-                    </div>
-                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                      <Check className="h-6 w-6" style={{ color: '#257273' }} />
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-3">Vendas concluídas</p>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Taxa de conversão</p>
-                      <p className="text-3xl font-bold text-gray-900 mt-2">{analytics.conversionRate.toFixed(1)}%</p>
-                    </div>
-                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                      <LinkIcon className="h-6 w-6" style={{ color: '#257273' }} />
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-3">Eficiência de vendas</p>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
-import { DollarSign, Users } from "lucide-react";
+import { DollarSign, Users, Link as LinkIcon, Check } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
 
@@ -10,6 +10,9 @@ interface DashboardStats {
   totalSales: number;
   cpaPercentage: number;
   recurringPercentage: number;
+  clicks: number;
+  conversions: number;
+  conversionRate: number;
 }
 
 export default function SellerDashboard() {
@@ -20,7 +23,10 @@ export default function SellerDashboard() {
     totalClients: 0,
     totalSales: 0,
     cpaPercentage: 0,
-    recurringPercentage: 0
+    recurringPercentage: 0,
+    clicks: 0,
+    conversions: 0,
+    conversionRate: 0
   });
 
   useEffect(() => {
@@ -42,11 +48,25 @@ export default function SellerDashboard() {
   const fetchDashboardData = async () => {
     // Buscar dados do vendedor
     if (seller) {
+      // Buscar estatísticas de analytics
+      let analytics = { clicks: 0, conversions: 0, conversionRate: 0 };
+      try {
+        const response = await fetch(`/api/seller/analytics/${seller.id}`);
+        if (response.ok) {
+          analytics = await response.json();
+        }
+      } catch (error) {
+        console.error("Erro ao buscar estatísticas:", error);
+      }
+      
       setStats({
         totalClients: 0, // TODO: Implementar busca de clientes do vendedor
         totalSales: 0, // TODO: Implementar busca de vendas do vendedor
         cpaPercentage: Number(seller.cpaPercentage) || 0,
-        recurringPercentage: Number(seller.recurringCommissionPercentage) || 0
+        recurringPercentage: Number(seller.recurringCommissionPercentage) || 0,
+        clicks: analytics.clicks,
+        conversions: analytics.conversions,
+        conversionRate: analytics.conversionRate
       });
     }
   };
@@ -133,6 +153,45 @@ export default function SellerDashboard() {
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-3">Vendas realizadas</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Cliques no link</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.clicks}</p>
+              </div>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
+                <LinkIcon className="h-6 w-6" style={{ color: '#257273' }} />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-3">Total de acessos</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Conversões</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.conversions}</p>
+              </div>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
+                <Check className="h-6 w-6" style={{ color: '#257273' }} />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-3">Vendas concluídas</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Taxa de conversão</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.conversionRate.toFixed(1)}%</p>
+              </div>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
+                <DollarSign className="h-6 w-6" style={{ color: '#257273' }} />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-3">Eficiência de vendas</p>
           </div>
         </div>
       </div>
