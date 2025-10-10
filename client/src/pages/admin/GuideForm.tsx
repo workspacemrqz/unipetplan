@@ -7,13 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/admin/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { InputMasked } from "@/components/ui/input-masked";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
-import { insertGuideSchema } from "@shared/schema";
+import { z } from "zod";
 import { ArrowLeft } from "lucide-react";
 
 export default function GuideForm() {
@@ -25,7 +24,7 @@ export default function GuideForm() {
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [clientPets, setClientPets] = useState<any[]>([]);
 
-  const isEdit = Boolean(params.id);
+  const isEdit = Boolean(params['id']);
   
   // Extract query parameters from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -33,24 +32,27 @@ export default function GuideForm() {
   const urlPetId = urlParams.get('petId');
 
   const { data: guide, isLoading: guideLoading } = useQuery<any>({
-    queryKey: ["/admin/api/guides", params.id],
+    queryKey: ["/admin/api/guides", params['id']],
     enabled: isEdit,
   });
 
 
-  const { data: plans } = useQuery({
-    queryKey: ["/admin/api/plans/active"],
+  const guideFormSchema = z.object({
+    clientId: z.string().min(1, "Cliente é obrigatório"),
+    petId: z.string().min(1, "Pet é obrigatório"),
+    procedure: z.string().min(1, "Procedimento é obrigatório"),
+    generalNotes: z.string().optional(),
+    value: z.string().optional(),
+    status: z.string().optional(),
   });
 
-
   const form = useForm({
-    resolver: zodResolver(insertGuideSchema),
+    resolver: zodResolver(guideFormSchema),
     mode: 'onChange',
     defaultValues: {
       clientId: urlClientId || "",
       petId: urlPetId || "",
       procedure: "",
-      procedureNotes: "",
       generalNotes: "",
       value: "",
       status: "open",
@@ -71,7 +73,6 @@ export default function GuideForm() {
         clientId: guide.clientId || "",
         petId: guide.petId || "",
         procedure: guide.procedure || "",
-        procedureNotes: guide.procedureNotes || "",
         generalNotes: guide.generalNotes || "",
         value: guide.value || "",
         status: guide.status || "open",
@@ -118,7 +119,7 @@ export default function GuideForm() {
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       if (isEdit) {
-        await apiRequest("PUT", `/admin/api/guides/${params.id}`, data);
+        await apiRequest("PUT", `/admin/api/guides/${params['id']}`, data);
       } else {
         await apiRequest("POST", "/admin/api/guides", data);
       }
@@ -451,24 +452,6 @@ export default function GuideForm() {
               </div>
 
               <div className="mt-6 space-y-4">
-                <FormField
-                  control={form.control}
-                  name="procedureNotes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Anotações sobre o Procedimento</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          {...field} 
-                          placeholder="Observações específicas sobre o procedimento..."
-                          data-testid="textarea-procedure-notes" 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="generalNotes"
