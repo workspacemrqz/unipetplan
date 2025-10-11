@@ -65,6 +65,12 @@ export function requireSellerAuth(req: Request, res: Response, next: NextFunctio
 
 // Middleware function for protecting admin routes
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  console.log("🔐 [REQUIRE-ADMIN] Verificando autenticação admin para:", req.originalUrl);
+  console.log("🔐 [REQUIRE-ADMIN] Session exists:", !!req.session);
+  console.log("🔐 [REQUIRE-ADMIN] Session.admin:", req.session?.admin);
+  console.log("🔐 [REQUIRE-ADMIN] Authenticated:", req.session?.admin?.authenticated);
+  console.log("🔐 [REQUIRE-ADMIN] NODE_ENV:", process.env.NODE_ENV);
+  
   // SECURITY FIX: Remove development bypass completely in production environments
   // Never allow bypass in production, staging, or any deployed environment
   if (process.env.NODE_ENV === 'production' || 
@@ -72,18 +78,23 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
       process.env.REPLIT_DEPLOYMENT === 'true' ||
       process.env.RAILWAY_ENVIRONMENT ||
       process.env.VERCEL_ENV) {
+    console.log("🔐 [REQUIRE-ADMIN] Modo produção detectado");
     // ALWAYS require authentication in deployed environments
     if (!req.session || !req.session.admin || !req.session.admin.authenticated) {
+      console.log("❌ [REQUIRE-ADMIN] Autenticação falhou em produção");
       return res.status(401).json({ error: "Acesso administrativo não autorizado" });
     }
+    console.log("✅ [REQUIRE-ADMIN] Autenticação bem-sucedida em produção");
     return next();
   }
   
   // SECURITY FIX: In true local development, require MULTIPLE confirmations
   const isLocalDev = process.env.NODE_ENV === 'development' && 
-                     process.env.ALLOW_DEV_BYPASS === 'true' &&
-                     process.env.DEV_BYPASS_CONFIRMATION === 'YES_I_UNDERSTAND_THE_RISKS';
-                     
+                    process.env.ALLOW_DEV_BYPASS === 'true' &&
+                    process.env.DEV_BYPASS_CONFIRMATION === 'YES_I_UNDERSTAND_THE_RISKS';
+                    
+  console.log("🔐 [REQUIRE-ADMIN] Is local dev bypass:", isLocalDev);
+                    
   if (isLocalDev) {
     // Log de auditoria de segurança
     console.warn('🚨 [SECURITY AUDIT] Admin authentication bypass ativado em desenvolvimento local');
@@ -100,12 +111,20 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
         permissions: []
       };
     }
+    console.log("✅ [REQUIRE-ADMIN] Bypass ativo, permitindo acesso");
     return next();
   }
   
   // Default: require actual authentication
+  console.log("🔐 [REQUIRE-ADMIN] Verificação padrão de autenticação");
   if (!req.session || !req.session.admin || !req.session.admin.authenticated) {
-    return res.status(401).json({ error: "Acesso administrativo não autorizado" });
+    console.log("❌ [REQUIRE-ADMIN] Autenticação falhou - sessão:", {
+      hasSession: !!req.session,
+      hasAdmin: !!req.session?.admin,
+      isAuthenticated: req.session?.admin?.authenticated
+    });
+    return res.status(401).json({ error: "Não autenticado" });
   }
+  console.log("✅ [REQUIRE-ADMIN] Autenticação bem-sucedida");
   next();
 }
