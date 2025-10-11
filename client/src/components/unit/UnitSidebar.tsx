@@ -7,6 +7,7 @@ import {
   FileText,
   Clipboard,
   ClipboardList,
+  DollarSign,
   LogOut
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ export default function UnitSidebar() {
       items: [
         { name: "Guias de Atendimento", href: `/unidade/${slug}/guias`, icon: FileText },
         { name: "Histórico de atendimento", href: `/unidade/${slug}/historico`, icon: ClipboardList },
+        { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign },
         { name: "Clientes & Pets", href: `/unidade/${slug}/clientes`, icon: Users },
         { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard }
       ]

@@ -16,6 +16,7 @@ import UnitDashboard from "@/pages/unit-dashboard";
 import GuiasPage from "@/pages/unit/GuiasPage";
 import NovaGuiaPage from "@/pages/unit/NovaGuiaPage";
 import HistoricoPage from "@/pages/unit/HistoricoPage";
+import RelatorioFinanceiroPage from "@/pages/unit/RelatorioFinanceiroPage";
 import ClientesPage from "@/pages/unit/ClientesPage";
 import ProcedimentosPage from "@/pages/unit/ProcedimentosPage";
 import PrivacyPolicy from "@/pages/privacy-policy";
@@ -203,6 +204,7 @@ function Router() {
         <Route path="/unidade/:slug/guias/novo" component={NovaGuiaPage} />
         <Route path="/unidade/:slug/guias" component={GuiasPage} />
         <Route path="/unidade/:slug/historico" component={HistoricoPage} />
+        <Route path="/unidade/:slug/relatorio-financeiro" component={RelatorioFinanceiroPage} />
         <Route path="/unidade/:slug/clientes" component={ClientesPage} />
         <Route path="/unidade/:slug/procedimentos" component={ProcedimentosPage} />
         
