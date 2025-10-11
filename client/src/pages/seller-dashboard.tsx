@@ -8,7 +8,6 @@ import {
   Check as Target,
   Star as Activity,
   FileText as BarChart3,
-  CreditCard as Wallet,
   DollarSign as CircleDollarSign
 } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
@@ -207,16 +206,11 @@ export default function SellerDashboard() {
                 Acompanhe seu desempenho e comissões em tempo real
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-sm" style={{ color: '#060606' }}>Saldo Total</p>
-                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#060606' }}>
-                  R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Wallet className="h-8 w-8" style={{ color: '#060606' }} />
-              </div>
+            <div className="text-right">
+              <p className="text-sm" style={{ color: '#060606' }}>Saldo Total</p>
+              <p className="text-2xl md:text-3xl font-bold" style={{ color: '#060606' }}>
+                R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </p>
             </div>
           </div>
         </div>
