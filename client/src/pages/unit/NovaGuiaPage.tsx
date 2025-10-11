@@ -504,6 +504,11 @@ export default function NovaGuiaPage() {
                               </SelectContent>
                             </Select>
                             <FormMessage />
+                            {field.value && (
+                              <p className="text-sm text-primary mt-1">
+                                Coparticipação: {form.getValues("value") === "0,00" ? "Sem coparticipação" : `R$ ${form.getValues("value")}`}
+                              </p>
+                            )}
                           </FormItem>
                         );
                       }}
