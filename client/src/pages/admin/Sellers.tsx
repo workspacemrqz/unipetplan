@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
 import { useLocation } from "wouter";
-import { Plus, Search, Edit, Eye, Copy, Check, Loader2, FileText, MoreHorizontal, ChevronLeft, ChevronRight, Globe } from "lucide-react";
+import { Plus, Search, Edit, Eye, Copy, Check, Loader2, FileText, MoreHorizontal, ChevronLeft, ChevronRight, Globe, DollarSign } from "lucide-react";
 import { Switch } from "@/components/admin/ui/switch";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -371,6 +371,14 @@ export default function Sellers() {
                             onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
                           >
                             <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setLocation(`/vendedores/${seller.id}/pagamentos`)}
+                            title="Gerenciar pagamentos e comissões"
+                          >
+                            <DollarSign className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="outline"
