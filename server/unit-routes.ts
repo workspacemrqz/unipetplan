@@ -132,7 +132,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       });
       
       // Filter to only show guides created by this unit
-      const allGuides = result?.data || [];
+      const allGuides = result?.guides || [];
       const unitGuides = allGuides.filter((guide: any) => guide.createdByUnitId === unitId);
       
       // Recalculate pagination for filtered results
