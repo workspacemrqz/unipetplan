@@ -169,21 +169,13 @@ export default function SellerDashboard() {
       <div className="space-y-6 p-2 md:p-0">
         {/* Header com Welcome */}
         <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl p-6 text-white shadow-lg">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#060606' }}>
-                Olá, {seller.fullName}! 👋
-              </h1>
-              <p style={{ color: '#060606' }}>
-                Acompanhe seu desempenho e comissões em tempo real
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm" style={{ color: '#060606' }}>Saldo Total</p>
-              <p className="text-2xl md:text-3xl font-bold" style={{ color: '#060606' }}>
-                R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#060606' }}>
+              Olá, {seller.fullName}! 👋
+            </h1>
+            <p style={{ color: '#060606' }}>
+              Acompanhe seu desempenho e comissões em tempo real
+            </p>
           </div>
         </div>
 
