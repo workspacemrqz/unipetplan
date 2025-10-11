@@ -26,7 +26,9 @@ import {
   type ClientLogin,
   type AdminLogin,
   type InsertPet,
-  type Pet
+  type Pet,
+  type InsertSeller,
+  type InsertGuide
 } from "../shared/schema.js";
 import { sanitizeText } from "./utils/text-sanitizer.js";
 import { sanitizeEmail } from "./utils/log-sanitizer.js";
@@ -2090,13 +2092,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const guideData = insertGuideSchema.parse(req.body);
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
+      let processedValue: string | undefined;
       if (guideData.value && typeof guideData.value === 'string') {
-        guideData.value = guideData.value.replace('.', '').replace(',', '.');
+        processedValue = guideData.value.replace('.', '').replace(',', '.');
       }
       
-      console.log(`📝 [ADMIN] Creating new guide:`, guideData);
+      const processedGuideData: InsertGuide = {
+        ...guideData,
+        clientId: guideData.clientId!,
+        petId: guideData.petId!,
+        procedure: guideData.procedure!,
+        value: processedValue
+      };
       
-      const newGuide = await storage.createGuide(guideData);
+      console.log(`📝 [ADMIN] Creating new guide:`, processedGuideData);
+      
+      const newGuide = await storage.createGuide(processedGuideData);
       
       // Automatically register procedure usage when guide is created
       if (guideData.petId && guideData.procedure) {
@@ -2149,11 +2160,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const guideData = insertGuideSchema.partial().parse(req.body);
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
+      const processedGuideData: Partial<InsertGuide> = { ...guideData };
       if (guideData.value && typeof guideData.value === 'string') {
-        guideData.value = guideData.value.replace('.', '').replace(',', '.');
+        processedGuideData.value = guideData.value.replace('.', '').replace(',', '.');
       }
       
-      const updatedGuide = await storage.updateGuide(req.params.id, guideData);
+      const updatedGuide = await storage.updateGuide(req.params.id, processedGuideData);
       
       if (!updatedGuide) {
         return res.status(404).json({ error: "Guia não encontrado" });
