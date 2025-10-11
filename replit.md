@@ -38,7 +38,7 @@ Preferred communication style: Simple, everyday language.
 ### System Design Choices
 -   **API Design**: RESTful with structured error handling.
 -   **Performance**: Code splitting, lazy loading, optimized bundle sizes, connection pooling, query optimization, response compression.
--   **Deployment**: Separate client/server builds for development, unified server for production. Standardized port configuration (5000 in production). Enhanced CORS and security configurations for Replit deployment, ensuring proper handling of `.replit.app` and `.replit.dev` domains.
+-   **Deployment**: Separate client/server builds for development, unified server for production. Standardized port configuration (5000 in production). Enhanced CORS and security configurations for Replit deployment, ensuring proper handling of `.replit.app` and `.replit.dev` domains. Trust proxy configuration enabled in production for correct HTTPS cookie handling behind Replit's proxy (October 2025).
 
 ## External Dependencies
 
