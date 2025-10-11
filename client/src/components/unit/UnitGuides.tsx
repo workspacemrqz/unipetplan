@@ -252,14 +252,6 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Guias de Atendimento</h1>
           <p className="text-sm text-muted-foreground">Visualize as guias geradas pela sua unidade</p>
         </div>
-        <Button 
-          variant="admin-action"
-          size="sm"
-          onClick={() => setLocation(`/unidade/${unitSlug}/guias/novo`)}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Guia
-        </Button>
       </div>
 
       {/* Date Filter */}
@@ -310,35 +302,44 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
           </Select>
         </div>
 
-        {/* Column Controls */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-auto"
-              style={{
-                borderColor: 'var(--border-gray)',
-                background: 'white'
-              }}
-            >
-              <MoreHorizontal className="h-4 w-4 mr-2" />
-              Colunas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            {allColumns.map((col) => (
-              <DropdownMenuCheckboxItem
-                key={col}
-                checked={visibleColumns.includes(col)}
-                onCheckedChange={() => toggleColumn(col)}
-                className="mb-1"
+        <div className="flex gap-2">
+          <Button 
+            variant="admin-action"
+            size="sm"
+            onClick={() => setLocation(`/unidade/${unitSlug}/guias/novo`)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                style={{
+                  borderColor: 'var(--border-gray)',
+                  background: 'white'
+                }}
               >
-                {col}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <MoreHorizontal className="h-4 w-4 mr-2" />
+                Colunas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {allColumns.map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col}
+                  checked={visibleColumns.includes(col)}
+                  onCheckedChange={() => toggleColumn(col)}
+                  className="mb-1"
+                >
+                  {col}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Modern Table Container */}
