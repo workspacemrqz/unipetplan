@@ -39,8 +39,12 @@ export function setupAuth(app: Express) {
     })
   };
 
-  // Remove trust proxy for local development
-  // app.set("trust proxy", 1);
+  // Trust proxy is required for production deployments (Replit, Vercel, etc)
+  // This allows Express to trust the X-Forwarded-* headers from the proxy
+  if (process.env.NODE_ENV === 'production') {
+    app.set("trust proxy", 1);
+  }
+  
   app.use(session(sessionSettings));
 
   // Session setup complete - admin routes removed as part of admin system cleanup
