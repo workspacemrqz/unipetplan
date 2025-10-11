@@ -264,7 +264,7 @@ export default function SellerDashboard() {
           <KPICard
             title="Total de Vendas"
             value={stats.totalSales}
-            subtitle="Vendas este mês"
+            subtitle="Vendas acumuladas"
           />
         </div>
 
