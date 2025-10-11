@@ -235,18 +235,26 @@ export default function SellerDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">Composição de Comissões</h3>
               <p className="text-sm text-gray-500">Distribuição por tipo de comissão</p>
             </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={commissionChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip 
-                  formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                />
-                <Bar dataKey="valor" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {totalCommission > 0 ? (
+              <div style={{ width: '100%', height: '280px' }}>
+                <ResponsiveContainer>
+                  <BarChart data={commissionChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="name" stroke="#6b7280" style={{ fontSize: '12px' }} />
+                    <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
+                    <Tooltip 
+                      formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    />
+                    <Bar dataKey="valor" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-[280px] text-gray-400">
+                <p className="text-sm">Nenhuma comissão registrada ainda</p>
+              </div>
+            )}
           </div>
 
           {/* Gráfico de Pizza */}
@@ -255,28 +263,36 @@ export default function SellerDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">Proporção de Comissões</h3>
               <p className="text-sm text-gray-500">Total: R$ {totalCommission.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {totalCommission > 0 ? (
+              <div style={{ width: '100%', height: '280px' }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={90}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-[280px] text-gray-400">
+                <p className="text-sm">Nenhuma comissão registrada ainda</p>
+              </div>
+            )}
           </div>
 
           {/* Gráfico de Funil de Conversão */}
@@ -285,17 +301,25 @@ export default function SellerDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">Funil de Conversão</h3>
               <p className="text-sm text-gray-500">Do clique à venda</p>
             </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={funnelData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" stroke="#6b7280" />
-                <YAxis dataKey="name" type="category" stroke="#6b7280" width={100} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                />
-                <Bar dataKey="valor" radius={[0, 8, 8, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {(stats.clicks > 0 || stats.conversions > 0) ? (
+              <div style={{ width: '100%', height: '280px' }}>
+                <ResponsiveContainer>
+                  <BarChart data={funnelData} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis type="number" stroke="#6b7280" style={{ fontSize: '12px' }} />
+                    <YAxis dataKey="name" type="category" stroke="#6b7280" width={100} style={{ fontSize: '12px' }} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    />
+                    <Bar dataKey="valor" radius={[0, 8, 8, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-[280px] text-gray-400">
+                <p className="text-sm">Nenhum clique registrado ainda</p>
+              </div>
+            )}
           </div>
 
           {/* Indicador de Performance */}
@@ -304,42 +328,48 @@ export default function SellerDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">Taxa de Conversão</h3>
               <p className="text-sm text-gray-500">Eficiência de vendas</p>
             </div>
-            <div className="flex items-center justify-center h-[250px]">
-              <div className="text-center">
-                <div className="relative inline-flex items-center justify-center">
-                  <svg className="w-40 h-40 transform -rotate-90">
-                    <circle
-                      cx="80"
-                      cy="80"
-                      r="70"
-                      stroke="#e8f4f4"
-                      strokeWidth="12"
-                      fill="none"
-                    />
-                    <circle
-                      cx="80"
-                      cy="80"
-                      r="70"
-                      stroke="#257273"
-                      strokeWidth="12"
-                      fill="none"
-                      strokeDasharray={`${2 * Math.PI * 70}`}
-                      strokeDashoffset={`${2 * Math.PI * 70 * (1 - stats.conversionRate / 100)}`}
-                      strokeLinecap="round"
-                      style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
-                    />
-                  </svg>
-                  <div className="absolute">
-                    <p className="text-4xl font-bold" style={{ color: '#257273' }}>
-                      {stats.conversionRate.toFixed(1)}%
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">Conversão</p>
+            <div className="flex items-center justify-center" style={{ height: '280px' }}>
+              {stats.clicks > 0 ? (
+                <div className="text-center">
+                  <div className="relative inline-flex items-center justify-center">
+                    <svg className="w-40 h-40 transform -rotate-90">
+                      <circle
+                        cx="80"
+                        cy="80"
+                        r="70"
+                        stroke="#e8f4f4"
+                        strokeWidth="12"
+                        fill="none"
+                      />
+                      <circle
+                        cx="80"
+                        cy="80"
+                        r="70"
+                        stroke="#257273"
+                        strokeWidth="12"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 70}`}
+                        strokeDashoffset={`${2 * Math.PI * 70 * (1 - stats.conversionRate / 100)}`}
+                        strokeLinecap="round"
+                        style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+                      />
+                    </svg>
+                    <div className="absolute">
+                      <p className="text-4xl font-bold" style={{ color: '#257273' }}>
+                        {stats.conversionRate.toFixed(1)}%
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">Conversão</p>
+                    </div>
                   </div>
+                  <p className="text-xs text-gray-500 mt-4">
+                    {stats.conversions} {stats.conversions === 1 ? 'venda' : 'vendas'} de {stats.clicks} {stats.clicks === 1 ? 'clique' : 'cliques'}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
-                  {stats.conversions} vendas de {stats.clicks} cliques
-                </p>
-              </div>
+              ) : (
+                <div className="text-center text-gray-400">
+                  <p className="text-sm">Compartilhe seu link para começar</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
