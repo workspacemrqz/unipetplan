@@ -239,8 +239,8 @@ export default function SellerDashboard() {
             value={`R$ ${(commissions.totalPaid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
             subtitle="Pagamentos processados"
             icon={CircleDollarSign}
-            color="#16a34a"
-            bgColor="#dcfce7"
+            color="#277677"
+            bgColor="#e6f2f2"
           />
           
           <KPICard
@@ -250,8 +250,8 @@ export default function SellerDashboard() {
             icon={Target}
             trend={stats.conversionRate > 5 ? "up" : "down"}
             trendValue={stats.conversionRate > 5 ? "+2.3%" : "-1.2%"}
-            color="#0891b2"
-            bgColor="#e0f2fe"
+            color="#277677"
+            bgColor="#e6f2f2"
           />
           
           <KPICard
@@ -261,8 +261,8 @@ export default function SellerDashboard() {
             icon={BarChart3}
             trend="up"
             trendValue="+8 vendas"
-            color="#7c3aed"
-            bgColor="#f3e8ff"
+            color="#277677"
+            bgColor="#e6f2f2"
           />
         </div>
 
@@ -281,28 +281,28 @@ export default function SellerDashboard() {
             <p className="text-sm text-teal-700 mt-2">Por nova venda realizada</p>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-blue-900">Comissão Recorrente</h4>
-              <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+              <h4 className="font-semibold text-teal-900">Comissão Recorrente</h4>
+              <div className="px-3 py-1 rounded-full text-sm font-bold text-white" style={{ backgroundColor: '#277677' }}>
                 {stats.recurringPercentage}%
               </div>
             </div>
-            <p className="text-2xl font-bold text-blue-900">
+            <p className="text-2xl font-bold text-teal-900">
               R$ {parseFloat(commissions.totalRecurring).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
-            <p className="text-sm text-blue-700 mt-2">Das mensalidades dos clientes</p>
+            <p className="text-sm text-teal-700 mt-2">Das mensalidades dos clientes</p>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-6 border border-amber-200">
+          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-amber-900">Valor Pendente</h4>
-              <Activity className="h-5 w-5 text-amber-600" />
+              <h4 className="font-semibold text-teal-900">Valor Pendente</h4>
+              <Activity className="h-5 w-5" style={{ color: '#277677' }} />
             </div>
-            <p className="text-2xl font-bold text-amber-900">
+            <p className="text-2xl font-bold text-teal-900">
               R$ {valorPendente.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
-            <p className="text-sm text-amber-700 mt-2">Aguardando pagamento</p>
+            <p className="text-sm text-teal-700 mt-2">Aguardando pagamento</p>
           </div>
         </div>
       </div>
