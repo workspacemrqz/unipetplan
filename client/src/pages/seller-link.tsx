@@ -66,12 +66,16 @@ export default function SellerLink() {
 
   return (
     <SellerLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 p-2 md:p-0">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Link de Referência</h1>
-            <p className="text-sm text-muted-foreground">Compartilhe seu link e ganhe comissões</p>
+        <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl p-6 text-white shadow-lg">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#060606' }}>
+              Link de Referência
+            </h1>
+            <p style={{ color: '#060606' }}>
+              Compartilhe seu link e ganhe comissões
+            </p>
           </div>
         </div>
 
