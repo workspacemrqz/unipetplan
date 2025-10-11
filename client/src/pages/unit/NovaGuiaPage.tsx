@@ -262,7 +262,13 @@ export default function NovaGuiaPage() {
       return;
     }
 
-    mutation.mutate(data);
+    // Convert value from Brazilian format (0,00) to numeric format (0.00)
+    const formattedData = {
+      ...data,
+      value: data.value ? parseFloat(data.value.replace(',', '.')) : 0
+    };
+
+    mutation.mutate(formattedData);
   };
 
   if (unitInfoLoading) {
