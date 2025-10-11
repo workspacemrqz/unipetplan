@@ -179,20 +179,73 @@ export default function SellerDashboard() {
           </div>
         </div>
 
-        {/* KPI Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <KPICard
-            title="Valor a Receber"
-            value={`R$ ${parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-            subtitle={`${commissions.contractsCount} vendas realizadas`}
-          />
+        {/* Dashboard de Pagamentos */}
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo Financeiro</h3>
           
-          <KPICard
-            title="Valor Recebido"
-            value={`R$ ${(commissions.totalPaid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-            subtitle="Pagamentos processados"
-          />
-          
+          {/* Valores principais */}
+          <div className="space-y-6">
+            {/* Barra de progresso visual */}
+            <div className="relative">
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-gray-600">Progresso de Pagamentos</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {((commissions.totalPaid || 0) / parseFloat(commissions.totalToReceive) * 100).toFixed(1)}% recebido
+                </span>
+              </div>
+              <div className="h-8 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full transition-all duration-500"
+                  style={{ 
+                    width: `${Math.min(((commissions.totalPaid || 0) / parseFloat(commissions.totalToReceive) * 100), 100)}%` 
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Grid de valores */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Valor Total a Receber */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">Total a Receber</p>
+                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-xs text-gray-500">{commissions.contractsCount} vendas realizadas</p>
+              </div>
+
+              {/* Valor Recebido */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">Valor Recebido</p>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+                <p className="text-2xl font-bold text-green-600">
+                  R$ {(commissions.totalPaid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-xs text-gray-500">Pagamentos processados</p>
+              </div>
+
+              {/* Valor Pendente */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">Valor Pendente</p>
+                  <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                </div>
+                <p className="text-2xl font-bold text-orange-600">
+                  R$ {valorPendente.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-xs text-gray-500">Aguardando pagamento</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI Cards Grid - Métricas de Performance */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <KPICard
             title="Taxa de Conversão"
             value={`${stats.conversionRate.toFixed(1)}%`}
