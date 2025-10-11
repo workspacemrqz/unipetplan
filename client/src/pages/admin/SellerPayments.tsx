@@ -159,29 +159,30 @@ export default function SellerPayments() {
         </p>
       </div>
 
-      {/* Back Button */}
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => setLocation("/vendedores")}
-        className="w-full sm:w-auto"
-        style={{ backgroundColor: '#FFFFFF' }}
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar
-      </Button>
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setLocation("/vendedores")}
+          className="w-full sm:w-auto"
+          style={{ backgroundColor: '#FFFFFF' }}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
 
-      {/* Register Payment Button */}
-      <Button 
-        onClick={() => setPaymentDialogOpen(true)}
-        variant="admin-action"
-        size="sm"
-        className="w-full sm:w-auto"
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        Registrar Pagamento
-      </Button>
+        <Button 
+          onClick={() => setPaymentDialogOpen(true)}
+          variant="admin-action"
+          size="sm"
+          className="w-full sm:w-auto"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Registrar Pagamento
+        </Button>
+      </div>
 
       {/* Sales Report Cards */}
       {salesReport && (
