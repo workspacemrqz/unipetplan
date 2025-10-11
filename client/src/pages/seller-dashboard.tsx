@@ -106,17 +106,29 @@ export default function SellerDashboard() {
         recurringPercentage: seller.recurringCommissionPercentage || '0',
         totalPaid: 0
       };
+      
       try {
         const response = await fetch(`/api/seller/commissions/${seller.id}`);
         if (response.ok) {
-          commissionsData = await response.json();
+          const data = await response.json();
+          commissionsData = {
+            totalToReceive: data.totalToReceive || '0.00',
+            totalCPA: data.totalCPA || '0.00',
+            totalRecurring: data.totalRecurring || '0.00',
+            contractsCount: data.contractsCount || 0,
+            cpaPercentage: data.cpaPercentage || seller.cpaPercentage || '0',
+            recurringPercentage: data.recurringPercentage || seller.recurringCommissionPercentage || '0',
+            totalPaid: 0
+          };
         }
       } catch (error) {
         console.error("Erro ao buscar comissões:", error);
       }
 
       try {
-        const response = await fetch(`/api/seller/payments-total/${seller.id}`);
+        const response = await fetch(`/api/seller/payments-total/${seller.id}`, {
+          credentials: 'include'
+        });
         if (response.ok) {
           const paymentsData = await response.json();
           commissionsData.totalPaid = paymentsData.totalPaid || 0;
@@ -129,12 +141,12 @@ export default function SellerDashboard() {
       
       setStats({
         totalClients: 0,
-        totalSales: commissionsData.contractsCount,
-        cpaPercentage: Number(seller.cpaPercentage) || 0,
-        recurringPercentage: Number(seller.recurringCommissionPercentage) || 0,
-        clicks: analytics.clicks,
-        conversions: analytics.conversions,
-        conversionRate: analytics.conversionRate
+        totalSales: commissionsData.contractsCount || 0,
+        cpaPercentage: Number(seller.cpaPercentage || 0),
+        recurringPercentage: Number(seller.recurringCommissionPercentage || 0),
+        clicks: analytics.clicks || 0,
+        conversions: analytics.conversions || 0,
+        conversionRate: analytics.conversionRate || 0
       });
     }
   };
@@ -158,8 +170,26 @@ export default function SellerDashboard() {
     return null;
   }
 
-  // Calcular valores pendentes
-  const valorPendente = parseFloat(commissions.totalToReceive) - (commissions.totalPaid || 0);
+  // Calcular valores pendentes - garantir que sempre sejam números válidos
+  const totalToReceive = typeof commissions.totalToReceive === 'string' 
+    ? parseFloat(commissions.totalToReceive) || 0 
+    : commissions.totalToReceive || 0;
+  
+  const totalPaid = typeof commissions.totalPaid === 'number' 
+    ? commissions.totalPaid 
+    : parseFloat(String(commissions.totalPaid || 0)) || 0;
+  
+  const valorPendente = totalToReceive - totalPaid;
+  
+  // Formatar valores para exibição
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('pt-BR', { 
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
 
   return (
     <SellerLayout>
@@ -191,7 +221,7 @@ export default function SellerDashboard() {
                   <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">
-                  R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  {formatCurrency(totalToReceive)}
                 </p>
                 <p className="text-xs text-gray-500">{commissions.contractsCount} vendas realizadas</p>
               </div>
@@ -203,7 +233,7 @@ export default function SellerDashboard() {
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
                 <p className="text-2xl font-bold text-green-600">
-                  R$ {(commissions.totalPaid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  {formatCurrency(totalPaid)}
                 </p>
                 <p className="text-xs text-gray-500">Pagamentos processados</p>
               </div>
@@ -215,7 +245,7 @@ export default function SellerDashboard() {
                   <div className="w-3 h-3 rounded-full bg-orange-500"></div>
                 </div>
                 <p className="text-2xl font-bold text-orange-600">
-                  R$ {valorPendente.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  {formatCurrency(valorPendente)}
                 </p>
                 <p className="text-xs text-gray-500">Aguardando pagamento</p>
               </div>
@@ -248,7 +278,7 @@ export default function SellerDashboard() {
               </div>
             </div>
             <p className="text-2xl font-bold text-teal-900">
-              R$ {parseFloat(commissions.totalCPA).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              {formatCurrency(parseFloat(commissions.totalCPA) || 0)}
             </p>
             <p className="text-sm text-teal-700 mt-2">Por nova venda realizada</p>
           </div>
@@ -261,7 +291,7 @@ export default function SellerDashboard() {
               </div>
             </div>
             <p className="text-2xl font-bold text-teal-900">
-              R$ {parseFloat(commissions.totalRecurring).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              {formatCurrency(parseFloat(commissions.totalRecurring) || 0)}
             </p>
             <p className="text-sm text-teal-700 mt-2">Das mensalidades dos clientes</p>
           </div>
