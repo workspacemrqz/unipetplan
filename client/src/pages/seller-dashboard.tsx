@@ -13,19 +13,6 @@ import {
 } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
-import { 
-  AreaChart, 
-  Area, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  Legend
-} from 'recharts';
 
 interface DashboardStats {
   totalClients: number;
@@ -46,27 +33,6 @@ interface CommissionData {
   recurringPercentage: string;
   totalPaid?: number;
 }
-
-// Custom Tooltip Component
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-100">
-        <p className="text-sm font-medium text-gray-900">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: {
-              typeof entry.value === 'number' && entry.name.includes('R$')
-                ? `R$ ${entry.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                : entry.value
-            }
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
 
 // KPI Card Component
 const KPICard = ({ 
@@ -224,28 +190,6 @@ export default function SellerDashboard() {
     return null;
   }
 
-  // Dados para gráfico de área com evolução mensal simulada
-  const monthlyData = [
-    { month: 'Jan', cpa: 1200, recorrente: 800, total: 2000 },
-    { month: 'Fev', cpa: 1400, recorrente: 950, total: 2350 },
-    { month: 'Mar', cpa: 1100, recorrente: 1100, total: 2200 },
-    { month: 'Abr', cpa: 1600, recorrente: 1200, total: 2800 },
-    { month: 'Mai', cpa: 1800, recorrente: 1400, total: 3200 },
-    { month: 'Jun', cpa: parseFloat(commissions.totalCPA), recorrente: parseFloat(commissions.totalRecurring), total: parseFloat(commissions.totalCPA) + parseFloat(commissions.totalRecurring) }
-  ];
-
-  // Dados para distribuição de comissões
-  const commissionDistribution = [
-    { name: 'CPA', value: parseFloat(commissions.totalCPA), percentage: 0 },
-    { name: 'Recorrente', value: parseFloat(commissions.totalRecurring), percentage: 0 }
-  ];
-
-  const totalCommission = parseFloat(commissions.totalCPA) + parseFloat(commissions.totalRecurring);
-  if (totalCommission > 0 && commissionDistribution[0] && commissionDistribution[1]) {
-    commissionDistribution[0].percentage = (parseFloat(commissions.totalCPA) / totalCommission) * 100;
-    commissionDistribution[1].percentage = (parseFloat(commissions.totalRecurring) / totalCommission) * 100;
-  }
-
   // Calcular valores pendentes
   const valorPendente = parseFloat(commissions.totalToReceive) - (commissions.totalPaid || 0);
 
@@ -320,102 +264,6 @@ export default function SellerDashboard() {
             color="#7c3aed"
             bgColor="#f3e8ff"
           />
-        </div>
-
-        {/* Main Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Gráfico de Área - Evolução das Comissões */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Evolução das Comissões</h3>
-              <p className="text-sm text-gray-500">Acompanhamento mensal de ganhos</p>
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={monthlyData}>
-                <defs>
-                  <linearGradient id="colorCPA" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#257273" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#257273" stopOpacity={0.1}/>
-                  </linearGradient>
-                  <linearGradient id="colorRecorrente" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b9899" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#3b9899" stopOpacity={0.1}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-                <YAxis stroke="#6b7280" fontSize={12} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Area
-                  type="monotone"
-                  dataKey="cpa"
-                  stackId="1"
-                  stroke="#257273"
-                  fill="url(#colorCPA)"
-                  name="CPA"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="recorrente"
-                  stackId="1"
-                  stroke="#3b9899"
-                  fill="url(#colorRecorrente)"
-                  name="Recorrente"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Distribuição de Comissões - Donut Chart */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Distribuição</h3>
-              <p className="text-sm text-gray-500">Por tipo de comissão</p>
-            </div>
-            <>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={commissionDistribution}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    <Cell fill="#257273" />
-                    <Cell fill="#3b9899" />
-                  </Pie>
-                  <Tooltip
-                    formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="space-y-3 mt-4">
-                {commissionDistribution.map((item, index) => (
-                  <div key={item.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: index === 0 ? '#257273' : '#3b9899' }}
-                      />
-                      <span className="text-sm text-gray-600">{item.name}</span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-gray-900">
-                        R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {item.percentage.toFixed(1)}%
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          </div>
         </div>
 
         {/* Resumo de Comissões */}
