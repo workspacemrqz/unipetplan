@@ -5,11 +5,8 @@ import {
   ChevronUp as TrendingUp, 
   ChevronDown as TrendingDown, 
   DollarSign,
-  Copy as MousePointerClick,
   Check as Target,
   Star as Activity,
-  ArrowDown,
-  Star as Award,
   FileText as BarChart3,
   CreditCard as Wallet,
   DollarSign as CircleDollarSign
@@ -19,15 +16,9 @@ import { useSellerAuth } from "@/contexts/SellerAuthContext";
 import { 
   AreaChart, 
   Area, 
-  BarChart, 
-  Bar,
-  Line,
   PieChart, 
   Pie, 
   Cell, 
-  RadialBarChart,
-  RadialBar,
-  ComposedChart,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -243,54 +234,6 @@ export default function SellerDashboard() {
     { month: 'Jun', cpa: parseFloat(commissions.totalCPA), recorrente: parseFloat(commissions.totalRecurring), total: parseFloat(commissions.totalCPA) + parseFloat(commissions.totalRecurring) }
   ];
 
-  // Dados para funil de conversão moderno
-  const funnelData = [
-    { 
-      name: 'Cliques', 
-      value: stats.clicks, 
-      percentage: 100,
-      color: '#e8f4f4',
-      icon: '👆'
-    },
-    { 
-      name: 'Engajamento', 
-      value: Math.floor(stats.clicks * 0.4), 
-      percentage: 40,
-      color: '#a7d5d6',
-      icon: '💫'
-    },
-    { 
-      name: 'Interesse', 
-      value: Math.floor(stats.clicks * 0.15), 
-      percentage: 15,
-      color: '#5fafb0',
-      icon: '⭐'
-    },
-    { 
-      name: 'Conversões', 
-      value: stats.conversions, 
-      percentage: stats.conversionRate,
-      color: '#257273',
-      icon: '✅'
-    }
-  ];
-
-  // Dados para gráfico radial
-  const conversionRadialData = [
-    {
-      name: 'Taxa',
-      value: stats.conversionRate,
-      fill: '#257273',
-    }
-  ];
-
-  // Dados de performance
-  const performanceData = [
-    { metric: 'Cliques', atual: stats.clicks, meta: Math.floor(stats.clicks * 1.5) },
-    { metric: 'Conversões', atual: stats.conversions, meta: Math.floor(stats.conversions * 1.8) },
-    { metric: 'Vendas', atual: stats.totalSales, meta: Math.floor(stats.totalSales * 1.3) }
-  ];
-
   // Dados para distribuição de comissões
   const commissionDistribution = [
     { name: 'CPA', value: parseFloat(commissions.totalCPA), percentage: 0 },
@@ -313,10 +256,10 @@ export default function SellerDashboard() {
         <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl p-6 text-white shadow-lg">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: '#060606' }}>
                 Olá, {seller.fullName}! 👋
               </h1>
-              <p className="text-teal-100">
+              <p style={{ color: '#060606' }}>
                 Acompanhe seu desempenho e comissões em tempo real
               </p>
             </div>
@@ -387,50 +330,41 @@ export default function SellerDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">Evolução das Comissões</h3>
               <p className="text-sm text-gray-500">Acompanhamento mensal de ganhos</p>
             </div>
-            {totalCommission > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={monthlyData}>
-                  <defs>
-                    <linearGradient id="colorCPA" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#257273" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#257273" stopOpacity={0.1}/>
-                    </linearGradient>
-                    <linearGradient id="colorRecorrente" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b9899" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#3b9899" stopOpacity={0.1}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-                  <YAxis stroke="#6b7280" fontSize={12} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="cpa"
-                    stackId="1"
-                    stroke="#257273"
-                    fill="url(#colorCPA)"
-                    name="CPA"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="recorrente"
-                    stackId="1"
-                    stroke="#3b9899"
-                    fill="url(#colorRecorrente)"
-                    name="Recorrente"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-[300px] text-gray-400">
-                <div className="text-center">
-                  <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">Nenhuma comissão registrada ainda</p>
-                </div>
-              </div>
-            )}
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={monthlyData}>
+                <defs>
+                  <linearGradient id="colorCPA" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#257273" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#257273" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="colorRecorrente" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b9899" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#3b9899" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
+                <YAxis stroke="#6b7280" fontSize={12} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Area
+                  type="monotone"
+                  dataKey="cpa"
+                  stackId="1"
+                  stroke="#257273"
+                  fill="url(#colorCPA)"
+                  name="CPA"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="recorrente"
+                  stackId="1"
+                  stroke="#3b9899"
+                  fill="url(#colorRecorrente)"
+                  name="Recorrente"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Distribuição de Comissões - Donut Chart */}
@@ -439,178 +373,48 @@ export default function SellerDashboard() {
               <h3 className="text-lg font-semibold text-gray-900">Distribuição</h3>
               <p className="text-sm text-gray-500">Por tipo de comissão</p>
             </div>
-            {totalCommission > 0 ? (
-              <>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={commissionDistribution}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      <Cell fill="#257273" />
-                      <Cell fill="#3b9899" />
-                    </Pie>
-                    <Tooltip
-                      formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-3 mt-4">
-                  {commissionDistribution.map((item, index) => (
-                    <div key={item.name} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: index === 0 ? '#257273' : '#3b9899' }}
-                        />
-                        <span className="text-sm text-gray-600">{item.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-gray-900">
-                          R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {item.percentage.toFixed(1)}%
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-[300px] text-gray-400">
-                <div className="text-center">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">Sem dados disponíveis</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Funil de Conversão Moderno */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Funil de Conversão</h3>
-            <p className="text-sm text-gray-500">Jornada do cliente desde o clique até a venda</p>
-          </div>
-          {stats.clicks > 0 ? (
-            <div className="space-y-4">
-              {funnelData.map((stage, index) => (
-                <div key={stage.name} className="relative">
-                  <div className="flex items-center gap-4">
-                    <div className="text-2xl">{stage.icon}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">{stage.name}</span>
-                        <span className="text-sm text-gray-600">{stage.value} ({stage.percentage.toFixed(1)}%)</span>
-                      </div>
-                      <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-1000 ease-out"
-                          style={{
-                            width: `${stage.percentage}%`,
-                            backgroundColor: stage.color,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  {index < funnelData.length - 1 && (
-                    <div className="ml-10 my-2">
-                      <ArrowDown className="h-4 w-4 text-gray-400" />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-[200px] text-gray-400">
-              <div className="text-center">
-                <MousePointerClick className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">Compartilhe seu link para começar a rastrear conversões</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Performance vs Meta */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Gráfico de Performance */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Performance vs Meta</h3>
-              <p className="text-sm text-gray-500">Compare seu desempenho com as metas</p>
-            </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <ComposedChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="metric" stroke="#6b7280" fontSize={12} />
-                <YAxis stroke="#6b7280" fontSize={12} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Bar dataKey="atual" fill="#257273" name="Atual" radius={[8, 8, 0, 0]} />
-                <Line type="monotone" dataKey="meta" stroke="#ef4444" name="Meta" strokeWidth={2} strokeDasharray="5 5" />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Taxa de Conversão Radial */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Taxa de Conversão</h3>
-              <p className="text-sm text-gray-500">Eficiência das suas vendas</p>
-            </div>
-            <div className="relative">
-              <ResponsiveContainer width="100%" height={250}>
-                <RadialBarChart
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="60%"
-                  outerRadius="90%"
-                  data={conversionRadialData}
-                  startAngle={90}
-                  endAngle={-270}
-                >
-                  <RadialBar
+            <>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={commissionDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
                     dataKey="value"
-                    cornerRadius={10}
-                    fill="#257273"
-                    background={{ fill: '#f3f4f6' }}
-                  />
-                  <text
-                    x="50%"
-                    y="50%"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    className="text-3xl font-bold fill-gray-900"
                   >
-                    {stats.conversionRate.toFixed(1)}%
-                  </text>
-                </RadialBarChart>
+                    <Cell fill="#257273" />
+                    <Cell fill="#3b9899" />
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                  />
+                </PieChart>
               </ResponsiveContainer>
-              <div className="text-center mt-2">
-                <p className="text-sm text-gray-600">
-                  {stats.conversions} vendas de {stats.clicks} cliques
-                </p>
-                {stats.conversionRate > 5 ? (
-                  <div className="flex items-center justify-center gap-1 mt-2 text-green-600">
-                    <Award className="h-4 w-4" />
-                    <span className="text-sm font-medium">Excelente performance!</span>
+              <div className="space-y-3 mt-4">
+                {commissionDistribution.map((item, index) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: index === 0 ? '#257273' : '#3b9899' }}
+                      />
+                      <span className="text-sm text-gray-600">{item.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-gray-900">
+                        R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {item.percentage.toFixed(1)}%
+                      </p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-1 mt-2 text-amber-600">
-                    <Target className="h-4 w-4" />
-                    <span className="text-sm font-medium">Continue melhorando</span>
-                  </div>
-                )}
+                ))}
               </div>
-            </div>
+            </>
           </div>
         </div>
 
