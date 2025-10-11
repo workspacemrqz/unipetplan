@@ -1208,7 +1208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add random suffix to ensure uniqueness
       const whitelabelUrl = `${baseSlug}-${Date.now().toString(36)}`;
       
-      const dbSellerData = {
+      const dbSellerData: InsertSeller = {
         ...sellerData,
         cpfHash,
         whitelabelUrl,
