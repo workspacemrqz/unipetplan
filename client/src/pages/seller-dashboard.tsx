@@ -209,13 +209,13 @@ export default function SellerDashboard() {
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm text-teal-100">Saldo Total</p>
-                <p className="text-2xl md:text-3xl font-bold">
+                <p className="text-sm" style={{ color: '#060606' }}>Saldo Total</p>
+                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#060606' }}>
                   R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <div className="p-3 bg-white/20 rounded-xl">
-                <Wallet className="h-8 w-8" />
+                <Wallet className="h-8 w-8" style={{ color: '#060606' }} />
               </div>
             </div>
           </div>
