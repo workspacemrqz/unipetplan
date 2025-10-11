@@ -497,6 +497,84 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
 
+  // Get available procedures for a pet based on their plan and usage
+  app.get(["/api/unit/:slug/pets/:petId/available-procedures", "/api/units/:slug/pets/:petId/available-procedures"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const petId = req.params.petId;
+      const year = new Date().getFullYear();
+      
+      // Get pet with plan
+      const pet = await storage.getPet(petId);
+      if (!pet) {
+        return res.status(404).json({ error: "Pet não encontrado" });
+      }
+      
+      if (!pet.planId) {
+        return res.json({ procedures: [], message: "Pet sem plano" });
+      }
+      
+      // Get procedures for this pet's plan
+      const planProcedures = await storage.getPlanProceduresWithDetails(pet.planId);
+      
+      // Get usage for this pet
+      const usage = await storage.getProcedureUsageByPet(petId, year);
+      
+      // Map procedures with availability
+      const availableProcedures = planProcedures.map((pp: any) => {
+        // Find usage for this procedure
+        const usageRecord = usage.find((u: any) => u.procedureId === pp.procedureId);
+        
+        // Extract numeric limit from limitesAnuais string
+        let annualLimit = 0;
+        if (pp.limitesAnuais) {
+          const match = pp.limitesAnuais.match(/(\d+)/);
+          if (match) {
+            annualLimit = parseInt(match[1], 10);
+          }
+        }
+        
+        const usedCount = usageRecord ? usageRecord.usageCount : 0;
+        const remaining = Math.max(0, annualLimit - usedCount);
+        
+        // Calculate waiting period days remaining
+        let waitingDaysRemaining = 0;
+        if (pp.carencia) {
+          const carenciaMatch = pp.carencia.match(/(\d+)/);
+          if (carenciaMatch) {
+            const waitingDaysTotal = parseInt(carenciaMatch[1], 10);
+            const petCreatedDate = new Date(pet.createdAt);
+            const currentDate = new Date();
+            const daysSinceRegistered = Math.floor((currentDate.getTime() - petCreatedDate.getTime()) / (1000 * 60 * 60 * 24));
+            waitingDaysRemaining = Math.max(0, waitingDaysTotal - daysSinceRegistered);
+          }
+        }
+        
+        const canUse = remaining > 0 && waitingDaysRemaining === 0;
+        
+        return {
+          id: pp.procedureId,
+          name: pp.procedureName,
+          annualLimit: annualLimit,
+          used: usedCount,
+          remaining: remaining,
+          canUse: canUse,
+          waitingDaysRemaining: waitingDaysRemaining,
+          coparticipation: pp.coparticipacao ? pp.coparticipacao / 100 : 0
+        };
+      }).filter((p: any) => p.canUse && p.annualLimit > 0); // Only return usable procedures
+      
+      res.json({
+        procedures: availableProcedures,
+        petName: pet.name,
+        planId: pet.planId
+      });
+      
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching available procedures:", error);
+      res.status(500).json({ error: "Erro ao buscar procedimentos disponíveis" });
+    }
+  });
+
   // Search clients (authenticated)
   app.get("/api/unit/:slug/clients/search/:query", requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
