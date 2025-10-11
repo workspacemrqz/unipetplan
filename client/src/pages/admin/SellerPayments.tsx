@@ -5,6 +5,7 @@ import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Textarea } from "@/components/admin/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import {
   Table,
   TableBody,
@@ -147,100 +148,122 @@ export default function SellerPayments() {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="p-3 sm:p-4 lg:p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setLocation("/vendedores")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Pagamentos e Comissões</h1>
-            {seller && <p className="text-muted-foreground">{seller.fullName}</p>}
-          </div>
-        </div>
-        <Button onClick={() => setPaymentDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Registrar Pagamento
-        </Button>
+      <div>
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground break-words">
+          Pagamentos e Comissões
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          {seller ? seller.fullName : "Carregando..."}
+        </p>
       </div>
+
+      {/* Back Button */}
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => setLocation("/vendedores")}
+        className="w-full sm:w-auto"
+        style={{ backgroundColor: '#FFFFFF' }}
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar
+      </Button>
+
+      {/* Register Payment Button */}
+      <Button 
+        onClick={() => setPaymentDialogOpen(true)}
+        variant="admin-action"
+        size="sm"
+        className="w-full sm:w-auto"
+      >
+        <Plus className="h-4 w-4 mr-2" />
+        Registrar Pagamento
+      </Button>
 
       {/* Sales Report Cards */}
       {salesReport && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-sm font-medium text-muted-foreground mb-1">Comissão Total</h3>
-            <p className="text-2xl font-bold text-[#257273]">{formatCurrency(salesReport.totalCommission)}</p>
-            <div className="mt-2 text-sm text-muted-foreground">
-              <div>CPA: {formatCurrency(salesReport.totalCpaCommission)}</div>
-              <div>Recorrente: {formatCurrency(salesReport.totalRecurringCommission)}</div>
-            </div>
-          </div>
+        <Card style={{ backgroundColor: '#FFFFFF' }}>
+          <CardHeader>
+            <CardTitle className="text-foreground">Resumo de Comissões</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">Comissão Total</h3>
+                <p className="text-2xl font-bold text-[#257273]">{formatCurrency(salesReport.totalCommission)}</p>
+                <div className="mt-2 text-sm text-muted-foreground">
+                  <div>CPA: {formatCurrency(salesReport.totalCpaCommission)}</div>
+                  <div>Recorrente: {formatCurrency(salesReport.totalRecurringCommission)}</div>
+                </div>
+              </div>
 
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-sm font-medium text-muted-foreground mb-1">Total Pago</h3>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(salesReport.totalPaid)}</p>
-            <div className="mt-2 text-sm text-muted-foreground">
-              {payments.length} pagamento{payments.length !== 1 ? "s" : ""}
-            </div>
-          </div>
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">Total Pago</h3>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(salesReport.totalPaid)}</p>
+                <div className="mt-2 text-sm text-muted-foreground">
+                  {payments.length} pagamento{payments.length !== 1 ? "s" : ""}
+                </div>
+              </div>
 
-          <div className="border rounded-lg p-4 bg-white">
-            <h3 className="text-sm font-medium text-muted-foreground mb-1">Saldo a Pagar</h3>
-            <p className={`text-2xl font-bold ${salesReport.balance > 0 ? "text-orange-600" : "text-gray-600"}`}>
-              {formatCurrency(salesReport.balance)}
-            </p>
-            <div className="mt-2 text-sm text-muted-foreground">
-              {salesReport.totalSales} venda{salesReport.totalSales !== 1 ? "s" : ""}
+              <div className="border rounded-lg p-4">
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">Saldo a Pagar</h3>
+                <p className={`text-2xl font-bold ${salesReport.balance > 0 ? "text-orange-600" : "text-gray-600"}`}>
+                  {formatCurrency(salesReport.balance)}
+                </p>
+                <div className="mt-2 text-sm text-muted-foreground">
+                  {salesReport.totalSales} venda{salesReport.totalSales !== 1 ? "s" : ""}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Payments Table */}
-      <div className="border rounded-lg bg-white">
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-semibold">Histórico de Pagamentos</h2>
-        </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Data</TableHead>
-              <TableHead>Valor</TableHead>
-              <TableHead>Descrição</TableHead>
-              <TableHead>Registrado em</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {payments.length === 0 ? (
+      <Card style={{ backgroundColor: '#FFFFFF' }}>
+        <CardHeader>
+          <CardTitle className="text-foreground">Histórico de Pagamentos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                  Nenhum pagamento registrado
-                </TableCell>
+                <TableHead>Data</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Registrado em</TableHead>
               </TableRow>
-            ) : (
-              payments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell>
-                    {format(new Date(payment.paymentDate), "dd/MM/yyyy", { locale: ptBR })}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {formatCurrency(parseFloat(payment.amount))}
-                  </TableCell>
-                  <TableCell>{payment.description || "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {format(new Date(payment.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+            </TableHeader>
+            <TableBody>
+              {payments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                    Nenhum pagamento registrado
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : (
+                payments.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell>
+                      {format(new Date(payment.paymentDate), "dd/MM/yyyy", { locale: ptBR })}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {formatCurrency(parseFloat(payment.amount))}
+                    </TableCell>
+                    <TableCell>{payment.description || "-"}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {format(new Date(payment.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {/* Payment Dialog */}
       <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
