@@ -98,7 +98,7 @@ export default function SellerLogin() {
                 <div className="relative">
                   <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
-                    type="text"
+                    type="password"
                     value={cpfMask(cpf)}
                     onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
                     className="w-full pl-10 p-3 rounded-lg border text-sm"
