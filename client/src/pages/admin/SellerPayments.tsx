@@ -61,10 +61,13 @@ export default function SellerPayments() {
     enabled: !!sellerId,
   });
 
-  const { data: payments = [] } = useQuery<Payment[]>({
+  const { data: paymentsData } = useQuery<Payment[]>({
     queryKey: [`/admin/api/sellers/${sellerId}/payments`],
     enabled: !!sellerId,
   });
+  
+  // Ensure payments is always an array
+  const payments = Array.isArray(paymentsData) ? paymentsData : [];
 
   const { data: salesReport } = useQuery<SalesReport>({
     queryKey: [`/admin/api/sellers/${sellerId}/sales-report`],
