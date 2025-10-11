@@ -69,10 +69,18 @@ export default function SellerPayments() {
   // Ensure payments is always an array
   const payments = Array.isArray(paymentsData) ? paymentsData : [];
 
-  const { data: salesReport } = useQuery<SalesReport>({
+  const { data: salesReport, error: salesReportError } = useQuery<SalesReport>({
     queryKey: [`/admin/api/sellers/${sellerId}/sales-report`],
     enabled: !!sellerId,
   });
+  
+  // Debug log for sales report
+  if (salesReportError) {
+    console.error("Error fetching sales report:", salesReportError);
+  }
+  if (salesReport) {
+    console.log("Sales report fetched:", salesReport);
+  }
 
   const createPaymentMutation = useMutation({
     mutationFn: async (data: { amount: string; paymentDate: string; description: string }) => {

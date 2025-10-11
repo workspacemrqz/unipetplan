@@ -1133,6 +1133,8 @@ export class DatabaseStorage implements IStorage {
 
   async getSellerSalesReport(sellerId: string): Promise<any> {
     try {
+      console.log('📊 [STORAGE] Getting sales report for seller:', sellerId);
+      
       // Get CPA commission from initial contracts (one-time payment per contract)
       const cpaData = await db
         .select({
@@ -1144,6 +1146,8 @@ export class DatabaseStorage implements IStorage {
         .from(contracts)
         .leftJoin(sellers, eq(contracts.sellerId, sellers.id))
         .where(eq(contracts.sellerId, sellerId));
+      
+      console.log('📊 [STORAGE] CPA Data:', cpaData[0]);
 
       // Get recurring commission from all installments paid
       const recurringData = await db
@@ -1162,6 +1166,8 @@ export class DatabaseStorage implements IStorage {
             eq(contractInstallments.status, 'paid')
           )
         );
+      
+      console.log('📊 [STORAGE] Recurring Data:', recurringData[0]);
 
       // Get total payments made to seller
       const paymentsData = await db
@@ -1170,12 +1176,22 @@ export class DatabaseStorage implements IStorage {
         })
         .from(sellerPayments)
         .where(eq(sellerPayments.sellerId, sellerId));
+      
+      console.log('📊 [STORAGE] Payments Data:', paymentsData[0]);
 
       const totalCpa = parseFloat(cpaData[0]?.cpaCommission || '0');
       const totalRecurring = parseFloat(recurringData[0]?.recurringCommission || '0');
       const totalCommission = totalCpa + totalRecurring;
       const totalPaid = parseFloat(paymentsData[0]?.totalPaid || '0');
       const balance = totalCommission - totalPaid;
+      
+      console.log('📊 [STORAGE] Calculated values:', {
+        totalCpa,
+        totalRecurring,
+        totalCommission,
+        totalPaid,
+        balance
+      });
 
       return {
         totalSales: cpaData[0]?.totalSales || 0,

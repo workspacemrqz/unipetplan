@@ -692,7 +692,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("🔍 [MIDDLEWARE] Path:", req.path, "Method:", req.method, "Original URL:", req.originalUrl);
     
     // Skip authentication only for login and auth status endpoints
-    if (req.path === "/admin/api/login" || req.path === "/admin/api/auth/status") {
+    // Use originalUrl since req.path only contains the part after the wildcard
+    if (req.originalUrl === "/admin/api/login" || req.originalUrl === "/admin/api/auth/status") {
       return next();
     }
     
@@ -1339,7 +1340,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get seller sales report
   app.get("/admin/api/sellers/:id/sales-report", requireAdmin, async (req, res) => {
     try {
-      const report = await storage.getSellerSalesReport(req.params.id);
+      const sellerId = req.params.id;
+      console.log("📊 [ADMIN] Sales report endpoint called for seller:", sellerId);
+      console.log("📊 [ADMIN] Request URL:", req.originalUrl);
+      console.log("📊 [ADMIN] Request params:", req.params);
+      
+      const report = await storage.getSellerSalesReport(sellerId);
+      
+      console.log("📊 [ADMIN] Sales report result:", {
+        sellerId,
+        totalSales: report.totalSales,
+        totalRevenue: report.totalRevenue,
+        totalCpaCommission: report.totalCpaCommission,
+        totalRecurringCommission: report.totalRecurringCommission,
+        totalCommission: report.totalCommission,
+        totalPaid: report.totalPaid,
+        balance: report.balance
+      });
+      
       res.json(report);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching seller sales report:", error);
