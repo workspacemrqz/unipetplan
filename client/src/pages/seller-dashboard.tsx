@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
 import { 
-  ChevronUp as TrendingUp, 
-  ChevronDown as TrendingDown,
   Star as Activity
 } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
@@ -33,27 +31,14 @@ interface CommissionData {
 const KPICard = ({ 
   title, 
   value, 
-  subtitle, 
-  trend, 
-  trendValue
+  subtitle
 }: any) => {
-  const isPositiveTrend = trend === 'up';
-  const TrendIcon = isPositiveTrend ? TrendingUp : trend === 'down' ? TrendingDown : null;
-  
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <p className="text-sm font-medium text-gray-600">{title}</p>
-            {TrendIcon && trendValue && (
-              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                isPositiveTrend ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-              }`}>
-                <TrendIcon className="h-3 w-3" />
-                <span>{trendValue}</span>
-              </div>
-            )}
           </div>
           <p className="text-3xl font-bold text-gray-900">{value}</p>
           {subtitle && (
@@ -208,8 +193,6 @@ export default function SellerDashboard() {
             title="Valor a Receber"
             value={`R$ ${parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
             subtitle={`${commissions.contractsCount} vendas realizadas`}
-            trend="up"
-            trendValue="+12.5%"
           />
           
           <KPICard
@@ -222,16 +205,12 @@ export default function SellerDashboard() {
             title="Taxa de Conversão"
             value={`${stats.conversionRate.toFixed(1)}%`}
             subtitle={`${stats.conversions} de ${stats.clicks} cliques`}
-            trend={stats.conversionRate > 5 ? "up" : "down"}
-            trendValue={stats.conversionRate > 5 ? "+2.3%" : "-1.2%"}
           />
           
           <KPICard
             title="Total de Vendas"
             value={stats.totalSales}
             subtitle="Vendas este mês"
-            trend="up"
-            trendValue="+8 vendas"
           />
         </div>
 
