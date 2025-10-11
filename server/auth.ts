@@ -54,6 +54,15 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+// Middleware function for protecting seller routes
+export function requireSellerAuth(req: Request, res: Response, next: NextFunction) {
+  const session = req.session as any;
+  if (!session || !session.seller) {
+    return res.status(401).json({ error: "Acesso não autorizado" });
+  }
+  next();
+}
+
 // Middleware function for protecting admin routes
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   // SECURITY FIX: Remove development bypass completely in production environments

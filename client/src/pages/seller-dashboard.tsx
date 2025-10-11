@@ -22,6 +22,7 @@ interface CommissionData {
   contractsCount: number;
   cpaPercentage: string;
   recurringPercentage: string;
+  totalPaid?: number;
 }
 
 export default function SellerDashboard() {
@@ -83,7 +84,8 @@ export default function SellerDashboard() {
         totalRecurring: '0.00',
         contractsCount: 0,
         cpaPercentage: seller.cpaPercentage || '0',
-        recurringPercentage: seller.recurringCommissionPercentage || '0'
+        recurringPercentage: seller.recurringCommissionPercentage || '0',
+        totalPaid: 0
       };
       try {
         const response = await fetch(`/api/seller/commissions/${seller.id}`);
@@ -92,6 +94,17 @@ export default function SellerDashboard() {
         }
       } catch (error) {
         console.error("Erro ao buscar comissões:", error);
+      }
+
+      // Buscar total pago ao vendedor
+      try {
+        const response = await fetch(`/api/seller/payments-total/${seller.id}`);
+        if (response.ok) {
+          const paymentsData = await response.json();
+          commissionsData.totalPaid = paymentsData.totalPaid || 0;
+        }
+      } catch (error) {
+        console.error("Erro ao buscar total pago:", error);
       }
       
       setCommissions(commissionsData);
@@ -138,30 +151,54 @@ export default function SellerDashboard() {
           </div>
         </div>
         
-        {/* Commission to Receive Card - Featured */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Valor a Receber</p>
-              <p className="text-4xl font-bold text-gray-900 mt-2">
-                R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-              <div className="mt-3 space-y-1">
-                <p className="text-xs text-gray-500">
-                  CPA: R$ {parseFloat(commissions.totalCPA).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        {/* Commission Cards - Featured */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Valor a Receber</p>
+                <p className="text-4xl font-bold text-gray-900 mt-2">
+                  R$ {parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
-                <p className="text-xs text-gray-500">
-                  Recorrente: R$ {parseFloat(commissions.totalRecurring).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
+                <div className="mt-3 space-y-1">
+                  <p className="text-xs text-gray-500">
+                    CPA: R$ {parseFloat(commissions.totalCPA).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Recorrente: R$ {parseFloat(commissions.totalRecurring).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+              <div className="p-4 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
+                <DollarSign className="h-8 w-8" style={{ color: '#257273' }} />
               </div>
             </div>
-            <div className="p-4 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-              <DollarSign className="h-8 w-8" style={{ color: '#257273' }} />
-            </div>
+            <p className="text-xs text-gray-500 mt-4 border-t pt-3">
+              Baseado em {commissions.contractsCount} {commissions.contractsCount === 1 ? 'venda realizada' : 'vendas realizadas'}
+            </p>
           </div>
-          <p className="text-xs text-gray-500 mt-4 border-t pt-3">
-            Baseado em {commissions.contractsCount} {commissions.contractsCount === 1 ? 'venda realizada' : 'vendas realizadas'}
-          </p>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Valor Recebido</p>
+                <p className="text-4xl font-bold text-green-600 mt-2">
+                  R$ {(commissions.totalPaid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                <div className="mt-3 space-y-1">
+                  <p className="text-xs text-green-600">
+                    Total de pagamentos já recebidos
+                  </p>
+                </div>
+              </div>
+              <div className="p-4 rounded-lg bg-green-50">
+                <Check className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-4 border-t pt-3">
+              Pagamentos processados pela administração
+            </p>
+          </div>
         </div>
 
         {/* Stats Cards */}

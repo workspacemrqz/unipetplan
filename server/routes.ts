@@ -31,7 +31,7 @@ import {
 import { sanitizeText } from "./utils/text-sanitizer.js";
 import { sanitizeEmail } from "./utils/log-sanitizer.js";
 import { enforceCorrectBillingPeriod } from "./utils/billing-validation.js";
-import { setupAuth, requireAuth, requireAdmin } from "./auth.js";
+import { setupAuth, requireAuth, requireAdmin, requireSellerAuth } from "./auth.js";
 import bcrypt from "bcryptjs";
 import { supabaseStorage } from "./supabase-storage.js";
 import { CieloService, type CreditCardPaymentRequest } from "./services/cielo-service.js";
@@ -1474,6 +1474,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ [COMMISSIONS] Error fetching seller commissions:", error);
       res.status(500).json({ error: "Erro ao buscar comissões" });
+    }
+  });
+
+  // Get seller total payments received (protected endpoint for seller dashboard)
+  app.get("/api/seller/payments-total/:sellerId", requireSellerAuth, async (req, res) => {
+    try {
+      const { sellerId } = req.params;
+      const session = req.session as any;
+      
+      // Verify seller can only access their own data
+      if (session.seller.id !== sellerId) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+      
+      // Verify seller exists
+      const seller = await storage.getSellerById(sellerId);
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      // Get total paid to seller
+      const report = await storage.getSellerSalesReport(sellerId);
+      
+      res.json({
+        totalPaid: report.totalPaid,
+        balance: report.balance,
+        totalCommission: report.totalCommission
+      });
+    } catch (error) {
+      console.error("❌ [SELLER] Error fetching seller payments:", error);
+      res.status(500).json({ error: "Erro ao buscar pagamentos" });
     }
   });
 
