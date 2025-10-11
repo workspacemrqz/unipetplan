@@ -119,7 +119,11 @@ export default function SellerPayments() {
   });
 
   const handleCreatePayment = () => {
-    if (!amount || parseFloat(amount.replace(",", ".")) <= 0) {
+    console.log("💰 [PAYMENT] Iniciando criação de pagamento");
+    console.log("💰 [PAYMENT] Valores:", { amount, paymentDate, description });
+    
+    if (!amount) {
+      console.log("❌ [PAYMENT] Valor vazio");
       toast({
         title: "Erro",
         description: "Informe um valor válido",
@@ -128,6 +132,20 @@ export default function SellerPayments() {
       return;
     }
 
+    const numericValue = parseFloat(amount.replace(/\./g, '').replace(",", "."));
+    console.log("💰 [PAYMENT] Valor numérico:", numericValue);
+    
+    if (isNaN(numericValue) || numericValue <= 0) {
+      console.log("❌ [PAYMENT] Valor inválido ou negativo");
+      toast({
+        title: "Erro",
+        description: "Informe um valor válido maior que zero",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log("✅ [PAYMENT] Validação OK, enviando para backend");
     createPaymentMutation.mutate({
       amount,
       paymentDate,
@@ -309,10 +327,10 @@ export default function SellerPayments() {
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setPaymentDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setPaymentDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button onClick={handleCreatePayment} disabled={createPaymentMutation.isPending}>
+              <Button type="button" onClick={handleCreatePayment} disabled={createPaymentMutation.isPending}>
                 {createPaymentMutation.isPending ? "Salvando..." : "Registrar"}
               </Button>
             </div>
