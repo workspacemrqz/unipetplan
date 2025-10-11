@@ -451,30 +451,46 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
 
-  // Get pets by client ID (authenticated)
-  app.get("/api/unit/:slug/clients/:clientId/pets", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+  // Get client by CPF (authenticated) - supports both /api/unit and /api/units paths
+  app.get(["/api/unit/:slug/clients/cpf/:cpf", "/api/units/:slug/clients/cpf/:cpf"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
-      const unitId = req.unit?.unitId;
-      const clientId = req.params.clientId;
+      const cpf = req.params.cpf;
       
-      if (!unitId) {
-        return res.status(401).json({ error: "Autenticação necessária" });
-      }
+      // Remove formatting from CPF (keep only numbers)
+      const sanitizedCpf = cpf.replace(/\D/g, '');
       
-      // First check if client belongs to this unit
+      // Get all clients
       const allClients = await storage.getAllClients();
-      const client = allClients.find((c: any) => c.id === clientId && c.createdByUnitId === unitId);
+      
+      // Find client by CPF (match both formatted and unformatted)
+      const client = allClients.find((c: any) => {
+        const clientCpf = c.cpf?.replace(/\D/g, '');
+        return clientCpf === sanitizedCpf;
+      });
       
       if (!client) {
-        return res.status(404).json({ error: "Cliente não encontrado para esta unidade" });
+        return res.status(404).json({ error: "Cliente não encontrado com este CPF" });
       }
+      
+      // Remove sensitive data
+      const { password: _, cpfHash: __, ...clientData } = client as any;
+      
+      res.json(clientData);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching client by CPF:", error);
+      res.status(500).json({ error: "Erro ao buscar cliente" });
+    }
+  });
+
+  // Get pets by client ID (authenticated) - supports both /api/unit and /api/units paths
+  app.get(["/api/unit/:slug/clients/:clientId/pets", "/api/units/:slug/clients/:clientId/pets"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const clientId = req.params.clientId;
       
       // Get pets for this client  
       const pets = await storage.getPetsByClientId(clientId);
-      // Filter to only show pets created by this unit
-      const unitPets = pets.filter((pet: any) => pet.createdByUnitId === unitId);
       
-      res.json(unitPets || []);
+      res.json(pets || []);
     } catch (error) {
       console.error("❌ [UNIT] Error fetching client pets:", error);
       res.status(500).json({ error: "Erro ao buscar pets do cliente" });
