@@ -515,31 +515,6 @@ export default function NovaGuiaPage() {
                     />
                   )}
 
-                  {/* Valor - Calculated from procedure */}
-                  {form.watch("procedure") && (
-                    <FormField
-                      control={form.control}
-                      name="value"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Valor da Coparticipação</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="0,00"
-                              className="h-12"
-                              style={{
-                                borderColor: 'var(--border-gray)',
-                                background: 'white'
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-
                   {/* Notas Gerais */}
                   {form.watch("procedure") && (
                     <div className="md:col-span-2">
