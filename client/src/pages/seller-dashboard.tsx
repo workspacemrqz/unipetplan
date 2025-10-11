@@ -270,30 +270,38 @@ export default function SellerDashboard() {
 
         {/* Resumo de Comissões */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-teal-900">Comissão CPA</h4>
-              <div className="px-3 py-1 rounded-full text-sm font-bold text-white" style={{ backgroundColor: '#277677' }}>
-                {stats.cpaPercentage}%
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-sm font-medium text-gray-600">Comissão CPA</p>
+                  <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                    {stats.cpaPercentage}%
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900">
+                  {formatCurrency(parseFloat(commissions.totalCPA) || 0)}
+                </p>
+                <p className="text-xs text-gray-500 mt-2">Por nova venda realizada</p>
               </div>
             </div>
-            <p className="text-2xl font-bold text-teal-900">
-              {formatCurrency(parseFloat(commissions.totalCPA) || 0)}
-            </p>
-            <p className="text-sm text-teal-700 mt-2">Por nova venda realizada</p>
           </div>
 
-          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-teal-900">Comissão Recorrente</h4>
-              <div className="px-3 py-1 rounded-full text-sm font-bold text-white" style={{ backgroundColor: '#277677' }}>
-                {stats.recurringPercentage}%
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-sm font-medium text-gray-600">Comissão Recorrente</p>
+                  <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                    {stats.recurringPercentage}%
+                  </div>
+                </div>
+                <p className="text-3xl font-bold text-gray-900">
+                  {formatCurrency(parseFloat(commissions.totalRecurring) || 0)}
+                </p>
+                <p className="text-xs text-gray-500 mt-2">Das mensalidades dos clientes</p>
               </div>
             </div>
-            <p className="text-2xl font-bold text-teal-900">
-              {formatCurrency(parseFloat(commissions.totalRecurring) || 0)}
-            </p>
-            <p className="text-sm text-teal-700 mt-2">Das mensalidades dos clientes</p>
           </div>
         </div>
       </div>
