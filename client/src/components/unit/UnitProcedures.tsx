@@ -43,8 +43,6 @@ interface Procedure {
 const allColumns = [
   "Procedimento",
   "Categoria",
-  "Descrição",
-  "Status",
   "Ações"
 ] as const;
 
@@ -125,7 +123,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
         selectedProcedure.plans.forEach((plan, index) => {
           text += `${index + 1}. ${plan.planName}\n`;
           text += `   Valor Integral: ${formatPrice(plan.price)}\n`;
-          text += `   Pagar (R$): ${formatPrice(plan.payValue)}\n`;
+          text += `   Receber: ${formatPrice(plan.payValue)}\n`;
           text += `   Coparticipação: ${plan.coparticipacao > 0 ? formatPrice(plan.coparticipacao) : 'N/A'}\n`;
           text += `   Carência: ${plan.carencia || 'N/A'}\n`;
           text += `   Limites Anuais: ${plan.limitesAnuais || 'N/A'}\n\n`;
@@ -226,8 +224,6 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
               <TableRow className="bg-white border-b border-[#eaeaea]">
                 {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
                 {visibleColumns.includes("Categoria") && <TableHead className="w-[140px] bg-white">Categoria</TableHead>}
-                {visibleColumns.includes("Descrição") && <TableHead className="w-[250px] bg-white">Descrição</TableHead>}
-                {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
                 {visibleColumns.includes("Ações") && <TableHead className="w-[80px] bg-white">Ações</TableHead>}
               </TableRow>
             </TableHeader>
@@ -251,24 +247,6 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                     {visibleColumns.includes("Categoria") && (
                       <TableCell className="whitespace-nowrap bg-white">
                         {procedure.category}
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Descrição") && (
-                      <TableCell className="bg-white">
-                        <span className="line-clamp-2">
-                          {procedure.description || "Não informada"}
-                        </span>
-                      </TableCell>
-                    )}
-                    {visibleColumns.includes("Status") && (
-                      <TableCell className="whitespace-nowrap bg-white">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          procedure.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {procedure.isActive ? 'Ativo' : 'Inativo'}
-                        </span>
                       </TableCell>
                     )}
                     {visibleColumns.includes("Ações") && (
@@ -401,7 +379,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                           </div>
                           
                           <div>
-                            <label className="text-sm text-muted-foreground">Pagar (R$)</label>
+                            <label className="text-sm text-muted-foreground">Receber</label>
                             <p className="font-semibold text-base text-green-600">
                               {formatPrice(plan.payValue)}
                             </p>
