@@ -81,15 +81,16 @@ export default function SellerLink() {
             <div className="space-y-6">
               {/* Link Display and Copy */}
               <div className="space-y-4">
-                <div className="flex items-center gap-3">
+                <div className="space-y-3">
                   <Input
                     value={referralLink}
                     readOnly
-                    className="flex-1 font-mono text-sm"
+                    className="w-full font-mono text-sm break-all"
+                    style={{ overflow: 'visible', whiteSpace: 'normal', wordBreak: 'break-all' }}
                   />
                   <Button
                     onClick={handleCopyLink}
-                    className="shrink-0"
+                    className="w-full"
                     variant={copied ? "outline" : "default"}
                   >
                     {copied ? (
