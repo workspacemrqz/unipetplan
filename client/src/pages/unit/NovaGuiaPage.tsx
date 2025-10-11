@@ -91,7 +91,7 @@ export default function NovaGuiaPage() {
   const { data: availableProcedures, isLoading: proceduresLoading } = useQuery<any>({
     queryKey: [`/api/units/${slug}/pets/${petIdToFetch}/available-procedures`],
     queryFn: async () => {
-      const token = localStorage.getItem('unitAuthToken');
+      const token = localStorage.getItem('unit-token');
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
@@ -130,7 +130,7 @@ export default function NovaGuiaPage() {
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
-      const token = localStorage.getItem('unitAuthToken');
+      const token = localStorage.getItem('unit-token');
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
@@ -186,7 +186,7 @@ export default function NovaGuiaPage() {
     setIsSearchingClient(true);
     
     try {
-      const token = localStorage.getItem('unitAuthToken');
+      const token = localStorage.getItem('unit-token');
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
