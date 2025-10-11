@@ -1514,6 +1514,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get seller monthly sales history
+  app.get("/api/seller/history/:sellerId", async (req, res) => {
+    try {
+      const { sellerId } = req.params;
+      
+      // Verify seller exists
+      const seller = await storage.getSellerById(sellerId);
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      // Get all contracts for this seller
+      const contracts = await storage.getAllContracts();
+      const sellerContracts = contracts.filter(c => c.sellerId === sellerId);
+      
+      // Group contracts by month
+      const monthlyData: Record<string, {
+        month: string;
+        sales: number;
+        cpaCommission: number;
+        recurringCommission: number;
+        totalCommission: number;
+      }> = {};
+      
+      // Get last 12 months
+      const now = new Date();
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthlyData[monthKey] = {
+          month: monthKey,
+          sales: 0,
+          cpaCommission: 0,
+          recurringCommission: 0,
+          totalCommission: 0
+        };
+      }
+      
+      // Process each contract
+      for (const contract of sellerContracts) {
+        const contractDate = new Date(contract.createdAt || contract.startDate || '');
+        const monthKey = `${contractDate.getFullYear()}-${String(contractDate.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (monthlyData[monthKey]) {
+          monthlyData[monthKey].sales += 1;
+          
+          // Calculate CPA commission for this sale
+          const saleValue = contract.billingPeriod === 'annual' 
+            ? parseFloat(contract.annualAmount || '0')
+            : parseFloat(contract.monthlyAmount || '0');
+          
+          const cpaCommission = (saleValue * parseFloat(seller.cpaPercentage || '0')) / 100;
+          monthlyData[monthKey].cpaCommission += cpaCommission;
+          
+          // Calculate recurring commission (only for active contracts)
+          if (contract.status === 'active') {
+            const monthlyValue = parseFloat(contract.monthlyAmount || '0');
+            const recurringCommission = (monthlyValue * parseFloat(seller.recurringCommissionPercentage || '0')) / 100;
+            monthlyData[monthKey].recurringCommission += recurringCommission;
+          }
+          
+          monthlyData[monthKey].totalCommission = monthlyData[monthKey].cpaCommission + monthlyData[monthKey].recurringCommission;
+        }
+      }
+      
+      // Convert to array and sort by month
+      const monthlyArray = Object.values(monthlyData).sort((a, b) => a.month.localeCompare(b.month));
+      
+      res.json(monthlyArray);
+    } catch (error) {
+      console.error("❌ [SELLER] Error fetching seller history:", error);
+      res.status(500).json({ error: "Erro ao buscar histórico" });
+    }
+  });
+  
   // Get seller total payments received (protected endpoint for seller dashboard)
   app.get("/api/seller/payments-total/:sellerId", requireSellerAuth, async (req, res) => {
     try {
