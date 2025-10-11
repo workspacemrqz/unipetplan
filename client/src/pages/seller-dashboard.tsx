@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
-import { DollarSign, Check, Link as LinkIcon, ArrowUpRight } from "lucide-react";
+import { DollarSign, Check, Link as LinkIcon, ArrowUp } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -366,7 +366,7 @@ export default function SellerDashboard() {
                 <p className="text-3xl font-bold text-gray-900 mt-2">{stats.recurringPercentage}%</p>
               </div>
               <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <ArrowUpRight className="h-6 w-6" style={{ color: '#257273' }} />
+                <ArrowUp className="h-6 w-6" style={{ color: '#257273' }} />
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-3">Das mensalidades dos clientes</p>
