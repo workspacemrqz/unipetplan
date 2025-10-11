@@ -782,7 +782,10 @@ export const insertSellerPaymentSchema = z.object({
     }
     return num;
   }),
-  paymentDate: z.date().optional(),
+  paymentDate: z.union([z.string(), z.date()]).transform((val) => {
+    if (val instanceof Date) return val;
+    return new Date(val);
+  }).optional(),
   description: z.string().optional(),
   createdBy: z.string().min(1, "Criador é obrigatório"),
 });
