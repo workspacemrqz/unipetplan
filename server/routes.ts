@@ -2054,8 +2054,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
       
-      // Get all guides first (we'll implement filtering here directly)
-      const allGuides = await storage.getAllGuides();
+      // Get all guides with network units info using the proper function
+      const result = await storage.getGuidesWithNetworkUnits({});
+      const allGuides = result?.guides || [];
       
       // Apply filters
       let filteredGuides = allGuides;
