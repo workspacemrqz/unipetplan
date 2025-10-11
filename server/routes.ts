@@ -1306,20 +1306,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("💰 [PAYMENT-ENDPOINT] Iniciando criação de pagamento");
     console.log("💰 [PAYMENT-ENDPOINT] Seller ID:", req.params.id);
     console.log("💰 [PAYMENT-ENDPOINT] Body recebido:", req.body);
-    console.log("💰 [PAYMENT-ENDPOINT] Session:", { userId: req.session?.userId, hasSession: !!req.session });
+    console.log("💰 [PAYMENT-ENDPOINT] Admin Session:", { 
+      admin: req.session?.admin,
+      login: req.session?.admin?.login,
+      hasSession: !!req.session 
+    });
     
     try {
-      const userId = req.session?.userId;
-      if (!userId) {
-        console.log("❌ [PAYMENT-ENDPOINT] Usuário não autenticado");
+      // Para admins, usar o login do admin como createdBy
+      const adminLogin = req.session?.admin?.login;
+      if (!adminLogin) {
+        console.log("❌ [PAYMENT-ENDPOINT] Admin não autenticado");
         return res.status(401).json({ error: "Não autenticado" });
       }
 
+      console.log("💰 [PAYMENT-ENDPOINT] Admin login:", adminLogin);
       console.log("💰 [PAYMENT-ENDPOINT] Parsing dados do pagamento...");
+      
       const paymentData = insertSellerPaymentSchema.parse({
         ...req.body,
         sellerId: req.params.id,
-        createdBy: userId
+        createdBy: adminLogin // Usar login do admin
       });
       
       console.log("💰 [PAYMENT-ENDPOINT] Dados validados:", paymentData);
