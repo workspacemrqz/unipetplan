@@ -1210,13 +1210,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add random suffix to ensure uniqueness
       const whitelabelUrl = `${baseSlug}-${Date.now().toString(36)}`;
       
-      const dbSellerData: InsertSeller = {
+      const dbSellerData = {
         ...sellerData,
         cpfHash,
         whitelabelUrl,
         cpaPercentage: sellerData.cpaPercentage.toString(),
         recurringCommissionPercentage: sellerData.recurringCommissionPercentage.toString()
-      };
+      } as InsertSeller;
       
       const newSeller = await storage.createSeller(dbSellerData);
       console.log("✅ [ADMIN] Seller created:", newSeller.id);
@@ -2160,9 +2160,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const guideData = insertGuideSchema.partial().parse(req.body);
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
-      const processedGuideData: Partial<InsertGuide> = { ...guideData };
+      const processedGuideData = { ...guideData } as Partial<InsertGuide>;
       if (guideData.value && typeof guideData.value === 'string') {
-        processedGuideData.value = guideData.value.replace('.', '').replace(',', '.');
+        processedGuideData.value = guideData.value.replace('.', '').replace(',', '.') as string;
       }
       
       const updatedGuide = await storage.updateGuide(req.params.id, processedGuideData);
