@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
-import { 
-  Star as Activity
-} from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
 
@@ -242,7 +239,7 @@ export default function SellerDashboard() {
         </div>
 
         {/* Resumo de Comissões */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-semibold text-teal-900">Comissão CPA</h4>
@@ -267,17 +264,6 @@ export default function SellerDashboard() {
               R$ {parseFloat(commissions.totalRecurring).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
             <p className="text-sm text-teal-700 mt-2">Das mensalidades dos clientes</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-teal-900">Valor Pendente</h4>
-              <Activity className="h-5 w-5" style={{ color: '#277677' }} />
-            </div>
-            <p className="text-2xl font-bold text-teal-900">
-              R$ {valorPendente.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </p>
-            <p className="text-sm text-teal-700 mt-2">Aguardando pagamento</p>
           </div>
         </div>
       </div>
