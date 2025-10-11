@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
-import { DollarSign, Users, Link as LinkIcon, Check } from "lucide-react";
+import { DollarSign, Check, Link as LinkIcon, ArrowUpRight } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface DashboardStats {
   totalClients: number;
@@ -64,9 +65,7 @@ export default function SellerDashboard() {
   };
 
   const fetchDashboardData = async () => {
-    // Buscar dados do vendedor
     if (seller) {
-      // Buscar estatísticas de analytics
       let analytics = { clicks: 0, conversions: 0, conversionRate: 0 };
       try {
         const response = await fetch(`/api/seller/analytics/${seller.id}`);
@@ -77,7 +76,6 @@ export default function SellerDashboard() {
         console.error("Erro ao buscar estatísticas:", error);
       }
       
-      // Buscar dados de comissões
       let commissionsData = {
         totalToReceive: '0.00',
         totalCPA: '0.00',
@@ -96,7 +94,6 @@ export default function SellerDashboard() {
         console.error("Erro ao buscar comissões:", error);
       }
 
-      // Buscar total pago ao vendedor
       try {
         const response = await fetch(`/api/seller/payments-total/${seller.id}`);
         if (response.ok) {
@@ -110,8 +107,8 @@ export default function SellerDashboard() {
       setCommissions(commissionsData);
       
       setStats({
-        totalClients: 0, // TODO: Implementar busca de clientes do vendedor
-        totalSales: commissionsData.contractsCount, // Use contracts count as total sales
+        totalClients: 0,
+        totalSales: commissionsData.contractsCount,
         cpaPercentage: Number(seller.cpaPercentage) || 0,
         recurringPercentage: Number(seller.recurringCommissionPercentage) || 0,
         clicks: analytics.clicks,
@@ -139,6 +136,35 @@ export default function SellerDashboard() {
   if (!seller) {
     return null;
   }
+
+  // Dados para gráfico de comissões
+  const commissionChartData = [
+    { 
+      name: 'CPA', 
+      valor: parseFloat(commissions.totalCPA),
+      fill: '#257273'
+    },
+    { 
+      name: 'Recorrente', 
+      valor: parseFloat(commissions.totalRecurring),
+      fill: '#3b9899'
+    }
+  ];
+
+  // Dados para gráfico de funil de conversão
+  const funnelData = [
+    { name: 'Cliques', valor: stats.clicks, fill: '#e8f4f4' },
+    { name: 'Conversões', valor: stats.conversions, fill: '#257273' }
+  ];
+
+
+  // Dados para gráfico de pizza
+  const pieData = [
+    { name: 'CPA', value: parseFloat(commissions.totalCPA), color: '#257273' },
+    { name: 'Recorrente', value: parseFloat(commissions.totalRecurring), color: '#3b9899' }
+  ];
+
+  const totalCommission = parseFloat(commissions.totalCPA) + parseFloat(commissions.totalRecurring);
 
   return (
     <SellerLayout>
@@ -201,6 +227,123 @@ export default function SellerDashboard() {
           </div>
         </div>
 
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Gráfico de Comissões */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Composição de Comissões</h3>
+              <p className="text-sm text-gray-500">Distribuição por tipo de comissão</p>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={commissionChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="name" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip 
+                  formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                />
+                <Bar dataKey="valor" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Gráfico de Pizza */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Proporção de Comissões</h3>
+              <p className="text-sm text-gray-500">Total: R$ {totalCommission.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Gráfico de Funil de Conversão */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Funil de Conversão</h3>
+              <p className="text-sm text-gray-500">Do clique à venda</p>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={funnelData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis type="number" stroke="#6b7280" />
+                <YAxis dataKey="name" type="category" stroke="#6b7280" width={100} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                />
+                <Bar dataKey="valor" radius={[0, 8, 8, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Indicador de Performance */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Taxa de Conversão</h3>
+              <p className="text-sm text-gray-500">Eficiência de vendas</p>
+            </div>
+            <div className="flex items-center justify-center h-[250px]">
+              <div className="text-center">
+                <div className="relative inline-flex items-center justify-center">
+                  <svg className="w-40 h-40 transform -rotate-90">
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="70"
+                      stroke="#e8f4f4"
+                      strokeWidth="12"
+                      fill="none"
+                    />
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="70"
+                      stroke="#257273"
+                      strokeWidth="12"
+                      fill="none"
+                      strokeDasharray={`${2 * Math.PI * 70}`}
+                      strokeDashoffset={`${2 * Math.PI * 70 * (1 - stats.conversionRate / 100)}`}
+                      strokeLinecap="round"
+                      style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+                    />
+                  </svg>
+                  <div className="absolute">
+                    <p className="text-4xl font-bold" style={{ color: '#257273' }}>
+                      {stats.conversionRate.toFixed(1)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">Conversão</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  {stats.conversions} vendas de {stats.clicks} cliques
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -223,23 +366,10 @@ export default function SellerDashboard() {
                 <p className="text-3xl font-bold text-gray-900 mt-2">{stats.recurringPercentage}%</p>
               </div>
               <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <DollarSign className="h-6 w-6" style={{ color: '#257273' }} />
+                <ArrowUpRight className="h-6 w-6" style={{ color: '#257273' }} />
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-3">Das mensalidades dos clientes</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Clientes Ativos</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalClients}</p>
-              </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <Users className="h-6 w-6" style={{ color: '#257273' }} />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">Total de clientes ativos</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -258,40 +388,14 @@ export default function SellerDashboard() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Cliques no link</p>
+                <p className="text-sm font-medium text-gray-600">Cliques no Link</p>
                 <p className="text-3xl font-bold text-gray-900 mt-2">{stats.clicks}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
                 <LinkIcon className="h-6 w-6" style={{ color: '#257273' }} />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-3">Total de acessos</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Conversões</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.conversions}</p>
-              </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <Check className="h-6 w-6" style={{ color: '#257273' }} />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">Vendas concluídas</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Taxa de conversão</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.conversionRate.toFixed(1)}%</p>
-              </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <DollarSign className="h-6 w-6" style={{ color: '#257273' }} />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">Eficiência de vendas</p>
+            <p className="text-xs text-gray-500 mt-3">Total de acessos ao link</p>
           </div>
         </div>
       </div>
