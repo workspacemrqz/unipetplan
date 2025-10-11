@@ -1136,11 +1136,19 @@ export class DatabaseStorage implements IStorage {
       console.log('📊 [STORAGE] Getting sales report for seller:', sellerId);
       
       // Get CPA commission from initial contracts (one-time payment per contract)
+      // CPA is calculated on the initial sale value:
+      // - For annual plans: use annualAmount
+      // - For monthly plans: use monthlyAmount
       const cpaData = await db
         .select({
           totalSales: sql<number>`COUNT(*)`,
           cpaCommission: sql<string>`COALESCE(SUM(
-            CAST(${contracts.monthlyAmount} AS DECIMAL) * CAST(${sellers.cpaPercentage} AS DECIMAL) / 100
+            CASE 
+              WHEN ${contracts.billingPeriod} = 'annual' THEN
+                CAST(${contracts.annualAmount} AS DECIMAL) * CAST(${sellers.cpaPercentage} AS DECIMAL) / 100
+              ELSE
+                CAST(${contracts.monthlyAmount} AS DECIMAL) * CAST(${sellers.cpaPercentage} AS DECIMAL) / 100
+            END
           ), 0)`
         })
         .from(contracts)

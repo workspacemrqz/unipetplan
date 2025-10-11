@@ -1469,42 +1469,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Vendedor não encontrado" });
       }
       
-      // Get all contracts for this seller
-      const contracts = await storage.getAllContracts();
-      const sellerContracts = contracts.filter(c => c.sellerId === sellerId);
-      
-      // Calculate commissions based on contract values at time of sale
-      let totalCPA = 0; // One-time commission for initial sale
-      let totalRecurring = 0; // Recurring commission on monthly payments
-      let contractsCount = sellerContracts.length;
-      
-      for (const contract of sellerContracts) {
-        // CPA is calculated on the first payment value
-        // For annual plans, it's the annual amount
-        // For monthly plans, it's the monthly amount
-        const saleValue = contract.billingPeriod === 'annual' 
-          ? parseFloat(contract.annualAmount || '0')
-          : parseFloat(contract.monthlyAmount || '0');
-        
-        // Calculate CPA commission (one-time)
-        const cpaCommission = (saleValue * parseFloat(seller.cpaPercentage || '0')) / 100;
-        totalCPA += cpaCommission;
-        
-        // Calculate recurring commission (only for active contracts)
-        if (contract.status === 'active') {
-          const monthlyValue = parseFloat(contract.monthlyAmount || '0');
-          const recurringCommission = (monthlyValue * parseFloat(seller.recurringCommissionPercentage || '0')) / 100;
-          totalRecurring += recurringCommission;
-        }
-      }
-      
-      const totalToReceive = totalCPA + totalRecurring;
+      // Use the same logic as the admin page for consistency
+      const salesReport = await storage.getSellerSalesReport(sellerId);
       
       res.json({
-        totalToReceive: totalToReceive.toFixed(2),
-        totalCPA: totalCPA.toFixed(2),
-        totalRecurring: totalRecurring.toFixed(2),
-        contractsCount,
+        totalToReceive: salesReport.totalCommission.toFixed(2),
+        totalCPA: salesReport.totalCpaCommission.toFixed(2),
+        totalRecurring: salesReport.totalRecurringCommission.toFixed(2),
+        contractsCount: salesReport.totalSales,
         cpaPercentage: seller.cpaPercentage,
         recurringPercentage: seller.recurringCommissionPercentage
       });
