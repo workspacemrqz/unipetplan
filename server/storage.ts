@@ -1261,6 +1261,7 @@ export class DatabaseStorage implements IStorage {
       clientId: contract.clientId,
       planId: contract.planId,
       petId: contract.petId,
+      sellerId: (contract as any).sellerId || null, // Include sellerId for commission tracking
       contractNumber: contractNumber, // Drizzle espera este nome exato
       status: contract.status || 'active',
       startDate: contract.startDate || new Date(),
