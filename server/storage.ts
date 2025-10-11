@@ -43,6 +43,7 @@ import {
   clients,
   sellers,
   sellerAnalytics,
+  sellerPayments,
   species,
   pets,
   contracts,
@@ -129,6 +130,11 @@ export interface IStorage {
   trackSellerClick(sellerId: string): Promise<void>;
   trackSellerConversion(sellerId: string, revenue?: number): Promise<void>;
   getSellerAnalytics(sellerId: string): Promise<{clicks: number, conversions: number, conversionRate: number}>;
+
+  // Seller Payments
+  getSellerPayments(sellerId: string): Promise<any[]>;
+  createSellerPayment(payment: {sellerId: string; amount: number; paymentDate: Date; description: string | null; createdBy: string}): Promise<any>;
+  getSellerSalesReport(sellerId: string): Promise<any>;
 
   // === NEW TABLE METHODS ===
 
@@ -325,6 +331,19 @@ export class InMemoryStorage implements IStorage {
   async trackSellerConversion(sellerId: string, revenue?: number): Promise<void> {}
   async getSellerAnalytics(sellerId: string): Promise<{clicks: number, conversions: number, conversionRate: number}> {
     return { clicks: 0, conversions: 0, conversionRate: 0 };
+  }
+  async getSellerPayments(sellerId: string): Promise<any[]> { return []; }
+  async createSellerPayment(payment: {sellerId: string; amount: number; paymentDate: Date; description: string | null; createdBy: string}): Promise<any> { return payment as any; }
+  async getSellerSalesReport(sellerId: string): Promise<any> { 
+    return {
+      totalSales: 0,
+      totalRevenue: 0,
+      totalCpaCommission: 0,
+      totalRecurringCommission: 0,
+      totalCommission: 0,
+      totalPaid: 0,
+      balance: 0
+    };
   }
   async createPet(pet: InsertPet): Promise<Pet> { return pet as any; }
   async updatePet(id: string, pet: Partial<InsertPet>): Promise<Pet | undefined> { return undefined; }
@@ -1074,6 +1093,110 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('❌ Error fetching seller analytics:', error);
       return { clicks: 0, conversions: 0, conversionRate: 0 };
+    }
+  }
+
+  // Seller Payments
+  async getSellerPayments(sellerId: string): Promise<any[]> {
+    try {
+      const payments = await db
+        .select()
+        .from(sellerPayments)
+        .where(eq(sellerPayments.sellerId, sellerId))
+        .orderBy(desc(sellerPayments.paymentDate));
+      return payments;
+    } catch (error) {
+      console.error('❌ Error fetching seller payments:', error);
+      return [];
+    }
+  }
+
+  async createSellerPayment(payment: {
+    sellerId: string;
+    amount: number;
+    paymentDate: Date;
+    description: string | null;
+    createdBy: string;
+  }): Promise<any> {
+    const [newPayment] = await db
+      .insert(sellerPayments)
+      .values({
+        sellerId: payment.sellerId,
+        amount: payment.amount.toFixed(2),
+        paymentDate: payment.paymentDate,
+        description: payment.description,
+        createdBy: payment.createdBy
+      })
+      .returning();
+    return newPayment;
+  }
+
+  async getSellerSalesReport(sellerId: string): Promise<any> {
+    try {
+      // Get CPA commission from initial contracts (one-time payment per contract)
+      const cpaData = await db
+        .select({
+          totalSales: sql<number>`COUNT(*)`,
+          cpaCommission: sql<string>`COALESCE(SUM(
+            CAST(${contracts.monthlyAmount} AS DECIMAL) * CAST(${sellers.cpaPercentage} AS DECIMAL) / 100
+          ), 0)`
+        })
+        .from(contracts)
+        .leftJoin(sellers, eq(contracts.sellerId, sellers.id))
+        .where(eq(contracts.sellerId, sellerId));
+
+      // Get recurring commission from all installments paid
+      const recurringData = await db
+        .select({
+          totalRevenue: sql<string>`COALESCE(SUM(CAST(${contractInstallments.amount} AS DECIMAL)), 0)`,
+          recurringCommission: sql<string>`COALESCE(SUM(
+            CAST(${contractInstallments.amount} AS DECIMAL) * CAST(${sellers.recurringCommissionPercentage} AS DECIMAL) / 100
+          ), 0)`
+        })
+        .from(contractInstallments)
+        .leftJoin(contracts, eq(contractInstallments.contractId, contracts.id))
+        .leftJoin(sellers, eq(contracts.sellerId, sellers.id))
+        .where(
+          and(
+            eq(contracts.sellerId, sellerId),
+            eq(contractInstallments.status, 'paid')
+          )
+        );
+
+      // Get total payments made to seller
+      const paymentsData = await db
+        .select({
+          totalPaid: sql<string>`COALESCE(SUM(CAST(${sellerPayments.amount} AS DECIMAL)), 0)`
+        })
+        .from(sellerPayments)
+        .where(eq(sellerPayments.sellerId, sellerId));
+
+      const totalCpa = parseFloat(cpaData[0]?.cpaCommission || '0');
+      const totalRecurring = parseFloat(recurringData[0]?.recurringCommission || '0');
+      const totalCommission = totalCpa + totalRecurring;
+      const totalPaid = parseFloat(paymentsData[0]?.totalPaid || '0');
+      const balance = totalCommission - totalPaid;
+
+      return {
+        totalSales: cpaData[0]?.totalSales || 0,
+        totalRevenue: parseFloat(recurringData[0]?.totalRevenue || '0'),
+        totalCpaCommission: totalCpa,
+        totalRecurringCommission: totalRecurring,
+        totalCommission,
+        totalPaid,
+        balance
+      };
+    } catch (error) {
+      console.error('❌ Error fetching seller sales report:', error);
+      return {
+        totalSales: 0,
+        totalRevenue: 0,
+        totalCpaCommission: 0,
+        totalRecurringCommission: 0,
+        totalCommission: 0,
+        totalPaid: 0,
+        balance: 0
+      };
     }
   }
 

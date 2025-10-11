@@ -752,10 +752,36 @@ export const sellerLoginSchema = z.object({
 
 export const insertSellerPaymentSchema = z.object({
   sellerId: z.string().min(1, "ID do vendedor é obrigatório"),
-  amount: z.string().or(z.number()).refine((val) => {
-    const num = typeof val === 'string' ? parseFloat(val) : val;
-    return !isNaN(num) && num > 0;
-  }, { message: "Valor deve ser maior que zero" }),
+  amount: z.string().or(z.number()).transform((val) => {
+    if (typeof val === 'number') {
+      if (isNaN(val) || val <= 0) {
+        throw new Error("Valor deve ser maior que zero");
+      }
+      return val;
+    }
+    
+    // Reject negative values explicitly
+    if (val.includes('-')) {
+      throw new Error("Valor não pode ser negativo");
+    }
+    
+    // Remove all non-numeric except dots and commas
+    let cleanVal = val.trim().replace(/[^\d.,]/g, '');
+    
+    // If there's a comma, it's Brazilian format (dots=thousands, comma=decimal)
+    // If no comma, dots are decimals (standard HTML/JS format)
+    if (cleanVal.includes(',')) {
+      // Brazilian format: remove dots (thousands), replace comma with dot (decimal)
+      cleanVal = cleanVal.replace(/\./g, '').replace(',', '.');
+    }
+    // Otherwise keep dots as decimals
+    
+    const num = parseFloat(cleanVal || '0');
+    if (isNaN(num) || num <= 0) {
+      throw new Error("Valor deve ser maior que zero");
+    }
+    return num;
+  }),
   paymentDate: z.date().optional(),
   description: z.string().optional(),
   createdBy: z.string().min(1, "Criador é obrigatório"),

@@ -19,6 +19,7 @@ import {
   insertCouponSchema,
   updateCouponSchema,
   insertGuideSchema,
+  insertSellerPaymentSchema,
   type InsertNetworkUnit,
   type InsertSiteSettings,
   type InsertClient,
@@ -1284,6 +1285,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting seller:", error);
       res.status(500).json({ error: "Erro ao excluir vendedor" });
+    }
+  });
+
+  // ==== SELLER PAYMENT ROUTES ====
+  // Get seller payments
+  app.get("/admin/api/sellers/:id/payments", requireAdmin, async (req, res) => {
+    try {
+      const payments = await storage.getSellerPayments(req.params.id);
+      res.json(payments);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching seller payments:", error);
+      res.status(500).json({ error: "Erro ao buscar pagamentos do vendedor" });
+    }
+  });
+
+  // Create seller payment
+  app.post("/admin/api/sellers/:id/payments", requireAdmin, async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const paymentData = insertSellerPaymentSchema.parse({
+        ...req.body,
+        sellerId: req.params.id,
+        createdBy: userId
+      });
+
+      const payment = await storage.createSellerPayment({
+        sellerId: paymentData.sellerId,
+        amount: paymentData.amount, // Already normalized to number by schema
+        paymentDate: paymentData.paymentDate || new Date(),
+        description: paymentData.description || null,
+        createdBy: paymentData.createdBy
+      });
+
+      console.log("✅ [ADMIN] Seller payment created:", payment.id);
+      res.json(payment);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error creating seller payment:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos",
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: "Erro ao criar pagamento" });
+    }
+  });
+
+  // Get seller sales report
+  app.get("/admin/api/sellers/:id/sales-report", requireAdmin, async (req, res) => {
+    try {
+      const report = await storage.getSellerSalesReport(req.params.id);
+      res.json(report);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching seller sales report:", error);
+      res.status(500).json({ error: "Erro ao buscar relatório de vendas" });
     }
   });
 
