@@ -1303,17 +1303,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create seller payment
   app.post("/admin/api/sellers/:id/payments", requireAdmin, async (req, res) => {
+    console.log("💰 [PAYMENT-ENDPOINT] Iniciando criação de pagamento");
+    console.log("💰 [PAYMENT-ENDPOINT] Seller ID:", req.params.id);
+    console.log("💰 [PAYMENT-ENDPOINT] Body recebido:", req.body);
+    console.log("💰 [PAYMENT-ENDPOINT] Session:", { userId: req.session?.userId, hasSession: !!req.session });
+    
     try {
       const userId = req.session?.userId;
       if (!userId) {
+        console.log("❌ [PAYMENT-ENDPOINT] Usuário não autenticado");
         return res.status(401).json({ error: "Não autenticado" });
       }
 
+      console.log("💰 [PAYMENT-ENDPOINT] Parsing dados do pagamento...");
       const paymentData = insertSellerPaymentSchema.parse({
         ...req.body,
         sellerId: req.params.id,
         createdBy: userId
       });
+      
+      console.log("💰 [PAYMENT-ENDPOINT] Dados validados:", paymentData);
 
       const payment = await storage.createSellerPayment({
         sellerId: paymentData.sellerId,
@@ -1328,6 +1337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ [ADMIN] Error creating seller payment:", error);
       if (error instanceof z.ZodError) {
+        console.error("❌ [ADMIN] Validation errors:", error.errors);
         return res.status(400).json({ 
           error: "Dados inválidos",
           details: error.errors 

@@ -85,19 +85,40 @@ export default function SellerPayments() {
 
   const createPaymentMutation = useMutation({
     mutationFn: async (data: { amount: string; paymentDate: string; description: string }) => {
+      console.log("📡 [MUTATION] Enviando requisição para:", `/admin/api/sellers/${sellerId}/payments`);
+      console.log("📡 [MUTATION] Dados:", data);
+      
       const response = await fetch(`/admin/api/sellers/${sellerId}/payments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(data),
       });
+      
+      console.log("📡 [MUTATION] Status da resposta:", response.status);
+      console.log("📡 [MUTATION] Response OK:", response.ok);
+      
       if (!response.ok) {
-        const error = await response.json();
+        const errorText = await response.text();
+        console.log("❌ [MUTATION] Erro resposta (text):", errorText);
+        
+        let error;
+        try {
+          error = JSON.parse(errorText);
+        } catch {
+          error = { error: errorText || "Erro ao criar pagamento" };
+        }
+        
+        console.log("❌ [MUTATION] Erro processado:", error);
         throw new Error(error.error || "Erro ao criar pagamento");
       }
-      return response.json();
+      
+      const result = await response.json();
+      console.log("✅ [MUTATION] Sucesso:", result);
+      return result;
     },
     onSuccess: () => {
+      console.log("✅ [MUTATION] onSuccess callback executado");
       queryClient.invalidateQueries({ queryKey: [`/admin/api/sellers/${sellerId}/payments`] });
       queryClient.invalidateQueries({ queryKey: [`/admin/api/sellers/${sellerId}/sales-report`] });
       setPaymentDialogOpen(false);
@@ -110,6 +131,7 @@ export default function SellerPayments() {
       });
     },
     onError: (error: Error) => {
+      console.log("❌ [MUTATION] onError callback executado:", error);
       toast({
         title: "Erro",
         description: error.message,
