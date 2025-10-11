@@ -19,7 +19,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2 } from "lucide-react";
+import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2, Plus } from "lucide-react";
+import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarDate } from "@internationalized/date";
@@ -65,6 +66,7 @@ const allColumns = [
 ] as const;
 
 export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedGuide, setSelectedGuide] = useState<GuideWithNetworkUnit | null>(null);
@@ -250,6 +252,14 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Guias de Atendimento</h1>
           <p className="text-sm text-muted-foreground">Visualize as guias geradas pela sua unidade</p>
         </div>
+        <Button 
+          variant="admin-action"
+          size="sm"
+          onClick={() => setLocation(`/unidade/${unitSlug}/guias/novo`)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Nova Guia
+        </Button>
       </div>
 
       {/* Date Filter */}

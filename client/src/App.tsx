@@ -14,6 +14,7 @@ import Network from "@/pages/network";
 import UnitLoginPage from "@/pages/unit-login";
 import UnitDashboard from "@/pages/unit-dashboard";
 import GuiasPage from "@/pages/unit/GuiasPage";
+import NovaGuiaPage from "@/pages/unit/NovaGuiaPage";
 import ClientesPage from "@/pages/unit/ClientesPage";
 import ProcedimentosPage from "@/pages/unit/ProcedimentosPage";
 import PrivacyPolicy from "@/pages/privacy-policy";
@@ -198,6 +199,7 @@ function Router() {
         
         {/* Unit Routes - specific paths first */}
         <Route path="/unidade/:slug/painel" component={UnitDashboard} />
+        <Route path="/unidade/:slug/guias/novo" component={NovaGuiaPage} />
         <Route path="/unidade/:slug/guias" component={GuiasPage} />
         <Route path="/unidade/:slug/clientes" component={ClientesPage} />
         <Route path="/unidade/:slug/procedimentos" component={ProcedimentosPage} />
