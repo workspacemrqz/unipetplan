@@ -40,10 +40,10 @@ export default function UnitHistoricoAtendimento({ unitSlug }: { unitSlug: strin
   const [selectedGuide, setSelectedGuide] = useState<GuideWithNetworkUnit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
-  const { data: guides, isLoading } = useQuery<GuidesResponse>({
+  const { data: guides, isLoading, isError, error } = useQuery<GuidesResponse>({
     queryKey: [`/api/units/${unitSlug}/guides`, { page: '1', limit: '1000' }],
     queryFn: async () => {
-      const token = localStorage.getItem('unitAuthToken');
+      const token = localStorage.getItem('unit-token');
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
@@ -134,6 +134,20 @@ export default function UnitHistoricoAtendimento({ unitSlug }: { unitSlug: strin
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-muted-foreground">Carregando histórico...</p>
             </div>
+          </div>
+        ) : isError ? (
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <p className="text-red-600 font-semibold mb-2">Erro ao carregar histórico</p>
+            <p className="text-muted-foreground text-sm mb-4">
+              {error?.message || 'Não foi possível carregar o histórico de atendimentos'}
+            </p>
+            <Button
+              onClick={() => window.location.reload()}
+              variant="outline"
+            >
+              Tentar novamente
+            </Button>
           </div>
         ) : sortedDates.length === 0 ? (
           <div className="text-center py-12">
