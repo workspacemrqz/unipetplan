@@ -265,7 +265,7 @@ export default function SellerDashboard() {
           <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-semibold text-teal-900">Comissão CPA</h4>
-              <div className="bg-teal-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+              <div className="px-3 py-1 rounded-full text-sm font-bold text-white" style={{ backgroundColor: '#277677' }}>
                 {stats.cpaPercentage}%
               </div>
             </div>
