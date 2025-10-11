@@ -185,24 +185,6 @@ export default function SellerDashboard() {
           
           {/* Valores principais */}
           <div className="space-y-6">
-            {/* Barra de progresso visual */}
-            <div className="relative">
-              <div className="flex justify-between mb-2">
-                <span className="text-sm text-gray-600">Progresso de Pagamentos</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {((commissions.totalPaid || 0) / parseFloat(commissions.totalToReceive) * 100).toFixed(1)}% recebido
-                </span>
-              </div>
-              <div className="h-8 bg-gray-100 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full transition-all duration-500"
-                  style={{ 
-                    width: `${Math.min(((commissions.totalPaid || 0) / parseFloat(commissions.totalToReceive) * 100), 100)}%` 
-                  }}
-                />
-              </div>
-            </div>
-
             {/* Grid de valores */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Valor Total a Receber */}
