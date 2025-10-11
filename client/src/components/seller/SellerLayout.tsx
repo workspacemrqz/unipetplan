@@ -43,9 +43,7 @@ function SellerLayout({ children }: LayoutProps) {
             >
               {sidebarOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
             </Button>
-            <div className="text-sm font-medium text-gray-900">
-              SISTEMA UNIPET
-            </div>
+            <img src="/unipet-logo.png" alt="Unipet Plan" className="h-6 w-auto" />
           </div>
         </div>
 

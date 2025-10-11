@@ -36,12 +36,9 @@ export default function SellerSidebar() {
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-[#eaeaea]">
-      {/* Logo - Exact same style as unit */}
+      {/* Logo */}
       <div className="p-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">SISTEMA UNIPET</h1>
-          <p className="text-sm text-gray-600">Plano de Saúde Pet</p>
-        </div>
+        <img src="/unipet-logo.png" alt="Unipet Plan" className="h-8 w-auto" />
       </div>
 
       {/* Navigation - Exact same style as unit */}
