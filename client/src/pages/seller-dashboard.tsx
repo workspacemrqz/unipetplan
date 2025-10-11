@@ -3,12 +3,8 @@ import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
 import { 
   ChevronUp as TrendingUp, 
-  ChevronDown as TrendingDown, 
-  DollarSign,
-  Check as Target,
-  Star as Activity,
-  FileText as BarChart3,
-  DollarSign as CircleDollarSign
+  ChevronDown as TrendingDown,
+  Star as Activity
 } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
@@ -38,11 +34,8 @@ const KPICard = ({
   title, 
   value, 
   subtitle, 
-  icon: Icon, 
   trend, 
-  trendValue, 
-  color = '#257273',
-  bgColor = '#e8f4f4'
+  trendValue
 }: any) => {
   const isPositiveTrend = trend === 'up';
   const TrendIcon = isPositiveTrend ? TrendingUp : trend === 'down' ? TrendingDown : null;
@@ -66,12 +59,6 @@ const KPICard = ({
           {subtitle && (
             <p className="text-xs text-gray-500 mt-2">{subtitle}</p>
           )}
-        </div>
-        <div 
-          className="p-3 rounded-xl"
-          style={{ backgroundColor: bgColor }}
-        >
-          <Icon className="h-6 w-6" style={{ color }} />
         </div>
       </div>
     </div>
@@ -221,42 +208,30 @@ export default function SellerDashboard() {
             title="Valor a Receber"
             value={`R$ ${parseFloat(commissions.totalToReceive).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
             subtitle={`${commissions.contractsCount} vendas realizadas`}
-            icon={DollarSign}
             trend="up"
             trendValue="+12.5%"
-            color="#257273"
-            bgColor="#e8f4f4"
           />
           
           <KPICard
             title="Valor Recebido"
             value={`R$ ${(commissions.totalPaid || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
             subtitle="Pagamentos processados"
-            icon={CircleDollarSign}
-            color="#277677"
-            bgColor="#e6f2f2"
           />
           
           <KPICard
             title="Taxa de Conversão"
             value={`${stats.conversionRate.toFixed(1)}%`}
             subtitle={`${stats.conversions} de ${stats.clicks} cliques`}
-            icon={Target}
             trend={stats.conversionRate > 5 ? "up" : "down"}
             trendValue={stats.conversionRate > 5 ? "+2.3%" : "-1.2%"}
-            color="#277677"
-            bgColor="#e6f2f2"
           />
           
           <KPICard
             title="Total de Vendas"
             value={stats.totalSales}
             subtitle="Vendas este mês"
-            icon={BarChart3}
             trend="up"
             trendValue="+8 vendas"
-            color="#277677"
-            bgColor="#e6f2f2"
           />
         </div>
 
