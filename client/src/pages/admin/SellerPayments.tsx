@@ -135,10 +135,15 @@ export default function SellerPayments() {
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
+    // Para valores muito pequenos, mostrar até 4 casas decimais
+    const options: Intl.NumberFormatOptions = {
       style: "currency",
       currency: "BRL",
-    }).format(value);
+      minimumFractionDigits: 2,
+      maximumFractionDigits: value < 0.01 && value > 0 ? 4 : 2,
+    };
+    
+    return new Intl.NumberFormat("pt-BR", options).format(value);
   };
 
   return (
