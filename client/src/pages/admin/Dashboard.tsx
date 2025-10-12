@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/
 import { Skeleton } from "@/components/admin/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/admin/ui/alert";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
-import type { Client, Guide, ContactSubmission } from "../../../../shared/schema";
+import type { Client, Atendimento, ContactSubmission } from "../../../../shared/schema";
 import {
   User,
   DollarSign,
@@ -107,7 +107,7 @@ export default function Dashboard() {
     activeClients?: number;
     registeredPets?: number;
   };
-  const allGuides = (dashboardData as any)?.guides || [] as Guide[];
+  const allAtendimentos = (dashboardData as any)?.atendimentos || [] as Atendimento[];
   const clients = (dashboardData as any)?.clients || [] as Client[];
   const contactSubmissions = (dashboardData as any)?.contactSubmissions || [] as ContactSubmission[];
   const planDistribution = ((dashboardData as any)?.planDistribution || []) as PlanDistribution[];
@@ -115,7 +115,7 @@ export default function Dashboard() {
 
   // Map loading and error states for backward compatibility
   const statsLoading = isLoadingDashboard;
-  const guidesLoading = isLoadingDashboard;
+  const atendimentosLoading = isLoadingDashboard;
   const networkLoading = isLoadingDashboard;
   const clientsLoading = isLoadingDashboard;
   const submissionsLoading = isLoadingDashboard;
@@ -124,7 +124,7 @@ export default function Dashboard() {
   const revenueLoading = isLoadingDashboard;
 
   const statsError = isDashboardError;
-  const guidesError = isDashboardError;
+  const atendimentosError = isDashboardError;
   const networkError = isDashboardError;
   const clientsError = isDashboardError;
   const submissionsError = isDashboardError;
@@ -135,17 +135,17 @@ export default function Dashboard() {
 
   // Memoize loading states
   const isAnyLoading = useMemo(() =>
-    statsLoading || guidesLoading || distributionLoading || clientsLoading ||
+    statsLoading || atendimentosLoading || distributionLoading || clientsLoading ||
     submissionsLoading || plansLoading || networkLoading || revenueLoading || isLoadingProcedures,
-    [statsLoading, guidesLoading, distributionLoading, clientsLoading,
+    [statsLoading, atendimentosLoading, distributionLoading, clientsLoading,
       submissionsLoading, plansLoading, networkLoading, revenueLoading, isLoadingProcedures]
   );
 
   // Memoize error states
   const hasErrors = useMemo(() =>
-    statsError || guidesError || distributionError || clientsError ||
+    statsError || atendimentosError || distributionError || clientsError ||
     submissionsError || plansError || networkError || revenueError,
-    [statsError, guidesError, distributionError, clientsError,
+    [statsError, atendimentosError, distributionError, clientsError,
       submissionsError, plansError, networkError, revenueError]
   );
 

@@ -87,7 +87,7 @@ export function ProceduresTab() {
     }
   };
 
-  // Removed manual registration - usage is now tracked automatically when guides are created
+  // Removed manual registration - usage is now tracked automatically when atendimentos are created
 
   useEffect(() => {
     fetchProcedureUsage();

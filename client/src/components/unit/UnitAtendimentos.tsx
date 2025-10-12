@@ -214,7 +214,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
     
     // Cabeçalho
     text += "=".repeat(50) + "\n";
-    text += "Informações do Atendimento DE ATENDIMENTO\n";
+    text += "Informações do Atendimento\n";
     text += "=".repeat(50) + "\n\n";
 
     // Informações Básicas

@@ -36,7 +36,7 @@ interface Client {
   email: string;
 }
 
-interface Guide {
+interface Atendimento {
   id: string;
   title: string;
   description: string;
@@ -55,10 +55,10 @@ export default function CustomerPets() {
   const [editFormData, setEditFormData] = useState<Partial<Pet>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
-  const [showGuides, setShowGuides] = useState<string | null>(null);
-  const [guides, setGuides] = useState<Guide[]>([]);
-  const [loadingGuides, setLoadingGuides] = useState(false);
-  const [guidesError, setGuidesError] = useState<string | null>(null);
+  const [showAtendimentos, setShowAtendimentos] = useState<string | null>(null);
+  const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
+  const [loadingAtendimentos, setLoadingAtendimentos] = useState(false);
+  const [atendimentosError, setAtendimentosError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   // Redirect to login if not authenticated
@@ -239,9 +239,9 @@ export default function CustomerPets() {
     }
   };
 
-  const fetchPetGuides = async (petId: string) => {
-    setLoadingGuides(true);
-    setGuidesError(null);
+  const fetchPetAtendimentos = async (petId: string) => {
+    setLoadingAtendimentos(true);
+    setAtendimentosError(null);
     
     try {
       const response = await fetch(`/api/clients/pets/${petId}/atendimentos`, {
@@ -250,28 +250,28 @@ export default function CustomerPets() {
 
       if (response.ok) {
         const result = await response.json();
-        setGuides(result.guides || []);
+        setAtendimentos(result.atendimentos || []);
       } else {
         const errorData = await response.json();
-        setGuidesError(errorData.error || 'Erro ao carregar atendimentos');
+        setAtendimentosError(errorData.error || 'Erro ao carregar atendimentos');
       }
     } catch (error) {
-      console.error('Error fetching guides:', error);
-      setGuidesError('Erro ao carregar atendimentos');
+      console.error('Error fetching atendimentos:', error);
+      setAtendimentosError('Erro ao carregar atendimentos');
     } finally {
-      setLoadingGuides(false);
+      setLoadingAtendimentos(false);
     }
   };
 
-  const openGuides = (petId: string) => {
-    setShowGuides(petId);
-    fetchPetGuides(petId);
+  const openAtendimentos = (petId: string) => {
+    setShowAtendimentos(petId);
+    fetchPetAtendimentos(petId);
   };
 
-  const closeGuides = () => {
-    setShowGuides(null);
-    setGuides([]);
-    setGuidesError(null);
+  const closeAtendimentos = () => {
+    setShowAtendimentos(null);
+    setAtendimentos([]);
+    setAtendimentosError(null);
   };
 
   const formatPetInfo = (label: string, value?: string | boolean | null): string => {
@@ -816,7 +816,7 @@ export default function CustomerPets() {
                           <span>Editar</span>
                         </button>
                         <button
-                          onClick={() => openGuides(pet.id)}
+                          onClick={() => openAtendimentos(pet.id)}
                           className="flex items-center space-x-1 px-3 py-2 rounded-lg"
                           style={{ background: 'var(--bg-beige)', color: 'var(--text-dark-secondary)' }}
                         >
@@ -834,8 +834,8 @@ export default function CustomerPets() {
         </div>
       </div>
 
-      {/* Guides Modal */}
-      {showGuides && (
+      {/* Atendimentos Modal */}
+      {showAtendimentos && (
         <div className="fixed inset-0 bg-foreground/50 flex items-center justify-center p-4 z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -851,7 +851,7 @@ export default function CustomerPets() {
                 </h3>
               </div>
               <button
-                onClick={closeGuides}
+                onClick={closeAtendimentos}
                 className="p-2 rounded-lg"
                 style={{ color: 'var(--text-dark-secondary)' }}
               >
@@ -861,7 +861,7 @@ export default function CustomerPets() {
 
             {/* Modal Content */}
             <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
-              {loadingGuides ? (
+              {loadingAtendimentos ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
                     <div className="w-8 h-8 border-4 rounded-full animate-spin mx-auto mb-4" 
@@ -869,7 +869,7 @@ export default function CustomerPets() {
                     <p style={{ color: 'var(--text-dark-secondary)' }}>Carregando atendimentos...</p>
                   </div>
                 </div>
-              ) : guidesError ? (
+              ) : atendimentosError ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -880,7 +880,7 @@ export default function CustomerPets() {
                       Erro ao carregar atendimentos
                     </p>
                     <button
-                      onClick={() => fetchPetGuides(showGuides)}
+                      onClick={() => fetchPetAtendimentos(showAtendimentos)}
                       className="mt-4 px-4 py-2 rounded-lg"
                       style={{ background: 'var(--btn-ver-planos-bg)', color: 'var(--btn-ver-planos-text)' }}
                     >
@@ -888,7 +888,7 @@ export default function CustomerPets() {
                     </button>
                   </div>
                 </div>
-              ) : guides.length === 0 ? (
+              ) : atendimentos.length === 0 ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
                     <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -902,15 +902,15 @@ export default function CustomerPets() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {guides.map((guide) => (
-                    <div key={guide.id} className="border rounded-lg p-4" style={{ borderColor: 'var(--border-gray)' }}>
+                  {atendimentos.map((atendimento) => (
+                    <div key={atendimento.id} className="border rounded-lg p-4" style={{ borderColor: 'var(--border-gray)' }}>
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h4 className="font-semibold text-lg" style={{ color: 'var(--text-dark-primary)' }}>
-                            {guide.title}
+                            {atendimento.title}
                           </h4>
                           <p className="text-sm" style={{ color: 'var(--text-dark-secondary)' }}>
-                            Criada em: {new Date(guide.createdAt).toLocaleDateString('pt-BR')}
+                            Criada em: {new Date(atendimento.createdAt).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -921,16 +921,16 @@ export default function CustomerPets() {
                         </div>
                       </div>
                       
-                      {guide.description && (
+                      {atendimento.description && (
                         <p className="mb-3" style={{ color: 'var(--text-dark-secondary)' }}>
-                          {guide.description}
+                          {atendimento.description}
                         </p>
                       )}
                       
-                      {guide.content && (
+                      {atendimento.content && (
                         <div className="bg-gray-50 rounded-lg p-3">
                           <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-dark-primary)' }}>
-                            {guide.content}
+                            {atendimento.content}
                           </p>
                         </div>
                       )}

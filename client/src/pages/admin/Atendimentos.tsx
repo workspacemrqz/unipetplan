@@ -23,7 +23,7 @@ import {
 import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2, Plus, Edit } from "lucide-react";
 import { useLocation } from "wouter";
 
-// Types for guides data
+// Types for atendimentos data
 interface AtendimentoWithNetworkUnit {
   id: string;
   procedure: string;
@@ -75,10 +75,10 @@ export default function Atendimentos() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedGuide, setSelectedGuide] = useState<AtendimentoWithNetworkUnit | null>(null);
+  const [selectedAtendimento, setSelectedAtendimento] = useState<AtendimentoWithNetworkUnit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [editingGuide, setEditingGuide] = useState<AtendimentoWithNetworkUnit | null>(null);
+  const [editingAtendimento, setEditingAtendimento] = useState<AtendimentoWithNetworkUnit | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
@@ -126,37 +126,37 @@ export default function Atendimentos() {
     ...dateParams
   };
 
-  const { data: guides, isLoading } = useQuery<AtendimentosResponse>({
+  const { data: atendimentos, isLoading } = useQuery<AtendimentosResponse>({
     queryKey: ["/admin/api/atendimentos/with-network-units", queryParams],
     ...getQueryOptions('atendimentos'),
     // Using standard queryClient fetcher that supports [path, params] format and handles 401s globally
   });
 
 
-  const guidesData = guides?.data || [];
-  const totalGuides = guides?.total || 0;
-  const totalPages = guides?.totalPages || 1;
+  const atendimentosData = atendimentos?.data || [];
+  const totalAtendimentos = atendimentos?.total || 0;
+  const totalPages = atendimentos?.totalPages || 1;
 
 
 
-  const handleViewDetails = (guide: AtendimentoWithNetworkUnit) => {
-    setSelectedGuide(guide);
+  const handleViewDetails = (atendimento: AtendimentoWithNetworkUnit) => {
+    setSelectedAtendimento(atendimento);
     setDetailsOpen(true);
   };
 
-  const handleEdit = (guide: AtendimentoWithNetworkUnit) => {
-    setEditingGuide(guide);
-    setNewStatus(guide.status);
+  const handleEdit = (atendimento: AtendimentoWithNetworkUnit) => {
+    setEditingAtendimento(atendimento);
+    setNewStatus(atendimento.status);
     setEditOpen(true);
   };
 
   const handleSaveStatus = async () => {
-    if (!editingGuide) return;
+    if (!editingAtendimento) return;
     
     setIsSaving(true);
     
     try {
-      const response = await fetch(`/admin/api/atendimentos/${editingGuide.id}`, {
+      const response = await fetch(`/admin/api/atendimentos/${editingAtendimento.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -176,7 +176,7 @@ export default function Atendimentos() {
       });
 
       setEditOpen(false);
-      setEditingGuide(null);
+      setEditingAtendimento(null);
       
       // Invalidar as queries para recarregar os dados
       await queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos/with-network-units"] });
@@ -192,56 +192,56 @@ export default function Atendimentos() {
     }
   };
 
-  const generateGuideText = () => {
-    if (!selectedGuide) return "";
+  const generateAtendimentoText = () => {
+    if (!selectedAtendimento) return "";
 
     let text = "";
     
     // Cabeçalho
     text += "=".repeat(50) + "\n";
-    text += "Informações do Atendimento DE ATENDIMENTO\n";
+    text += "Informações do Atendimento\n";
     text += "=".repeat(50) + "\n\n";
 
     // Informações Básicas
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome do Procedimento: ${selectedGuide.procedure || selectedGuide.procedureName || 'Não informado'}\n`;
-    text += `Status: ${getStatusLabel(selectedGuide.status)}\n`;
-    text += `Valor: R$ ${selectedGuide.value || 'Não informado'}\n\n`;
+    text += `Nome do Procedimento: ${selectedAtendimento.procedure || selectedAtendimento.procedureName || 'Não informado'}\n`;
+    text += `Status: ${getStatusLabel(selectedAtendimento.status)}\n`;
+    text += `Valor: R$ ${selectedAtendimento.value || 'Não informado'}\n\n`;
 
     // Informações do Cliente e Pet
-    if (selectedGuide.clientName || selectedGuide.petName) {
+    if (selectedAtendimento.clientName || selectedAtendimento.petName) {
       text += "INFORMAÇÕES DO CLIENTE E PET:\n";
       text += "-".repeat(30) + "\n";
-      if (selectedGuide.clientName) {
-        text += `Cliente: ${selectedGuide.clientName}\n`;
+      if (selectedAtendimento.clientName) {
+        text += `Cliente: ${selectedAtendimento.clientName}\n`;
       }
-      if (selectedGuide.petName) {
-        text += `Pet: ${selectedGuide.petName}\n`;
+      if (selectedAtendimento.petName) {
+        text += `Pet: ${selectedAtendimento.petName}\n`;
       }
       text += "\n";
     }
 
     // Notas do Procedimento
-    if (selectedGuide.procedureNotes) {
+    if (selectedAtendimento.procedureNotes) {
       text += "NOTAS DO PROCEDIMENTO:\n";
       text += "-".repeat(25) + "\n";
-      text += `${selectedGuide.procedureNotes}\n\n`;
+      text += `${selectedAtendimento.procedureNotes}\n\n`;
     }
 
     // Notas Gerais
-    if (selectedGuide.generalNotes) {
+    if (selectedAtendimento.generalNotes) {
       text += "NOTAS GERAIS:\n";
       text += "-".repeat(15) + "\n";
-      text += `${selectedGuide.generalNotes}\n\n`;
+      text += `${selectedAtendimento.generalNotes}\n\n`;
     }
 
     // Informações do Cadastro
     text += "INFORMAÇÕES DO CADASTRO:\n";
     text += "-".repeat(25) + "\n";
-    text += `Data de Criação: ${selectedGuide.createdAt ? format(new Date(selectedGuide.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : "Não informado"}\n`;
-    if (selectedGuide.updatedAt) {
-      text += `Última Atualização: ${format(new Date(selectedGuide.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}\n`;
+    text += `Data de Criação: ${selectedAtendimento.createdAt ? format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : "Não informado"}\n`;
+    if (selectedAtendimento.updatedAt) {
+      text += `Última Atualização: ${format(new Date(selectedAtendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}\n`;
     }
 
     text += "\n" + "=".repeat(50) + "\n";
@@ -256,7 +256,7 @@ export default function Atendimentos() {
     
     try {
       setCopyState('copying');
-      const text = generateGuideText();
+      const text = generateAtendimentoText();
       await navigator.clipboard.writeText(text);
       
       setCopyState('copied');
@@ -319,7 +319,7 @@ export default function Atendimentos() {
                 setCurrentPage(1); // Reset para página 1 ao buscar
               }}
               className="pl-10 w-80"
-              data-testid="input-search-guides"
+              data-testid="input-search-atendimentos"
             />
           </div>
           <Select value={statusFilter} onValueChange={(value) => {
@@ -417,34 +417,34 @@ export default function Atendimentos() {
                   </TableCell>
                 </TableRow>
               ))
-            ) : guidesData && guidesData.length > 0 ? (
-              guidesData.map((guide: AtendimentoWithNetworkUnit) => (
-                <TableRow key={guide.id} className="bg-white border-b border-[#eaeaea]">
+            ) : atendimentosData && atendimentosData.length > 0 ? (
+              atendimentosData.map((atendimento: AtendimentoWithNetworkUnit) => (
+                <TableRow key={atendimento.id} className="bg-white border-b border-[#eaeaea]">
                   {visibleColumns.includes("Procedimento") && (
                     <TableCell className="font-medium whitespace-nowrap bg-white">
-                      {guide.procedure || 'Não informado'}
+                      {atendimento.procedure || 'Não informado'}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Unidade") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      {guide.networkUnit?.name || "Não informada"}
+                      {atendimento.networkUnit?.name || "Não informada"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Valor") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      R$ {parseFloat(guide.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      R$ {parseFloat(atendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Status") && (
                     <TableCell className="whitespace-nowrap bg-white">
                       <Badge className={cn("whitespace-nowrap", getStatusColor())}>
-                        {getStatusLabel(guide.status)}
+                        {getStatusLabel(atendimento.status)}
                       </Badge>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Data") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      {guide.createdAt && format(new Date(guide.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                      {atendimento.createdAt && format(new Date(atendimento.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Ações") && (
@@ -453,16 +453,16 @@ export default function Atendimentos() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleViewDetails(guide)}
-                          data-testid={`button-view-${guide.id}`}
+                          onClick={() => handleViewDetails(atendimento)}
+                          data-testid={`button-view-${atendimento.id}`}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEdit(guide)}
-                          data-testid={`button-edit-${guide.id}`}
+                          onClick={() => handleEdit(atendimento)}
+                          data-testid={`button-edit-${atendimento.id}`}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -489,13 +489,13 @@ export default function Atendimentos() {
         </div>
         
         {/* Pagination */}
-        {totalGuides > 10 && (
+        {totalAtendimentos > 10 && (
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-6 lg:space-x-8">
               <div className="flex items-center space-x-2">
                 <p className="text-sm font-medium">
-                  {totalGuides > 0 ? (
-                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalGuides)} de {totalGuides} atendimentos</>
+                  {totalAtendimentos > 0 ? (
+                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalAtendimentos)} de {totalAtendimentos} atendimentos</>
                   ) : (
                     "Nenhum atendimento encontrado"
                   )}
@@ -564,26 +564,26 @@ export default function Atendimentos() {
             </div>
           </DialogHeader>
           
-          {selectedGuide && (
+          {selectedAtendimento && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Informações Básicas</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Procedimento:</strong> <span className="text-foreground">{selectedGuide.procedure || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Procedimento:</strong> <span className="text-foreground">{selectedAtendimento.procedure || 'Não informado'}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Valor:</strong> <span className="text-foreground">R$ {parseFloat(selectedGuide.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
+                      <span><strong className="text-primary">Valor:</strong> <span className="text-foreground">R$ {parseFloat(selectedAtendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Status:</strong></span>
                       <Badge className={getStatusColor()}>
-                        {getStatusLabel(selectedGuide.status)}
+                        {getStatusLabel(selectedAtendimento.status)}
                       </Badge>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Criada em:</strong> <span className="text-foreground">{selectedGuide.createdAt && format(new Date(selectedGuide.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
+                      <span><strong className="text-primary">Criada em:</strong> <span className="text-foreground">{selectedAtendimento.createdAt && format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
                     </div>
                   </div>
                 </div>
@@ -591,23 +591,23 @@ export default function Atendimentos() {
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Observações</h4>
                   <div className="space-y-2 text-sm">
-                    {selectedGuide.procedureNotes && (
+                    {selectedAtendimento.procedureNotes && (
                       <div>
                         <span className="font-medium text-primary">Observações do Procedimento:</span>
                         <p className="text-muted-foreground mt-1 p-2 bg-muted/10 rounded">
-                          {selectedGuide.procedureNotes}
+                          {selectedAtendimento.procedureNotes}
                         </p>
                       </div>
                     )}
-                    {selectedGuide.generalNotes && (
+                    {selectedAtendimento.generalNotes && (
                       <div>
                         <span className="font-medium text-primary">Anotações Gerais:</span>
                         <p className="text-muted-foreground mt-1 p-2 bg-muted/10 rounded">
-                          {selectedGuide.generalNotes}
+                          {selectedAtendimento.generalNotes}
                         </p>
                       </div>
                     )}
-                    {!selectedGuide.procedureNotes && !selectedGuide.generalNotes && (
+                    {!selectedAtendimento.procedureNotes && !selectedAtendimento.generalNotes && (
                       <p className="text-muted-foreground italic">Nenhuma observação registrada.</p>
                     )}
                   </div>

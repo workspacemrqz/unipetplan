@@ -53,13 +53,13 @@ export default function AtendimentoForm() {
   const urlClientId = urlParams.get('clientId');
   const urlPetId = urlParams.get('petId');
 
-  const { data: guide, isLoading: guideLoading } = useQuery<any>({
+  const { data: atendimento, isLoading: atendimentoLoading } = useQuery<any>({
     queryKey: ["/admin/api/atendimentos", params['id']],
     enabled: isEdit,
   });
 
 
-  const guideFormSchema = z.object({
+  const atendimentoFormSchema = z.object({
     clientId: z.string().min(1, "Cliente é obrigatório"),
     petId: z.string().min(1, "Pet é obrigatório"),
     procedure: z.string().min(1, "Procedimento é obrigatório"),
@@ -70,7 +70,7 @@ export default function AtendimentoForm() {
   });
 
   const form = useForm({
-    resolver: zodResolver(guideFormSchema),
+    resolver: zodResolver(atendimentoFormSchema),
     mode: 'onChange',
     defaultValues: {
       clientId: urlClientId || "",
@@ -84,7 +84,7 @@ export default function AtendimentoForm() {
   });
 
   // Fetch available procedures for the selected pet
-  const petIdToFetch = form.watch("petId") || urlPetId || guide?.petId;
+  const petIdToFetch = form.watch("petId") || urlPetId || atendimento?.petId;
   const { data: availableProcedures, isLoading: proceduresLoading } = useQuery<any>({
     queryKey: ["/admin/api/pets", petIdToFetch, "available-procedures"],
     queryFn: () => apiRequest("GET", `/admin/api/pets/${petIdToFetch}/available-procedures`),
@@ -97,27 +97,27 @@ export default function AtendimentoForm() {
   });
 
   useEffect(() => {
-    if (guide) {
+    if (atendimento) {
       form.reset({
-        clientId: guide.clientId || "",
-        petId: guide.petId || "",
-        procedure: guide.procedure || "",
-        networkUnitId: guide.networkUnitId || "",
-        generalNotes: guide.generalNotes || "",
-        value: guide.value || "",
-        status: guide.status || "open",
+        clientId: atendimento.clientId || "",
+        petId: atendimento.petId || "",
+        procedure: atendimento.procedure || "",
+        networkUnitId: atendimento.networkUnitId || "",
+        generalNotes: atendimento.generalNotes || "",
+        value: atendimento.value || "",
+        status: atendimento.status || "open",
       });
     } else if (urlClientId || urlPetId) {
-      // Set URL parameters if editing and no guide data yet
+      // Set URL parameters if editing and no atendimento data yet
       form.setValue("clientId", urlClientId || "");
       form.setValue("petId", urlPetId || "");
     }
-  }, [guide, form, urlClientId, urlPetId]);
+  }, [atendimento, form, urlClientId, urlPetId]);
 
   // Load client and pets when editing or URL params are present
   useEffect(() => {
     const loadClientAndPets = async () => {
-      const clientId = guide?.clientId || urlClientId;
+      const clientId = atendimento?.clientId || urlClientId;
       
       if (clientId && !selectedClient) {
         try {
@@ -129,13 +129,13 @@ export default function AtendimentoForm() {
           const pets = await apiRequest("GET", `/admin/api/clients/${clientId}/pets`);
           setClientPets(pets);
           
-          // Set the petId if it's provided in URL or guide
-          const petId = guide?.petId || urlPetId;
+          // Set the petId if it's provided in URL or atendimento
+          const petId = atendimento?.petId || urlPetId;
           if (petId) {
             form.setValue("petId", petId);
             // When loading existing data, preserve other fields if editing
-            // But clear them if creating new (no guide data)
-            if (!guide) {
+            // But clear them if creating new (no atendimento data)
+            if (!atendimento) {
               form.setValue("networkUnitId", "");
               form.setValue("procedure", "");
               form.setValue("generalNotes", "");
@@ -144,8 +144,8 @@ export default function AtendimentoForm() {
           } else if (pets.length === 1) {
             // Auto-select if only one pet
             form.setValue("petId", pets[0].id);
-            // Clear dependent fields for new guides
-            if (!guide) {
+            // Clear dependent fields for new atendimentos
+            if (!atendimento) {
               form.setValue("networkUnitId", "");
               form.setValue("procedure", "");
               form.setValue("generalNotes", "");
@@ -159,7 +159,7 @@ export default function AtendimentoForm() {
     };
     
     loadClientAndPets();
-  }, [guide?.clientId, urlClientId, selectedClient]);
+  }, [atendimento?.clientId, urlClientId, selectedClient]);
 
   // Auto-search when CPF has 11 digits
   useEffect(() => {
@@ -289,7 +289,7 @@ export default function AtendimentoForm() {
   };
 
 
-  if (isEdit && guideLoading) {
+  if (isEdit && atendimentoLoading) {
     return (
       <div className="p-6">
         <div className="animate-pulse space-y-4">
@@ -318,7 +318,7 @@ export default function AtendimentoForm() {
         variant="outline"
         size="sm"
         onClick={() => setLocation("/atendimentos")}
-        data-testid="button-back-to-guides"
+        data-testid="button-back-to-atendimentos"
         className="w-full sm:w-auto"
         style={{ backgroundColor: '#FFFFFF' }}
       >

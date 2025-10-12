@@ -23,7 +23,7 @@ import { ptBR } from "date-fns/locale";
 import { CalendarDate } from "@internationalized/date";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 
-interface GuideWithRelations {
+interface AtendimentoWithRelations {
   id: string;
   procedure: string;
   value?: string;
@@ -33,7 +33,7 @@ interface GuideWithRelations {
 }
 
 interface AtendimentosResponse {
-  data: GuideWithRelations[];
+  data: AtendimentoWithRelations[];
   total: number;
   totalPages: number;
   page: number;
@@ -78,7 +78,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
     setCurrentPage(1); // Reset para página 1 ao filtrar por data
   };
 
-  const { data: guides, isLoading, isError, error } = useQuery<AtendimentosResponse>({
+  const { data: atendimentos, isLoading, isError, error } = useQuery<AtendimentosResponse>({
     queryKey: [`/api/units/${unitSlug}/atendimentos`],
     queryFn: async () => {
       const token = localStorage.getItem('unit-token');
@@ -104,25 +104,25 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
     enabled: !!unitSlug
   });
 
-  const guidesData = guides?.data || [];
+  const atendimentosData = atendimentos?.data || [];
 
-  // Filter guides by search query and date
-  const filteredGuides = useMemo(() => {
-    return guidesData.filter(guide => {
+  // Filter atendimentos by search query and date
+  const filteredAtendimentos = useMemo(() => {
+    return atendimentosData.filter(atendimento => {
       // Search filter
       const searchLower = searchQuery.toLowerCase();
       const matchesSearch = !searchQuery || (
-        (guide.clientName && guide.clientName.toLowerCase().includes(searchLower)) ||
-        (guide.procedure && guide.procedure.toLowerCase().includes(searchLower))
+        (atendimento.clientName && atendimento.clientName.toLowerCase().includes(searchLower)) ||
+        (atendimento.procedure && atendimento.procedure.toLowerCase().includes(searchLower))
       );
 
       // Date filter
       let matchesDate = true;
       if (debouncedDateFilter.startDate || debouncedDateFilter.endDate) {
-        if (!guide.createdAt) {
+        if (!atendimento.createdAt) {
           matchesDate = false;
         } else {
-          const guideDate = new Date(guide.createdAt);
+          const atendimentoDate = new Date(atendimento.createdAt);
           
           if (debouncedDateFilter.startDate) {
             const startDate = new Date(
@@ -130,7 +130,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
               debouncedDateFilter.startDate.month - 1,
               debouncedDateFilter.startDate.day
             );
-            if (guideDate < startDate) {
+            if (atendimentoDate < startDate) {
               matchesDate = false;
             }
           }
@@ -142,7 +142,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
               debouncedDateFilter.endDate.day,
               23, 59, 59
             );
-            if (guideDate > endDate) {
+            if (atendimentoDate > endDate) {
               matchesDate = false;
             }
           }
@@ -151,21 +151,21 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
 
       return matchesSearch && matchesDate;
     });
-  }, [guidesData, searchQuery, debouncedDateFilter]);
+  }, [atendimentosData, searchQuery, debouncedDateFilter]);
 
   // Sort by date (newest first)
-  const sortedGuides = useMemo(() => {
-    return [...filteredGuides].sort((a, b) => {
+  const sortedAtendimentos = useMemo(() => {
+    return [...filteredAtendimentos].sort((a, b) => {
       if (!a.createdAt || !b.createdAt) return 0;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  }, [filteredGuides]);
+  }, [filteredAtendimentos]);
 
   // Pagination
-  const totalPages = Math.ceil(sortedGuides.length / pageSize);
+  const totalPages = Math.ceil(sortedAtendimentos.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const displayGuides = sortedGuides.slice(startIndex, endIndex);
+  const displayAtendimentos = sortedAtendimentos.slice(startIndex, endIndex);
 
   // Format currency
   const formatCurrency = (value?: string) => {
@@ -278,7 +278,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
               Tentar novamente
             </Button>
           </div>
-        ) : sortedGuides.length === 0 ? (
+        ) : sortedAtendimentos.length === 0 ? (
           <div className="text-center py-12 px-4">
             <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
@@ -312,30 +312,30 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {displayGuides.map((guide, index) => {
+                  {displayAtendimentos.map((atendimento, index) => {
                     const sequentialNumber = startIndex + index + 1;
                     return (
-                      <TableRow key={guide.id}>
+                      <TableRow key={atendimento.id}>
                         {visibleColumns.includes("Nº") && (
                           <TableCell className="font-medium">{sequentialNumber}</TableCell>
                         )}
                         {visibleColumns.includes("Data") && (
-                          <TableCell>{formatDate(guide.createdAt)}</TableCell>
+                          <TableCell>{formatDate(atendimento.createdAt)}</TableCell>
                         )}
                         {visibleColumns.includes("Cliente") && (
-                          <TableCell>{guide.clientName || '-'}</TableCell>
+                          <TableCell>{atendimento.clientName || '-'}</TableCell>
                         )}
                         {visibleColumns.includes("Procedimento") && (
-                          <TableCell>{guide.procedure || '-'}</TableCell>
+                          <TableCell>{atendimento.procedure || '-'}</TableCell>
                         )}
                         {visibleColumns.includes("Copart") && (
                           <TableCell className="text-right font-medium">
-                            {formatCurrency(guide.value)}
+                            {formatCurrency(atendimento.value)}
                           </TableCell>
                         )}
                         {visibleColumns.includes("Pago") && (
                           <TableCell className="text-right font-medium text-green-600">
-                            {formatCurrency(guide.value)}
+                            {formatCurrency(atendimento.value)}
                           </TableCell>
                         )}
                       </TableRow>
@@ -349,7 +349,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-6 py-4 border-t">
                 <p className="text-sm text-muted-foreground">
-                  Mostrando {startIndex + 1} a {Math.min(endIndex, sortedGuides.length)} de {sortedGuides.length} resultados
+                  Mostrando {startIndex + 1} a {Math.min(endIndex, sortedAtendimentos.length)} de {sortedAtendimentos.length} resultados
                 </p>
                 <div className="flex items-center gap-2">
                   <Button

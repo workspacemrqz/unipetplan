@@ -132,18 +132,18 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       });
       
       // Filter to only show atendimentos created by this unit
-      const allGuides = result?.atendimentos || [];
-      const unitGuides = allGuides.filter((guide: any) => guide.createdByUnitId === unitId);
+      const allAtendimentos = result?.atendimentos || [];
+      const unitAtendimentos = allAtendimentos.filter((atendimento: any) => atendimento.createdByUnitId === unitId);
       
       // Recalculate pagination for filtered results
-      const filteredTotal = unitGuides.length;
+      const filteredTotal = unitAtendimentos.length;
       const totalPages = Math.ceil(filteredTotal / limit);
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
-      const paginatedGuides = unitGuides.slice(startIndex, endIndex);
+      const paginatedAtendimentos = unitAtendimentos.slice(startIndex, endIndex);
       
       res.json({
-        data: paginatedGuides,
+        data: paginatedAtendimentos,
         total: filteredTotal,
         totalPages,
         page
@@ -158,46 +158,46 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
   app.post(["/api/unit/:slug/atendimentos", "/api/units/:slug/atendimentos"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
       const unitId = req.unit?.unitId;
-      const guideData = req.body;
+      const atendimentoData = req.body;
       
       if (!unitId) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
       // Add unit ID to track which unit created this atendimento
-      const newGuide = await storage.createAtendimento({
-        ...guideData,
+      const newAtendimento = await storage.createAtendimento({
+        ...atendimentoData,
         networkUnitId: unitId,
         createdByUnitId: unitId
       });
       
       // Automatically register procedure usage when atendimento is created
-      if (guideData.petId && guideData.procedureId) {
+      if (atendimentoData.petId && atendimentoData.procedureId) {
         try {
           const year = new Date().getFullYear();
           
           // Get pet's plan to check procedure limits
-          const pet = await storage.getPet(guideData.petId);
+          const pet = await storage.getPet(atendimentoData.petId);
           if (pet && pet.planId) {
             const plan = await storage.getPlan(pet.planId);
             if (plan) {
               // Find procedure in plan to get limit - fetch from database
               const planProcedures = await storage.getPlanProceduresWithDetails(pet.planId);
-              const procedureInPlan = planProcedures.find((p: any) => p.procedureId === guideData.procedureId);
+              const procedureInPlan = planProcedures.find((p: any) => p.procedureId === atendimentoData.procedureId);
               
               if (procedureInPlan && procedureInPlan.annualLimit) {
                 // Get current usage
-                const usageRecords = await storage.getProcedureUsageByPet(guideData.petId, year);
-                const currentUsage = usageRecords.find((u: any) => u.procedureId === guideData.procedureId && u.planId === pet.planId);
+                const usageRecords = await storage.getProcedureUsageByPet(atendimentoData.petId, year);
+                const currentUsage = usageRecords.find((u: any) => u.procedureId === atendimentoData.procedureId && u.planId === pet.planId);
                 const used = currentUsage?.usageCount || 0;
                 const remaining = procedureInPlan.annualLimit - used;
                 
                 // Only register if there's remaining limit
                 if (remaining > 0) {
-                  await storage.incrementProcedureUsage(guideData.petId, guideData.procedureId, pet.planId);
-                  console.log(`✅ [UNIT] Procedure usage automatically registered for pet ${guideData.petId}, procedure ${guideData.procedureId}`);
+                  await storage.incrementProcedureUsage(atendimentoData.petId, atendimentoData.procedureId, pet.planId);
+                  console.log(`✅ [UNIT] Procedure usage automatically registered for pet ${atendimentoData.petId}, procedure ${atendimentoData.procedureId}`);
                 } else {
-                  console.log(`⚠️ [UNIT] Procedure limit reached for pet ${guideData.petId}, procedure ${guideData.procedureId}`);
+                  console.log(`⚠️ [UNIT] Procedure limit reached for pet ${atendimentoData.petId}, procedure ${atendimentoData.procedureId}`);
                 }
               }
             }
@@ -208,8 +208,8 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         }
       }
       
-      console.log(`✅ [UNIT] Atendimento created by unit ${unitId}:`, newGuide.id);
-      res.status(201).json(newGuide);
+      console.log(`✅ [UNIT] Atendimento created by unit ${unitId}:`, newAtendimento.id);
+      res.status(201).json(newAtendimento);
     } catch (error) {
       console.error("❌ [UNIT] Error creating atendimento:", error);
       res.status(500).json({ error: "Erro ao criar atendimento" });
@@ -220,7 +220,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
   app.put(["/api/unit/:slug/atendimentos/:id", "/api/units/:slug/atendimentos/:id"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
       const unitId = req.unit?.unitId;
-      const guideId = req.params.id;
+      const atendimentoId = req.params.id;
       const { status } = req.body;
       
       if (!unitId) {
@@ -228,20 +228,20 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       }
       
       // Verify that the atendimento was created by this unit
-      const guide = await storage.getAtendimento(guideId);
-      if (!guide) {
+      const atendimento = await storage.getAtendimento(atendimentoId);
+      if (!atendimento) {
         return res.status(404).json({ error: "Atendimento não encontrado" });
       }
       
-      if (guide.createdByUnitId !== unitId) {
+      if (atendimento.createdByUnitId !== unitId) {
         return res.status(403).json({ error: "Você não tem permissão para editar este atendimento" });
       }
       
       // Update the atendimento status
-      const updatedGuide = await storage.updateAtendimento(guideId, { status });
+      const updatedAtendimento = await storage.updateAtendimento(atendimentoId, { status });
       
-      console.log(`✅ [UNIT] Atendimento ${guideId} status updated by unit ${unitId} to ${status}`);
-      res.json(updatedGuide);
+      console.log(`✅ [UNIT] Atendimento ${atendimentoId} status updated by unit ${unitId} to ${status}`);
+      res.json(updatedAtendimento);
     } catch (error) {
       console.error("❌ [UNIT] Error updating atendimento:", error);
       res.status(500).json({ error: "Erro ao atualizar atendimento" });

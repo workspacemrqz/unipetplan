@@ -793,7 +793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Fetch all required data in parallel for optimal performance
       const [
-        allGuides,
+        allAtendimentos,
         networkUnits, 
         clients,
         contactSubmissions,
@@ -811,7 +811,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ]);
 
       // Apply date filters if present
-      let filteredGuides = allGuides;
+      let filteredAtendimentos = allAtendimentos;
       let filteredClients = clients;
       let filteredContactSubmissions = contactSubmissions;
       let filteredPets = allPets;
@@ -825,11 +825,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return end;
         })() : null;
 
-        // Filter guides by createdAt
+        // Filter atendimentos by createdAt
         if (startDateTime || endDateTime) {
-          filteredGuides = allGuides.filter(guide => {
-            if (!guide.createdAt) return false;
-            const createdAt = new Date(guide.createdAt);
+          filteredAtendimentos = allAtendimentos.filter(atendimento => {
+            if (!atendimento.createdAt) return false;
+            const createdAt = new Date(atendimento.createdAt);
             if (startDateTime && createdAt < startDateTime) return false;
             if (endDateTime && createdAt > endDateTime) return false;
             return true;
@@ -881,7 +881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         console.log("📊 [DASHBOARD] After date filtering:", {
-          guides: `${filteredGuides.length}/${allGuides.length}`,
+          atendimentos: `${filteredAtendimentos.length}/${allAtendimentos.length}`,
           clients: `${filteredClients.length}/${clients.length}`,
           contactSubmissions: `${filteredContactSubmissions.length}/${contactSubmissions.length}`,
           pets: `${filteredPets.length}/${allPets.length}`,
@@ -890,7 +890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("📊 [DASHBOARD] Data fetched successfully:", {
-        guides: hasDateFilter ? `${filteredGuides.length}/${allGuides.length}` : allGuides.length,
+        atendimentos: hasDateFilter ? `${filteredAtendimentos.length}/${allAtendimentos.length}` : allAtendimentos.length,
         networkUnits: networkUnits.length,
         clients: hasDateFilter ? `${filteredClients.length}/${clients.length}` : clients.length,
         contactSubmissions: hasDateFilter ? `${filteredContactSubmissions.length}/${contactSubmissions.length}` : contactSubmissions.length,
@@ -902,8 +902,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stats = {
         activeClients: filteredClients.length,
         registeredPets: filteredPets.length,
-        openGuides: filteredGuides.filter(g => g.status === 'open').length,
-        totalGuides: filteredGuides.length,
+        openGuides: filteredAtendimentos.filter(g => g.status === 'open').length,
+        totalGuides: filteredAtendimentos.length,
         totalPlans: plans.length,
         activePlans: plans.filter(p => p.isActive).length,
         inactivePlans: plans.filter(p => !p.isActive).length,
@@ -976,7 +976,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const dashboardData = {
         stats,
-        guides: filteredGuides.slice(0, 5), // Return first 5 for performance using filtered data
+        atendimentos: filteredAtendimentos.slice(0, 5), // Return first 5 for performance using filtered data
         networkUnits: networkUnits.slice(0, 10), // Return first 10 for performance (not date-filtered)
         clients: filteredClients.slice(0, 10), // Return first 10 for performance using filtered data
         contactSubmissions: filteredContactSubmissions.slice(0, 10), // Return first 10 for performance using filtered data
@@ -2031,14 +2031,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin guides routes
+  // Admin atendimentos routes
   app.get("/admin/api/atendimentos", requireAdmin, async (req, res) => {
     
     try {
-      const guides = await storage.getAllAtendimentos();
-      res.json(guides);
+      const atendimentos = await storage.getAllAtendimentos();
+      res.json(atendimentos);
     } catch (error) {
-      console.error("❌ [ADMIN] Error fetching guides:", error);
+      console.error("❌ [ADMIN] Error fetching atendimentos:", error);
       res.status(500).json({ error: "Erro ao buscar atendimentos" });
     }
   });
@@ -2054,61 +2054,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
       
-      // Get all guides with network units info using the proper function
+      // Get all atendimentos with network units info using the proper function
       const result = await storage.getAtendimentosWithNetworkUnits({});
-      const allGuides = result?.atendimentos || [];
+      const allAtendimentos = result?.atendimentos || [];
       
       // Apply filters
-      let filteredGuides = allGuides;
+      let filteredAtendimentos = allAtendimentos;
       
       // Search filter - search in procedure, procedureNotes, or generalNotes
       if (search && search.trim()) {
         const searchTerm = search.trim().toLowerCase();
-        filteredGuides = filteredGuides.filter(guide => 
-          (guide.procedure && guide.procedure.toLowerCase().includes(searchTerm)) ||
-          (guide.procedureNotes && guide.procedureNotes.toLowerCase().includes(searchTerm)) ||
-          (guide.generalNotes && guide.generalNotes.toLowerCase().includes(searchTerm))
+        filteredAtendimentos = filteredAtendimentos.filter(atendimento => 
+          (atendimento.procedure && atendimento.procedure.toLowerCase().includes(searchTerm)) ||
+          (atendimento.procedureNotes && atendimento.procedureNotes.toLowerCase().includes(searchTerm)) ||
+          (atendimento.generalNotes && atendimento.generalNotes.toLowerCase().includes(searchTerm))
         );
       }
       
       // Status filter
       if (status && status !== 'all') {
-        filteredGuides = filteredGuides.filter(guide => guide.status === status);
+        filteredAtendimentos = filteredAtendimentos.filter(atendimento => atendimento.status === status);
       }
       
       // Date filters
       if (startDate) {
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
-        filteredGuides = filteredGuides.filter(guide => 
-          guide.createdAt && new Date(guide.createdAt) >= start
+        filteredAtendimentos = filteredAtendimentos.filter(atendimento => 
+          atendimento.createdAt && new Date(atendimento.createdAt) >= start
         );
       }
       
       if (endDate) {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-        filteredGuides = filteredGuides.filter(guide => 
-          guide.createdAt && new Date(guide.createdAt) <= end
+        filteredAtendimentos = filteredAtendimentos.filter(atendimento => 
+          atendimento.createdAt && new Date(atendimento.createdAt) <= end
         );
       }
       
       // Sort by createdAt descending (newest first)
-      filteredGuides.sort((a, b) => {
+      filteredAtendimentos.sort((a, b) => {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return dateB - dateA;
       });
       
       // Calculate pagination
-      const total = filteredGuides.length;
+      const total = filteredAtendimentos.length;
       const totalPages = Math.ceil(total / limit);
       const offset = (page - 1) * limit;
-      const paginatedGuides = filteredGuides.slice(offset, offset + limit);
+      const paginatedAtendimentos = filteredAtendimentos.slice(offset, offset + limit);
       
       // Return paginated response in the format expected by frontend
       const response = {
-        data: paginatedGuides,
+        data: paginatedAtendimentos,
         total,
         totalPages,
         page
@@ -2116,85 +2116,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(response);
     } catch (error) {
-      console.error("❌ [ADMIN] Error fetching guides with network units:", error);
+      console.error("❌ [ADMIN] Error fetching atendimentos with network units:", error);
       res.status(500).json({ error: "Erro ao buscar atendimentos" });
     }
   });
 
   app.get("/admin/api/atendimentos/:id", requireAdmin, async (req, res) => {
     try {
-      const guide = await storage.getAtendimento(req.params.id);
-      if (!guide) {
+      const atendimento = await storage.getAtendimento(req.params.id);
+      if (!atendimento) {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
-      res.json(guide);
+      res.json(atendimento);
     } catch (error) {
-      console.error("❌ [ADMIN] Error fetching guide:", error);
+      console.error("❌ [ADMIN] Error fetching atendimento:", error);
       res.status(500).json({ error: "Erro ao buscar atendimento" });
     }
   });
 
-  // Create new guide
+  // Create new atendimento
   app.post("/admin/api/atendimentos", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
-      const guideData = insertAtendimentoSchema.parse(req.body);
+      const atendimentoData = insertAtendimentoSchema.parse(req.body);
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
       let processedValue: string | undefined;
-      if (guideData.value && typeof guideData.value === 'string') {
-        processedValue = guideData.value.replace('.', '').replace(',', '.');
+      if (atendimentoData.value && typeof atendimentoData.value === 'string') {
+        processedValue = atendimentoData.value.replace('.', '').replace(',', '.');
       }
       
-      const processedGuideData: InsertAtendimento = {
-        ...guideData,
-        clientId: guideData.clientId!,
-        petId: guideData.petId!,
-        procedure: guideData.procedure!,
+      const processedAtendimentoData: InsertAtendimento = {
+        ...atendimentoData,
+        clientId: atendimentoData.clientId!,
+        petId: atendimentoData.petId!,
+        procedure: atendimentoData.procedure!,
         value: processedValue
       };
       
-      console.log(`📝 [ADMIN] Creating new guide:`, processedGuideData);
+      console.log(`📝 [ADMIN] Creating new atendimento:`, processedAtendimentoData);
       
-      const newGuide = await storage.createAtendimento(processedGuideData);
+      const newAtendimento = await storage.createAtendimento(processedAtendimentoData);
       
-      // Automatically register procedure usage when guide is created
-      if (guideData.petId && guideData.procedure) {
+      // Automatically register procedure usage when atendimento is created
+      if (atendimentoData.petId && atendimentoData.procedure) {
         try {
           const year = new Date().getFullYear();
           
           // Get pet's plan to check procedure limits
-          const pet = await storage.getPet(guideData.petId);
+          const pet = await storage.getPet(atendimentoData.petId);
           if (pet && pet.planId) {
             // Find procedure in plan to get procedureId and limit
             const planProcedures = await storage.getPlanProceduresWithDetails(pet.planId);
-            const procedureInPlan = planProcedures.find((p: any) => p.name === guideData.procedure);
+            const procedureInPlan = planProcedures.find((p: any) => p.name === atendimentoData.procedure);
             
             if (procedureInPlan && procedureInPlan.procedureId && procedureInPlan.annualLimit) {
               // Get current usage
-              const usageRecords = await storage.getProcedureUsageByPet(guideData.petId, year);
+              const usageRecords = await storage.getProcedureUsageByPet(atendimentoData.petId, year);
               const currentUsage = usageRecords.find((u: any) => u.procedureId === procedureInPlan.procedureId && u.planId === pet.planId);
               const used = currentUsage?.usageCount || 0;
               const remaining = procedureInPlan.annualLimit - used;
               
               // Only register if there's remaining limit
               if (remaining > 0) {
-                await storage.incrementProcedureUsage(guideData.petId, procedureInPlan.procedureId, pet.planId);
-                console.log(`✅ [ADMIN] Procedure usage automatically registered for pet ${guideData.petId}, procedure ${procedureInPlan.procedureId}`);
+                await storage.incrementProcedureUsage(atendimentoData.petId, procedureInPlan.procedureId, pet.planId);
+                console.log(`✅ [ADMIN] Procedure usage automatically registered for pet ${atendimentoData.petId}, procedure ${procedureInPlan.procedureId}`);
               } else {
-                console.log(`⚠️ [ADMIN] Procedure limit reached for pet ${guideData.petId}, procedure ${procedureInPlan.procedureId}`);
+                console.log(`⚠️ [ADMIN] Procedure limit reached for pet ${atendimentoData.petId}, procedure ${procedureInPlan.procedureId}`);
               }
             }
           }
         } catch (error) {
-          // Log error but don't fail the guide creation
+          // Log error but don't fail the atendimento creation
           console.error("❌ [ADMIN] Error registering procedure usage:", error);
         }
       }
       
-      console.log(`✅ [ADMIN] Guide created:`, newGuide.id);
-      res.status(201).json(newGuide);
+      console.log(`✅ [ADMIN] Atendimento created:`, newAtendimento.id);
+      res.status(201).json(newAtendimento);
     } catch (error: any) {
-      console.error("❌ [ADMIN] Error creating guide:", error);
+      console.error("❌ [ADMIN] Error creating atendimento:", error);
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: "Dados inválidos", details: error.errors });
       }
@@ -2202,27 +2202,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update guide
+  // Update atendimento
   app.put("/admin/api/atendimentos/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
-      const guideData = insertAtendimentoSchema.partial().parse(req.body);
+      const atendimentoData = insertAtendimentoSchema.partial().parse(req.body);
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
-      const processedGuideData = { ...guideData } as Partial<InsertAtendimento>;
-      if (guideData.value && typeof guideData.value === 'string') {
-        processedGuideData.value = guideData.value.replace('.', '').replace(',', '.') as string;
+      const processedAtendimentoData = { ...atendimentoData } as Partial<InsertAtendimento>;
+      if (atendimentoData.value && typeof atendimentoData.value === 'string') {
+        processedAtendimentoData.value = atendimentoData.value.replace('.', '').replace(',', '.') as string;
       }
       
-      const updatedGuide = await storage.updateAtendimento(req.params.id, processedGuideData);
+      const updatedAtendimento = await storage.updateAtendimento(req.params.id, processedAtendimentoData);
       
-      if (!updatedGuide) {
+      if (!updatedAtendimento) {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
-      console.log(`✅ [ADMIN] Guide updated:`, updatedGuide.id);
-      res.json(updatedGuide);
+      console.log(`✅ [ADMIN] Atendimento updated:`, updatedAtendimento.id);
+      res.json(updatedAtendimento);
     } catch (error: any) {
-      console.error("❌ [ADMIN] Error updating guide:", error);
+      console.error("❌ [ADMIN] Error updating atendimento:", error);
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: "Dados inválidos", details: error.errors });
       }
@@ -2230,7 +2230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete guide
+  // Delete atendimento
   app.delete("/admin/api/atendimentos/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const success = await storage.deleteAtendimento(req.params.id);
@@ -2239,10 +2239,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
-      console.log(`✅ [ADMIN] Guide deleted:`, req.params.id);
+      console.log(`✅ [ADMIN] Atendimento deleted:`, req.params.id);
       res.json({ success: true });
     } catch (error) {
-      console.error("❌ [ADMIN] Error deleting guide:", error);
+      console.error("❌ [ADMIN] Error deleting atendimento:", error);
       res.status(500).json({ error: "Erro ao deletar atendimento" });
     }
   });
@@ -6015,7 +6015,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get Pet's Guides
+  // Get Pet's Atendimentos
   // Delete Pet
   app.delete("/api/clients/pets/:petId", requireClient, async (req, res) => {
     try {
@@ -6033,7 +6033,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get Pet's Guides
+  // Get Pet's Atendimentos
   app.get("/api/clients/pets/:petId/atendimentos", requireClient, async (req, res) => {
     try {
       const clientId = req.session.client?.id;
@@ -6055,15 +6055,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Por enquanto, retornar array vazio pois não há atendimentos específicas por pet
       // Em futuras implementações, isso pode ser expandido para atendimentos personalizadas
-      const guides = [];
+      const atendimentos = [];
       
       res.json({ 
-        guides: guides,
-        message: guides.length === 0 ? "Nenhuma atendimento encontrada para este pet" : "Atendimentos carregadas com sucesso"
+        atendimentos: atendimentos,
+        message: atendimentos.length === 0 ? "Nenhuma atendimento encontrada para este pet" : "Atendimentos carregadas com sucesso"
       });
       
     } catch (error) {
-      console.error("❌ Error fetching pet guides:", error);
+      console.error("❌ Error fetching pet atendimentos:", error);
       res.status(500).json({ error: "Erro ao carregar atendimentos" });
     }
   });

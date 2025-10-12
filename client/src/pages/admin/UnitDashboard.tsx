@@ -21,7 +21,7 @@ interface NetworkUnit {
   urlSlug: string;
 }
 
-interface Guide {
+interface Atendimento {
   id: string;
   clientId: string;
   petId: string;
@@ -126,7 +126,7 @@ export default function UnitDashboard() {
     unit: null,
     token: null
   });
-  const [guides, setGuides] = useState<Guide[]>([]);
+  const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [coverage, setCoverage] = useState<Coverage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,12 +134,12 @@ export default function UnitDashboard() {
   const [loadingCoverage, setLoadingCoverage] = useState(false);
   const [loginData, setLoginData] = useState({ login: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
+  const [selectedAtendimento, setSelectedAtendimento] = useState<Atendimento | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("guides");
+  const [activeTab, setActiveTab] = useState("atendimentos");
   
-  // Guide creation form state
-  const [guideForm, setGuideForm] = useState({
+  // Atendimento creation form state
+  const [atendimentoForm, setAtendimentoForm] = useState({
     clientId: "",
     petId: "",
     procedure: "",
@@ -154,7 +154,7 @@ export default function UnitDashboard() {
   const [availableProcedures, setAvailableProcedures] = useState<Procedure[]>([]);
   const [selectedPetData, setSelectedPetData] = useState<Pet & { plan?: Plan } | null>(null);
   const [calculatedValues, setCalculatedValues] = useState<CalculatedValues | null>(null);
-  const [submittingGuide, setSubmittingGuide] = useState(false);
+  const [submittingAtendimento, setSubmittingAtendimento] = useState(false);
   const [loadingProcedures, setLoadingProcedures] = useState(false);
   const [loadingCalculation, setLoadingCalculation] = useState(false);
   
@@ -182,10 +182,10 @@ export default function UnitDashboard() {
     checkAuthentication();
   }, []);
 
-  // Load guides when authenticated
+  // Load atendimentos when authenticated
   useEffect(() => {
     if (authState.isAuthenticated && authState.unit) {
-      loadGuides();
+      loadAtendimentos();
     }
   }, [authState.isAuthenticated, authState.unit]);
 
@@ -196,8 +196,8 @@ export default function UnitDashboard() {
         loadClients();
       } else if (activeTab === 'coverage') {
         loadCoverage();
-      } else if (activeTab === 'create-guide') {
-        loadClientsForGuides();
+      } else if (activeTab === 'create-atendimento') {
+        loadClientsForAtendimentos();
         loadActiveProcedures();
       } else if (activeTab === 'cards') {
         loadCardsData();
@@ -271,11 +271,11 @@ export default function UnitDashboard() {
         unit: null,
         token: null
       });
-      setGuides([]);
+      setAtendimentos([]);
     }
   };
 
-  const loadGuides = async () => {
+  const loadAtendimentos = async () => {
     try {
       const response = await fetch(`/admin/api/unit/${authState.unit?.id}/atendimentos`, {
         credentials: 'include'
@@ -283,10 +283,10 @@ export default function UnitDashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        setGuides(data);
+        setAtendimentos(data);
       }
     } catch (error) {
-      console.error("Failed to load guides:", error);
+      console.error("Failed to load atendimentos:", error);
     }
   };
 
@@ -377,7 +377,7 @@ export default function UnitDashboard() {
     }
   };
 
-  const loadClientsForGuides = async () => {
+  const loadClientsForAtendimentos = async () => {
     if (!authState.unit?.id) return;
     
     try {
@@ -389,7 +389,7 @@ export default function UnitDashboard() {
         setAvailableClients(data);
       }
     } catch (error) {
-      console.error("Failed to load unit clients for guide creation:", error);
+      console.error("Failed to load unit clients for atendimento creation:", error);
     }
   };
 
@@ -415,7 +415,7 @@ export default function UnitDashboard() {
   };
 
   const handleClientChange = (clientId: string) => {
-    setGuideForm(prev => ({ ...prev, clientId, petId: "", procedureId: "", coparticipacao: "", receber: "" }));
+    setAtendimentoForm(prev => ({ ...prev, clientId, petId: "", procedureId: "", coparticipacao: "", receber: "" }));
     setAvailablePets([]);
     setSelectedPetData(null);
     setCalculatedValues(null);
@@ -425,7 +425,7 @@ export default function UnitDashboard() {
   };
 
   const handlePetChange = async (petId: string) => {
-    setGuideForm(prev => ({ ...prev, petId, procedureId: "", coparticipacao: "", receber: "" }));
+    setAtendimentoForm(prev => ({ ...prev, petId, procedureId: "", coparticipacao: "", receber: "" }));
     setCalculatedValues(null);
     
     if (petId) {
@@ -457,7 +457,7 @@ export default function UnitDashboard() {
   };
 
   const handleProcedureChange = async (procedureId: string) => {
-    setGuideForm(prev => ({ ...prev, procedureId, coparticipacao: "", receber: "" }));
+    setAtendimentoForm(prev => ({ ...prev, procedureId, coparticipacao: "", receber: "" }));
     setCalculatedValues(null);
     
     if (procedureId && selectedPetData) {
@@ -487,7 +487,7 @@ export default function UnitDashboard() {
       // If no plan, just show procedure price without coparticipação
       const selectedProcedure = availableProcedures.find(p => p.id === procedureId);
       if (selectedProcedure) {
-        setGuideForm(prev => ({ ...prev, procedure: selectedProcedure.name }));
+        setAtendimentoForm(prev => ({ ...prev, procedure: selectedProcedure.name }));
       }
       return;
     }
@@ -528,7 +528,7 @@ export default function UnitDashboard() {
             };
             
             setCalculatedValues(calculatedData);
-            setGuideForm(prev => ({ 
+            setAtendimentoForm(prev => ({ 
               ...prev, 
               procedure: procedureCoverage.procedure.name,
               coparticipacao: coparticipacao.toFixed(2),
@@ -544,33 +544,33 @@ export default function UnitDashboard() {
     }
   };
 
-  const createGuide = async () => {
-    if (!guideForm.clientId || !guideForm.petId || !guideForm.procedureId) {
+  const createAtendimento = async () => {
+    if (!atendimentoForm.clientId || !atendimentoForm.petId || !atendimentoForm.procedureId) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
-    setSubmittingGuide(true);
+    setSubmittingAtendimento(true);
     try {
       const response = await fetch('/admin/api/unit/atendimentos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          clientId: guideForm.clientId,
-          petId: guideForm.petId,
-          procedure: guideForm.procedure,
-          procedureNotes: guideForm.procedureNotes,
-          generalNotes: guideForm.generalNotes,
-          coparticipacao: guideForm.coparticipacao,
-          receber: guideForm.receber,
-          value: guideForm.receber // Mantendo value para compatibilidade com o backend
+          clientId: atendimentoForm.clientId,
+          petId: atendimentoForm.petId,
+          procedure: atendimentoForm.procedure,
+          procedureNotes: atendimentoForm.procedureNotes,
+          generalNotes: atendimentoForm.generalNotes,
+          coparticipacao: atendimentoForm.coparticipacao,
+          receber: atendimentoForm.receber,
+          value: atendimentoForm.receber // Mantendo value para compatibilidade com o backend
         })
       });
 
       if (response.ok) {
         alert("Atendimento criado com sucesso!");
-        setGuideForm({
+        setAtendimentoForm({
           clientId: "",
           petId: "",
           procedure: "",
@@ -583,7 +583,7 @@ export default function UnitDashboard() {
         setAvailablePets([]);
         setSelectedPetData(null);
         setCalculatedValues(null);
-        loadGuides(); // Reload guides
+        loadAtendimentos(); // Reload atendimentos
       } else {
         const error = await response.json();
         alert(`Erro ao criar atendimento: ${error.message}`);
@@ -591,13 +591,13 @@ export default function UnitDashboard() {
     } catch (error) {
       alert("Erro de conexão ao criar atendimento.");
     } finally {
-      setSubmittingGuide(false);
+      setSubmittingAtendimento(false);
     }
   };
 
-  const updateGuideStatus = async (guideId: string, unitStatus: string) => {
+  const updateAtendimentoStatus = async (atendimentoId: string, unitStatus: string) => {
     try {
-      const response = await fetch(`/admin/api/unit/atendimentos/${guideId}/status`, {
+      const response = await fetch(`/admin/api/unit/atendimentos/${atendimentoId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -605,11 +605,11 @@ export default function UnitDashboard() {
       });
 
       if (response.ok) {
-        loadGuides(); // Reload guides
-        setSelectedGuide(null);
+        loadAtendimentos(); // Reload atendimentos
+        setSelectedAtendimento(null);
       }
     } catch (error) {
-      console.error("Failed to update guide status:", error);
+      console.error("Failed to update atendimento status:", error);
     }
   };
 
@@ -750,7 +750,7 @@ export default function UnitDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1">
-            <TabsTrigger value="guides" className="flex items-center gap-2">
+            <TabsTrigger value="atendimentos" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Atendimentos</span>
             </TabsTrigger>
@@ -762,7 +762,7 @@ export default function UnitDashboard() {
               <CreditCard className="h-4 w-4" />
               <span className="hidden sm:inline">Planos</span>
             </TabsTrigger>
-            <TabsTrigger value="create-guide" className="flex items-center gap-2">
+            <TabsTrigger value="create-atendimento" className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Lançar</span>
             </TabsTrigger>
@@ -776,8 +776,8 @@ export default function UnitDashboard() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Guides Tab */}
-          <TabsContent value="guides">
+          {/* Atendimentos Tab */}
+          <TabsContent value="atendimentos">
             <div className="space-y-4">
               <div className="mb-4">
                 <h3 className="text-lg font-semibold mb-4">Atendimentos</h3>
@@ -791,36 +791,36 @@ export default function UnitDashboard() {
                   {["open", "closed", "cancelled"].map(status => (
                     <TabsContent key={status} value={status}>
                       <div className="grid gap-4">
-                        {guides
-                          .filter(guide => guide.unitStatus === status)
-                          .map(guide => (
-                            <Card key={guide.id} className="">
+                        {atendimentos
+                          .filter(atendimento => atendimento.unitStatus === status)
+                          .map(atendimento => (
+                            <Card key={atendimento.id} className="">
                               <CardContent className="p-3 sm:p-4 lg:p-6">
                                 <div className="flex justify-between items-start mb-4">
                                   <div className="flex-1">
                                     <div className="flex items-center space-x-3 mb-2">
-                                      <h3 className="text-lg font-semibold">{guide.procedure}</h3>
-                                      {getStatusBadge(guide.unitStatus || "open")}
+                                      <h3 className="text-lg font-semibold">{atendimento.procedure}</h3>
+                                      {getStatusBadge(atendimento.unitStatus || "open")}
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                                       <div className="flex items-center space-x-2">
                                         <User className="h-4 w-4" />
-                                        <span>{guide.client?.name || "Cliente não encontrado"}</span>
+                                        <span>{atendimento.client?.name || "Cliente não encontrado"}</span>
                                       </div>
                                       <div className="flex items-center space-x-2">
                                         <Heart className="h-4 w-4" />
-                                        <span>{guide.pet?.name || "Pet não encontrado"}</span>
+                                        <span>{atendimento.pet?.name || "Pet não encontrado"}</span>
                                       </div>
                                       <div className="flex items-center space-x-2">
                                         <Clock className="h-4 w-4" />
-                                        <span>{new Date(guide.createdAt).toLocaleDateString('pt-BR')}</span>
+                                        <span>{new Date(atendimento.createdAt).toLocaleDateString('pt-BR')}</span>
                                       </div>
                                     </div>
-                                    {guide.value && (
+                                    {atendimento.value && (
                                       <div className="flex items-center space-x-2 mt-2 text-sm">
                                         <DollarSign className="h-4 w-4 text-green-600" />
                                         <span className="font-medium text-green-600">
-                                          {formatCurrency(guide.value)}
+                                          {formatCurrency(atendimento.value)}
                                         </span>
                                       </div>
                                     )}
@@ -829,7 +829,7 @@ export default function UnitDashboard() {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={() => setSelectedGuide(guide)}
+                                      onClick={() => setSelectedAtendimento(atendimento)}
                                     >
                                       <Eye className="h-4 w-4" />
                                     </Button>
@@ -838,14 +838,14 @@ export default function UnitDashboard() {
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          onClick={() => updateGuideStatus(guide.id, "closed")}
+                                          onClick={() => updateAtendimentoStatus(atendimento.id, "closed")}
                                         >
                                           <CheckCircle className="h-4 w-4" />
                                         </Button>
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          onClick={() => updateGuideStatus(guide.id, "cancelled")}
+                                          onClick={() => updateAtendimentoStatus(atendimento.id, "cancelled")}
                                         >
                                           <XCircle className="h-4 w-4" />
                                         </Button>
@@ -857,7 +857,7 @@ export default function UnitDashboard() {
                             </Card>
                           ))}
                         
-                        {guides.filter(guide => guide.unitStatus === status).length === 0 && (
+                        {atendimentos.filter(atendimento => atendimento.unitStatus === status).length === 0 && (
                           <Card>
                             <CardContent className="p-3 sm:p-4 lg:p-6 text-center">
                               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -983,8 +983,8 @@ export default function UnitDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Create Guide Tab */}
-          <TabsContent value="create-guide">
+          {/* Create Atendimento Tab */}
+          <TabsContent value="create-atendimento">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Lançar Novo Atendimento</h3>
@@ -995,7 +995,7 @@ export default function UnitDashboard() {
 
               <Card>
                 <CardContent className="p-6">
-                  <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); createGuide(); }}>
+                  <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); createAtendimento(); }}>
                     {/* Client Selection */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
@@ -1003,7 +1003,7 @@ export default function UnitDashboard() {
                           Cliente <span className="text-red-500">*</span>
                         </Label>
                         <Select 
-                          value={guideForm.clientId} 
+                          value={atendimentoForm.clientId} 
                           onValueChange={handleClientChange}
                         >
                           <SelectTrigger
@@ -1031,9 +1031,9 @@ export default function UnitDashboard() {
                           Pet <span className="text-red-500">*</span>
                         </Label>
                         <Select 
-                          value={guideForm.petId} 
+                          value={atendimentoForm.petId} 
                           onValueChange={handlePetChange}
-                          disabled={!guideForm.clientId}
+                          disabled={!atendimentoForm.clientId}
                         >
                           <SelectTrigger
                             className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
@@ -1053,7 +1053,7 @@ export default function UnitDashboard() {
                             ])}
                           </SelectContent>
                         </Select>
-                        {!guideForm.clientId && (
+                        {!atendimentoForm.clientId && (
                           <p className="text-xs text-gray-500">Selecione um cliente primeiro</p>
                         )}
                       </div>
@@ -1066,9 +1066,9 @@ export default function UnitDashboard() {
                           Procedimento <span className="text-red-500">*</span>
                         </Label>
                         <Select 
-                          value={guideForm.procedureId} 
+                          value={atendimentoForm.procedureId} 
                           onValueChange={handleProcedureChange}
-                          disabled={!guideForm.petId || loadingProcedures}
+                          disabled={!atendimentoForm.petId || loadingProcedures}
                         >
                           <SelectTrigger
                             className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
@@ -1091,7 +1091,7 @@ export default function UnitDashboard() {
                             ])}
                           </SelectContent>
                         </Select>
-                        {!guideForm.petId && (
+                        {!atendimentoForm.petId && (
                           <p className="text-xs text-gray-500">Selecione um pet primeiro</p>
                         )}
                       </div>
@@ -1194,8 +1194,8 @@ export default function UnitDashboard() {
                           type="number"
                           step="0.01"
                           placeholder="0,00"
-                          value={guideForm.coparticipacao}
-                          onChange={(e) => setGuideForm(prev => ({ ...prev, coparticipacao: e.target.value }))}
+                          value={atendimentoForm.coparticipacao}
+                          onChange={(e) => setAtendimentoForm(prev => ({ ...prev, coparticipacao: e.target.value }))}
                           className={calculatedValues ? "bg-gray-50" : ""}
                         />
                         {calculatedValues && (
@@ -1214,8 +1214,8 @@ export default function UnitDashboard() {
                           type="number"
                           step="0.01"
                           placeholder="0,00"
-                          value={guideForm.receber}
-                          onChange={(e) => setGuideForm(prev => ({ ...prev, receber: e.target.value }))}
+                          value={atendimentoForm.receber}
+                          onChange={(e) => setAtendimentoForm(prev => ({ ...prev, receber: e.target.value }))}
                           className={calculatedValues ? "bg-gray-50" : ""}
                         />
                         {calculatedValues && (
@@ -1236,8 +1236,8 @@ export default function UnitDashboard() {
                           id="procedureNotes"
                           placeholder="Detalhes específicos sobre o procedimento..."
                           rows={3}
-                          value={guideForm.procedureNotes}
-                          onChange={(e) => setGuideForm(prev => ({ ...prev, procedureNotes: e.target.value }))}
+                          value={atendimentoForm.procedureNotes}
+                          onChange={(e) => setAtendimentoForm(prev => ({ ...prev, procedureNotes: e.target.value }))}
                         />
                       </div>
 
@@ -1249,8 +1249,8 @@ export default function UnitDashboard() {
                           id="generalNotes"
                           placeholder="Informações adicionais, contexto, etc..."
                           rows={3}
-                          value={guideForm.generalNotes}
-                          onChange={(e) => setGuideForm(prev => ({ ...prev, generalNotes: e.target.value }))}
+                          value={atendimentoForm.generalNotes}
+                          onChange={(e) => setAtendimentoForm(prev => ({ ...prev, generalNotes: e.target.value }))}
                         />
                       </div>
                     </div>
@@ -1262,7 +1262,7 @@ export default function UnitDashboard() {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setGuideForm({
+                          setAtendimentoForm({
                             clientId: "",
                             petId: "",
                             procedure: "",
@@ -1283,10 +1283,10 @@ export default function UnitDashboard() {
                         type="submit" 
                         variant="admin-action"
                         size="sm"
-                        disabled={submittingGuide || !guideForm.clientId || !guideForm.petId || !guideForm.procedureId}
+                        disabled={submittingAtendimento || !atendimentoForm.clientId || !atendimentoForm.petId || !atendimentoForm.procedureId}
                         className="min-w-[100px]"
                       >
-                        {submittingGuide ? (
+                        {submittingAtendimento ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <>
@@ -1310,13 +1310,13 @@ export default function UnitDashboard() {
                 </Card>
                 <Card className="bg-green-50">
                   <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600">{guides.filter(g => g.unitStatus === 'closed').length}</div>
+                    <div className="text-2xl font-bold text-green-600">{atendimentos.filter(a => a.unitStatus === 'closed').length}</div>
                     <div className="text-sm text-green-600">Atendimentos Concluídas</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-yellow-50">
                   <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-yellow-600">{guides.filter(g => g.unitStatus === 'open').length}</div>
+                    <div className="text-2xl font-bold text-yellow-600">{atendimentos.filter(a => a.unitStatus === 'open').length}</div>
                     <div className="text-sm text-yellow-600">Atendimentos Pendentes</div>
                   </CardContent>
                 </Card>
@@ -1662,19 +1662,19 @@ export default function UnitDashboard() {
           </TabsContent>
         </Tabs>
 
-        {/* Guide Details Modal */}
-        {selectedGuide && (
+        {/* Atendimento Details Modal */}
+        {selectedAtendimento && (
           <div className="fixed inset-0 bg-foreground/50 flex items-center justify-center p-4 z-50">
             <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle>{selectedGuide.procedure}</CardTitle>
+                    <CardTitle>{selectedAtendimento.procedure}</CardTitle>
                     <CardDescription>
-                      Criada em {new Date(selectedGuide.createdAt).toLocaleDateString('pt-BR')}
+                      Criada em {new Date(selectedAtendimento.createdAt).toLocaleDateString('pt-BR')}
                     </CardDescription>
                   </div>
-                  <Button variant="ghost" onClick={() => setSelectedGuide(null)}>
+                  <Button variant="ghost" onClick={() => setSelectedAtendimento(null)}>
                     ×
                   </Button>
                 </div>
@@ -1683,38 +1683,38 @@ export default function UnitDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium text-primary">Cliente</Label>
-                    <p className="text-sm text-foreground">{selectedGuide.client?.name}</p>
-                    <p className="text-sm text-foreground">{selectedGuide.client?.email}</p>
-                    <p className="text-sm text-foreground">{formatBrazilianPhoneForDisplay(selectedGuide.client?.phone)}</p>
+                    <p className="text-sm text-foreground">{selectedAtendimento.client?.name}</p>
+                    <p className="text-sm text-foreground">{selectedAtendimento.client?.email}</p>
+                    <p className="text-sm text-foreground">{formatBrazilianPhoneForDisplay(selectedAtendimento.client?.phone)}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-primary">Pet</Label>
-                    <p className="text-sm text-foreground">{selectedGuide.pet?.name}</p>
+                    <p className="text-sm text-foreground">{selectedAtendimento.pet?.name}</p>
                     <p className="text-sm text-foreground">
-                      {selectedGuide.pet?.species} - {selectedGuide.pet?.breed}
+                      {selectedAtendimento.pet?.species} - {selectedAtendimento.pet?.breed}
                     </p>
                   </div>
                 </div>
                 
-                {selectedGuide.procedureNotes && (
+                {selectedAtendimento.procedureNotes && (
                   <div>
                     <Label className="text-sm font-medium text-primary">Observações do Procedimento</Label>
-                    <p className="text-sm text-foreground">{selectedGuide.procedureNotes}</p>
+                    <p className="text-sm text-foreground">{selectedAtendimento.procedureNotes}</p>
                   </div>
                 )}
 
-                {selectedGuide.generalNotes && (
+                {selectedAtendimento.generalNotes && (
                   <div>
                     <Label className="text-sm font-medium text-primary">Observações Gerais</Label>
-                    <p className="text-sm text-foreground">{selectedGuide.generalNotes}</p>
+                    <p className="text-sm text-foreground">{selectedAtendimento.generalNotes}</p>
                   </div>
                 )}
 
-                {selectedGuide.value && (
+                {selectedAtendimento.value && (
                   <div>
                     <Label className="text-sm font-medium text-primary">Valor</Label>
                     <p className="text-sm font-medium text-green-600">
-                      {formatCurrency(selectedGuide.value)}
+                      {formatCurrency(selectedAtendimento.value)}
                     </p>
                   </div>
                 )}
@@ -1722,16 +1722,16 @@ export default function UnitDashboard() {
                 <div>
                   <Label className="text-sm font-medium text-primary">Status</Label>
                   <div className="mt-1">
-                    {getStatusBadge(selectedGuide.unitStatus || "open")}
+                    {getStatusBadge(selectedAtendimento.unitStatus || "open")}
                   </div>
                 </div>
 
-                {selectedGuide.unitStatus === "open" && (
+                {selectedAtendimento.unitStatus === "open" && (
                   <div className="flex space-x-2 pt-4">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => updateGuideStatus(selectedGuide.id, "closed")}
+                      onClick={() => updateAtendimentoStatus(selectedAtendimento.id, "closed")}
                       className="flex-1"
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
@@ -1740,7 +1740,7 @@ export default function UnitDashboard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => updateGuideStatus(selectedGuide.id, "cancelled")}
+                      onClick={() => updateAtendimentoStatus(selectedAtendimento.id, "cancelled")}
                       className="flex-1"
                     >
                       <XCircle className="h-4 w-4 mr-2" />

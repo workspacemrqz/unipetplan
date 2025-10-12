@@ -122,7 +122,7 @@ export class CacheManager {
   }
 
   // Invalidate all queries related to atendimentos
-  invalidateGuideData(guideId?: string) {
+  invalidateAtendimentoData(atendimentoId?: string) {
     const invalidationPromises = [];
     
     // Invalidate all atendimento-related queries
@@ -135,9 +135,9 @@ export class CacheManager {
     );
     
     // If specific atendimento, invalidate its details
-    if (guideId) {
+    if (atendimentoId) {
       invalidationPromises.push(
-        this.queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos", guideId] })
+        this.queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos", atendimentoId] })
       );
     }
     
@@ -215,14 +215,14 @@ export class CacheManager {
         return this.invalidatePlanData(entityId);
       case 'pet':
         return this.invalidatePetData(entityId, additionalContext?.clientId);
-      case 'guide':
-        return this.invalidateGuideData(entityId);
+      case 'atendimento':
+        return this.invalidateAtendimentoData(entityId);
       case 'network-unit':
         // Network units affect multiple entities
         return Promise.all([
           this.queryClient.invalidateQueries({ queryKey: ["/admin/api/network-units"] }),
           this.queryClient.invalidateQueries({ queryKey: ["/admin/api/network-units/credentials"] }),
-          this.invalidateGuideData(), // Atendimentos reference network units
+          this.invalidateAtendimentoData(), // Atendimentos reference network units
           this.queryClient.invalidateQueries({ 
             predicate: (query) => query.queryKey[0] === "/admin/api/dashboard/all"
           })
@@ -231,7 +231,7 @@ export class CacheManager {
         return Promise.all([
           this.queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] }),
           this.invalidatePlanData(), // Procedures are related to plans
-          this.invalidateGuideData() // Atendimentos reference procedures
+          this.invalidateAtendimentoData() // Atendimentos reference procedures
         ]);
       default:
         // Generic fallback
@@ -430,7 +430,7 @@ export class CacheManager {
     // Prefetch based on current page context
     switch (currentPage) {
       case 'dashboard':
-        // From dashboard, users commonly go to clients, guides, or plans
+        // From dashboard, users commonly go to clients, atendimentos, or plans
         prefetchPromises.push(this.prefetchDashboardData());
         break;
         
@@ -500,7 +500,7 @@ export const createSmartInvalidation = (queryClient: QueryClient) => {
     invalidateClientData: cacheManager.invalidateClientData.bind(cacheManager),
     invalidatePlanData: cacheManager.invalidatePlanData.bind(cacheManager),
     invalidatePetData: cacheManager.invalidatePetData.bind(cacheManager),
-    invalidateGuideData: cacheManager.invalidateGuideData.bind(cacheManager),
+    invalidateAtendimentoData: cacheManager.invalidateAtendimentoData.bind(cacheManager),
     invalidateRelatedData: cacheManager.invalidateRelatedData.bind(cacheManager),
     updateClientOptimistically: cacheManager.updateClientOptimistically.bind(cacheManager),
     updatePlanOptimistically: cacheManager.updatePlanOptimistically.bind(cacheManager),
