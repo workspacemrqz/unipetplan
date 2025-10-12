@@ -28,7 +28,8 @@ const navigation = [
     name: "Financeiro",
     items: [
       { name: "Pagamentos", href: "/financeiro", iconName: "Pagamento" },
-      { name: "Cupons", href: "/cupom", iconName: "Cupom" }
+      { name: "Cupons", href: "/cupom", iconName: "Cupom" },
+      { name: "Relatório Financeiro", href: "/relatorio-financeiro", iconName: "Pagamento" }
     ]
   },
   {
