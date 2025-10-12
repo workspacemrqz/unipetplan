@@ -490,6 +490,28 @@ export default function CorpoClinicoPage() {
           </div>
 
           <div className="flex gap-2">
+            <Button
+              onClick={() => {
+                setEditingVet(null);
+                form.reset({
+                  name: "",
+                  crmv: "",
+                  email: "",
+                  phone: "",
+                  specialty: "",
+                  type: currentTab,
+                  login: "",
+                  password: "",
+                  canAccessAtendimentos: false,
+                  isActive: true,
+                });
+                setDialogOpen(true);
+              }}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar
+            </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -517,28 +539,6 @@ export default function CorpoClinicoPage() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <Button
-              onClick={() => {
-                setEditingVet(null);
-                form.reset({
-                  name: "",
-                  crmv: "",
-                  email: "",
-                  phone: "",
-                  specialty: "",
-                  type: currentTab,
-                  login: "",
-                  password: "",
-                  canAccessAtendimentos: false,
-                  isActive: true,
-                });
-                setDialogOpen(true);
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Veterinário
-            </Button>
           </div>
         </div>
 
