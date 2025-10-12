@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useParams } from "wouter";
 import { cn } from "@/lib/admin/utils";
+import { useState, useEffect } from "react";
 import {
   Home,
   FileText,
@@ -9,14 +10,36 @@ import {
   Plus,
   DollarSign,
   Users,
-  ScrollText
+  List,
+  ChevronDown,
+  ChevronRight,
+  Clock
 } from "lucide-react";
+
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: any;
+  subItems?: Array<{
+    name: string;
+    href: string;
+    icon: any;
+  }>;
+}
+
+interface NavigationSection {
+  name: string;
+  items: NavigationItem[];
+}
 
 export default function UnitSidebar() {
   const [location] = useLocation();
   const { slug } = useParams();
   
-  const navigation = [
+  // Estado para controlar quais seções estão expandidas
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  
+  const navigation: NavigationSection[] = [
     {
       name: "Principal",
       items: [
@@ -24,7 +47,7 @@ export default function UnitSidebar() {
       ]
     },
     {
-      name: "Gestão",
+      name: "Atendimentos",
       items: [
         { 
           name: "Atendimentos", 
@@ -34,13 +57,65 @@ export default function UnitSidebar() {
             { name: "Novo Atendimento", href: `/unidade/${slug}/atendimentos/novo`, icon: Plus }
           ]
         },
+        { name: "Histórico", href: `/unidade/${slug}/historico`, icon: Clock }
+      ]
+    },
+    {
+      name: "Gestão",
+      items: [
         { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard },
-        { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, icon: Users },
-        { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: ScrollText },
+        { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, icon: Users }
+      ]
+    },
+    {
+      name: "Financeiro",
+      items: [
         { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign }
+      ]
+    },
+    {
+      name: "Sistema",
+      items: [
+        { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: List }
       ]
     }
   ];
+
+  // Expand section containing current route on mount and route change
+  useEffect(() => {
+    const newExpanded = new Set<string>();
+    
+    for (const section of navigation) {
+      const hasActiveItem = section.items.some(item => {
+        // Check main item
+        if (location === item.href) return true;
+        // Check subitems
+        if (item.subItems?.some(sub => location === sub.href)) return true;
+        // Check if current location starts with item href (for nested routes)
+        if (item.href !== `/unidade/${slug}/painel` && location.startsWith(item.href)) return true;
+        return false;
+      });
+      
+      if (hasActiveItem) {
+        newExpanded.add(section.name);
+      }
+    }
+    
+    setExpandedSections(newExpanded);
+  }, [location, slug]);
+
+  // Função para alternar a expansão de uma seção
+  const toggleSection = (sectionName: string) => {
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionName)) {
+        newSet.delete(sectionName);
+      } else {
+        newSet.add(sectionName);
+      }
+      return newSet;
+    });
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('unit-token');
@@ -51,67 +126,89 @@ export default function UnitSidebar() {
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-[#eaeaea]">
-      {/* Logo */}
+      {/* Logo - Preservado como solicitado */}
       <div className="p-6">
         <img src="/unipet-logo.png" alt="Unipet Plan" className="h-8 w-auto" />
       </div>
 
-      {/* Navigation - Exact same style as admin */}
-      <nav className="flex-1 px-6 pb-6 space-y-6 overflow-y-auto">
-        {navigation.map((section) => (
-          <div key={section.name}>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-              {section.name}
-            </h3>
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                // Check if current location matches the item's href or any subitem
-                const isActive = location === item.href || item.subItems?.some(sub => location === sub.href);
-                
-                return (
-                  <div key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-gray-600 hover:text-gray-900"
-                      )}
-                    >
-                      <item.icon className="h-5 w-5 mr-3" />
-                      {item.name}
-                    </Link>
+      {/* Navigation - Seguindo exatamente o estilo do admin */}
+      <nav className="flex-1 px-4 pb-6 space-y-4 overflow-y-auto">
+        {navigation.map((section) => {
+          const isExpanded = expandedSections.has(section.name);
+          
+          return (
+            <div key={section.name}>
+              {/* Section Header - Mesmo estilo do admin */}
+              <button
+                onClick={() => toggleSection(section.name)}
+                className="w-full flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-3 py-1 hover:text-gray-600 transition-colors rounded-lg"
+              >
+                <span>{section.name}</span>
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+              
+              {/* Section Items */}
+              {isExpanded && (
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    // Check if current location matches the item's href or any subitem
+                    const isActive = location === item.href || 
+                      item.subItems?.some(sub => location === sub.href) ||
+                      (item.href !== `/unidade/${slug}/painel` && location.startsWith(item.href));
                     
-                    {/* Render subitems if they exist */}
-                    {item.subItems && (
-                      <div className="ml-8 mt-1 space-y-1">
-                        {item.subItems.map((subItem) => {
-                          const isSubActive = location === subItem.href;
-                          return (
-                            <Link
-                              key={subItem.name}
-                              href={subItem.href}
-                              className={cn(
-                                "flex items-center px-3 py-1.5 text-sm rounded-lg transition-colors",
-                                isSubActive
-                                  ? "bg-primary/10 text-primary"
-                                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                              )}
-                            >
-                              <subItem.icon className="h-4 w-4 mr-2" />
-                              {subItem.name}
-                            </Link>
-                          );
-                        })}
+                    return (
+                      <div key={item.name}>
+                        <Link
+                          href={item.href}
+                          className={cn(
+                            "flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group",
+                            isActive
+                              ? "bg-primary text-primary-foreground shadow-md"
+                              : "text-gray-600 hover:bg-primary/10 hover:text-primary"
+                          )}
+                        >
+                          <item.icon className={cn(
+                            "h-5 w-5 mr-3 transition-transform duration-200",
+                            !isActive && "group-hover:scale-110"
+                          )} />
+                          <span className="font-medium">{item.name}</span>
+                        </Link>
+                        
+                        {/* Render subitems if they exist */}
+                        {item.subItems && isExpanded && (
+                          <div className="ml-8 mt-1 space-y-1">
+                            {item.subItems.map((subItem) => {
+                              const isSubActive = location === subItem.href;
+                              return (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className={cn(
+                                    "flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200",
+                                    isSubActive
+                                      ? "bg-primary/10 text-primary font-medium"
+                                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                                  )}
+                                >
+                                  <subItem.icon className="h-4 w-4 mr-2" />
+                                  {subItem.name}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Logout Button */}
