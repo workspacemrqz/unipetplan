@@ -602,19 +602,28 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Informações Básicas</h4>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center space-x-2">
+                    <div>
                       <span><strong className="text-primary">Procedimentos:</strong></span>
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <div className="space-y-2 mt-2 pl-2 border-l-2 border-gray-200">
                       {selectedAtendimento.procedures && selectedAtendimento.procedures.length > 0 ? (
                         selectedAtendimento.procedures.map((proc: any, index: number) => (
-                          <Badge key={index} variant="secondary" className="text-sm">
-                            {proc.procedureName || proc.name}
-                            {proc.value && ` - R$ ${parseFloat(proc.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                          </Badge>
+                          <div 
+                            key={index} 
+                            className="pb-2 border-b border-gray-100 last:border-b-0 last:pb-0"
+                          >
+                            <p className="text-foreground break-words whitespace-pre-wrap font-medium">
+                              {proc.procedureName || proc.name}
+                            </p>
+                            {proc.value && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Valor: R$ {parseFloat(proc.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </p>
+                            )}
+                          </div>
                         ))
                       ) : (
-                        <span className="text-foreground">{selectedAtendimento.procedure || 'Não informado'}</span>
+                        <span className="text-foreground break-words whitespace-pre-wrap">{selectedAtendimento.procedure || 'Não informado'}</span>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
