@@ -110,6 +110,20 @@ export default function CorpoClinicoPage() {
 
   const { data: veterinarians = [], isLoading: isLoadingVets } = useQuery<Veterinarian[]>({
     queryKey: [`/api/units/${slug}/veterinarios`],
+    queryFn: async () => {
+      const token = localStorage.getItem('unit-token');
+      const response = await fetch(`/api/units/${slug}/veterinarios`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao carregar veterinários');
+      }
+
+      return response.json();
+    },
     enabled: !loading,
   });
 
