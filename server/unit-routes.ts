@@ -255,6 +255,80 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
   
+  // Get financial report (authenticated)
+  app.get(["/api/unit/:slug/relatorio-financeiro", "/api/units/:slug/relatorio-financeiro"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Get atendimentos for this unit with network unit info
+      const result = await storage.getAtendimentosWithNetworkUnits({
+        networkUnitId: unitId
+      });
+      
+      let allAtendimentos = result?.atendimentos || [];
+      
+      // Adicionar procedimentos para cada atendimento
+      allAtendimentos = await Promise.all(
+        allAtendimentos.map(async (atendimento: any) => {
+          const procedures = await storage.getAtendimentoProcedures(atendimento.id);
+          return {
+            ...atendimento,
+            procedures: procedures
+          };
+        })
+      );
+      
+      // Create financial report entries - one entry per procedure
+      const financialEntries: any[] = [];
+      
+      for (const atendimento of allAtendimentos) {
+        if (atendimento.procedures && atendimento.procedures.length > 0) {
+          // Multiple procedures
+          atendimento.procedures.forEach((proc: any) => {
+            financialEntries.push({
+              id: `${atendimento.id}-${proc.id || proc.procedureName}`,
+              atendimentoId: atendimento.id,
+              date: atendimento.createdAt,
+              clientName: atendimento.clientName || 'Não informado',
+              petName: atendimento.petName || '',
+              procedure: proc.procedureName || proc.name || 'Não informado',
+              coparticipacao: proc.coparticipacao || '0',
+              value: proc.value || '0'
+            });
+          });
+        } else {
+          // Legacy single procedure
+          financialEntries.push({
+            id: atendimento.id,
+            atendimentoId: atendimento.id,
+            date: atendimento.createdAt,
+            clientName: atendimento.clientName || 'Não informado',
+            petName: atendimento.petName || '',
+            procedure: atendimento.procedure || 'Não informado',
+            coparticipacao: atendimento.coparticipacao || '0',
+            value: atendimento.value || '0'
+          });
+        }
+      }
+      
+      // Sort by date descending (most recent first)
+      financialEntries.sort((a, b) => {
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+        return dateB - dateA;
+      });
+      
+      res.json(financialEntries);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching financial report:", error);
+      res.status(500).json({ error: "Erro ao buscar relatório financeiro" });
+    }
+  });
+  
   // Update atendimento status (authenticated)
   app.put(["/api/unit/:slug/atendimentos/:id", "/api/units/:slug/atendimentos/:id"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {

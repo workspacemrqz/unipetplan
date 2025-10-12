@@ -2161,6 +2161,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get financial report for all units
+  app.get("/admin/api/relatorio-financeiro", requireAdmin, async (req, res) => {
+    try {
+      // Get all atendimentos with network unit info
+      const result = await storage.getAtendimentosWithNetworkUnits({});
+      let allAtendimentos = result?.atendimentos || [];
+      
+      // Adicionar procedimentos para cada atendimento
+      allAtendimentos = await Promise.all(
+        allAtendimentos.map(async (atendimento: any) => {
+          const procedures = await storage.getAtendimentoProcedures(atendimento.id);
+          return {
+            ...atendimento,
+            procedures: procedures
+          };
+        })
+      );
+      
+      // Create financial report entries - one entry per procedure
+      const financialEntries: any[] = [];
+      
+      for (const atendimento of allAtendimentos) {
+        if (atendimento.procedures && atendimento.procedures.length > 0) {
+          // Multiple procedures
+          atendimento.procedures.forEach((proc: any) => {
+            financialEntries.push({
+              id: `${atendimento.id}-${proc.id || proc.procedureName}`,
+              atendimentoId: atendimento.id,
+              date: atendimento.createdAt,
+              clientName: atendimento.clientName || 'Não informado',
+              petName: atendimento.petName || '',
+              procedure: proc.procedureName || proc.name || 'Não informado',
+              coparticipacao: proc.coparticipacao || '0',
+              value: proc.value || '0',
+              networkUnitName: atendimento.networkUnit?.name || 'Não informada'
+            });
+          });
+        } else {
+          // Legacy single procedure
+          financialEntries.push({
+            id: atendimento.id,
+            atendimentoId: atendimento.id,
+            date: atendimento.createdAt,
+            clientName: atendimento.clientName || 'Não informado',
+            petName: atendimento.petName || '',
+            procedure: atendimento.procedure || 'Não informado',
+            coparticipacao: atendimento.coparticipacao || '0',
+            value: atendimento.value || '0',
+            networkUnitName: atendimento.networkUnit?.name || 'Não informada'
+          });
+        }
+      }
+      
+      // Sort by date descending (most recent first)
+      financialEntries.sort((a, b) => {
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+        return dateB - dateA;
+      });
+      
+      res.json(financialEntries);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching financial report:", error);
+      res.status(500).json({ error: "Erro ao buscar relatório financeiro" });
+    }
+  });
+
   app.get("/admin/api/atendimentos/:id", requireAdmin, async (req, res) => {
     try {
       const atendimento = await storage.getAtendimento(req.params.id);
