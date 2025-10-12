@@ -244,14 +244,14 @@ export default function Contracts() {
 
   const updateContractMutation = useMutation({
     mutationFn: async (data: { id: string; monthlyAmount: string; status: string }) => {
-      return await apiRequest(`/admin/api/contracts/${data.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      return await apiRequest(
+        'PATCH',
+        `/admin/api/contracts/${data.id}`,
+        {
           monthlyAmount: data.monthlyAmount,
           status: data.status,
-        }),
-      });
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/admin/api/contracts'] });
