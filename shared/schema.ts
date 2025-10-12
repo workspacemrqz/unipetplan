@@ -558,6 +558,7 @@ export const atendimentos = pgTable("atendimentos", {
   status: text("status").default("open"), // 'open', 'closed', 'cancelled'
   unitStatus: text("unit_status").default("open"), // 'open', 'closed', 'cancelled' - status specific for network units
   createdByUnitId: varchar("created_by_unit_id"), // Track which unit created this atendimento
+  veterinarianId: varchar("veterinarian_id").references(() => veterinarians.id), // Track which veterinarian created this atendimento
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
