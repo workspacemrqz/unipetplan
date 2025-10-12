@@ -15,6 +15,38 @@ import { ArrowLeft, ArrowRight, Check, Loader2, User, Heart, FileText, CheckCirc
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+// Componente de indicador isolado - FORA do componente principal
+const StepIndicatorComponent = memo(({ currentStep }: { currentStep: number }) => (
+  <div className="flex items-center justify-center mb-8">
+    {[1, 2, 3, 4].map((step) => (
+      <div key={`static-step-${step}`} className="flex items-center">
+        <div
+          className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
+            step <= currentStep ? "bg-[#277677]" : "bg-gray-300"
+          )}
+        >
+          {step < currentStep ? (
+            <Check className="h-5 w-5" />
+          ) : (
+            step
+          )}
+        </div>
+        {step < 4 && (
+          <div
+            className={cn(
+              "w-16 h-1 mx-2",
+              step < currentStep ? "bg-[#277677]" : "bg-gray-300"
+            )}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+), (prevProps, nextProps) => prevProps.currentStep === nextProps.currentStep);
+
+StepIndicatorComponent.displayName = 'StepIndicatorComponent';
+
 interface SteppedAtendimentoFormProps {
   mode: 'admin' | 'unit';
   slug?: string;
@@ -316,50 +348,6 @@ export default function SteppedAtendimentoForm({
     mutation.mutate(data);
   };
 
-  // Componente de indicador de etapas - Memoizado para evitar animações desnecessárias
-  const StepIndicator = memo(({ currentStep }: { currentStep: number }) => (
-    <div className="flex items-center justify-center mb-8">
-      {[1, 2, 3, 4].map((step) => (
-        <div key={step} className="flex items-center">
-          <motion.div
-            key={`circle-${step}-${currentStep}`} // Key única para controlar quando animar
-            initial={{ scale: 0.8 }}
-            animate={{ 
-              scale: step === currentStep ? 1.1 : 1,
-              backgroundColor: step <= currentStep ? "#277677" : "#e5e5e5"
-            }}
-            transition={{ duration: 0.3 }}
-            className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
-              step <= currentStep ? "bg-[#277677]" : "bg-gray-300"
-            )}
-          >
-            {step < currentStep ? (
-              <Check className="h-5 w-5" />
-            ) : (
-              step
-            )}
-          </motion.div>
-          {step < 4 && (
-            <motion.div
-              key={`line-${step}-${currentStep}`} // Key única para controlar quando animar
-              initial={{ scaleX: 0 }}
-              animate={{ 
-                scaleX: step < currentStep ? 1 : 0.5,
-                backgroundColor: step < currentStep ? "#277677" : "#e5e5e5"
-              }}
-              transition={{ duration: 0.3 }}
-              className={cn(
-                "w-16 h-1 mx-2",
-                step < currentStep ? "bg-[#277677]" : "bg-gray-300"
-              )}
-            />
-          )}
-        </div>
-      ))}
-    </div>
-  ));
-
   // Animação das etapas
   const slideVariants = {
     enter: (direction: number) => ({
@@ -378,7 +366,7 @@ export default function SteppedAtendimentoForm({
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <StepIndicator currentStep={currentStep} />
+      <StepIndicatorComponent currentStep={currentStep} />
       
       <Form {...form}>
         <Card className="border border-[#eaeaea] rounded-lg bg-white shadow-sm !bg-white">
