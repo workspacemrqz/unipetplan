@@ -632,7 +632,7 @@ export default function SteppedAtendimentoForm({
                                   }
                                 }} 
                                 value={field.value} 
-                                disabled={!petIdToFetch || proceduresLoading}
+                                disabled={!petIdToFetch || proceduresLoading || !form.getValues("networkUnitId")}
                               >
                                 <FormControl>
                                   <SelectTrigger 
@@ -643,7 +643,9 @@ export default function SteppedAtendimentoForm({
                                     }}
                                   >
                                     <SelectValue placeholder={
-                                      proceduresLoading 
+                                      !form.getValues("networkUnitId")
+                                        ? "Selecione primeiro a rede credenciada"
+                                        : proceduresLoading 
                                         ? "Carregando procedimentos..." 
                                         : "Selecione o procedimento"
                                     } />
