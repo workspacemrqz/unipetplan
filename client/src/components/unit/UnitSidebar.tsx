@@ -44,15 +44,10 @@ export default function UnitSidebar() {
   // Definir navegação baseada no tipo de usuário
   const navigation: NavigationSection[] = isVeterinarian 
     ? [
-        // Menu reduzido para veterinários
+        // Menu reduzido para veterinários - apenas novo atendimento
         {
           name: "Atendimentos",
           items: [
-            { 
-              name: "Atendimentos", 
-              href: `/unidade/${slug}/atendimentos`, 
-              icon: FileText
-            },
             { 
               name: "Novo Atendimento", 
               href: `/unidade/${slug}/atendimentos/novo`, 
