@@ -77,14 +77,16 @@ export default function NovoAtendimentoPage() {
         </Button>
 
         {/* Stepped Form */}
-        <SteppedAtendimentoForm
-          mode="unit"
-          slug={slug}
-          networkUnitId={unitInfo?.id}
-          networkUnitName={unitInfo?.name}
-          onSuccess={() => setLocation(`/unidade/${slug}/atendimentos`)}
-          onCancel={() => setLocation(`/unidade/${slug}/atendimentos`)}
-        />
+        {slug && (
+          <SteppedAtendimentoForm
+            mode="unit"
+            slug={slug}
+            networkUnitId={unitInfo?.id}
+            networkUnitName={unitInfo?.name}
+            onSuccess={() => setLocation(`/unidade/${slug}/atendimentos`)}
+            onCancel={() => setLocation(`/unidade/${slug}/atendimentos`)}
+          />
+        )}
       </div>
     </UnitLayout>
   );

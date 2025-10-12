@@ -12,7 +12,7 @@ import { FileText, User, Heart, MapPin, Clock, DollarSign, CheckCircle, XCircle,
 import DigitalCard from "@/components/DigitalCard";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import LoadingDots from "@/components/ui/LoadingDots";
-import { AtendimentoStepForm } from "@/components/admin/AtendimentoStepForm";
+import SteppedAtendimentoForm from "@/components/shared/SteppedAtendimentoForm";
 
 interface NetworkUnit {
   id: string;
@@ -994,41 +994,33 @@ export default function UnitDashboard() {
                 </p>
               </div>
 
-              <Card>
-                <CardContent className="p-6">
-                  <AtendimentoStepForm
-                    atendimentoForm={atendimentoForm}
-                    setAtendimentoForm={setAtendimentoForm}
-                    availableClients={availableClients}
-                    availablePets={availablePets}
-                    availableProcedures={availableProcedures}
-                    loadingProcedures={loadingProcedures}
-                    selectedPetData={selectedPetData}
-                    calculatedValues={calculatedValues}
-                    loadingCalculation={loadingCalculation}
-                    handleClientChange={handleClientChange}
-                    handlePetChange={handlePetChange}
-                    handleProcedureChange={handleProcedureChange}
-                    onSubmit={createAtendimento}
-                    onCancel={() => {
-                      setAtendimentoForm({
-                        clientId: "",
-                        petId: "",
-                        procedure: "",
-                        procedureId: "",
-                        procedureNotes: "",
-                        generalNotes: "",
-                        coparticipacao: "",
-                        receber: ""
-                      });
-                      setAvailablePets([]);
-                      setSelectedPetData(null);
-                      setCalculatedValues(null);
-                    }}
-                    submittingAtendimento={submittingAtendimento}
-                  />
-                </CardContent>
-              </Card>
+              <SteppedAtendimentoForm
+                mode="admin"
+                networkUnitId={selectedUnitId}
+                networkUnitName={selectedUnit?.name}
+                onSuccess={() => {
+                  toast({
+                    title: "Atendimento criado",
+                    description: "Atendimento foi criado com sucesso.",
+                  });
+                  setActiveTab('atendimentos');
+                }}
+                onCancel={() => {
+                  setAtendimentoForm({
+                    clientId: "",
+                    petId: "",
+                    procedure: "",
+                    procedureId: "",
+                    procedureNotes: "",
+                    generalNotes: "",
+                    coparticipacao: "",
+                    receber: ""
+                  });
+                  setAvailablePets([]);
+                  setSelectedPetData(null);
+                  setCalculatedValues(null);
+                }}
+              />
 
               {/* Quick Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
