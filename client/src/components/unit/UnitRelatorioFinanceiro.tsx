@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
@@ -20,6 +20,8 @@ import { Search, MoreHorizontal, ChevronLeft, ChevronRight, DollarSign } from "l
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { CalendarDate } from "@internationalized/date";
+import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 
 interface GuideWithRelations {
   id: string;
@@ -52,6 +54,30 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
   const { visibleColumns, toggleColumn } = useColumnPreferences('unit.relatorio-financeiro.columns', allColumns);
   const pageSize = 10;
 
+  const [dateFilter, setDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
+  const [debouncedDateFilter, setDebouncedDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
+  // Debounce date filter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedDateFilter(dateFilter);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [dateFilter]);
+
+  const handleDateRangeChange = (startDate: CalendarDate | null, endDate: CalendarDate | null) => {
+    setDateFilter({ startDate, endDate });
+    setCurrentPage(1); // Reset para página 1 ao filtrar por data
+  };
+
   const { data: guides, isLoading, isError, error } = useQuery<GuidesResponse>({
     queryKey: [`/api/units/${unitSlug}/guides`],
     queryFn: async () => {
@@ -80,16 +106,52 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
 
   const guidesData = guides?.data || [];
 
-  // Filter guides by search query
+  // Filter guides by search query and date
   const filteredGuides = useMemo(() => {
     return guidesData.filter(guide => {
+      // Search filter
       const searchLower = searchQuery.toLowerCase();
-      return (
+      const matchesSearch = !searchQuery || (
         (guide.clientName && guide.clientName.toLowerCase().includes(searchLower)) ||
         (guide.procedure && guide.procedure.toLowerCase().includes(searchLower))
       );
+
+      // Date filter
+      let matchesDate = true;
+      if (debouncedDateFilter.startDate || debouncedDateFilter.endDate) {
+        if (!guide.createdAt) {
+          matchesDate = false;
+        } else {
+          const guideDate = new Date(guide.createdAt);
+          
+          if (debouncedDateFilter.startDate) {
+            const startDate = new Date(
+              debouncedDateFilter.startDate.year,
+              debouncedDateFilter.startDate.month - 1,
+              debouncedDateFilter.startDate.day
+            );
+            if (guideDate < startDate) {
+              matchesDate = false;
+            }
+          }
+          
+          if (debouncedDateFilter.endDate && matchesDate) {
+            const endDate = new Date(
+              debouncedDateFilter.endDate.year,
+              debouncedDateFilter.endDate.month - 1,
+              debouncedDateFilter.endDate.day,
+              23, 59, 59
+            );
+            if (guideDate > endDate) {
+              matchesDate = false;
+            }
+          }
+        }
+      }
+
+      return matchesSearch && matchesDate;
     });
-  }, [guidesData, searchQuery]);
+  }, [guidesData, searchQuery, debouncedDateFilter]);
 
   // Sort by date (newest first)
   const sortedGuides = useMemo(() => {
@@ -140,6 +202,13 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
           <p className="text-sm text-muted-foreground">Visualize todos os procedimentos e valores cobrados</p>
         </div>
       </div>
+
+      {/* Date Filter */}
+      <DateFilterComponent
+        onDateRangeChange={handleDateRangeChange}
+        isLoading={isLoading}
+        initialRange={dateFilter}
+      />
 
       {/* Search and Column Preferences */}
       <div className="flex flex-wrap gap-4 items-center justify-between">
