@@ -552,14 +552,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (adminPassword.startsWith('$2a$') || adminPassword.startsWith('$2b$')) {
         // It's a bcrypt hash - secure comparison
         isValidPassword = await bcrypt.compare(loginData.password, adminPassword);
-      } else if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') {
-        // Development only: Allow plain text password with warning
-        console.warn("⚠️ [ADMIN-LOGIN-DEV] Plain text password in use. For production, use bcrypt hash.");
-        isValidPassword = loginData.password === adminPassword;
-      } else {
+      } else if (process.env.NODE_ENV === 'production') {
         // Production: Plain text passwords not allowed
-        console.error("❌ [ADMIN-LOGIN] Plain text password detected. SENHA must be a bcrypt hash for security.");
+        console.error("❌ [ADMIN-LOGIN] Plain text password detected in production. SENHA must be a bcrypt hash for security.");
         return res.status(500).json({ error: "Configuração de segurança incorreta. Contate o administrador." });
+      } else {
+        // Development/staging/undefined: Allow plain text password with warning
+        console.warn("⚠️ [ADMIN-LOGIN-DEV] Plain text password in use (NODE_ENV: " + (process.env.NODE_ENV || 'undefined') + "). For production, use bcrypt hash.");
+        isValidPassword = loginData.password === adminPassword;
       }
 
       if (isValidLogin && isValidPassword) {
@@ -648,14 +648,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (adminPassword.startsWith('$2a$') || adminPassword.startsWith('$2b$')) {
         // It's a bcrypt hash - secure comparison
         isValidPassword = await bcrypt.compare(password, adminPassword);
-      } else if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') {
-        // Development only: Allow plain text password with warning
-        console.warn("⚠️ [VERIFY-PASSWORD-DEV] Plain text password in use. For production, use bcrypt hash.");
-        isValidPassword = password === adminPassword;
-      } else {
+      } else if (process.env.NODE_ENV === 'production') {
         // Production: Plain text passwords not allowed
-        console.error("❌ [VERIFY-PASSWORD] Plain text password detected. SENHA must be a bcrypt hash for security.");
+        console.error("❌ [VERIFY-PASSWORD] Plain text password detected in production. SENHA must be a bcrypt hash for security.");
         return res.status(500).json({ valid: false, error: "Configuração de segurança incorreta" });
+      } else {
+        // Development/staging/undefined: Allow plain text password with warning
+        console.warn("⚠️ [VERIFY-PASSWORD-DEV] Plain text password in use (NODE_ENV: " + (process.env.NODE_ENV || 'undefined') + "). For production, use bcrypt hash.");
+        isValidPassword = password === adminPassword;
       }
 
       res.json({ valid: isValidPassword });
