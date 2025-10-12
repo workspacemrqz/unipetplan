@@ -539,11 +539,11 @@ export default function SteppedAtendimentoForm({
                                 animate={{ opacity: 1, y: 0 }}
                                 className="mt-6 space-y-4"
                               >
-                                {/* Informações Pessoais do Pet */}
+                                {/* Informações do Pet */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
                                   <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-3">
                                     <h3 className="font-semibold text-base md:text-lg text-[#277677]">
-                                      Informações Pessoais do Pet
+                                      Informações do Pet
                                     </h3>
                                     <span 
                                       className="px-3 py-1 rounded-full text-xs font-medium w-fit" 
@@ -854,14 +854,12 @@ export default function SteppedAtendimentoForm({
                                   {filteredProcedures.length > 0 ? (
                                     filteredProcedures.map((proc: any) => (
                                       <SelectItem key={proc.id} value={proc.name}>
-                                        <div className="flex flex-col max-w-full">
-                                          <span className="truncate">{proc.name}</span>
-                                          {proc.annualLimit && (
-                                            <span className="text-xs text-white/90 truncate">
-                                              Limite: {proc.remaining}/{proc.annualLimit} restantes
-                                            </span>
-                                          )}
-                                        </div>
+                                        {proc.name}
+                                        {proc.annualLimit && (
+                                          <span className="text-xs text-muted-foreground ml-2">
+                                            (Limite: {proc.remaining}/{proc.annualLimit})
+                                          </span>
+                                        )}
                                       </SelectItem>
                                     ))
                                   ) : (
