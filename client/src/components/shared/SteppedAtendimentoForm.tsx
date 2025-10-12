@@ -684,12 +684,7 @@ export default function SteppedAtendimentoForm({
                                                 </p>
                                               )}
                                             </div>
-                                            <span className={`px-2 py-1 rounded text-xs ${
-                                              atendimento.status === 'completed' || atendimento.status === 'closed' ? 'bg-green-100 text-green-700' :
-                                              atendimento.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                              atendimento.status === 'open' ? 'bg-blue-100 text-blue-700' :
-                                              'bg-gray-100 text-gray-700'
-                                            }`}>
+                                            <span className="px-2 py-1 rounded text-xs" style={{ backgroundColor: 'rgba(39, 118, 119, 0.1)', color: '#277677' }}>
                                               {atendimento.status === 'completed' || atendimento.status === 'closed' ? 'Concluída' :
                                                atendimento.status === 'pending' ? 'Pendente' :
                                                atendimento.status === 'open' ? 'Aberta' :
