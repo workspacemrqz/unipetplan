@@ -477,7 +477,7 @@ export default function SteppedAtendimentoForm({
                             >
                               <FormControl>
                                 <SelectTrigger 
-                                  className="h-12"
+                                  className="h-12 text-left"
                                   style={{
                                     borderColor: 'var(--border-gray)',
                                     background: 'white'
