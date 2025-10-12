@@ -113,40 +113,40 @@ export default function LogsPage() {
     if (!actionData) return "-";
     
     try {
-      // Format based on action type
+      // Format based on action type with descriptive messages
       switch (actionType) {
         case "step_changed":
           if (actionData.from !== undefined && actionData.to !== undefined) {
-            return `Avançou da etapa ${actionData.from} para ${actionData.to}`;
+            return `Avançou da etapa ${actionData.from} para a etapa ${actionData.to}`;
           }
           break;
         
         case "client_selected":
           if (actionData.clientName || actionData.name) {
-            return `Cliente: ${actionData.clientName || actionData.name}`;
+            return `Selecionou o cliente: ${actionData.clientName || actionData.name}`;
           }
           if (actionData.cpf) {
-            return `CPF: ${actionData.cpf}`;
+            return `Selecionou o cliente com CPF: ${actionData.cpf}`;
           }
           break;
         
         case "pet_selected":
           if (actionData.petName || actionData.name) {
-            return `Pet: ${actionData.petName || actionData.name}`;
+            return `Selecionou o pet: ${actionData.petName || actionData.name}`;
           }
           break;
         
         case "procedure_added":
           if (actionData.procedureName || actionData.name) {
             const procedureName = actionData.procedureName || actionData.name;
-            const value = actionData.value ? ` - R$ ${actionData.value}` : '';
-            return `Procedimento: ${procedureName}${value}`;
+            const value = actionData.value ? ` no valor de R$ ${actionData.value}` : '';
+            return `Adicionou o procedimento: ${procedureName}${value}`;
           }
           break;
         
         case "atendimento_created":
           if (actionData.atendimentoId || actionData.id) {
-            return `Atendimento criado com sucesso`;
+            return `Finalizou e criou o atendimento com sucesso`;
           }
           break;
       }
