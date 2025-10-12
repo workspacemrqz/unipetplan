@@ -40,7 +40,7 @@ Preferred communication style: Simple, everyday language.
 -   **API Design**: RESTful with structured error handling.
 -   **Performance**: Code splitting, lazy loading, optimized bundle sizes, connection pooling, query optimization, response compression.
 -   **Deployment**: Separate client/server builds for development, unified server for production. Standardized port configuration (5000 in production). Enhanced CORS and security configurations for Replit deployment, ensuring proper handling of `.replit.app` and `.replit.dev` domains. Trust proxy configuration enabled in production for correct HTTPS cookie handling behind Replit's proxy (October 2025).
--   **Development Workflow (October 2025)**: Unified development setup using `start-dev.sh` script that simultaneously runs backend (port 3000) and frontend (port 5000). Single workflow command `npm run dev:all` starts both servers with proper process monitoring and cleanup. Frontend proxies API requests to backend via Vite proxy configuration (`/api` and `/admin/api` routes).
+-   **Development Workflow (October 2025)**: Unified development setup using `unified-dev-server.ts` script that creates a proxy server on port 5000. Backend runs on port 3000, frontend (Vite) on port 3001, with the unified server proxying requests appropriately. Single workflow command `npm run dev:all` starts all three servers with proper process monitoring and cleanup. API requests (`/api`, `/admin/api`) are proxied to backend, all other requests to frontend.
 
 ## External Dependencies
 

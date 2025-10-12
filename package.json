@@ -7,7 +7,7 @@
   "scripts": {
     "install:all": "npm install --prefix . && npm install --prefix client",
     "dev": "tsx server/index.ts",
-    "dev:all": "bash start-dev.sh",
+    "dev:all": "tsx unified-dev-server.ts",
     "dev:frontend": "cd client && npm run dev",
     "build": "npm run build:server && npm run build:client",
     "build:server": "tsc --project tsconfig.server.json",
