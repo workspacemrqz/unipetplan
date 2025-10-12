@@ -448,10 +448,16 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                                 {proc.procedureName || proc.name}
                               </Badge>
                             ))
+                          ) : atendimento.procedure ? (
+                            atendimento.procedure.split(/[,/]/).map((proc: string, index: number) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {proc.trim()}
+                              </Badge>
+                            ))
                           ) : (
-                            <span className="text-muted-foreground">
-                              {atendimento.procedure || 'Não informado'}
-                            </span>
+                            <Badge variant="secondary" className="text-xs text-muted-foreground">
+                              Não informado
+                            </Badge>
                           )}
                         </div>
                       </TableCell>
