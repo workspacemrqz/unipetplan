@@ -981,19 +981,19 @@ export default function Checkout() {
                       }}
                       className={cn(
                         "rounded-2xl border-[1px] bg-[var(--bg-cream-light)] text-center flex flex-col relative transform-style-preserve-3d backface-hidden transition-all duration-300 cursor-pointer",
-                        index === 1
+                        plan.name.toUpperCase().includes('INFINITY')
                           ? "border-[var(--text-gold)] border-2"
                           : "border-[var(--border-teal-light)]",
                         // Apply 3D effects only on desktop and when there are exactly 3 plans visible
                         isDesktop && plans.length >= 3 && [
                           index === 0 && "pricing-card-left",
-                          index === 1 && "pricing-card-popular", 
+                          plan.name.toUpperCase().includes('INFINITY') && "pricing-card-popular", 
                           index === 2 && "pricing-card-right"
                         ]
                       )}
                       onClick={() => handlePlanSelect(plan)}
                     >
-                      {index === 1 && (
+                      {plan.name.toUpperCase().includes('INFINITY') && (
                         <div className="absolute top-0 right-0 bg-[var(--text-gold)] py-0.5 px-2 rounded-bl-xl rounded-tr-xl flex items-center">
                           <Star className="text-[var(--text-light)] h-4 w-4 fill-current" />
                           <span className="text-[var(--text-light)] ml-1 font-sans font-semibold">

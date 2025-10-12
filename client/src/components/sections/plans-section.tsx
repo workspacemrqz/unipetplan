@@ -161,7 +161,7 @@ export default function PlansSection({
       description: plan.description || "",
       buttonText: plan.buttonText || `Contratar Plano ${plan.name}`,
       href: undefined as string | undefined,
-      isPopular: index === 1, // Geralmente o segundo plano é o mais popular
+      isPopular: plan.id === '887dd8ae-1885-4d66-bc65-0ec460912c59', // INFINITY é o plano mais popular
       planType: plan.planType,
       image: image || '/default-plan.svg'
     };
