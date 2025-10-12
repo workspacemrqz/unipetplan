@@ -10,10 +10,9 @@ import {
   Plus,
   DollarSign,
   Users,
-  List,
+  Search,
   ChevronDown,
-  ChevronRight,
-  Clock
+  ChevronRight
 } from "lucide-react";
 
 interface NavigationItem {
@@ -52,12 +51,13 @@ export default function UnitSidebar() {
         { 
           name: "Atendimentos", 
           href: `/unidade/${slug}/atendimentos`, 
-          icon: FileText,
-          subItems: [
-            { name: "Novo Atendimento", href: `/unidade/${slug}/atendimentos/novo`, icon: Plus }
-          ]
+          icon: FileText
         },
-        { name: "Histórico", href: `/unidade/${slug}/historico`, icon: Clock }
+        { 
+          name: "Novo Atendimento", 
+          href: `/unidade/${slug}/atendimentos/novo`, 
+          icon: Plus 
+        }
       ]
     },
     {
@@ -76,7 +76,7 @@ export default function UnitSidebar() {
     {
       name: "Sistema",
       items: [
-        { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: List }
+        { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: Search }
       ]
     }
   ];
