@@ -56,12 +56,13 @@ export default function RelatorioFinanceiro() {
   };
 
   return (
-    <div className="container py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Relatório Financeiro</h1>
-        <p className="text-muted-foreground">
-          Visualize todos os procedimentos realizados em todas as unidades
-        </p>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Relatório Financeiro</h1>
+          <p className="text-sm text-muted-foreground">Visualize todos os procedimentos realizados em todas as unidades</p>
+        </div>
       </div>
 
       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm">
