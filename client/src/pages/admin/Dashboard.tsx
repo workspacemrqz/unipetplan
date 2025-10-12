@@ -186,7 +186,7 @@ export default function Dashboard() {
 
       {/* Empty Results Warning */}
       {hasDateFilter && !isAnyLoading &&
-        stats?.activeClients === 0 && allGuides?.length === 0 && (
+        stats?.activeClients === 0 && allAtendimentos?.length === 0 && (
           <Alert>
             <AlertDescription>
               Nenhum dado encontrado para o período selecionado. Tente expandir o intervalo de datas.
@@ -283,7 +283,7 @@ export default function Dashboard() {
             ) : (() => {
               const chartData = [
                 { name: 'Formulários', quantidade: contactSubmissions?.length || 0 },
-                { name: 'Atendimentos', quantidade: allGuides?.length || 0 },
+                { name: 'Atendimentos', quantidade: allAtendimentos?.length || 0 },
                 { name: 'Clientes', quantidade: clients?.length || 0 },
                 { name: 'Pets', quantidade: stats?.registeredPets || 0 },
                 { name: 'Planos', quantidade: (dashboardData as any)?.plans?.length || 0 },
