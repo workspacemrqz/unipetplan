@@ -380,7 +380,7 @@ export default function SteppedAtendimentoForm({
       
       <Form {...form}>
         <Card className="shadow-lg">
-          <CardHeader>
+          <CardHeader className="border border-[#eaeaea] rounded-lg bg-white shadow-sm">
             <CardTitle className="text-xl flex items-center gap-2">
               {currentStep === 1 && <User className="h-5 w-5" />}
               {currentStep === 2 && <Heart className="h-5 w-5" />}
