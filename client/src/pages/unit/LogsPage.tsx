@@ -109,12 +109,50 @@ export default function LogsPage() {
     return log.log.userType;
   };
 
-  const formatActionData = (actionData: any): string => {
+  const formatActionData = (actionType: string, actionData: any): string => {
     if (!actionData) return "-";
     
     try {
+      // Format based on action type
+      switch (actionType) {
+        case "step_changed":
+          if (actionData.from !== undefined && actionData.to !== undefined) {
+            return `Avançou da etapa ${actionData.from} para ${actionData.to}`;
+          }
+          break;
+        
+        case "client_selected":
+          if (actionData.clientName || actionData.name) {
+            return `Cliente: ${actionData.clientName || actionData.name}`;
+          }
+          if (actionData.cpf) {
+            return `CPF: ${actionData.cpf}`;
+          }
+          break;
+        
+        case "pet_selected":
+          if (actionData.petName || actionData.name) {
+            return `Pet: ${actionData.petName || actionData.name}`;
+          }
+          break;
+        
+        case "procedure_added":
+          if (actionData.procedureName || actionData.name) {
+            const procedureName = actionData.procedureName || actionData.name;
+            const value = actionData.value ? ` - R$ ${actionData.value}` : '';
+            return `Procedimento: ${procedureName}${value}`;
+          }
+          break;
+        
+        case "atendimento_created":
+          if (actionData.atendimentoId || actionData.id) {
+            return `Atendimento criado com sucesso`;
+          }
+          break;
+      }
+      
+      // Fallback: format object as readable string if no specific format matched
       if (typeof actionData === 'object') {
-        // Format object as readable string
         const entries = Object.entries(actionData);
         if (entries.length === 0) return "-";
         
@@ -122,6 +160,7 @@ export default function LogsPage() {
           .map(([key, value]) => `${key}: ${value}`)
           .join(", ");
       }
+      
       return String(actionData);
     } catch {
       return "-";
@@ -186,7 +225,7 @@ export default function LogsPage() {
                     </TableCell>
                     <TableCell>{getUserLabel(logEntry)}</TableCell>
                     <TableCell className="max-w-md truncate">
-                      {formatActionData(logEntry.log.actionData)}
+                      {formatActionData(logEntry.log.actionType, logEntry.log.actionData)}
                     </TableCell>
                   </TableRow>
                 ))}
