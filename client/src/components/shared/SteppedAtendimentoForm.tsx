@@ -379,8 +379,8 @@ export default function SteppedAtendimentoForm({
       <StepIndicator />
       
       <Form {...form}>
-        <Card className="shadow-lg">
-          <CardHeader className="border border-[#eaeaea] rounded-lg bg-white shadow-sm">
+        <Card className="border border-[#eaeaea] rounded-lg bg-white shadow-sm">
+          <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
               {currentStep === 1 && <User className="h-5 w-5" />}
               {currentStep === 2 && <Heart className="h-5 w-5" />}
