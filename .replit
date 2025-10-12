@@ -16,15 +16,30 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "App"
+args = "Backend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Frontend"
 
 [[workflows.workflow]]
-name = "App"
+name = "Backend"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev:all"
+args = "npm run dev"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "Frontend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd client && npm run dev"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -96,6 +111,10 @@ externalPort = 80
 [[ports]]
 localPort = 46843
 externalPort = 8099
+
+[[ports]]
+localPort = 5000
+externalPort = 80
 
 [deployment]
 deploymentTarget = "gce"
