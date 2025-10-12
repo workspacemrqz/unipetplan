@@ -660,8 +660,14 @@ export default function SteppedAtendimentoForm({
                                     🏥 Histórico de Atendimentos
                                   </h3>
                                   {petHistory && petHistory.length > 0 ? (
-                                    <div className="space-y-3">
-                                      {petHistory.slice(0, 5).map((atendimento: any, index: number) => (
+                                    <div 
+                                      className={`space-y-3 ${petHistory.length > 5 ? 'max-h-[400px] overflow-y-auto pr-2' : ''}`}
+                                      style={petHistory.length > 5 ? { 
+                                        scrollbarWidth: 'thin',
+                                        scrollbarColor: '#277677 #f0f0f0'
+                                      } : {}}
+                                    >
+                                      {petHistory.map((atendimento: any, index: number) => (
                                         <div key={atendimento.id || index} className="border-l-2 border-[#277677] pl-3 text-sm">
                                           <div className="flex justify-between items-start">
                                             <div>
@@ -690,11 +696,6 @@ export default function SteppedAtendimentoForm({
                                           </div>
                                         </div>
                                       ))}
-                                      {petHistory.length > 5 && (
-                                        <p className="text-sm text-gray-500 text-center mt-2">
-                                          + {petHistory.length - 5} atendimentos anteriores
-                                        </p>
-                                      )}
                                     </div>
                                   ) : (
                                     <p className="text-gray-500 text-sm">
