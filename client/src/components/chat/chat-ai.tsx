@@ -24,9 +24,9 @@ interface ChatSettings {
   welcomeMessage: string;
   placeholderText: string;
   buttonIcon: string;
-  botIcon?: string | null; // Foto de perfil - aparece no header
+  botIcon?: string | null;
   userIcon?: string | null;
-  supportIcon?: string | null; // Foto do suporte - aparece nas mensagens
+  supportIcon?: string | null;
   isEnabled: boolean;
   chatPosition: "bottom-right" | "bottom-left";
   chatSize: "sm" | "md" | "lg" | "xl" | "full";
@@ -39,8 +39,6 @@ const generateSessionId = () => {
   return `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
 
-
-
 export default function ChatAI() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,24 +48,17 @@ export default function ChatAI() {
     welcomeMessage: "Olá! Como posso te ajudar hoje?",
     placeholderText: "Digite sua mensagem...",
     buttonIcon: "MessageSquare",
-    isEnabled: false, // Começa como false para não aparecer antes de carregar do banco
+    isEnabled: false,
     chatPosition: "bottom-right",
     chatSize: "md"
   });
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [, navigate] = useLocation();
-  
-  // Buffer para acumular mensagens
-  const [messageBuffer, setMessageBuffer] = useState<string[]>([]);
-  const bufferTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const [isBuffering, setIsBuffering] = useState(false);
 
-  // Load chat settings and conversation history
   useEffect(() => {
     const loadChatData = async () => {
       try {
-        // Load settings
         const settingsResponse = await fetch("/api/chat/settings");
         if (settingsResponse.ok) {
           const chatSettings = await settingsResponse.json();
@@ -75,18 +66,15 @@ export default function ChatAI() {
           logger.log('🔍 [CHAT] Bot icon:', chatSettings.botIcon ? (typeof chatSettings.botIcon === 'string' ? 'Present (' + chatSettings.botIcon.substring(0, 50) + '...)' : 'Present (Binary Data)') : 'Not set');
           logger.log('🔍 [CHAT] Support icon:', chatSettings.supportIcon ? (typeof chatSettings.supportIcon === 'string' ? 'Present (' + chatSettings.supportIcon.substring(0, 50) + '...)' : 'Present (Binary Data)') : 'Not set');
           setSettings(prev => ({ ...prev, ...chatSettings }));
-          // Pequeno delay para garantir que não apareça antes das configurações serem aplicadas
           setTimeout(() => {
             setSettingsLoaded(true);
           }, 100);
         } else {
-          // Se não conseguir carregar as configurações, marca como carregado mas desabilitado
           setTimeout(() => {
             setSettingsLoaded(true);
           }, 100);
         }
 
-        // Load conversation history
         const historyResponse = await fetch(`/api/chat/conversations/${sessionId}`);
         if (historyResponse.ok) {
           const history = await historyResponse.json();
@@ -107,8 +95,6 @@ export default function ChatAI() {
           
           setMessages(formattedHistory);
         }
-
-        // If there's history, it's already set in the formattedHistory above
       } catch (error) {
         logger.error("Error loading chat data:", error);
       }
@@ -117,85 +103,9 @@ export default function ChatAI() {
     loadChatData();
   }, [sessionId]);
 
-  // Cleanup do timer quando o componente for desmontado
-  useEffect(() => {
-    return () => {
-      if (bufferTimerRef.current) {
-        clearTimeout(bufferTimerRef.current);
-      }
-    };
-  }, []);
-
-
-
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // Função para enviar todas as mensagens do buffer para o webhook
-  const sendBufferedMessages = async (bufferedMessages: string[]) => {
-    if (bufferedMessages.length === 0) return;
-
-    const combinedMessage = bufferedMessages.join('\n\n');
-    
-    try {
-      setIsLoading(true);
-      
-      // Verificar se é a primeira vez enviando mensagens (primeira resposta)
-      const botMessagesCount = messages.filter(msg => !msg.isUser).length;
-      const isFirstResponse = botMessagesCount === 0;
-      
-      if (isFirstResponse) {
-        // Adicionar mensagem de atendimento automático antes da primeira resposta
-        const attendantMessage: Message = {
-          id: `attendant_${Date.now()}`,
-          content: "Um de nossos atendentes estará com você em até 4 minutos. Pedimos que aguarde um instante",
-          isUser: false,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, attendantMessage]);
-      }
-      
-      const response = await fetch("/api/chat/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: combinedMessage,
-          sessionId,
-          timestamp: new Date().toISOString()
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const botMessage: Message = {
-          id: `bot_${Date.now()}`,
-          content: data.response || "Desculpe, não consegui processar sua mensagem.",
-          isUser: false,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, botMessage]);
-      } else {
-        throw new Error("Failed to send message");
-      }
-    } catch (error) {
-      logger.error("Error sending buffered messages:", error);
-      const errorMessage: Message = {
-        id: `error_${Date.now()}`,
-        content: "Desculpe, ocorreu um erro. Tente novamente mais tarde.",
-        isUser: false,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-      setIsBuffering(false);
-      setMessageBuffer([]);
-    }
-  };
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -211,48 +121,22 @@ export default function ChatAI() {
     const messageContent = inputValue.trim();
     setInputValue("");
 
-    // Check if this is the first user message (only count user messages before adding current one)
-    const userMessagesCount = messages.filter(msg => msg.isUser).length;
-    const isFirstMessage = userMessagesCount === 1; // Agora é 1 porque já adicionamos a mensagem atual
-    
-    if (isFirstMessage) {
-      // Iniciar o buffer com a primeira mensagem
-      setMessageBuffer([messageContent]);
-      setIsBuffering(true);
-      
-      // Configurar timer para enviar após 20 segundos
-      bufferTimerRef.current = setTimeout(() => {
-        setMessageBuffer(currentBuffer => {
-          sendBufferedMessages(currentBuffer);
-          return [];
-        });
-      }, 20000);
-      
-      return;
-    }
-
-    // Se já está no modo buffer, adicionar mensagem ao buffer
-    if (isBuffering) {
-      setMessageBuffer(prev => [...prev, messageContent]);
-      
-      // Resetar o timer para mais 20 segundos
-      if (bufferTimerRef.current) {
-        clearTimeout(bufferTimerRef.current);
-      }
-      
-      bufferTimerRef.current = setTimeout(() => {
-        setMessageBuffer(currentBuffer => {
-          sendBufferedMessages(currentBuffer);
-          return [];
-        });
-      }, 20000);
-      
-      return;
-    }
-
-    // Se não está no modo buffer, processar normalmente (isso não deve acontecer após a primeira mensagem)
     try {
       setIsLoading(true);
+      
+      const botMessagesCount = messages.filter(msg => !msg.isUser).length;
+      const isFirstResponse = botMessagesCount === 0;
+      
+      if (isFirstResponse) {
+        const attendantMessage: Message = {
+          id: `attendant_${Date.now()}`,
+          content: "Um de nossos atendentes estará com você em até 4 minutos. Pedimos que aguarde um instante",
+          isUser: false,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, attendantMessage]);
+      }
+
       const response = await fetch("/api/chat/send", {
         method: "POST",
         headers: {
@@ -298,7 +182,6 @@ export default function ChatAI() {
     }
   };
 
-  // Function to process message content and make links clickable
   const processMessageContent = (content: string) => {
     const parts = content.split(/(https:\/\/unipetplan\.com\.br\/planos)/g);
     
@@ -323,8 +206,6 @@ export default function ChatAI() {
     });
   };
 
-  // Não renderizar até que as configurações sejam carregadas do banco
-  // E verificar se realmente está habilitado
   if (!settingsLoaded || !settings?.isEnabled) {
     return null;
   }
@@ -355,7 +236,6 @@ export default function ChatAI() {
 
       <ExpandableChatBody>
         <div className="space-y-4">
-          {/* Mensagem de boas-vindas centralizada */}
           {messages.length === 0 && settings.welcomeMessage && (
             <div className="flex justify-center items-center py-8">
               <div className="bg-[var(--bg-cream-light)] rounded-lg px-4 py-3 text-center max-w-xs">
@@ -423,18 +303,6 @@ export default function ChatAI() {
                   <span className="text-xs text-[var(--text-dark-secondary)]">Digitando...</span>
                 </div>
                 <div className="absolute w-2 h-2 bg-[var(--bg-cream-lighter)] border-l border-b border-[var(--border-teal-light)] transform rotate-45 -left-1 top-3" />
-              </div>
-            </div>
-          )}
-          {isBuffering && !isLoading && (
-            <div className="flex items-center justify-center py-2">
-              <div className="bg-[var(--bg-teal-lighter)] border border-[var(--border-teal-light)] rounded-lg px-3 py-2 shadow-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-[var(--bg-teal)] rounded-full animate-pulse" />
-                  <span className="text-xs text-[var(--text-teal)]">
-                    Aguardando mais mensagens... ({messageBuffer.length} mensagem{messageBuffer.length > 1 ? 's' : ''} no buffer)
-                  </span>
-                </div>
               </div>
             </div>
           )}
