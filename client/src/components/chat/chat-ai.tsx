@@ -123,19 +123,6 @@ export default function ChatAI() {
 
     try {
       setIsLoading(true);
-      
-      const botMessagesCount = messages.filter(msg => !msg.isUser).length;
-      const isFirstResponse = botMessagesCount === 0;
-      
-      if (isFirstResponse) {
-        const attendantMessage: Message = {
-          id: `attendant_${Date.now()}`,
-          content: "Um de nossos atendentes estará com você em até 4 minutos. Pedimos que aguarde um instante",
-          isUser: false,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, attendantMessage]);
-      }
 
       const response = await fetch("/api/chat/send", {
         method: "POST",
