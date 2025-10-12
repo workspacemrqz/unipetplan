@@ -542,7 +542,7 @@ export default function SteppedAtendimentoForm({
                                 {/* Informações Pessoais do Pet */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
                                   <h3 className="font-semibold text-lg mb-3 text-[#277677]">
-                                    📋 Informações Pessoais do Pet
+                                    Informações Pessoais do Pet
                                   </h3>
                                   <div className="flex gap-4">
                                     {/* Foto do Pet */}
@@ -657,7 +657,7 @@ export default function SteppedAtendimentoForm({
                                 {/* Histórico de Atendimentos */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
                                   <h3 className="font-semibold text-lg mb-3 text-[#277677]">
-                                    🏥 Histórico de Atendimentos
+                                    Histórico de Atendimentos
                                   </h3>
                                   {petHistory && petHistory.length > 0 ? (
                                     <div 
@@ -685,13 +685,16 @@ export default function SteppedAtendimentoForm({
                                               )}
                                             </div>
                                             <span className={`px-2 py-1 rounded text-xs ${
-                                              atendimento.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                              atendimento.status === 'completed' || atendimento.status === 'closed' ? 'bg-green-100 text-green-700' :
                                               atendimento.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                              atendimento.status === 'open' ? 'bg-blue-100 text-blue-700' :
                                               'bg-gray-100 text-gray-700'
                                             }`}>
-                                              {atendimento.status === 'completed' ? 'Concluído' :
+                                              {atendimento.status === 'completed' || atendimento.status === 'closed' ? 'Concluída' :
                                                atendimento.status === 'pending' ? 'Pendente' :
-                                               atendimento.status || 'Em andamento'}
+                                               atendimento.status === 'open' ? 'Aberta' :
+                                               atendimento.status === 'cancelled' ? 'Cancelada' :
+                                               'Em andamento'}
                                             </span>
                                           </div>
                                         </div>
