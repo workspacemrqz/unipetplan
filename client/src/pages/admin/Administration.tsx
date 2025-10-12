@@ -8,7 +8,7 @@ import { Input } from "@/components/admin/ui/input";
 import { InputMasked } from "@/components/admin/ui/input-masked";
 import { Badge } from "@/components/admin/ui/badge";
 import { Switch } from "@/components/admin/ui/switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/admin/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/admin/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/admin/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/admin/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
@@ -388,28 +388,50 @@ export default function Administration() {
           form.reset();
         }
       }}>
-        <DialogContent className="overflow-y-auto max-h-[75vh]">
+        <DialogContent hideCloseButton maxHeightMobile="max-h-[80vh]">
             <DialogHeader>
-              <DialogTitle className="text-foreground">
-                {editingUser ? "Editar Usuário" : "Novo Usuário"}
+              <DialogTitle className="flex items-center space-x-2">
+                {editingUser ? (
+                  <>
+                    <Edit className="h-5 w-5 text-primary" />
+                    <span>Editar Usuário</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-5 w-5 text-primary" />
+                    <span>Novo Usuário</span>
+                  </>
+                )}
               </DialogTitle>
-              {editingUser && (
-                <p className="text-sm text-muted-foreground">
-                  {editingUser.username}
-                </p>
-              )}
+              <DialogDescription>
+                {editingUser 
+                  ? "Atualize as informações e permissões do usuário." 
+                  : "Crie um novo usuário e configure suas permissões de acesso."
+                }
+              </DialogDescription>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar">
+                <div className="space-y-6">
+                  {/* Informações Básicas */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-foreground mb-2">Informações Básicas</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nome de Usuário *</FormLabel>
+                        <FormLabel className="text-primary">Nome de Usuário *</FormLabel>
                         <FormControl>
-                          <Input {...field} data-testid="input-username" />
+                          <Input 
+                            {...field} 
+                            data-testid="input-username" 
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              backgroundColor: '#FFFFFF'
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -421,13 +443,17 @@ export default function Administration() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email *</FormLabel>
+                          <FormLabel className="text-primary">Email *</FormLabel>
                           <FormControl>
                             <InputMasked 
                               {...field} 
                               type="email" 
                               mask="email"
                               data-testid="input-user-email" 
+                              style={{
+                                borderColor: 'var(--border-gray)',
+                                backgroundColor: '#FFFFFF'
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -440,11 +466,19 @@ export default function Administration() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
+                        <FormLabel className="text-primary">
                           Senha {editingUser ? "(deixe vazio para manter atual)" : "*"}
                         </FormLabel>
                         <FormControl>
-                          <Input {...field} type="password" data-testid="input-password" />
+                          <Input 
+                            {...field} 
+                            type="password" 
+                            data-testid="input-password" 
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              backgroundColor: '#FFFFFF'
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -456,7 +490,7 @@ export default function Administration() {
                     name="role"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Função *</FormLabel>
+                        <FormLabel className="text-primary">Função *</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger 
@@ -464,7 +498,7 @@ export default function Administration() {
                               className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
                               style={{
                                 borderColor: 'var(--border-gray)',
-                                background: 'white'
+                                backgroundColor: '#FFFFFF'
                               }}
                             >
                               <SelectValue />
@@ -488,33 +522,38 @@ export default function Administration() {
                       </FormItem>
                     )}
                   />
-                </div>
+                    </div>
+                  </div>
 
-                <FormField
-                  control={form.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Usuário Ativo</FormLabel>
-                        <p className="text-sm text-muted-foreground">
-                          Usuários ativos podem acessar o sistema
-                        </p>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          data-testid="switch-user-active"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                  {/* Configurações de Status */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-foreground mb-2">Configurações de Status</h4>
+                    <FormField
+                      control={form.control}
+                      name="isActive"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">Usuário Ativo</FormLabel>
+                            <p className="text-sm text-muted-foreground">
+                              Usuários ativos podem acessar o sistema
+                            </p>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              data-testid="switch-user-active"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                {/* Permissions */}
-                <div className="space-y-3">
-                  <FormLabel>Locais de Acesso</FormLabel>
+                  {/* Permissions */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-foreground mb-2">Locais de Acesso</h4>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto border rounded-lg p-3">
                     {AVAILABLE_PERMISSIONS.map((permission) => (
                       <div key={permission.id} className="flex items-start space-x-3">
@@ -538,9 +577,10 @@ export default function Administration() {
                       </div>
                     ))}
                   </div>
+                  </div>
                 </div>
 
-                <div className="flex justify-end space-x-4">
+                <div className="flex justify-end space-x-4 pt-4">
                   <Button
                     type="button"
                     variant="outline"
@@ -570,9 +610,24 @@ export default function Administration() {
                     className="min-w-[100px]"
                   >
                     {createMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {editingUser ? "Atualizando..." : "Criando..."}
+                      </>
                     ) : (
-                      editingUser ? "Atualizar" : "Criar"
+                      <>
+                        {editingUser ? (
+                          <>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Atualizar
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Criar Usuário
+                          </>
+                        )}
+                      </>
                     )}
                   </Button>
                 </div>
