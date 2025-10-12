@@ -1038,6 +1038,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get atendimentos history for a specific pet (admin)
+  app.get("/admin/api/pets/:petId/atendimentos", requireAdmin, async (req, res) => {
+    try {
+      const petId = req.params.petId;
+      
+      // Get all atendimentos for this pet
+      const result = await storage.getAtendimentosWithNetworkUnits({});
+      const allAtendimentos = result?.atendimentos || [];
+      
+      // Filter by petId
+      const petAtendimentos = allAtendimentos.filter(
+        atendimento => atendimento.petId === petId
+      );
+      
+      // Sort by date descending (newest first)
+      petAtendimentos.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      
+      res.json(petAtendimentos);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching pet atendimentos:", error);
+      res.status(500).json({ error: "Erro ao buscar histórico de atendimentos" });
+    }
+  });
+
   app.get("/admin/api/clients/search/:query", requireAdmin, async (req, res) => {
     try {
       // Temporary fix: use getAllClients and filter manually

@@ -521,6 +521,39 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
 
+  // Get atendimentos history for a specific pet (unit)
+  app.get(["/api/unit/:slug/pets/:petId/atendimentos", "/api/units/:slug/pets/:petId/atendimentos"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const petId = req.params.petId;
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Get atendimentos for this unit
+      const result = await storage.getUnitAtendimentosWithSequentialNumber(unitId, {});
+      const allAtendimentos = result?.atendimentos || [];
+      
+      // Filter by petId
+      const petAtendimentos = allAtendimentos.filter(
+        (atendimento: any) => atendimento.petId === petId
+      );
+      
+      // Sort by date descending (newest first)
+      petAtendimentos.sort((a: any, b: any) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      
+      res.json(petAtendimentos);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching pet atendimentos:", error);
+      res.status(500).json({ error: "Erro ao buscar histórico de atendimentos" });
+    }
+  });
+
   // Get available procedures for a pet based on their plan and usage
   app.get(["/api/unit/:slug/pets/:petId/available-procedures", "/api/units/:slug/pets/:petId/available-procedures"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {

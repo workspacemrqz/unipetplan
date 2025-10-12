@@ -75,6 +75,8 @@ export default function SteppedAtendimentoForm({
   const [clientPets, setClientPets] = useState<any[]>([]);
   const [procedureSearch, setProcedureSearch] = useState("");
   const [isSearchingClient, setIsSearchingClient] = useState(false);
+  const [selectedPet, setSelectedPet] = useState<any>(null);
+  const [petHistory, setPetHistory] = useState<any[]>([]);
 
   // Função para formatar CPF
   const formatCpf = (value: string) => {
@@ -455,7 +457,7 @@ export default function SteppedAtendimentoForm({
                       </p>
                     </div>
                     
-                    <div className="max-w-md mx-auto">
+                    <div className="max-w-3xl mx-auto">
                       <FormField
                         control={form.control}
                         name="petId"
@@ -463,11 +465,37 @@ export default function SteppedAtendimentoForm({
                           <FormItem>
                             <FormLabel>Pet *</FormLabel>
                             <Select 
-                              onValueChange={(value) => {
+                              onValueChange={async (value) => {
                                 field.onChange(value);
                                 form.setValue("procedure", "");
                                 form.setValue("generalNotes", "");
                                 form.setValue("value", "");
+                                
+                                // Buscar informações detalhadas do pet
+                                const pet = clientPets.find(p => p.id === value);
+                                setSelectedPet(pet);
+                                
+                                // Buscar histórico de atendimentos
+                                try {
+                                  const historyResponse = await fetch(
+                                    mode === 'admin' 
+                                      ? `/admin/api/pets/${value}/atendimentos`
+                                      : `/api/units/${slug}/pets/${value}/atendimentos`,
+                                    mode === 'unit' ? {
+                                      headers: { 'Authorization': `Bearer ${localStorage.getItem('unit-token')}` }
+                                    } : undefined
+                                  );
+                                  
+                                  if (historyResponse.ok) {
+                                    const history = await historyResponse.json();
+                                    setPetHistory(history);
+                                  } else {
+                                    setPetHistory([]);
+                                  }
+                                } catch (error) {
+                                  console.error('Erro ao buscar histórico:', error);
+                                  setPetHistory([]);
+                                }
                               }} 
                               value={field.value}
                             >
@@ -505,16 +533,148 @@ export default function SteppedAtendimentoForm({
                             </Select>
                             <FormMessage />
                             
-                            {field.value && (
+                            {field.value && selectedPet && (
                               <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="mt-4 p-4 rounded-lg"
-                                style={{ backgroundColor: 'rgba(39, 118, 119, 0.1)', borderWidth: '1px', borderStyle: 'solid', borderColor: '#277677' }}
+                                className="mt-6 space-y-4"
                               >
-                                <p className="font-semibold" style={{ color: '#277677' }}>
-                                  Pet selecionado: {clientPets.find(p => p.id === field.value)?.name}
-                                </p>
+                                {/* Informações Pessoais do Pet */}
+                                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                  <h3 className="font-semibold text-lg mb-3 text-[#277677]">
+                                    📋 Informações Pessoais do Pet
+                                  </h3>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    <div>
+                                      <span className="font-medium text-gray-600">Nome:</span>
+                                      <span className="ml-2 text-gray-900">{selectedPet.name}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Espécie:</span>
+                                      <span className="ml-2 text-gray-900">{selectedPet.species || 'Não informado'}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Raça:</span>
+                                      <span className="ml-2 text-gray-900">{selectedPet.breed || 'Não informada'}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Idade:</span>
+                                      <span className="ml-2 text-gray-900">{selectedPet.age || 'Não informada'}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Sexo:</span>
+                                      <span className="ml-2 text-gray-900">{selectedPet.sex || 'Não informado'}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Castrado:</span>
+                                      <span className="ml-2 text-gray-900">
+                                        {selectedPet.castrated === true ? 'Sim' : selectedPet.castrated === false ? 'Não' : 'Não informado'}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Cor:</span>
+                                      <span className="ml-2 text-gray-900">{selectedPet.color || 'Não informada'}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Peso:</span>
+                                      <span className="ml-2 text-gray-900">
+                                        {selectedPet.weight ? `${selectedPet.weight} kg` : 'Não informado'}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Microchip:</span>
+                                      <span className="ml-2 text-gray-900">{selectedPet.microchip || 'Não informado'}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-medium text-gray-600">Plano:</span>
+                                      <span className="ml-2 text-gray-900">
+                                        {selectedPet.planId ? 'Ativo' : 'Sem plano'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Informações Médicas */}
+                                  {(selectedPet.previousDiseases || selectedPet.surgeries || selectedPet.allergies || selectedPet.currentMedications) && (
+                                    <div className="mt-4 pt-4 border-t border-gray-200">
+                                      <h4 className="font-medium text-gray-700 mb-2">Informações Médicas</h4>
+                                      <div className="space-y-2 text-sm">
+                                        {selectedPet.previousDiseases && (
+                                          <div>
+                                            <span className="font-medium text-gray-600">Doenças Anteriores:</span>
+                                            <p className="mt-1 text-gray-900">{selectedPet.previousDiseases}</p>
+                                          </div>
+                                        )}
+                                        {selectedPet.surgeries && (
+                                          <div>
+                                            <span className="font-medium text-gray-600">Cirurgias:</span>
+                                            <p className="mt-1 text-gray-900">{selectedPet.surgeries}</p>
+                                          </div>
+                                        )}
+                                        {selectedPet.allergies && (
+                                          <div>
+                                            <span className="font-medium text-gray-600">Alergias:</span>
+                                            <p className="mt-1 text-gray-900">{selectedPet.allergies}</p>
+                                          </div>
+                                        )}
+                                        {selectedPet.currentMedications && (
+                                          <div>
+                                            <span className="font-medium text-gray-600">Medicações Atuais:</span>
+                                            <p className="mt-1 text-gray-900">{selectedPet.currentMedications}</p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* Histórico de Atendimentos */}
+                                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                  <h3 className="font-semibold text-lg mb-3 text-[#277677]">
+                                    🏥 Histórico de Atendimentos
+                                  </h3>
+                                  {petHistory && petHistory.length > 0 ? (
+                                    <div className="space-y-3">
+                                      {petHistory.slice(0, 5).map((atendimento: any, index: number) => (
+                                        <div key={atendimento.id || index} className="border-l-2 border-[#277677] pl-3 text-sm">
+                                          <div className="flex justify-between items-start">
+                                            <div>
+                                              <p className="font-medium text-gray-900">
+                                                {atendimento.procedure || 'Procedimento não especificado'}
+                                              </p>
+                                              <p className="text-gray-600 text-xs">
+                                                {new Date(atendimento.createdAt || atendimento.created_at).toLocaleDateString('pt-BR')}
+                                                {atendimento.networkUnit && ` - ${atendimento.networkUnit.name}`}
+                                              </p>
+                                              {atendimento.generalNotes && (
+                                                <p className="text-gray-700 mt-1">
+                                                  Observação: {atendimento.generalNotes}
+                                                </p>
+                                              )}
+                                            </div>
+                                            <span className={`px-2 py-1 rounded text-xs ${
+                                              atendimento.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                              atendimento.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                              'bg-gray-100 text-gray-700'
+                                            }`}>
+                                              {atendimento.status === 'completed' ? 'Concluído' :
+                                               atendimento.status === 'pending' ? 'Pendente' :
+                                               atendimento.status || 'Em andamento'}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      ))}
+                                      {petHistory.length > 5 && (
+                                        <p className="text-sm text-gray-500 text-center mt-2">
+                                          + {petHistory.length - 5} atendimentos anteriores
+                                        </p>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <p className="text-gray-500 text-sm">
+                                      Nenhum atendimento anterior registrado
+                                    </p>
+                                  )}
+                                </div>
                               </motion.div>
                             )}
                           </FormItem>
