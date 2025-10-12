@@ -43,34 +43,19 @@ export default function UnitDashboard() {
     const token = localStorage.getItem('unit-token');
     const newStats = { ...stats };
     
-    // Buscar atendimentos
+    // Buscar estatísticas agregadas do backend
     try {
-      const guidesResponse = await fetch(`/api/units/${slug}/atendimentos`, {
+      const statsResponse = await fetch(`/api/units/${slug}/dashboard-stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (guidesResponse.ok) {
-        const guidesData = await guidesResponse.json();
-        newStats.totalGuides = guidesData.total || guidesData.data?.length || 0;
+      if (statsResponse.ok) {
+        const dashboardStats = await statsResponse.json();
+        newStats.totalGuides = dashboardStats.totalAtendimentos || 0;
+        newStats.totalClients = dashboardStats.uniqueClients || 0;
+        newStats.totalPets = dashboardStats.uniquePets || 0;
       }
     } catch (error) {
-      console.error('Erro ao buscar atendimentos:', error);
-    }
-    
-    // Buscar clientes
-    try {
-      const clientsResponse = await fetch(`/api/unit/${slug}/clients`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (clientsResponse.ok) {
-        const clientsData = await clientsResponse.json();
-        const totalPets = clientsData.reduce((acc: number, client: any) => {
-          return acc + (client.pets?.length || 0);
-        }, 0);
-        newStats.totalClients = clientsData.length || 0;
-        newStats.totalPets = totalPets;
-      }
-    } catch (error) {
-      console.error('Erro ao buscar clientes:', error);
+      console.error('Erro ao buscar estatísticas do dashboard:', error);
     }
     
     // Buscar procedimentos
@@ -136,7 +121,7 @@ export default function UnitDashboard() {
                 <Users className="h-6 w-6" style={{ color: '#257273' }} />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-3">Total de clientes cadastrados</p>
+            <p className="text-xs text-gray-500 mt-3">Clientes únicos atendidos</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -149,7 +134,7 @@ export default function UnitDashboard() {
                 <Users className="h-6 w-6" style={{ color: '#257273' }} />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-3">Total de pets cadastrados</p>
+            <p className="text-xs text-gray-500 mt-3">Pets únicos atendidos</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">

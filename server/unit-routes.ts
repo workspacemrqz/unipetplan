@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { IStorage } from './storage.js';
+import { db } from './db.js';
+import { atendimentos } from '../shared/schema.js';
+import { sql, eq } from 'drizzle-orm';
 
 interface UnitRequest extends Request {
   unit?: {
@@ -215,6 +218,50 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     } catch (error) {
       console.error("❌ [UNIT] Error fetching atendimentos:", error);
       res.status(500).json({ error: "Erro ao buscar atendimentos" });
+    }
+  });
+  
+  // Get dashboard statistics (authenticated) - aggregated counts from database
+  app.get("/api/units/:slug/dashboard-stats", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Count DISTINCT clients using SQL aggregation
+      const uniqueClientsResult = await db
+        .select({ count: sql<number>`count(distinct ${atendimentos.clientId})` })
+        .from(atendimentos)
+        .where(eq(atendimentos.createdByUnitId, unitId));
+      
+      // Count DISTINCT pets using SQL aggregation
+      const uniquePetsResult = await db
+        .select({ count: sql<number>`count(distinct ${atendimentos.petId})` })
+        .from(atendimentos)
+        .where(eq(atendimentos.createdByUnitId, unitId));
+      
+      // Count total atendimentos
+      const totalAtendimentosResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(atendimentos)
+        .where(eq(atendimentos.createdByUnitId, unitId));
+      
+      const uniqueClients = uniqueClientsResult[0]?.count || 0;
+      const uniquePets = uniquePetsResult[0]?.count || 0;
+      const totalAtendimentos = totalAtendimentosResult[0]?.count || 0;
+      
+      console.log(`✅ [UNIT] Dashboard stats for unit ${unitId}: ${totalAtendimentos} atendimentos, ${uniqueClients} unique clients, ${uniquePets} unique pets`);
+      
+      res.json({
+        uniqueClients: Number(uniqueClients),
+        uniquePets: Number(uniquePets),
+        totalAtendimentos: Number(totalAtendimentos)
+      });
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Erro ao buscar estatísticas do dashboard" });
     }
   });
   
@@ -982,7 +1029,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       }
       
       // Hash password if provided
-      let passwordHash = null;
+      let passwordHash: string | null = null;
       if (login && password) {
         passwordHash = await bcrypt.hash(password, 10);
       }
