@@ -28,39 +28,45 @@ export function configureSecurityMiddleware(app: Application) {
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
   }));
 
-  // CORS Configuration - Allow Replit deployment domains
-  const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? [
-        'https://unipetplan.com.br', 
-        'https://www.unipetplan.com.br',
-        // Support both old and new Replit domain formats
-        'https://unipet.replit.app',
-        process.env.REPLIT_DEPLOYMENT === 'true' ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : null,
-        process.env.REPLIT_DEPLOYMENT === 'true' ? `https://${process.env.REPL_SLUG}.replit.app` : null
-      ].filter(Boolean)
-    : ['http://localhost:5000', 'http://127.0.0.1:5000', 'http://localhost:3000'];
-
+  // CORS Configuration - Secure validation with URL parsing
   app.use(cors({
     origin: (origin, callback) => {
-      // ✅ DEPLOYMENT FIX: Allow same-origin requests (no origin header)
-      // This is required for deployed apps where frontend and backend are on same domain
+      // Allow same-origin (no origin header)
       if (!origin) {
-        // Allow same-origin requests in both dev and production
+        console.log('✅ [CORS] Same-origin request allowed');
         return callback(null, true);
       }
       
-      // Permitir URLs do Replit durante desenvolvimento e produção
-      if (origin.includes('.replit.dev') || origin.includes('.replit.app')) {
-        console.log('✅ [CORS] Permitindo origem Replit:', origin);
-        return callback(null, true);
-      }
-      
-      if (allowedOrigins.includes(origin)) {
-        console.log('✅ [CORS] Origem permitida:', origin);
-        callback(null, true);
-      } else {
-        console.warn(`⚠️ [CORS] Blocked request from origin: ${origin}`);
-        callback(new Error('Origem não permitida pelo CORS'));
+      try {
+        const url = new URL(origin);
+        const hostname = url.hostname;
+        
+        // Strict Replit domain check using endsWith
+        if (hostname.endsWith('.replit.dev') || hostname.endsWith('.replit.app') || 
+            hostname === 'replit.dev' || hostname === 'replit.app') {
+          console.log('✅ [CORS] Replit domain allowed:', origin);
+          return callback(null, true);
+        }
+        
+        // Custom production domains
+        const productionDomains = ['unipetplan.com.br', 'www.unipetplan.com.br'];
+        if (productionDomains.includes(hostname)) {
+          console.log('✅ [CORS] Production domain allowed:', origin);
+          return callback(null, true);
+        }
+        
+        // Localhost in development only
+        if (process.env.NODE_ENV !== 'production' && 
+            (hostname === 'localhost' || hostname === '127.0.0.1')) {
+          console.log('✅ [CORS] Localhost allowed (dev):', origin);
+          return callback(null, true);
+        }
+        
+        console.warn(`⚠️ [CORS] Blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      } catch (error) {
+        console.error('❌ [CORS] Invalid origin URL:', origin);
+        callback(new Error('Invalid origin'));
       }
     },
     credentials: true,
