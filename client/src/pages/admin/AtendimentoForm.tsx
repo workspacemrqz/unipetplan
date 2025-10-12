@@ -1,7 +1,5 @@
 import { useLocation } from "wouter";
 import SteppedAtendimentoForm from "@/components/shared/SteppedAtendimentoForm";
-import { Button } from "@/components/admin/ui/button";
-import { ArrowLeft } from "lucide-react";
 
 export default function AtendimentoForm() {
   const [, setLocation] = useLocation();
@@ -18,24 +16,10 @@ export default function AtendimentoForm() {
         </p>
       </div>
 
-      {/* Back Button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setLocation("/atendimentos")}
-        data-testid="button-back-to-atendimentos"
-        className="w-full sm:w-auto"
-        style={{ backgroundColor: '#FFFFFF' }}
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar para Atendimentos
-      </Button>
-
       {/* Stepped Form */}
       <SteppedAtendimentoForm
         mode="admin"
         onSuccess={() => setLocation("/atendimentos")}
-        onCancel={() => setLocation("/atendimentos")}
       />
     </div>
   );
