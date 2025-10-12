@@ -6,7 +6,8 @@ import {
   FileText,
   Clipboard,
   DollarSign,
-  LogOut
+  LogOut,
+  Plus
 } from "lucide-react";
 
 export default function UnitSidebar() {
@@ -23,7 +24,14 @@ export default function UnitSidebar() {
     {
       name: "Gestão",
       items: [
-        { name: "Atendimentos", href: `/unidade/${slug}/atendimentos`, icon: FileText },
+        { 
+          name: "Atendimentos", 
+          href: `/unidade/${slug}/atendimentos`, 
+          icon: FileText,
+          subItems: [
+            { name: "Novo Atendimento", href: `/unidade/${slug}/atendimentos/novo`, icon: Plus }
+          ]
+        },
         { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign },
         { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard }
       ]
@@ -53,23 +61,48 @@ export default function UnitSidebar() {
             </h3>
             <div className="space-y-1">
               {section.items.map((item) => {
-                // Check if current location matches the item's href
-                const isActive = location === item.href;
+                // Check if current location matches the item's href or any subitem
+                const isActive = location === item.href || item.subItems?.some(sub => location === sub.href);
                 
                 return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-gray-600 hover:text-gray-900"
+                  <div key={item.name}>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "text-gray-600 hover:text-gray-900"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 mr-3" />
+                      {item.name}
+                    </Link>
+                    
+                    {/* Render subitems if they exist */}
+                    {item.subItems && (
+                      <div className="ml-8 mt-1 space-y-1">
+                        {item.subItems.map((subItem) => {
+                          const isSubActive = location === subItem.href;
+                          return (
+                            <Link
+                              key={subItem.name}
+                              href={subItem.href}
+                              className={cn(
+                                "flex items-center px-3 py-1.5 text-sm rounded-lg transition-colors",
+                                isSubActive
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                              )}
+                            >
+                              <subItem.icon className="h-4 w-4 mr-2" />
+                              {subItem.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
                     )}
-                  >
-                    <item.icon className="h-5 w-5 mr-3" />
-                    {item.name}
-                  </Link>
+                  </div>
                 );
               })}
             </div>

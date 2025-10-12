@@ -314,13 +314,6 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Atendimentos</h1>
           <p className="text-sm text-muted-foreground">Visualize os atendimentos gerados pela sua unidade</p>
         </div>
-        <Button
-          onClick={() => setLocation(`/unidade/${unitSlug}/atendimentos/novo`)}
-          className="bg-[#277677] hover:bg-[#1f5a5b] text-white flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Novo Atendimento
-        </Button>
       </div>
 
       {/* Date Filter */}
