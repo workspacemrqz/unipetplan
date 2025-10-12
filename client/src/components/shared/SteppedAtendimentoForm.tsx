@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -316,12 +316,13 @@ export default function SteppedAtendimentoForm({
     mutation.mutate(data);
   };
 
-  // Componente de indicador de etapas
-  const StepIndicator = () => (
+  // Componente de indicador de etapas - Memoizado para evitar animações desnecessárias
+  const StepIndicator = memo(({ currentStep }: { currentStep: number }) => (
     <div className="flex items-center justify-center mb-8">
       {[1, 2, 3, 4].map((step) => (
         <div key={step} className="flex items-center">
           <motion.div
+            key={`circle-${step}-${currentStep}`} // Key única para controlar quando animar
             initial={{ scale: 0.8 }}
             animate={{ 
               scale: step === currentStep ? 1.1 : 1,
@@ -341,6 +342,7 @@ export default function SteppedAtendimentoForm({
           </motion.div>
           {step < 4 && (
             <motion.div
+              key={`line-${step}-${currentStep}`} // Key única para controlar quando animar
               initial={{ scaleX: 0 }}
               animate={{ 
                 scaleX: step < currentStep ? 1 : 0.5,
@@ -356,7 +358,7 @@ export default function SteppedAtendimentoForm({
         </div>
       ))}
     </div>
-  );
+  ));
 
   // Animação das etapas
   const slideVariants = {
@@ -376,7 +378,7 @@ export default function SteppedAtendimentoForm({
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <StepIndicator />
+      <StepIndicator currentStep={currentStep} />
       
       <Form {...form}>
         <Card className="border border-[#eaeaea] rounded-lg bg-white shadow-sm !bg-white">
