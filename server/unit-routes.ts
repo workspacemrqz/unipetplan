@@ -782,4 +782,247 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       res.status(500).json({ error: "Erro ao buscar clientes" });
     }
   });
+
+  // ===== VETERINARIANS MANAGEMENT =====
+  
+  // Veterinarian login
+  app.post("/api/veterinarian-auth/login", async (req: Request, res: Response) => {
+    try {
+      const { login, password } = req.body;
+      
+      if (!login || !password) {
+        return res.status(400).json({ error: "Dados incompletos" });
+      }
+      
+      const veterinarian = await storage.getVeterinarianByLogin(login);
+      if (!veterinarian) {
+        return res.status(401).json({ error: "Credenciais inválidas" });
+      }
+      
+      // Check if veterinarian is active
+      if (!veterinarian.isActive) {
+        return res.status(401).json({ error: "Veterinário inativo" });
+      }
+      
+      // Check if has access to atendimentos
+      if (!veterinarian.canAccessAtendimentos) {
+        return res.status(401).json({ error: "Acesso não autorizado" });
+      }
+      
+      // Verify password
+      if (!veterinarian.passwordHash) {
+        return res.status(401).json({ error: "Credenciais não configuradas" });
+      }
+      
+      const isValidPassword = await bcrypt.compare(password, veterinarian.passwordHash);
+      
+      if (!isValidPassword) {
+        return res.status(401).json({ error: "Credenciais inválidas" });
+      }
+      
+      // ✅ SECURITY FIX: Enforce SESSION_SECRET without fallback
+      if (!process.env.SESSION_SECRET) {
+        console.error('❌ [SECURITY] SESSION_SECRET not configured for JWT');
+        return res.status(500).json({ error: 'Configuração de segurança ausente' });
+      }
+      
+      // Get unit info
+      const unit = await storage.getNetworkUnitById(veterinarian.networkUnitId);
+      if (!unit) {
+        return res.status(500).json({ error: "Erro ao buscar informações da unidade" });
+      }
+      
+      // Generate JWT token
+      const token = jwt.sign(
+        { 
+          veterinarianId: veterinarian.id,
+          unitId: veterinarian.networkUnitId,
+          slug: unit.urlSlug,
+          type: 'veterinarian'
+        },
+        process.env.SESSION_SECRET,
+        { expiresIn: '8h' }
+      );
+      
+      console.log(`✅ [VET-AUTH] Veterinarian logged in: ${veterinarian.name}`);
+      res.json({ 
+        token, 
+        veterinarianName: veterinarian.name,
+        unitName: unit.name,
+        unitSlug: unit.urlSlug
+      });
+    } catch (error) {
+      console.error("❌ [VET-AUTH] Login error:", error);
+      res.status(500).json({ error: "Erro ao fazer login" });
+    }
+  });
+  
+  // Get all veterinarians for a unit (authenticated)
+  app.get("/api/units/:slug/veterinarios", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      const veterinarians = await storage.getVeterinariansByUnitId(unitId);
+      res.json(veterinarians);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching veterinarians:", error);
+      res.status(500).json({ error: "Erro ao buscar veterinários" });
+    }
+  });
+
+  // Get a specific veterinarian (authenticated)
+  app.get("/api/units/:slug/veterinarios/:id", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      const { id } = req.params;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      const veterinarian = await storage.getVeterinarianById(id);
+      
+      if (!veterinarian) {
+        return res.status(404).json({ error: "Veterinário não encontrado" });
+      }
+      
+      // Verify veterinarian belongs to this unit
+      if (veterinarian.networkUnitId !== unitId) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+      
+      res.json(veterinarian);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching veterinarian:", error);
+      res.status(500).json({ error: "Erro ao buscar veterinário" });
+    }
+  });
+
+  // Create a new veterinarian (authenticated)
+  app.post("/api/units/:slug/veterinarios", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      const { name, crmv, email, phone, specialty, type, login, password, canAccessAtendimentos } = req.body;
+      
+      // Validate required fields
+      if (!name || !crmv || !email || !phone || !type) {
+        return res.status(400).json({ error: "Campos obrigatórios não preenchidos" });
+      }
+      
+      // Hash password if provided
+      let passwordHash = null;
+      if (login && password) {
+        passwordHash = await bcrypt.hash(password, 10);
+      }
+      
+      const veterinarian = await storage.createVeterinarian({
+        networkUnitId: unitId,
+        name,
+        crmv,
+        email,
+        phone,
+        specialty: specialty || null,
+        type,
+        login: login || null,
+        passwordHash,
+        canAccessAtendimentos: canAccessAtendimentos || false,
+        isActive: true
+      });
+      
+      console.log(`✅ [UNIT] Veterinarian created: ${veterinarian.name}`);
+      res.status(201).json(veterinarian);
+    } catch (error) {
+      console.error("❌ [UNIT] Error creating veterinarian:", error);
+      res.status(500).json({ error: "Erro ao criar veterinário" });
+    }
+  });
+
+  // Update a veterinarian (authenticated)
+  app.put("/api/units/:slug/veterinarios/:id", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      const { id } = req.params;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Verify veterinarian exists and belongs to this unit
+      const existing = await storage.getVeterinarianById(id);
+      if (!existing) {
+        return res.status(404).json({ error: "Veterinário não encontrado" });
+      }
+      if (existing.networkUnitId !== unitId) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+      
+      const { name, crmv, email, phone, specialty, type, login, password, canAccessAtendimentos, isActive } = req.body;
+      
+      const updateData: any = {};
+      if (name !== undefined) updateData.name = name;
+      if (crmv !== undefined) updateData.crmv = crmv;
+      if (email !== undefined) updateData.email = email;
+      if (phone !== undefined) updateData.phone = phone;
+      if (specialty !== undefined) updateData.specialty = specialty;
+      if (type !== undefined) updateData.type = type;
+      if (login !== undefined) updateData.login = login;
+      if (canAccessAtendimentos !== undefined) updateData.canAccessAtendimentos = canAccessAtendimentos;
+      if (isActive !== undefined) updateData.isActive = isActive;
+      
+      // Hash new password if provided
+      if (password) {
+        updateData.passwordHash = await bcrypt.hash(password, 10);
+      }
+      
+      const veterinarian = await storage.updateVeterinarian(id, updateData);
+      
+      console.log(`✅ [UNIT] Veterinarian updated: ${veterinarian?.name}`);
+      res.json(veterinarian);
+    } catch (error) {
+      console.error("❌ [UNIT] Error updating veterinarian:", error);
+      res.status(500).json({ error: "Erro ao atualizar veterinário" });
+    }
+  });
+
+  // Delete a veterinarian (authenticated)
+  app.delete("/api/units/:slug/veterinarios/:id", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      const { id } = req.params;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Verify veterinarian exists and belongs to this unit
+      const existing = await storage.getVeterinarianById(id);
+      if (!existing) {
+        return res.status(404).json({ error: "Veterinário não encontrado" });
+      }
+      if (existing.networkUnitId !== unitId) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+      
+      const success = await storage.deleteVeterinarian(id);
+      
+      if (success) {
+        console.log(`✅ [UNIT] Veterinarian deleted: ${existing.name}`);
+        res.json({ success: true, message: "Veterinário removido com sucesso" });
+      } else {
+        res.status(500).json({ error: "Erro ao remover veterinário" });
+      }
+    } catch (error) {
+      console.error("❌ [UNIT] Error deleting veterinarian:", error);
+      res.status(500).json({ error: "Erro ao remover veterinário" });
+    }
+  });
 }
