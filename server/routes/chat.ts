@@ -168,13 +168,17 @@ router.post('/send', chatRateLimit, sanitizeInput, async (req, res) => {
       }
 
       console.log('✅ [CHAT-WEBHOOK] Success response:', {
+        fullData: data,
         hasResponse: !!data.response,
         responseLength: data.response?.length
       });
       
+      // Try different possible response fields from the webhook
+      const botResponse = data.response || data.message || data.text || data.output || (typeof data === 'string' ? data : 'Mensagem recebida');
+      
       res.json({
         success: true,
-        response: data.response || data.message || 'Mensagem recebida',
+        response: botResponse,
         metadata: {
           sessionId,
           timestamp: new Date().toISOString(),
