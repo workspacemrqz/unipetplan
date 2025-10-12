@@ -1,0 +1,830 @@
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/admin/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+import { ArrowLeft, ArrowRight, Check, Loader2, User, Heart, FileText, CheckCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+interface SteppedAtendimentoFormProps {
+  mode: 'admin' | 'unit';
+  slug?: string;
+  networkUnitId?: string;
+  networkUnitName?: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export default function SteppedAtendimentoForm({
+  mode,
+  slug,
+  networkUnitId,
+  networkUnitName,
+  onSuccess,
+  onCancel
+}: SteppedAtendimentoFormProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Etapas do formulário
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 4;
+  
+  // Estados do formulário
+  const [cpfSearch, setCpfSearch] = useState("");
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [clientPets, setClientPets] = useState<any[]>([]);
+  const [procedureSearch, setProcedureSearch] = useState("");
+  const [isSearchingClient, setIsSearchingClient] = useState(false);
+
+  // Função para formatar CPF
+  const formatCpf = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    const limited = numbers.slice(0, 11);
+    
+    if (limited.length <= 3) {
+      return limited;
+    } else if (limited.length <= 6) {
+      return `${limited.slice(0, 3)}.${limited.slice(3)}`;
+    } else if (limited.length <= 9) {
+      return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6)}`;
+    } else {
+      return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6, 9)}-${limited.slice(9)}`;
+    }
+  };
+
+  // Schema de validação
+  const atendimentoFormSchema = z.object({
+    clientId: z.string().min(1, "Cliente é obrigatório"),
+    petId: z.string().min(1, "Pet é obrigatório"),
+    procedure: z.string().min(1, "Procedimento é obrigatório"),
+    networkUnitId: z.string().min(1, "Rede credenciada é obrigatória"),
+    generalNotes: z.string().optional(),
+    value: z.string().optional(),
+    status: z.string().optional(),
+  });
+
+  const form = useForm({
+    resolver: zodResolver(atendimentoFormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      clientId: "",
+      petId: "",
+      procedure: "",
+      networkUnitId: networkUnitId || "",
+      generalNotes: "",
+      value: "",
+      status: "open",
+    },
+  });
+
+  // Buscar redes credenciadas (apenas para admin)
+  const { data: networkUnits = [], isLoading: networkUnitsLoading } = useQuery<any[]>({
+    queryKey: ["/admin/api/network-units"],
+    queryFn: async () => {
+      const response = await fetch("/admin/api/network-units");
+      if (!response.ok) throw new Error("Erro ao buscar redes credenciadas");
+      return response.json();
+    },
+    enabled: mode === 'admin',
+  });
+
+  // Buscar procedimentos disponíveis
+  const petIdToFetch = form.watch("petId");
+  const { data: availableProcedures, isLoading: proceduresLoading } = useQuery<any>({
+    queryKey: mode === 'admin' 
+      ? ["/admin/api/pets", petIdToFetch, "available-procedures"]
+      : [`/api/units/${slug}/pets/${petIdToFetch}/available-procedures`],
+    queryFn: async () => {
+      if (mode === 'admin') {
+        const response = await fetch(`/admin/api/pets/${petIdToFetch}/available-procedures`);
+        if (!response.ok) throw new Error("Erro ao buscar procedimentos");
+        return response.json();
+      } else {
+        const token = localStorage.getItem('unit-token');
+        if (!token) throw new Error('Token de autenticação não encontrado');
+        
+        const response = await fetch(`/api/units/${slug}/pets/${petIdToFetch}/available-procedures`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("Erro ao buscar procedimentos");
+        return response.json();
+      }
+    },
+    enabled: Boolean(petIdToFetch),
+  });
+
+  // Auto-busca quando CPF tem 11 dígitos
+  useEffect(() => {
+    const sanitizedCpf = cpfSearch.replace(/\D/g, '');
+    
+    if (sanitizedCpf.length === 11) {
+      searchClientByCpf();
+    } else if (sanitizedCpf.length < 11 && selectedClient) {
+      setSelectedClient(null);
+      setClientPets([]);
+      form.setValue("clientId", "");
+      form.setValue("petId", "");
+      form.setValue("procedure", "");
+      form.setValue("generalNotes", "");
+      form.setValue("value", "");
+    }
+  }, [cpfSearch]);
+
+  // Buscar cliente por CPF
+  const searchClientByCpf = async () => {
+    const sanitizedCpf = cpfSearch.replace(/\D/g, '');
+    
+    if (!sanitizedCpf || sanitizedCpf.length !== 11) {
+      toast({
+        title: "CPF inválido",
+        description: "Digite um CPF válido com 11 dígitos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSearchingClient(true);
+    
+    try {
+      let client;
+      let pets;
+      
+      if (mode === 'admin') {
+        const response = await fetch(`/admin/api/clients/cpf/${sanitizedCpf}`);
+        if (!response.ok) throw new Error("Cliente não encontrado com este CPF.");
+        client = await response.json();
+        
+        const petsResponse = await fetch(`/admin/api/clients/${client.id}/pets`);
+        if (!petsResponse.ok) throw new Error("Erro ao buscar pets do cliente");
+        pets = await petsResponse.json();
+      } else {
+        const token = localStorage.getItem('unit-token');
+        if (!token) throw new Error('Token de autenticação não encontrado');
+        
+        const response = await fetch(`/api/units/${slug}/clients/cpf/${sanitizedCpf}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("Cliente não encontrado com este CPF.");
+        client = await response.json();
+        
+        const petsResponse = await fetch(`/api/units/${slug}/clients/${client.id}/pets`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!petsResponse.ok) throw new Error("Erro ao buscar pets do cliente");
+        pets = await petsResponse.json();
+      }
+      
+      setSelectedClient(client);
+      form.setValue("clientId", client.id);
+      setClientPets(pets);
+      
+      // Reset campos dependentes
+      form.setValue("petId", "");
+      form.setValue("procedure", "");
+      form.setValue("generalNotes", "");
+      form.setValue("value", "");
+      
+      // Auto-selecionar se houver apenas um pet
+      if (pets.length === 1) {
+        form.setValue("petId", pets[0].id);
+      }
+      
+      toast({
+        title: "Cliente encontrado",
+        description: `${client.fullName} - CPF: ${client.cpf}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Cliente não encontrado com este CPF.",
+        variant: "destructive",
+      });
+      setSelectedClient(null);
+      setClientPets([]);
+      form.setValue("clientId", "");
+      form.setValue("petId", "");
+    } finally {
+      setIsSearchingClient(false);
+    }
+  };
+
+  // Mutation para criar atendimento
+  const mutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (mode === 'admin') {
+        const response = await fetch("/admin/api/atendimentos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error("Erro ao criar atendimento");
+        return response.json();
+      } else {
+        const token = localStorage.getItem('unit-token');
+        if (!token) throw new Error('Token de autenticação não encontrado');
+        
+        const response = await fetch(`/api/units/${slug}/atendimentos`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            ...data,
+            value: data.value ? parseFloat(data.value.replace(',', '.')) : 0
+          }),
+        });
+        if (!response.ok) throw new Error("Erro ao criar atendimento");
+        return response.json();
+      }
+    },
+    onSuccess: async () => {
+      if (mode === 'admin') {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos"] }),
+          queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos/with-network-units"] }),
+          queryClient.invalidateQueries({ queryKey: ["/admin/api/dashboard/all"] })
+        ]);
+      } else {
+        await queryClient.invalidateQueries({ queryKey: [`/api/units/${slug}/atendimentos`] });
+      }
+      
+      toast({
+        title: "Atendimento criado",
+        description: "Atendimento foi criado com sucesso.",
+      });
+      
+      onSuccess?.();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Falha ao criar atendimento.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Validação para avançar etapas
+  const canProceedToNextStep = () => {
+    switch (currentStep) {
+      case 1:
+        return selectedClient && form.getValues("clientId");
+      case 2:
+        return form.getValues("petId");
+      case 3:
+        return form.getValues("networkUnitId") && form.getValues("procedure");
+      case 4:
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  // Navegar entre etapas
+  const goToNextStep = () => {
+    if (canProceedToNextStep() && currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const goToPreviousStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Finalizar formulário
+  const handleFinish = () => {
+    const data = form.getValues();
+    if (!data.clientId || !data.petId || !data.procedure) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+    mutation.mutate(data);
+  };
+
+  // Componente de indicador de etapas
+  const StepIndicator = () => (
+    <div className="flex items-center justify-center mb-8">
+      {[1, 2, 3, 4].map((step) => (
+        <div key={step} className="flex items-center">
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ 
+              scale: step === currentStep ? 1.1 : 1,
+              backgroundColor: step <= currentStep ? "#277677" : "#e5e5e5"
+            }}
+            transition={{ duration: 0.3 }}
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
+              step <= currentStep ? "bg-[#277677]" : "bg-gray-300"
+            )}
+          >
+            {step < currentStep ? (
+              <Check className="h-5 w-5" />
+            ) : (
+              step
+            )}
+          </motion.div>
+          {step < 4 && (
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ 
+                scaleX: step < currentStep ? 1 : 0.5,
+                backgroundColor: step < currentStep ? "#277677" : "#e5e5e5"
+              }}
+              transition={{ duration: 0.3 }}
+              className={cn(
+                "w-16 h-1 mx-2",
+                step < currentStep ? "bg-[#277677]" : "bg-gray-300"
+              )}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  // Animação das etapas
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0
+    })
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto">
+      <StepIndicator />
+      
+      <Form {...form}>
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2">
+              {currentStep === 1 && <User className="h-5 w-5" />}
+              {currentStep === 2 && <Heart className="h-5 w-5" />}
+              {currentStep === 3 && <FileText className="h-5 w-5" />}
+              {currentStep === 4 && <CheckCircle className="h-5 w-5" />}
+              {currentStep === 1 && "Informações do Cliente"}
+              {currentStep === 2 && "Seleção do Pet"}
+              {currentStep === 3 && "Procedimento e Unidade"}
+              {currentStep === 4 && "Observações e Confirmação"}
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="min-h-[400px]">
+            <AnimatePresence mode="wait" custom={currentStep}>
+              <motion.div
+                key={currentStep}
+                custom={currentStep}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 }
+                }}
+                className="space-y-6"
+              >
+                {/* Etapa 1: Cliente */}
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <div className="text-center mb-6">
+                      <p className="text-gray-600">
+                        Digite o CPF do cliente para buscar suas informações
+                      </p>
+                    </div>
+                    
+                    <div className="max-w-md mx-auto">
+                      <FormLabel>CPF do Cliente *</FormLabel>
+                      <div className="relative">
+                        <Input
+                          placeholder="000.000.000-00"
+                          value={cpfSearch}
+                          onChange={(e) => setCpfSearch(formatCpf(e.target.value))}
+                          maxLength={14}
+                          className="h-12 text-center text-lg"
+                          style={{
+                            borderColor: 'var(--border-gray)',
+                            background: 'white'
+                          }}
+                        />
+                        {isSearchingClient && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {selectedClient && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg"
+                        >
+                          <p className="text-green-800 font-semibold">
+                            ✓ Cliente encontrado
+                          </p>
+                          <p className="text-gray-700 mt-2">
+                            <strong>Nome:</strong> {selectedClient.fullName}
+                          </p>
+                          <p className="text-gray-700">
+                            <strong>CPF:</strong> {selectedClient.cpf}
+                          </p>
+                          {selectedClient.email && (
+                            <p className="text-gray-700">
+                              <strong>Email:</strong> {selectedClient.email}
+                            </p>
+                          )}
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Etapa 2: Pet */}
+                {currentStep === 2 && (
+                  <div className="space-y-4">
+                    <div className="text-center mb-6">
+                      <p className="text-gray-600">
+                        Selecione o pet do cliente {selectedClient?.fullName}
+                      </p>
+                    </div>
+                    
+                    <div className="max-w-md mx-auto">
+                      <FormField
+                        control={form.control}
+                        name="petId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pet *</FormLabel>
+                            <Select 
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                form.setValue("procedure", "");
+                                form.setValue("generalNotes", "");
+                                form.setValue("value", "");
+                              }} 
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger 
+                                  className="h-12"
+                                  style={{
+                                    borderColor: 'var(--border-gray)',
+                                    background: 'white'
+                                  }}
+                                >
+                                  <SelectValue placeholder={
+                                    clientPets.length === 0 
+                                      ? "Cliente sem pets cadastrados" 
+                                      : "Selecione o pet"
+                                  } />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {clientPets.map((pet) => (
+                                  <SelectItem 
+                                    key={pet.id} 
+                                    value={pet.id}
+                                    className="py-3"
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="font-semibold">{pet.name}</span>
+                                      <span className="text-sm text-gray-500">
+                                        {pet.species} {pet.breed && `- ${pet.breed}`}
+                                      </span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            
+                            {field.value && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                              >
+                                <p className="text-blue-800 font-semibold">
+                                  Pet selecionado: {clientPets.find(p => p.id === field.value)?.name}
+                                </p>
+                              </motion.div>
+                            )}
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Etapa 3: Rede e Procedimento */}
+                {currentStep === 3 && (
+                  <div className="space-y-6">
+                    <div className="text-center mb-6">
+                      <p className="text-gray-600">
+                        Selecione a unidade e o procedimento
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {mode === 'admin' ? (
+                        <FormField
+                          control={form.control}
+                          name="networkUnitId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Rede Credenciada *</FormLabel>
+                              <Select 
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  form.setValue("procedure", "");
+                                  form.setValue("value", "");
+                                }} 
+                                value={field.value}
+                                disabled={networkUnitsLoading}
+                              >
+                                <FormControl>
+                                  <SelectTrigger 
+                                    className="h-12"
+                                    style={{
+                                      borderColor: 'var(--border-gray)',
+                                      background: 'white'
+                                    }}
+                                  >
+                                    <SelectValue placeholder={
+                                      networkUnitsLoading 
+                                        ? "Carregando redes..." 
+                                        : "Selecione a rede credenciada"
+                                    } />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {networkUnits.map((unit: any) => (
+                                    <SelectItem key={unit.id} value={unit.id}>
+                                      {unit.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ) : (
+                        <div className="space-y-2">
+                          <FormLabel>Rede Credenciada *</FormLabel>
+                          <Input
+                            value={networkUnitName || 'Unidade Atual'}
+                            disabled
+                            className="h-12"
+                            style={{
+                              borderColor: 'var(--border-gray)',
+                              background: '#f5f5f5',
+                              cursor: 'not-allowed'
+                            }}
+                          />
+                          <p className="text-xs text-gray-500">
+                            Unidade pré-selecionada automaticamente
+                          </p>
+                        </div>
+                      )}
+
+                      <FormField
+                        control={form.control}
+                        name="procedure"
+                        render={({ field }) => {
+                          const filteredProcedures = availableProcedures?.procedures?.filter((proc: any) => 
+                            proc.name.toLowerCase().includes(procedureSearch.toLowerCase())
+                          ) || [];
+
+                          return (
+                            <FormItem>
+                              <FormLabel>Procedimento *</FormLabel>
+                              <Select 
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  setProcedureSearch("");
+                                  const selectedProc = availableProcedures?.procedures?.find((p: any) => p.name === value);
+                                  if (selectedProc) {
+                                    const coparticipationValue = selectedProc.coparticipation || 0;
+                                    form.setValue("value", coparticipationValue.toFixed(2).replace('.', ','));
+                                  }
+                                }} 
+                                value={field.value} 
+                                disabled={!petIdToFetch || proceduresLoading}
+                              >
+                                <FormControl>
+                                  <SelectTrigger 
+                                    className="h-12"
+                                    style={{
+                                      borderColor: 'var(--border-gray)',
+                                      background: 'white'
+                                    }}
+                                  >
+                                    <SelectValue placeholder={
+                                      proceduresLoading 
+                                        ? "Carregando procedimentos..." 
+                                        : "Selecione o procedimento"
+                                    } />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <div className="p-2 border-b">
+                                    <Input
+                                      placeholder="Digite para buscar..."
+                                      value={procedureSearch}
+                                      onChange={(e) => setProcedureSearch(e.target.value)}
+                                      className="h-8"
+                                      onClick={(e) => e.stopPropagation()}
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                    />
+                                  </div>
+                                  
+                                  {filteredProcedures.length > 0 ? (
+                                    filteredProcedures.map((proc: any) => (
+                                      <SelectItem key={proc.id} value={proc.name}>
+                                        <div className="flex flex-col">
+                                          <span>{proc.name}</span>
+                                          {proc.annualLimit && (
+                                            <span className="text-xs text-gray-500">
+                                              Limite: {proc.remaining}/{proc.annualLimit} restantes
+                                            </span>
+                                          )}
+                                        </div>
+                                      </SelectItem>
+                                    ))
+                                  ) : (
+                                    <div className="p-4 text-sm text-muted-foreground">
+                                      Nenhum procedimento encontrado
+                                    </div>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                              
+                              {field.value && (
+                                <p className="text-sm text-primary mt-2">
+                                  Coparticipação: {form.getValues("value") === "0,00" ? "Sem coparticipação" : `R$ ${form.getValues("value")}`}
+                                </p>
+                              )}
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Etapa 4: Observações e Confirmação */}
+                {currentStep === 4 && (
+                  <div className="space-y-6">
+                    <div className="text-center mb-6">
+                      <p className="text-gray-600">
+                        Adicione observações e confirme o atendimento
+                      </p>
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="generalNotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Observações Gerais (Opcional)</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              placeholder="Adicione observações ou informações adicionais sobre o atendimento..."
+                              className="min-h-[120px]"
+                              style={{
+                                borderColor: 'var(--border-gray)',
+                                background: 'white'
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <h3 className="font-semibold mb-3">Resumo do Atendimento</h3>
+                      <div className="space-y-2 text-sm">
+                        <p>
+                          <strong>Cliente:</strong> {selectedClient?.fullName}
+                        </p>
+                        <p>
+                          <strong>Pet:</strong> {clientPets.find(p => p.id === form.getValues("petId"))?.name}
+                        </p>
+                        <p>
+                          <strong>Procedimento:</strong> {form.getValues("procedure")}
+                        </p>
+                        {mode === 'admin' && (
+                          <p>
+                            <strong>Unidade:</strong> {networkUnits.find((u: any) => u.id === form.getValues("networkUnitId"))?.name}
+                          </p>
+                        )}
+                        {form.getValues("value") && form.getValues("value") !== "0,00" && (
+                          <p>
+                            <strong>Coparticipação:</strong> R$ {form.getValues("value")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </CardContent>
+          
+          <div className="px-6 pb-6">
+            <Separator className="mb-6" />
+            
+            <div className="flex justify-between">
+              <div>
+                {currentStep > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPreviousStep}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Voltar
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onCancel}
+                >
+                  Cancelar
+                </Button>
+                
+                {currentStep < totalSteps ? (
+                  <Button
+                    type="button"
+                    onClick={goToNextStep}
+                    disabled={!canProceedToNextStep()}
+                    className="flex items-center gap-2"
+                  >
+                    Próximo
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleFinish}
+                    disabled={mutation.isPending}
+                    variant="default"
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  >
+                    {mutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Criando...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4" />
+                        Concluir
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </Card>
+      </Form>
+    </div>
+  );
+}

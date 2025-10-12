@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Users, Cat, Clipboard, FileText } from "lucide-react";
+import { Users, Heart, Clipboard, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info, Plus, AlertCircle } from "lucide-react";
@@ -119,7 +119,7 @@ export function AtendimentoStepForm({
       id: "pet",
       title: "Pet",
       description: "Selecione o pet do cliente para o atendimento",
-      icon: <Cat className="w-4 h-4" />,
+      icon: <Heart className="w-4 h-4" />,
       content: (
         <Card>
           <CardContent className="p-6">
