@@ -754,7 +754,7 @@ export default function SteppedAtendimentoForm({
                               >
                                 <FormControl>
                                   <SelectTrigger 
-                                    className="h-12"
+                                    className="h-12 text-left"
                                     style={{
                                       borderColor: 'var(--border-gray)',
                                       background: 'white'
@@ -824,7 +824,7 @@ export default function SteppedAtendimentoForm({
                               >
                                 <FormControl>
                                   <SelectTrigger 
-                                    className="h-12"
+                                    className="h-12 text-left"
                                     style={{
                                       borderColor: 'var(--border-gray)',
                                       background: 'white'
@@ -857,7 +857,7 @@ export default function SteppedAtendimentoForm({
                                         <div className="flex flex-col max-w-full">
                                           <span className="truncate">{proc.name}</span>
                                           {proc.annualLimit && (
-                                            <span className="text-xs text-gray-500 truncate">
+                                            <span className="text-xs text-white/90 truncate">
                                               Limite: {proc.remaining}/{proc.annualLimit} restantes
                                             </span>
                                           )}
