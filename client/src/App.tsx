@@ -17,6 +17,7 @@ import AtendimentosPage from "@/pages/unit/AtendimentosPage";
 import NovoAtendimentoPage from "@/pages/unit/NovoAtendimentoPage";
 import ProcedimentosPage from "@/pages/unit/ProcedimentosPage";
 import RelatorioFinanceiroPage from "@/pages/unit/RelatorioFinanceiroPage";
+import CorpoClinicoPage from "@/pages/unit/CorpoClinicoPage";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfUse from "@/pages/terms-of-use";
 import CheckoutPage from "@/pages/checkout";
@@ -204,6 +205,7 @@ function Router() {
         <Route path="/unidade/:slug/atendimentos/novo" component={NovoAtendimentoPage} />
         <Route path="/unidade/:slug/atendimentos" component={AtendimentosPage} />
         <Route path="/unidade/:slug/procedimentos" component={ProcedimentosPage} />
+        <Route path="/unidade/:slug/corpo-clinico" component={CorpoClinicoPage} />
         <Route path="/unidade/:slug/relatorio-financeiro" component={RelatorioFinanceiroPage} />
         
         {/* Public Routes with Layout - MUST come before /:slug */}
