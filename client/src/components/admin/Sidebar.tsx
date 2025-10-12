@@ -79,10 +79,10 @@ export default function Sidebar() {
   };
 
   // Map navigation paths to prefetch page types
-  const getPageTypeFromPath = (href: string): 'clients' | 'guides' | 'plans' | 'dashboard' | null => {
+  const getPageTypeFromPath = (href: string): 'clients' | 'atendimentos' | 'plans' | 'dashboard' | null => {
     if (href === '/') return 'dashboard';
     if (href.startsWith('/clientes')) return 'clients';
-    if (href.startsWith('/atendimentos')) return 'guides';
+    if (href.startsWith('/atendimentos')) return 'atendimentos';
     if (href.startsWith('/planos')) return 'plans';
     return null;
   };
