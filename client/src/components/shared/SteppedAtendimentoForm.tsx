@@ -231,7 +231,7 @@ export default function SteppedAtendimentoForm({
       
       toast({
         title: "Cliente encontrado",
-        description: `${client.fullName} - CPF: ${client.cpf}`,
+        description: `${client.fullName} - CPF: ${formatCpf(client.cpf)}`,
       });
     } catch (error: any) {
       toast({
@@ -442,7 +442,7 @@ export default function SteppedAtendimentoForm({
                             <strong>Nome:</strong> {selectedClient.fullName}
                           </p>
                           <p className="text-gray-700">
-                            <strong>CPF:</strong> {selectedClient.cpf}
+                            <strong>CPF:</strong> {formatCpf(selectedClient.cpf)}
                           </p>
                         </motion.div>
                       )}
