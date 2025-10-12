@@ -94,6 +94,7 @@ export interface IStorage {
   getAllNetworkUnits(): Promise<NetworkUnit[]>;
   getAllActiveNetworkUnits(): Promise<NetworkUnit[]>; // For public API
   getNetworkUnit(id: string): Promise<NetworkUnit | undefined>;
+  getNetworkUnitById(id: string): Promise<NetworkUnit | undefined>;
   createNetworkUnit(unit: InsertNetworkUnit): Promise<NetworkUnit>;
   updateNetworkUnit(id: string, unit: Partial<InsertNetworkUnit>): Promise<NetworkUnit | undefined>;
   deleteNetworkUnit(id: string): Promise<boolean>;
@@ -200,6 +201,7 @@ export interface IStorage {
   createAtendimentoProcedures(atendimentoId: string, procedures: any[]): Promise<void>;
   updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined>;
   getAtendimento(id: string): Promise<Atendimento | undefined>;
+  getAtendimentoProcedures(atendimentoId: string): Promise<any[]>;
   getAllAtendimentos(): Promise<Atendimento[]>;
   getActiveAtendimentos(): Promise<Atendimento[]>;
   deleteAtendimento(id: string): Promise<boolean>;
@@ -258,6 +260,14 @@ export interface IStorage {
   getAtendimentosWithNetworkUnits(filters: any): Promise<any>;
   getUnitAtendimentosWithSequentialNumber(unitId: string, filters: any): Promise<any>;
   getContractInstallmentByCieloPaymentId(cieloPaymentId: string): Promise<any | undefined>;
+
+  // Veterinarians
+  getVeterinarianById(id: string): Promise<any | undefined>;
+  getVeterinarianByLogin(login: string): Promise<any | undefined>;
+  getVeterinariansByUnitId(unitId: string): Promise<any[]>;
+  createVeterinarian(veterinarian: any): Promise<any>;
+  updateVeterinarian(id: string, veterinarian: any): Promise<any | undefined>;
+  deleteVeterinarian(id: string): Promise<boolean>;
 
   // Action Logs
   createActionLog(data: InsertActionLog): Promise<ActionLog>;
@@ -455,6 +465,29 @@ export class InMemoryStorage implements IStorage {
   async getAtendimentosWithNetworkUnits(filters: any): Promise<any> { return { atendimentos: [], total: 0 }; }
   async getUnitAtendimentosWithSequentialNumber(unitId: string, filters: any): Promise<any> { return { atendimentos: [], total: 0 }; }
   async getContractInstallmentByCieloPaymentId(cieloPaymentId: string): Promise<any | undefined> { return undefined; }
+  
+  // Network Unit methods
+  async getNetworkUnitById(id: string): Promise<NetworkUnit | undefined> { 
+    return this.networkUnits.find(u => u.id === id); 
+  }
+  
+  // Veterinarian methods
+  async getVeterinarianById(id: string): Promise<any | undefined> { return undefined; }
+  async getVeterinarianByLogin(login: string): Promise<any | undefined> { return undefined; }
+  async getVeterinariansByUnitId(unitId: string): Promise<any[]> { return []; }
+  async createVeterinarian(veterinarian: any): Promise<any> { return veterinarian; }
+  async updateVeterinarian(id: string, veterinarian: any): Promise<any | undefined> { return veterinarian; }
+  async deleteVeterinarian(id: string): Promise<boolean> { return true; }
+  
+  // Action Logs
+  async createActionLog(data: InsertActionLog): Promise<ActionLog> { 
+    return { 
+      ...data, 
+      id: crypto.randomUUID(), 
+      createdAt: new Date() 
+    } as ActionLog; 
+  }
+  async getActionLogsByUnit(unitId: string): Promise<ActionLog[]> { return []; }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -644,6 +677,10 @@ export class DatabaseStorage implements IStorage {
   async getNetworkUnit(id: string): Promise<NetworkUnit | undefined> {
     const [unit] = await db.select().from(networkUnits).where(eq(networkUnits.id, id));
     return unit || undefined;
+  }
+
+  async getNetworkUnitById(id: string): Promise<NetworkUnit | undefined> {
+    return this.getNetworkUnit(id);
   }
 
   async createNetworkUnit(insertUnit: InsertNetworkUnit): Promise<NetworkUnit> {
