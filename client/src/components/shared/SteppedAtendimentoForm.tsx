@@ -925,7 +925,7 @@ export default function SteppedAtendimentoForm({
                                     >
                                       <input
                                         type="checkbox"
-                                        className="mt-1"
+                                        className="mt-1 accent-[#277677]"
                                         checked={selectedProcedures.some(p => p.name === proc.name)}
                                         onChange={(e) => {
                                           if (e.target.checked) {
