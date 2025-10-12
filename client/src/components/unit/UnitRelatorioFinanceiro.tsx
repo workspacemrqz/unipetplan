@@ -15,13 +15,15 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, FileText, MoreHorizontal } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
+import { Search, FileText, MoreHorizontal, Eye, Copy, Check, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarDate } from "@internationalized/date";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { useToast } from "@/hooks/use-toast";
 
 interface FinancialEntry {
   id: string;
@@ -40,6 +42,7 @@ const allColumns = [
   "Procedimento",
   "Coparticipação",
   "Pago",
+  "Ações",
 ] as const;
 
 export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string }) {
@@ -47,6 +50,10 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { visibleColumns, toggleColumn } = useColumnPreferences(`unit-${unitSlug}-relatorio-financeiro.columns`, allColumns);
+  const [selectedEntry, setSelectedEntry] = useState<FinancialEntry | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
+  const { toast } = useToast();
   
   const [dateFilter, setDateFilter] = useState<{
     startDate: CalendarDate | null;
@@ -117,6 +124,52 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
         entry.procedure.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : entries;
+
+  const handleViewDetails = (entry: FinancialEntry) => {
+    setSelectedEntry(entry);
+    setDetailsOpen(true);
+  };
+
+  const generateProcedureText = () => {
+    if (!selectedEntry) return "";
+    
+    let text = "DETALHES DO PROCEDIMENTO\n";
+    text += "=".repeat(50) + "\n\n";
+    
+    text += `Data: ${selectedEntry.date ? format(new Date(selectedEntry.date), "dd/MM/yyyy", { locale: ptBR }) : "Não informado"}\n`;
+    text += `Cliente: ${selectedEntry.clientName}\n`;
+    text += `Pet: ${selectedEntry.petName || "Não informado"}\n`;
+    text += `Procedimento: ${selectedEntry.procedure}\n`;
+    text += `Coparticipação: ${formatCurrency(selectedEntry.coparticipacao)}\n`;
+    text += `Valor Pago: ${formatCurrency(selectedEntry.value)}\n`;
+    
+    text += "\n" + "=".repeat(50);
+    
+    return text;
+  };
+
+  const handleCopyToClipboard = async () => {
+    if (copyState !== 'idle') return;
+    
+    try {
+      setCopyState('copying');
+      const text = generateProcedureText();
+      await navigator.clipboard.writeText(text);
+      
+      setCopyState('copied');
+      
+      setTimeout(() => {
+        setCopyState('idle');
+      }, 2000);
+    } catch (error) {
+      setCopyState('idle');
+      toast({
+        title: "Erro",
+        description: "Não foi possível copiar as informações. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -193,6 +246,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
                 {visibleColumns.includes("Procedimento") && <TableHead className="w-[180px] bg-white">Procedimento</TableHead>}
                 {visibleColumns.includes("Coparticipação") && <TableHead className="w-[120px] bg-white">Coparticipação</TableHead>}
                 {visibleColumns.includes("Pago") && <TableHead className="w-[120px] bg-white">Pago</TableHead>}
+                {visibleColumns.includes("Ações") && <TableHead className="w-[100px] bg-white">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -242,6 +296,17 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
                         {formatCurrency(entry.value)}
                       </TableCell>
                     )}
+                    {visibleColumns.includes("Ações") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewDetails(entry)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               ) : (
@@ -258,6 +323,70 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
           </Table>
         </div>
       </div>
+
+      {/* Details Dialog */}
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent hideCloseButton>
+          <DialogHeader className="flex flex-row items-center justify-between pr-2">
+            <DialogTitle className="flex items-center space-x-2">
+              <Eye className="h-5 w-5 text-primary" />
+              <span>Detalhes do Procedimento</span>
+            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleCopyToClipboard}
+                disabled={copyState === 'copying'}
+                className={`gap-2 h-8 transition-all duration-300 ${
+                  copyState === 'copied' ? 'bg-[#e6f4f4] border-[#277677] text-[#277677]' : ''
+                }`}
+              >
+                {copyState === 'copying' && <Loader2 className="h-4 w-4 animate-spin" />}
+                {copyState === 'copied' && <Check className="h-4 w-4" />}
+                {copyState === 'idle' && <Copy className="h-4 w-4" />}
+                {copyState === 'copying' ? 'Copiando...' : copyState === 'copied' ? 'Copiado!' : 'Copiar'}
+              </Button>
+              <Button
+                variant="outline" 
+                onClick={() => setDetailsOpen(false)}
+                className="h-8"
+              >
+                Fechar
+              </Button>
+            </div>
+          </DialogHeader>
+          
+          {selectedEntry && (
+            <div className="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar">
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Informações do Procedimento</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Data:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedEntry.date ? format(new Date(selectedEntry.date), "dd/MM/yyyy", { locale: ptBR }) : "Não informado"}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedEntry.clientName}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedEntry.petName || "Não informado"}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Procedimento:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedEntry.procedure}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Coparticipação:</strong> <span className="font-bold text-foreground break-words whitespace-pre-wrap">{formatCurrency(selectedEntry.coparticipacao)}</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span><strong className="text-primary">Valor Pago:</strong> <span className="font-bold text-foreground break-words whitespace-pre-wrap">{formatCurrency(selectedEntry.value)}</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
