@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { IStorage } from './storage.js';
 import { db } from './db.js';
-import { atendimentos } from '../shared/schema.js';
+import { atendimentos, type InsertVeterinarian } from '../shared/schema.js';
 import { sql, eq } from 'drizzle-orm';
 
 interface UnitRequest extends Request {
