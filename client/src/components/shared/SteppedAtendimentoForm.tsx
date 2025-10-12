@@ -455,11 +455,6 @@ export default function SteppedAtendimentoForm({
                           <p className="text-gray-700">
                             <strong>CPF:</strong> {selectedClient.cpf}
                           </p>
-                          {selectedClient.email && (
-                            <p className="text-gray-700">
-                              <strong>Email:</strong> {selectedClient.email}
-                            </p>
-                          )}
                         </motion.div>
                       )}
                     </div>
