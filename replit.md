@@ -15,6 +15,7 @@ Preferred communication style: Simple, everyday language.
 -   **State Management**: TanStack React Query.
 -   **Forms**: React Hook Form with Zod validation.
 -   **Animation**: Framer Motion, with standardized button and page loading states using `Loader2` and a custom `LoadingDots` component.
+-   **Atendimento Creation (October 2025)**: Implemented step-by-step navigation flow with animations for both admin (`/admin/atendimentos/novo`) and unit (`/unidade/:slug/atendimentos/novo`) attendance creation pages. Uses shared `SteppedAtendimentoForm` component with 4-step flow: Client Selection → Pet Selection → Procedure & Network Unit → Notes & Confirmation. Features smooth slide animations and visual progress indicators.
 -   **Responsiveness**: Dynamic grid adjustments.
 -   **Admin UI Consistency**: Unified design patterns across all admin pages, consistent navigation structure, standardized dropdowns, and standardized button components (including delete confirmations). Detail popups (Client and Seller) have identical styling and features including copy-to-clipboard functionality.
 -   **Admin Navigation Menu (October 2025)**: Menu lateral administrativo (`client/src/components/admin/Sidebar.tsx`) reorganizado. "Rede Credenciada" foi movida da seção "Comunicação" para a seção "Parceiros" junto com "Vendedores" para agrupar recursos relacionados a parceiros de negócio.
