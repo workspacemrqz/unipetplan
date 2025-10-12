@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/admin/ui/table";
-import { FileText } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 
 // Helper function to get the appropriate token based on context
@@ -144,16 +143,13 @@ export default function LogsPage() {
     <UnitLayout>
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-[#0e7074]" />
-            <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">
-                Logs de Ações
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Registro de ações realizadas na criação de atendimentos
-              </p>
-            </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">
+              Logs de Ações
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Registro de ações realizadas na criação de atendimentos
+            </p>
           </div>
         </div>
 
