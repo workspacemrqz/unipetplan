@@ -57,6 +57,7 @@ interface AtendimentosResponse {
 }
 
 const allColumns = [
+  "Nº",
   "Procedimento",
   "Unidade",
   "Valor",
@@ -418,6 +419,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
           <Table className="w-full">
           <TableHeader>
             <TableRow className="bg-white border-b border-[#eaeaea]">
+              {visibleColumns.includes("Nº") && <TableHead className="w-[60px] bg-white">Nº</TableHead>}
               {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
               {visibleColumns.includes("Unidade") && <TableHead className="w-[180px] bg-white">Unidade</TableHead>}
               {visibleColumns.includes("Valor") && <TableHead className="w-[120px] bg-white">Valor</TableHead>}
@@ -436,59 +438,69 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                 </TableRow>
               ))
             ) : atendimentosData && atendimentosData.length > 0 ? (
-              atendimentosData.map((atendimento: AtendimentoWithNetworkUnit) => (
-                <TableRow key={atendimento.id} className="bg-white border-b border-[#eaeaea]">
-                  {visibleColumns.includes("Procedimento") && (
-                    <TableCell className="font-medium whitespace-nowrap bg-white">
-                      {atendimento.procedure || 'Não informado'}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Unidade") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      {atendimento.networkUnit?.name || "Não informada"}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Valor") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      R$ {parseFloat(atendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Status") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      <Badge className={cn("whitespace-nowrap", getStatusColor())}>
-                        {getStatusLabel(atendimento.status)}
-                      </Badge>
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Data") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      {atendimento.createdAt && format(new Date(atendimento.createdAt), "dd/MM/yyyy", { locale: ptBR })}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Ações") && (
-                    <TableCell className="whitespace-nowrap bg-white">
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewDetails(atendimento)}
-                          data-testid={`button-view-${atendimento.id}`}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(atendimento)}
-                          data-testid={`button-edit-${atendimento.id}`}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
+              atendimentosData.map((atendimento: AtendimentoWithNetworkUnit, index: number) => {
+                const startIndex = (currentPage - 1) * pageSize;
+                const sequentialNumber = startIndex + index + 1;
+                
+                return (
+                  <TableRow key={atendimento.id} className="bg-white border-b border-[#eaeaea]">
+                    {visibleColumns.includes("Nº") && (
+                      <TableCell className="font-medium bg-white">
+                        {sequentialNumber}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Procedimento") && (
+                      <TableCell className="font-medium whitespace-nowrap bg-white">
+                        {atendimento.procedure || 'Não informado'}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Unidade") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {atendimento.networkUnit?.name || "Não informada"}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Valor") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        R$ {parseFloat(atendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Status") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <Badge className={cn("whitespace-nowrap", getStatusColor())}>
+                          {getStatusLabel(atendimento.status)}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Data") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {atendimento.createdAt && format(new Date(atendimento.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Ações") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        <div className="flex items-center space-x-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(atendimento)}
+                            data-testid={`button-view-${atendimento.id}`}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(atendimento)}
+                            data-testid={`button-edit-${atendimento.id}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow className="bg-white border-b border-[#eaeaea]">
                 <TableCell colSpan={visibleColumns.length} className="text-center py-12 bg-white">
