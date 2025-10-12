@@ -183,6 +183,52 @@ export const queryClient = new QueryClient({
 // Definir a referência para o handler global
 adminQueryClient = queryClient;
 
+// Cache version management - força limpeza após refatoração de "guides" para "atendimentos"
+const CURRENT_CACHE_VERSION = '2.0';
+const CACHE_VERSION_KEY = 'admin-cache-version';
+
+function checkAndClearOldCache() {
+  try {
+    const storedVersion = localStorage.getItem(CACHE_VERSION_KEY);
+    
+    console.log('🔍 [ADMIN-CACHE] Verificando versão do cache...', {
+      storedVersion,
+      currentVersion: CURRENT_CACHE_VERSION
+    });
+    
+    // Se não existe versão ou é diferente da atual, limpar cache
+    if (!storedVersion || storedVersion !== CURRENT_CACHE_VERSION) {
+      console.log('🧹 [ADMIN-CACHE] Limpando cache antigo...', {
+        oldVersion: storedVersion || 'nenhuma',
+        newVersion: CURRENT_CACHE_VERSION,
+        reason: !storedVersion ? 'primeira execução' : 'versão desatualizada'
+      });
+      
+      // Limpar todo o cache do React Query
+      adminQueryClient.clear();
+      
+      // Atualizar versão no localStorage
+      localStorage.setItem(CACHE_VERSION_KEY, CURRENT_CACHE_VERSION);
+      
+      console.log('✅ [ADMIN-CACHE] Cache limpo com sucesso! Nova versão:', CURRENT_CACHE_VERSION);
+    } else {
+      console.log('✅ [ADMIN-CACHE] Cache está atualizado, versão:', CURRENT_CACHE_VERSION);
+    }
+  } catch (error) {
+    console.error('❌ [ADMIN-CACHE] Erro ao verificar/limpar cache:', error);
+    // Em caso de erro, tentar limpar mesmo assim
+    try {
+      adminQueryClient.clear();
+      localStorage.setItem(CACHE_VERSION_KEY, CURRENT_CACHE_VERSION);
+    } catch (fallbackError) {
+      console.error('❌ [ADMIN-CACHE] Erro no fallback de limpeza:', fallbackError);
+    }
+  }
+}
+
+// Executar verificação de cache imediatamente
+checkAndClearOldCache();
+
 // Configurações específicas para diferentes tipos de dados
 export const queryOptions = {
   // Static/rarely changing data - cache longest

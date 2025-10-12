@@ -15,7 +15,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
+    body: data ? JSON.stringify(data) : null,
     credentials: "include",
   });
 
@@ -60,7 +60,7 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutos para dados gerais
-      cacheTime: 10 * 60 * 1000, // 10 minutos
+      gcTime: 10 * 60 * 1000, // 10 minutos
       retry: false,
     },
     mutations: {
@@ -68,6 +68,52 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// Cache version management - força limpeza após refatoração de "guides" para "atendimentos"
+const CURRENT_CACHE_VERSION = '2.0';
+const CACHE_VERSION_KEY = 'public-cache-version';
+
+function checkAndClearOldCache() {
+  try {
+    const storedVersion = localStorage.getItem(CACHE_VERSION_KEY);
+    
+    console.log('🔍 [PUBLIC-CACHE] Verificando versão do cache...', {
+      storedVersion,
+      currentVersion: CURRENT_CACHE_VERSION
+    });
+    
+    // Se não existe versão ou é diferente da atual, limpar cache
+    if (!storedVersion || storedVersion !== CURRENT_CACHE_VERSION) {
+      console.log('🧹 [PUBLIC-CACHE] Limpando cache antigo...', {
+        oldVersion: storedVersion || 'nenhuma',
+        newVersion: CURRENT_CACHE_VERSION,
+        reason: !storedVersion ? 'primeira execução' : 'versão desatualizada'
+      });
+      
+      // Limpar todo o cache do React Query
+      queryClient.clear();
+      
+      // Atualizar versão no localStorage
+      localStorage.setItem(CACHE_VERSION_KEY, CURRENT_CACHE_VERSION);
+      
+      console.log('✅ [PUBLIC-CACHE] Cache limpo com sucesso! Nova versão:', CURRENT_CACHE_VERSION);
+    } else {
+      console.log('✅ [PUBLIC-CACHE] Cache está atualizado, versão:', CURRENT_CACHE_VERSION);
+    }
+  } catch (error) {
+    console.error('❌ [PUBLIC-CACHE] Erro ao verificar/limpar cache:', error);
+    // Em caso de erro, tentar limpar mesmo assim
+    try {
+      queryClient.clear();
+      localStorage.setItem(CACHE_VERSION_KEY, CURRENT_CACHE_VERSION);
+    } catch (fallbackError) {
+      console.error('❌ [PUBLIC-CACHE] Erro no fallback de limpeza:', fallbackError);
+    }
+  }
+}
+
+// Executar verificação de cache imediatamente
+checkAndClearOldCache();
 
 // Configurações específicas para diferentes tipos de dados
 export const queryOptions = {
