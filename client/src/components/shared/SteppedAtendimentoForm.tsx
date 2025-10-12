@@ -68,6 +68,31 @@ interface SteppedAtendimentoFormProps {
   onSuccess?: () => void;
 }
 
+const logAction = async (
+  mode: 'admin' | 'unit',
+  slug: string | undefined,
+  actionType: string,
+  actionData?: any
+) => {
+  if (mode !== 'unit') return;
+  
+  const token = getAuthToken();
+  if (!token) return;
+  
+  try {
+    await fetch(`/api/units/${slug}/logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ actionType, actionData })
+    });
+  } catch (error) {
+    console.error('Erro ao registrar log:', error);
+  }
+};
+
 export default function SteppedAtendimentoForm({
   mode,
   slug,
@@ -235,6 +260,11 @@ export default function SteppedAtendimentoForm({
       form.setValue("clientId", client.id);
       setClientPets(pets);
       
+      logAction(mode, slug, "client_selected", {
+        clientId: client.id,
+        clientName: client.fullName
+      });
+      
       // Reset campos dependentes
       form.setValue("petId", "");
       form.setValue("procedure", "");
@@ -306,7 +336,14 @@ export default function SteppedAtendimentoForm({
         return response.json();
       }
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      logAction(mode, slug, "atendimento_created", {
+        atendimentoId: data.id,
+        clientName: selectedClient?.fullName,
+        petName: selectedPet?.name,
+        procedures: selectedProcedures.map(p => p.name)
+      });
+      
       if (mode === 'admin') {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos"] }),
@@ -352,12 +389,20 @@ export default function SteppedAtendimentoForm({
   // Navegar entre etapas
   const goToNextStep = () => {
     if (canProceedToNextStep() && currentStep < totalSteps) {
+      logAction(mode, slug, "step_changed", {
+        from: currentStep,
+        to: currentStep + 1
+      });
       setCurrentStep(currentStep + 1);
     }
   };
 
   const goToPreviousStep = () => {
     if (currentStep > 1) {
+      logAction(mode, slug, "step_changed", {
+        from: currentStep,
+        to: currentStep - 1
+      });
       setCurrentStep(currentStep - 1);
     }
   };
@@ -501,6 +546,11 @@ export default function SteppedAtendimentoForm({
                                 // Buscar informações detalhadas do pet
                                 const pet = clientPets.find(p => p.id === value);
                                 setSelectedPet(pet);
+                                
+                                logAction(mode, slug, "pet_selected", {
+                                  petId: value,
+                                  petName: pet?.name
+                                });
                                 
                                 // Buscar histórico de atendimentos
                                 try {
@@ -881,6 +931,12 @@ export default function SteppedAtendimentoForm({
                                           if (e.target.checked) {
                                             const newProcedures = [...selectedProcedures, proc];
                                             setSelectedProcedures(newProcedures);
+                                            
+                                            logAction(mode, slug, "procedure_added", {
+                                              procedureName: proc.name,
+                                              coparticipation: proc.coparticipation || 0,
+                                              value: proc.coparticipation || 0
+                                            });
                                             
                                             // Atualizar o campo procedure com lista concatenada
                                             const procedureNames = newProcedures.map(p => p.name).join(", ");
