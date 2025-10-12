@@ -21,7 +21,6 @@ interface SteppedAtendimentoFormProps {
   networkUnitId?: string;
   networkUnitName?: string;
   onSuccess?: () => void;
-  onCancel?: () => void;
 }
 
 export default function SteppedAtendimentoForm({
@@ -29,8 +28,7 @@ export default function SteppedAtendimentoForm({
   slug,
   networkUnitId,
   networkUnitName,
-  onSuccess,
-  onCancel
+  onSuccess
 }: SteppedAtendimentoFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -444,9 +442,10 @@ export default function SteppedAtendimentoForm({
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg"
+                          className="mt-6 p-4 rounded-lg"
+                          style={{ backgroundColor: 'rgba(39, 118, 119, 0.1)', borderWidth: '1px', borderStyle: 'solid', borderColor: '#277677' }}
                         >
-                          <p className="text-green-800 font-semibold">
+                          <p className="font-semibold" style={{ color: '#277677' }}>
                             ✓ Cliente encontrado
                           </p>
                           <p className="text-gray-700 mt-2">
@@ -524,9 +523,10 @@ export default function SteppedAtendimentoForm({
                               <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                                className="mt-4 p-4 rounded-lg"
+                                style={{ backgroundColor: 'rgba(39, 118, 119, 0.1)', borderWidth: '1px', borderStyle: 'solid', borderColor: '#277677' }}
                               >
-                                <p className="text-blue-800 font-semibold">
+                                <p className="font-semibold" style={{ color: '#277677' }}>
                                   Pet selecionado: {clientPets.find(p => p.id === field.value)?.name}
                                 </p>
                               </motion.div>
@@ -792,7 +792,8 @@ export default function SteppedAtendimentoForm({
                     onClick={handleFinish}
                     disabled={mutation.isPending}
                     variant="default"
-                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                    className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+                    style={{ backgroundColor: '#277677' }}
                   >
                     {mutation.isPending ? (
                       <>
