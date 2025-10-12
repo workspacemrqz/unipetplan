@@ -2032,7 +2032,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin guides routes
-  app.get("/admin/api/guides", requireAdmin, async (req, res) => {
+  app.get("/admin/api/atendimentos", requireAdmin, async (req, res) => {
     
     try {
       const guides = await storage.getAllAtendimentos();
@@ -2043,7 +2043,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/guides/with-network-units", requireAdmin, async (req, res) => {
+  app.get("/admin/api/atendimentos/with-network-units", requireAdmin, async (req, res) => {
     
     try {
       // Parse query parameters
@@ -2121,7 +2121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/admin/api/guides/:id", requireAdmin, async (req, res) => {
+  app.get("/admin/api/atendimentos/:id", requireAdmin, async (req, res) => {
     try {
       const guide = await storage.getAtendimento(req.params.id);
       if (!guide) {
@@ -2135,7 +2135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new guide
-  app.post("/admin/api/guides", requireAdmin, adminCRUDLimiter, async (req, res) => {
+  app.post("/admin/api/atendimentos", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const guideData = insertAtendimentoSchema.parse(req.body);
       
@@ -2203,7 +2203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update guide
-  app.put("/admin/api/guides/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
+  app.put("/admin/api/atendimentos/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const guideData = insertAtendimentoSchema.partial().parse(req.body);
       
@@ -2231,7 +2231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete guide
-  app.delete("/admin/api/guides/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
+  app.delete("/admin/api/atendimentos/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const success = await storage.deleteAtendimento(req.params.id);
       
@@ -6034,7 +6034,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get Pet's Guides
-  app.get("/api/clients/pets/:petId/guides", requireClient, async (req, res) => {
+  app.get("/api/clients/pets/:petId/atendimentos", requireClient, async (req, res) => {
     try {
       const clientId = req.session.client?.id;
       const petId = req.params.petId;
