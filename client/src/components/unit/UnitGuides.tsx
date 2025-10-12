@@ -71,11 +71,16 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedGuide, setSelectedGuide] = useState<GuideWithNetworkUnit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingGuide, setEditingGuide] = useState<GuideWithNetworkUnit | null>(null);
+  const [newStatus, setNewStatus] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
   const { visibleColumns, toggleColumn } = useColumnPreferences('unit.guides.columns', allColumns);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const [dateFilter, setDateFilter] = useState<{
     startDate: CalendarDate | null;
@@ -147,6 +152,59 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
   const handleViewDetails = (guide: GuideWithNetworkUnit) => {
     setSelectedGuide(guide);
     setDetailsOpen(true);
+  };
+
+  const handleEdit = (guide: GuideWithNetworkUnit) => {
+    setEditingGuide(guide);
+    setNewStatus(guide.status);
+    setEditOpen(true);
+  };
+
+  const handleSaveStatus = async () => {
+    if (!editingGuide) return;
+    
+    setIsSaving(true);
+    
+    try {
+      const token = localStorage.getItem('unit-token');
+      if (!token) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      const response = await fetch(`/api/units/${unitSlug}/guides/${editingGuide.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar status");
+      }
+
+      toast({
+        title: "Status atualizado",
+        description: "O status da guia foi atualizado com sucesso.",
+      });
+
+      setEditOpen(false);
+      setEditingGuide(null);
+      
+      // Invalidar as queries para recarregar os dados
+      await queryClient.invalidateQueries({ queryKey: [`/api/units/${unitSlug}/guides`] });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o status. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const generateGuideText = () => {
@@ -411,6 +469,14 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(guide)}
+                          data-testid={`button-edit-${guide.id}`}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   )}
@@ -575,6 +641,76 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Status Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Status da Guia</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Status</label>
+              <Select value={newStatus} onValueChange={setNewStatus}>
+                <SelectTrigger 
+                  className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+                  style={{
+                    borderColor: 'var(--border-gray)',
+                    background: 'white'
+                  }}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem 
+                    value="open"
+                    className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                  >
+                    Aberta
+                  </SelectItem>
+                  <SelectItem 
+                    value="closed"
+                    className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                  >
+                    Concluída
+                  </SelectItem>
+                  <SelectItem 
+                    value="cancelled"
+                    className="py-3 pl-8 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+                  >
+                    Cancelada
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setEditOpen(false)}
+              disabled={isSaving}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="admin-action"
+              onClick={handleSaveStatus}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                "Salvar"
+              )}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

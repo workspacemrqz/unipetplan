@@ -216,6 +216,38 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
   
+  // Update guide status (authenticated)
+  app.put(["/api/unit/:slug/guides/:id", "/api/units/:slug/guides/:id"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      const guideId = req.params.id;
+      const { status } = req.body;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Verify that the guide was created by this unit
+      const guide = await storage.getGuide(guideId);
+      if (!guide) {
+        return res.status(404).json({ error: "Guia não encontrada" });
+      }
+      
+      if (guide.createdByUnitId !== unitId) {
+        return res.status(403).json({ error: "Você não tem permissão para editar esta guia" });
+      }
+      
+      // Update the guide status
+      const updatedGuide = await storage.updateGuide(guideId, { status });
+      
+      console.log(`✅ [UNIT] Guide ${guideId} status updated by unit ${unitId} to ${status}`);
+      res.json(updatedGuide);
+    } catch (error) {
+      console.error("❌ [UNIT] Error updating guide:", error);
+      res.status(500).json({ error: "Erro ao atualizar guia" });
+    }
+  });
+  
   // Get unit clients (authenticated)
   app.get("/api/unit/:slug/clients", requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
