@@ -118,14 +118,31 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
       
-      // Get atendimentos with sequential numbering
-      const result = await storage.getUnitAtendimentosWithSequentialNumber(unitId, {
-        status: status !== 'all' ? status : undefined,
-        startDate,
-        endDate
+      // Get atendimentos for this unit
+      const result = await storage.getAtendimentosWithNetworkUnits({
+        networkUnitId: unitId,
+        status: status !== 'all' ? status : undefined
       });
       
-      const allAtendimentos = result?.atendimentos || [];
+      let allAtendimentos = result?.atendimentos || [];
+      
+      // Apply date filter if present
+      if (startDate || endDate) {
+        const startDateTime = startDate ? new Date(startDate) : null;
+        const endDateTime = endDate ? (() => {
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+          return end;
+        })() : null;
+
+        allAtendimentos = allAtendimentos.filter((atendimento: any) => {
+          if (!atendimento.createdAt) return false;
+          const createdAt = new Date(atendimento.createdAt);
+          if (startDateTime && createdAt < startDateTime) return false;
+          if (endDateTime && createdAt > endDateTime) return false;
+          return true;
+        });
+      }
       
       // Sort by createdAt descending (newest first)
       allAtendimentos.sort((a: any, b: any) => {
@@ -539,7 +556,9 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       }
       
       // Get atendimentos for this unit
-      const result = await storage.getUnitAtendimentosWithSequentialNumber(unitId, {});
+      const result = await storage.getAtendimentosWithNetworkUnits({
+        networkUnitId: unitId
+      });
       const allAtendimentos = result?.atendimentos || [];
       
       // Filter by petId

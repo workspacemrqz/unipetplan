@@ -39,7 +39,6 @@ interface AtendimentoWithNetworkUnit {
   value?: string;
   createdAt?: string;
   updatedAt?: string;
-  numeroSequencial?: number;
   networkUnit?: {
     id: string;
     name: string;
@@ -58,7 +57,6 @@ interface AtendimentosResponse {
 }
 
 const allColumns = [
-  "Nº",
   "Procedimento",
   "Unidade",
   "Valor",
@@ -413,7 +411,6 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
           <Table className="w-full">
           <TableHeader>
             <TableRow className="bg-white border-b border-[#eaeaea]">
-              {visibleColumns.includes("Nº") && <TableHead className="w-[60px] bg-white">Nº</TableHead>}
               {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
               {visibleColumns.includes("Unidade") && <TableHead className="w-[180px] bg-white">Unidade</TableHead>}
               {visibleColumns.includes("Valor") && <TableHead className="w-[120px] bg-white">Valor</TableHead>}
@@ -435,11 +432,6 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
               atendimentosData.map((atendimento: AtendimentoWithNetworkUnit) => {
                 return (
                   <TableRow key={atendimento.id} className="bg-white border-b border-[#eaeaea]">
-                    {visibleColumns.includes("Nº") && (
-                      <TableCell className="font-medium bg-white">
-                        {atendimento.numeroSequencial || '-'}
-                      </TableCell>
-                    )}
                     {visibleColumns.includes("Procedimento") && (
                       <TableCell className="font-medium whitespace-nowrap bg-white">
                         {atendimento.procedure || 'Não informado'}
