@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronRight,
+  Stethoscope,
 } from "lucide-react";
 import { createCacheManager } from "@/lib/admin/cacheUtils";
 import CustomIcon from "@/components/admin/ui/CustomIcon";
@@ -119,9 +120,12 @@ export default function Sidebar() {
   return (
     <div className="flex flex-col h-full bg-white border-r border-[#eaeaea]">
       <div className="p-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">SISTEMA UNIPET</h1>
-          <p className="text-sm text-gray-600">Plano de Saúde Pet</p>
+        <div className="flex items-center space-x-3">
+          <Stethoscope className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">CRM UNIPET</h1>
+            <p className="text-sm text-gray-600">Plano de Saúde Pet</p>
+          </div>
         </div>
       </div>
 
