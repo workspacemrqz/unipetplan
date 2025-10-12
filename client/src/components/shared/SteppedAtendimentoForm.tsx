@@ -776,14 +776,6 @@ export default function SteppedAtendimentoForm({
               </div>
               
               <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onCancel}
-                >
-                  Cancelar
-                </Button>
-                
                 {currentStep < totalSteps ? (
                   <Button
                     type="button"
