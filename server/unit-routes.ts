@@ -7,6 +7,8 @@ interface UnitRequest extends Request {
   unit?: {
     unitId: string;
     slug: string;
+    veterinarianId?: string;
+    type?: 'unit' | 'veterinarian';
   };
 }
 
@@ -73,7 +75,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
   
-  // Middleware to verify unit authentication
+  // Middleware to verify unit authentication (accepts both unit and veterinarian tokens)
   const requireUnitAuth = async (req: UnitRequest, res: Response, next: NextFunction) => {
     try {
       const authHeader = req.headers.authorization;
@@ -91,7 +93,42 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       
       try {
         const decoded = jwt.verify(token, process.env.SESSION_SECRET) as any;
-        req.unit = decoded;
+        
+        // Accept both unit and veterinarian tokens
+        if (decoded.type === 'veterinarian') {
+          // Veterinarian token - verify current permissions and status
+          const veterinarian = await storage.getVeterinarianById(decoded.veterinarianId);
+          
+          if (!veterinarian) {
+            return res.status(401).json({ error: "Veterinário não encontrado" });
+          }
+          
+          // ✅ SECURITY: Verify veterinarian is active
+          if (!veterinarian.isActive) {
+            return res.status(403).json({ error: "Veterinário inativo" });
+          }
+          
+          // ✅ SECURITY: Verify veterinarian has access to atendimentos
+          if (!veterinarian.canAccessAtendimentos) {
+            return res.status(403).json({ error: "Acesso não autorizado" });
+          }
+          
+          // Set request context with veterinarian info
+          req.unit = {
+            unitId: decoded.unitId,
+            slug: decoded.slug,
+            veterinarianId: decoded.veterinarianId,
+            type: 'veterinarian'
+          };
+        } else {
+          // Unit token (default)
+          req.unit = {
+            unitId: decoded.unitId,
+            slug: decoded.slug,
+            type: 'unit'
+          };
+        }
+        
         next();
       } catch (err) {
         return res.status(401).json({ error: "Token inválido" });

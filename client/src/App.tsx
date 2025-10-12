@@ -92,6 +92,9 @@ import SellerDashboard from './pages/seller-dashboard';
 import SellerLink from './pages/seller-link';
 import SellerReferral from './pages/seller-referral';
 
+// Import veterinarian pages
+import VeterinarianLoginPage from './pages/veterinarian-login';
+
 // AdminRouter - handles all admin routes with base="/admin"
 function AdminRouter() {
   return (
@@ -199,6 +202,9 @@ function Router() {
         <Route path="/vendedor/dashboard" component={SellerDashboard} />
         <Route path="/vendedor/link" component={SellerLink} />
         <Route path="/vendedor/:slug" component={SellerReferral} />
+        
+        {/* Veterinarian Area Routes */}
+        <Route path="/veterinario/login" component={VeterinarianLoginPage} />
         
         {/* Unit Routes - specific paths first */}
         <Route path="/unidade/:slug/painel" component={UnitDashboard} />

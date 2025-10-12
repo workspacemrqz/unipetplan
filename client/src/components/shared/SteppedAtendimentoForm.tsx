@@ -47,6 +47,19 @@ const StepIndicatorComponent = memo(({ currentStep }: { currentStep: number }) =
 
 StepIndicatorComponent.displayName = 'StepIndicatorComponent';
 
+// Helper function to get the appropriate token based on context
+const getAuthToken = () => {
+  // Check for unit token
+  const unitToken = localStorage.getItem('unit-token');
+  if (unitToken) return unitToken;
+  
+  // Check for veterinarian token  
+  const vetToken = localStorage.getItem('veterinarian-token');
+  if (vetToken) return vetToken;
+  
+  return null;
+};
+
 interface SteppedAtendimentoFormProps {
   mode: 'admin' | 'unit';
   slug?: string;
@@ -143,7 +156,7 @@ export default function SteppedAtendimentoForm({
         if (!response.ok) throw new Error("Erro ao buscar procedimentos");
         return response.json();
       } else {
-        const token = localStorage.getItem('unit-token');
+        const token = getAuthToken();
         if (!token) throw new Error('Token de autenticação não encontrado');
         
         const response = await fetch(`/api/units/${slug}/pets/${petIdToFetch}/available-procedures`, {
@@ -202,7 +215,7 @@ export default function SteppedAtendimentoForm({
         if (!petsResponse.ok) throw new Error("Erro ao buscar pets do cliente");
         pets = await petsResponse.json();
       } else {
-        const token = localStorage.getItem('unit-token');
+        const token = getAuthToken();
         if (!token) throw new Error('Token de autenticação não encontrado');
         
         const response = await fetch(`/api/units/${slug}/clients/cpf/${sanitizedCpf}`, {
@@ -275,7 +288,7 @@ export default function SteppedAtendimentoForm({
         if (!response.ok) throw new Error("Erro ao criar atendimento");
         return response.json();
       } else {
-        const token = localStorage.getItem('unit-token');
+        const token = getAuthToken();
         if (!token) throw new Error('Token de autenticação não encontrado');
         
         const response = await fetch(`/api/units/${slug}/atendimentos`, {
@@ -496,7 +509,7 @@ export default function SteppedAtendimentoForm({
                                       ? `/admin/api/pets/${value}/atendimentos`
                                       : `/api/units/${slug}/pets/${value}/atendimentos`,
                                     mode === 'unit' ? {
-                                      headers: { 'Authorization': `Bearer ${localStorage.getItem('unit-token')}` }
+                                      headers: { 'Authorization': `Bearer ${getAuthToken()}` }
                                     } : undefined
                                   );
                                   

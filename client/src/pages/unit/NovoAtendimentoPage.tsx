@@ -10,12 +10,20 @@ export default function NovoAtendimentoPage() {
   const { slug } = useParams();
   const [authenticated, setAuthenticated] = useState(false);
 
-  // Verificar autenticação
+  // Verificar autenticação (aceita tokens de unidade ou veterinário)
   useEffect(() => {
-    const token = localStorage.getItem('unit-token');
+    // Check for unit authentication
+    const unitToken = localStorage.getItem('unit-token');
     const unitSlug = localStorage.getItem('unit-slug');
     
-    if (!token || unitSlug !== slug) {
+    // Check for veterinarian authentication
+    const vetToken = localStorage.getItem('veterinarian-token');
+    const vetUnitSlug = localStorage.getItem('unit-slug'); // Vet also uses unit-slug
+    
+    const hasUnitAuth = unitToken && unitSlug === slug;
+    const hasVetAuth = vetToken && vetUnitSlug === slug;
+    
+    if (!hasUnitAuth && !hasVetAuth) {
       setLocation(`/unidade/${slug}`);
       return;
     }

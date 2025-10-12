@@ -1063,6 +1063,12 @@ export const adminLoginSchema = z.object({
   password: z.string().min(1, "Senha é obrigatória")
 });
 
+// Veterinarian login schema
+export const veterinarianLoginSchema = z.object({
+  login: z.string().min(1, "Login é obrigatório"),
+  password: z.string().min(1, "Senha é obrigatória")
+});
+
 // === TYPE EXPORTS ===
 
 // Core shared types
@@ -1084,6 +1090,7 @@ export type Client = typeof clients.$inferSelect;
 export type InsertClient = typeof clients.$inferInsert;
 export type ClientLogin = z.infer<typeof clientLoginSchema>;
 export type AdminLogin = z.infer<typeof adminLoginSchema>;
+export type VeterinarianLogin = z.infer<typeof veterinarianLoginSchema>;
 export type Seller = typeof sellers.$inferSelect;
 export type InsertSeller = typeof sellers.$inferInsert;
 export type SellerLogin = z.infer<typeof sellerLoginSchema>;
