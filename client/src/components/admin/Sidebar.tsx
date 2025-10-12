@@ -21,7 +21,7 @@ const navigation = [
     items: [
       { name: "Clientes & Pets", href: "/clientes", iconName: "Cliente e Pet" },
       { name: "Contratos", href: "/contratos", iconName: "Contrato" },
-      { name: "Atendimentos", href: "/atendimentos", iconName: "Guia" }
+      { name: "Atendimentos", href: "/atendimentos", iconName: "Atendimento" }
     ]
   },
   {

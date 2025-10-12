@@ -489,7 +489,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                   <p className="text-muted-foreground">
                     {searchQuery || statusFilter !== "all" 
                       ? "Nenhum atendimento encontrado com os filtros aplicados." 
-                      : "Nenhuma guia foi gerada pela sua unidade ainda."
+                      : "Nenhum atendimento foi gerado pela sua unidade ainda."
                     }
                   </p>
                 </TableCell>

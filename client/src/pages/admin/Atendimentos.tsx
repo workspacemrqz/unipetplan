@@ -478,7 +478,7 @@ export default function Atendimentos() {
                   <p className="text-muted-foreground">
                     {searchQuery || statusFilter !== "all" 
                       ? "Nenhum atendimento encontrado com os filtros aplicados." 
-                      : "Nenhuma guia foi gerada pelas unidades da rede ainda."
+                      : "Nenhum atendimento foi gerado pelas unidades da rede ainda."
                     }
                   </p>
                 </TableCell>
