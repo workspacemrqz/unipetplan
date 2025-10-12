@@ -391,6 +391,7 @@ export class InMemoryStorage implements IStorage {
   async createAtendimentoProcedures(atendimentoId: string, procedures: any[]): Promise<void> { /* No-op for in-memory storage */ }
   async updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined> { return undefined; }
   async getAtendimento(id: string): Promise<Atendimento | undefined> { return undefined; }
+  async getAtendimentoProcedures(atendimentoId: string): Promise<any[]> { return []; }
   async getAllAtendimentos(): Promise<Atendimento[]> { return []; }
   async getActiveAtendimentos(): Promise<Atendimento[]> { return []; }
   async deleteAtendimento(id: string): Promise<boolean> { return true; }
@@ -1557,6 +1558,13 @@ export class DatabaseStorage implements IStorage {
   async getAtendimento(id: string): Promise<Atendimento | undefined> {
     const [atendimento] = await db.select().from(atendimentos).where(eq(atendimentos.id, id));
     return atendimento || undefined;
+  }
+
+  async getAtendimentoProcedures(atendimentoId: string): Promise<any[]> {
+    const procedures = await db.select()
+      .from(atendimentoProcedures)
+      .where(eq(atendimentoProcedures.atendimentoId, atendimentoId));
+    return procedures;
   }
 
   async getAllAtendimentos(): Promise<Atendimento[]> {

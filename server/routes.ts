@@ -2064,7 +2064,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const atendimentos = await storage.getAllAtendimentos();
-      res.json(atendimentos);
+      
+      // Adicionar procedimentos para cada atendimento
+      const atendimentosWithProcedures = await Promise.all(
+        atendimentos.map(async (atendimento) => {
+          const procedures = await storage.getAtendimentoProcedures(atendimento.id);
+          return {
+            ...atendimento,
+            procedures: procedures
+          };
+        })
+      );
+      
+      res.json(atendimentosWithProcedures);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching atendimentos:", error);
       res.status(500).json({ error: "Erro ao buscar atendimentos" });
@@ -2155,7 +2167,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!atendimento) {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
-      res.json(atendimento);
+      
+      // Buscar os procedimentos relacionados
+      const procedures = await storage.getAtendimentoProcedures(req.params.id);
+      
+      // Adicionar os procedimentos ao atendimento
+      const atendimentoWithProcedures = {
+        ...atendimento,
+        procedures: procedures
+      };
+      
+      res.json(atendimentoWithProcedures);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching atendimento:", error);
       res.status(500).json({ error: "Erro ao buscar atendimento" });

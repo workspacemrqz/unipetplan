@@ -126,6 +126,17 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       
       let allAtendimentos = result?.atendimentos || [];
       
+      // Adicionar procedimentos para cada atendimento
+      allAtendimentos = await Promise.all(
+        allAtendimentos.map(async (atendimento: any) => {
+          const procedures = await storage.getAtendimentoProcedures(atendimento.id);
+          return {
+            ...atendimento,
+            procedures: procedures
+          };
+        })
+      );
+      
       // Apply date filter if present
       if (startDate || endDate) {
         const startDateTime = startDate ? new Date(startDate) : null;
