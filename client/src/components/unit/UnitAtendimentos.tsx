@@ -648,14 +648,14 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
               {selectedAtendimento.procedureNotes && (
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Notas do Procedimento</h4>
-                  <p className="text-sm text-foreground">{selectedAtendimento.procedureNotes}</p>
+                  <p className="text-sm text-foreground break-words whitespace-pre-wrap">{selectedAtendimento.procedureNotes}</p>
                 </div>
               )}
 
               {selectedAtendimento.generalNotes && (
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Notas Gerais</h4>
-                  <p className="text-sm text-foreground">{selectedAtendimento.generalNotes}</p>
+                  <p className="text-sm text-foreground break-words whitespace-pre-wrap">{selectedAtendimento.generalNotes}</p>
                 </div>
               )}
 
