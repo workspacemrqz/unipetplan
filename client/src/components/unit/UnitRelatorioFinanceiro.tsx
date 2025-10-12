@@ -142,35 +142,48 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
       </div>
 
       {/* Search and Column Preferences */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Buscar por cliente ou procedimento..."
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-10"
-          />
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por cliente ou procedimento..."
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-10 w-80"
+            />
+          </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <MoreHorizontal className="h-4 w-4 mr-2" />
-              Colunas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {allColumns.map((column) => (
-              <DropdownMenuCheckboxItem
-                key={column}
-                checked={visibleColumns.includes(column)}
-                onCheckedChange={() => toggleColumn(column)}
+
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                style={{
+                  borderColor: 'var(--border-gray)',
+                  background: 'white'
+                }}
               >
-                {column}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <MoreHorizontal className="h-4 w-4 mr-2" />
+                Colunas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {allColumns.map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column}
+                  checked={visibleColumns.includes(column)}
+                  onCheckedChange={() => toggleColumn(column)}
+                  className="mb-1"
+                >
+                  {column}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Content */}
