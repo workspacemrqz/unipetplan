@@ -301,12 +301,38 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
+      // Extract date filter parameters
+      const { startDate, endDate } = req.query;
+      
       // Get atendimentos for this unit with network unit info
       const result = await storage.getAtendimentosWithNetworkUnits({
         networkUnitId: unitId
       });
       
       let allAtendimentos = result?.atendimentos || [];
+      
+      // Apply date filtering if provided
+      if (startDate || endDate) {
+        allAtendimentos = allAtendimentos.filter((atendimento: any) => {
+          if (!atendimento.createdAt) return false;
+          
+          const atendimentoDate = new Date(atendimento.createdAt);
+          
+          if (startDate) {
+            const start = new Date(startDate as string);
+            if (atendimentoDate < start) return false;
+          }
+          
+          if (endDate) {
+            // Set endDate to end of day (23:59:59.999) to include all records from that day
+            const end = new Date(endDate as string);
+            end.setHours(23, 59, 59, 999);
+            if (atendimentoDate > end) return false;
+          }
+          
+          return true;
+        });
+      }
       
       // Adicionar procedimentos para cada atendimento
       allAtendimentos = await Promise.all(
