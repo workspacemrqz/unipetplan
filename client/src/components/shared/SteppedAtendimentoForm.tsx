@@ -371,11 +371,7 @@ export default function SteppedAtendimentoForm({
       <Form {...form}>
         <Card className="border border-[#eaeaea] rounded-lg bg-white shadow-sm !bg-white">
           <CardHeader className="bg-white rounded-t-lg">
-            <CardTitle className="text-xl flex items-center gap-2">
-              {currentStep === 1 && <User className="h-5 w-5" />}
-              {currentStep === 2 && <Heart className="h-5 w-5" />}
-              {currentStep === 3 && <FileText className="h-5 w-5" />}
-              {currentStep === 4 && <CheckCircle className="h-5 w-5" />}
+            <CardTitle className="text-xl">
               {currentStep === 1 && "Informações do Cliente"}
               {currentStep === 2 && "Seleção do Pet"}
               {currentStep === 3 && "Procedimento e Unidade"}
