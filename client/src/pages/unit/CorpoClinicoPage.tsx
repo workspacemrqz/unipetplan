@@ -13,7 +13,6 @@ import { Switch } from "@/components/admin/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/admin/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/admin/ui/tabs";
 import {
   Table,
   TableBody,
@@ -469,6 +468,25 @@ export default function CorpoClinicoPage() {
                 className="pl-10 w-80"
               />
             </div>
+            <Select value={currentTab} onValueChange={(value) => setCurrentTab(value as "permanente" | "volante")}>
+              <SelectTrigger 
+                className="w-72 [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+                style={{
+                  borderColor: 'var(--border-gray)',
+                  background: 'white'
+                }}
+              >
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="permanente" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                  Veterinários Permanentes ({permanenteVets.length})
+                </SelectItem>
+                <SelectItem value="volante" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                  Veterinários Volantes ({volanteVets.length})
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-2">
@@ -524,38 +542,16 @@ export default function CorpoClinicoPage() {
           </div>
         </div>
 
-        <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "permanente" | "volante")}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="permanente">
-              <Users className="h-4 w-4 mr-2" />
-              Veterinários Permanentes ({permanenteVets.length})
-            </TabsTrigger>
-            <TabsTrigger value="volante">
-              <Users className="h-4 w-4 mr-2" />
-              Veterinários Volantes ({volanteVets.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="permanente" className="mt-6">
-            {isLoadingVets ? (
-              <div className="flex justify-center py-8">
-                <LoadingDots size="lg" color="#0e7074" />
-              </div>
-            ) : (
-              renderVeterinarianTable(paginatedPermanenteVets, permanenteCurrentPage, totalPermanentePages, setPermanenteCurrentPage)
-            )}
-          </TabsContent>
-
-          <TabsContent value="volante" className="mt-6">
-            {isLoadingVets ? (
-              <div className="flex justify-center py-8">
-                <LoadingDots size="lg" color="#0e7074" />
-              </div>
-            ) : (
-              renderVeterinarianTable(paginatedVolanteVets, volanteCurrentPage, totalVolantePages, setVolanteCurrentPage)
-            )}
-          </TabsContent>
-        </Tabs>
+        {/* Veterinarians Table */}
+        {isLoadingVets ? (
+          <div className="flex justify-center py-8">
+            <LoadingDots size="lg" color="#0e7074" />
+          </div>
+        ) : currentTab === "permanente" ? (
+          renderVeterinarianTable(paginatedPermanenteVets, permanenteCurrentPage, totalPermanentePages, setPermanenteCurrentPage)
+        ) : (
+          renderVeterinarianTable(paginatedVolanteVets, volanteCurrentPage, totalVolantePages, setVolanteCurrentPage)
+        )}
 
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
