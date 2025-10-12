@@ -166,15 +166,18 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
     text += `Status: ${getStatusLabel(selectedGuide.status)}\n`;
     text += `Valor: R$ ${selectedGuide.value || 'Não informado'}\n\n`;
 
-    // Informações do Cliente e Pet
-    if (selectedGuide.clientName || selectedGuide.petName) {
-      text += "INFORMAÇÕES DO CLIENTE E PET:\n";
-      text += "-".repeat(30) + "\n";
+    // Informações do Cliente, Pet e Unidade
+    if (selectedGuide.clientName || selectedGuide.petName || selectedGuide.networkUnit?.name) {
+      text += "INFORMAÇÕES DO CLIENTE, PET E UNIDADE:\n";
+      text += "-".repeat(40) + "\n";
       if (selectedGuide.clientName) {
         text += `Cliente: ${selectedGuide.clientName}\n`;
       }
       if (selectedGuide.petName) {
         text += `Pet: ${selectedGuide.petName}\n`;
+      }
+      if (selectedGuide.networkUnit?.name) {
+        text += `Unidade: ${selectedGuide.networkUnit.name}\n`;
       }
       text += "\n";
     }
@@ -535,6 +538,9 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                     </div>
                     <div>
                       <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{selectedGuide.petName || 'Não informado'}</span></span>
+                    </div>
+                    <div>
+                      <span><strong className="text-primary">Unidade:</strong> <span className="text-foreground">{selectedGuide.networkUnit?.name || 'Não informada'}</span></span>
                     </div>
                   </div>
                 </div>

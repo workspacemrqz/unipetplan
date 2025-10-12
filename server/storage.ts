@@ -1987,14 +1987,18 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(guides.status, filters.status));
     }
 
-    // Build and execute query
+    // Build and execute query with client and pet data
     const baseQuery = db
       .select({
         guide: guides,
         networkUnit: networkUnits,
+        client: clients,
+        pet: pets,
       })
       .from(guides)
-      .leftJoin(networkUnits, eq(guides.networkUnitId, networkUnits.id));
+      .leftJoin(networkUnits, eq(guides.networkUnitId, networkUnits.id))
+      .leftJoin(clients, eq(guides.clientId, clients.id))
+      .leftJoin(pets, eq(guides.petId, pets.id));
 
     const results = conditions.length > 0
       ? await baseQuery.where(and(...conditions)).orderBy(desc(guides.createdAt))
@@ -2004,6 +2008,8 @@ export class DatabaseStorage implements IStorage {
       guides: results.map(r => ({
         ...r.guide,
         networkUnit: r.networkUnit,
+        clientName: r.client?.fullName || null,
+        petName: r.pet?.name || null,
       })),
       total: results.length,
     };
