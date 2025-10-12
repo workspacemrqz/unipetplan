@@ -14,10 +14,14 @@ export default function AtendimentosPage() {
   }, [slug]);
 
   const checkAuthentication = async () => {
-    const token = localStorage.getItem('unit-token');
+    const unitToken = localStorage.getItem('unit-token');
+    const veterinarianToken = localStorage.getItem('veterinarian-token');
     const unitSlug = localStorage.getItem('unit-slug');
     
-    if (!token || unitSlug !== slug) {
+    // Verificar se existe unit-token OU veterinarian-token
+    const hasValidToken = unitToken || veterinarianToken;
+    
+    if (!hasValidToken || unitSlug !== slug) {
       setLocation(`/unidade/${slug}`);
       return;
     }

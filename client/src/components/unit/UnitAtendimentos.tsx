@@ -128,7 +128,11 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
   const { data: atendimentos, isLoading } = useQuery<AtendimentosResponse>({
     queryKey: [`/api/units/${unitSlug}/atendimentos`, queryParams],
     queryFn: async () => {
-      const token = localStorage.getItem('unit-token');
+      // Verificar primeiro veterinarian-token, depois unit-token
+      const veterinarianToken = localStorage.getItem('veterinarian-token');
+      const unitToken = localStorage.getItem('unit-token');
+      const token = veterinarianToken || unitToken;
+      
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
@@ -173,7 +177,11 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
     setIsSaving(true);
     
     try {
-      const token = localStorage.getItem('unit-token');
+      // Verificar primeiro veterinarian-token, depois unit-token
+      const veterinarianToken = localStorage.getItem('veterinarian-token');
+      const unitToken = localStorage.getItem('unit-token');
+      const token = veterinarianToken || unitToken;
+      
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
