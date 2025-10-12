@@ -22,12 +22,12 @@ const StepIndicatorComponent = memo(({ currentStep }: { currentStep: number }) =
       <div key={`static-step-${step}`} className="flex items-center">
         <div
           className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
+            "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base",
             step <= currentStep ? "bg-[#277677]" : "bg-gray-300"
           )}
         >
           {step < currentStep ? (
-            <Check className="h-5 w-5" />
+            <Check className="h-4 w-4 md:h-5 md:w-5" />
           ) : (
             step
           )}
@@ -35,7 +35,7 @@ const StepIndicatorComponent = memo(({ currentStep }: { currentStep: number }) =
         {step < 4 && (
           <div
             className={cn(
-              "w-16 h-1 mx-2",
+              "w-12 md:w-16 h-1 mx-1 md:mx-2",
               step < currentStep ? "bg-[#277677]" : "bg-gray-300"
             )}
           />
@@ -514,7 +514,7 @@ export default function SteppedAtendimentoForm({
                                   } />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent className="max-w-[90vw] md:max-w-full">
                                 {clientPets.map((pet) => (
                                   <SelectItem 
                                     key={pet.id} 
@@ -767,7 +767,7 @@ export default function SteppedAtendimentoForm({
                                     } />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent>
+                                <SelectContent className="max-w-[90vw] md:max-w-full">
                                   {networkUnits.map((unit: any) => (
                                     <SelectItem key={unit.id} value={unit.id}>
                                       {unit.name}
@@ -839,7 +839,7 @@ export default function SteppedAtendimentoForm({
                                     } />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent>
+                                <SelectContent className="max-w-[90vw] md:max-w-full">
                                   <div className="p-2 border-b">
                                     <Input
                                       placeholder="Digite para buscar..."
@@ -854,10 +854,10 @@ export default function SteppedAtendimentoForm({
                                   {filteredProcedures.length > 0 ? (
                                     filteredProcedures.map((proc: any) => (
                                       <SelectItem key={proc.id} value={proc.name}>
-                                        <div className="flex flex-col">
-                                          <span>{proc.name}</span>
+                                        <div className="flex flex-col max-w-full">
+                                          <span className="truncate">{proc.name}</span>
                                           {proc.annualLimit && (
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-gray-500 truncate">
                                               Limite: {proc.remaining}/{proc.annualLimit} restantes
                                             </span>
                                           )}
