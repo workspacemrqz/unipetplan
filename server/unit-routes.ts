@@ -132,7 +132,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       });
       
       // Filter to only show atendimentos created by this unit
-      const allGuides = result?.guides || [];
+      const allGuides = result?.atendimentos || [];
       const unitGuides = allGuides.filter((guide: any) => guide.createdByUnitId === unitId);
       
       // Recalculate pagination for filtered results
