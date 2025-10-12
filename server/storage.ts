@@ -36,10 +36,13 @@ import {
   type InsertSatisfactionSurvey,
   type Veterinarian,
   type InsertVeterinarian,
+  type ActionLog,
+  type InsertActionLog,
   contactSubmissions,
   plans,
   networkUnits,
   veterinarians,
+  actionLogs,
   faqItems,
   siteSettings,
   chatSettings,
@@ -255,6 +258,10 @@ export interface IStorage {
   getAtendimentosWithNetworkUnits(filters: any): Promise<any>;
   getUnitAtendimentosWithSequentialNumber(unitId: string, filters: any): Promise<any>;
   getContractInstallmentByCieloPaymentId(cieloPaymentId: string): Promise<any | undefined>;
+
+  // Action Logs
+  createActionLog(data: InsertActionLog): Promise<ActionLog>;
+  getActionLogsByUnit(unitId: string): Promise<ActionLog[]>;
 
   // Chat Conversations - Removed (table no longer exists)
 }
@@ -2188,6 +2195,32 @@ export class DatabaseStorage implements IStorage {
       .delete(veterinarians)
       .where(eq(veterinarians.id, id));
     return (result.rowCount || 0) > 0;
+  }
+
+  // Action Logs
+  async createActionLog(data: InsertActionLog): Promise<ActionLog> {
+    const [log] = await db
+      .insert(actionLogs)
+      .values(data)
+      .returning();
+    return log;
+  }
+
+  async getActionLogsByUnit(unitId: string): Promise<ActionLog[]> {
+    const logs = await db
+      .select({
+        log: actionLogs,
+        veterinarian: veterinarians,
+      })
+      .from(actionLogs)
+      .leftJoin(veterinarians, eq(actionLogs.veterinarianId, veterinarians.id))
+      .where(eq(actionLogs.networkUnitId, unitId))
+      .orderBy(desc(actionLogs.createdAt));
+    
+    return logs.map((row) => ({
+      ...row.log,
+      veterinarianName: row.veterinarian?.name || null,
+    })) as any;
   }
 
 }

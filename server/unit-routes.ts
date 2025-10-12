@@ -1062,4 +1062,62 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       res.status(500).json({ error: "Erro ao remover veterinário" });
     }
   });
+
+  // Create action log (authenticated)
+  app.post("/api/units/:slug/logs", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      const userType = req.unit?.type || 'unit';
+      const veterinarianId = req.unit?.veterinarianId;
+      const { actionType, actionData } = req.body;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+
+      if (!actionType) {
+        return res.status(400).json({ error: "actionType é obrigatório" });
+      }
+      
+      // Create log entry
+      const logData: any = {
+        networkUnitId: unitId,
+        userType: userType,
+        actionType: actionType,
+        actionData: actionData || null,
+      };
+
+      // If user is a veterinarian, include veterinarianId
+      if (userType === 'veterinarian' && veterinarianId) {
+        logData.veterinarianId = veterinarianId;
+      }
+      
+      const log = await storage.createActionLog(logData);
+      
+      console.log(`✅ [UNIT] Action log created: ${actionType} by ${userType}`);
+      res.status(201).json(log);
+    } catch (error) {
+      console.error("❌ [UNIT] Error creating action log:", error);
+      res.status(500).json({ error: "Erro ao criar log de ação" });
+    }
+  });
+
+  // Get action logs for unit (authenticated)
+  app.get("/api/units/:slug/logs", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      const logs = await storage.getActionLogsByUnit(unitId);
+      
+      console.log(`✅ [UNIT] Retrieved ${logs.length} action logs for unit ${unitId}`);
+      res.json(logs);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching action logs:", error);
+      res.status(500).json({ error: "Erro ao buscar logs de ação" });
+    }
+  });
 }
