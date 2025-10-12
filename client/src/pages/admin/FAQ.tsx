@@ -129,8 +129,13 @@ export default function FAQ() {
   });
 
   const toggleMutation = useMutation({
-    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      await apiRequest("PUT", `/admin/api/faq/${id}`, { isActive });
+    mutationFn: async ({ id, isActive, item }: { id: string; isActive: boolean; item: any }) => {
+      await apiRequest("PUT", `/admin/api/faq/${id}`, {
+        question: item.question,
+        answer: item.answer,
+        displayOrder: item.displayOrder,
+        isActive,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/faq"] });
@@ -202,8 +207,12 @@ export default function FAQ() {
     }
   };
 
-  const handleToggleStatus = (id: string, currentStatus: boolean) => {
-    toggleMutation.mutate({ id, isActive: !currentStatus });
+  const handleToggleStatus = (item: any) => {
+    toggleMutation.mutate({ 
+      id: item.id, 
+      isActive: !item.isActive,
+      item: item 
+    });
   };
 
   const onSubmit = (data: any) => {
@@ -434,7 +443,7 @@ export default function FAQ() {
                     <TableCell className="whitespace-nowrap bg-white">
                       <Switch
                         checked={item.isActive}
-                        onCheckedChange={() => handleToggleStatus(item.id, item.isActive)}
+                        onCheckedChange={() => handleToggleStatus(item)}
                         disabled={toggleMutation.isPending}
                         data-testid={`switch-faq-status-${item.id}`}
                       />
