@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { CalendarDate } from "@internationalized/date";
 import UnitLayout from "@/components/unit/UnitLayout";
+import { Button } from "@/components/admin/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
 import {
   Table,
   TableBody,
@@ -11,7 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/admin/ui/table";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
+import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
+import { getDateRangeParams } from "@/lib/date-utils";
 
 // Helper function to get the appropriate token based on context
 const getAuthToken = () => {
@@ -55,10 +61,39 @@ interface Log {
   } | null;
 }
 
+interface LogsResponse {
+  data: Log[];
+  total: number;
+  totalPages: number;
+  page: number;
+}
+
 export default function LogsPage() {
   const { slug } = useParams();
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
+  const [userTypeFilter, setUserTypeFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  const [dateFilter, setDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
+  const [debouncedDateFilter, setDebouncedDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
+  // Debounce date filter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedDateFilter(dateFilter);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [dateFilter]);
 
   useEffect(() => {
     checkAuthentication();
@@ -76,8 +111,24 @@ export default function LogsPage() {
     setLoading(false);
   };
 
-  const { data: logs = [], isLoading: isLoadingLogs } = useQuery<Log[]>({
-    queryKey: [`/api/units/${slug}/logs`],
+  const handleDateRangeChange = (startDate: CalendarDate | null, endDate: CalendarDate | null) => {
+    setDateFilter({ startDate, endDate });
+    setCurrentPage(1);
+  };
+
+  // Get date range params for the query
+  const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
+
+  // Construct query parameters
+  const queryParams = {
+    page: currentPage.toString(),
+    limit: pageSize.toString(),
+    ...(userTypeFilter !== "all" && { userType: userTypeFilter }),
+    ...dateParams
+  };
+
+  const { data: logsResponse, isLoading: isLoadingLogs } = useQuery<LogsResponse>({
+    queryKey: [`/api/units/${slug}/logs`, queryParams],
     enabled: !loading,
     queryFn: async () => {
       const token = getAuthToken();
@@ -86,7 +137,8 @@ export default function LogsPage() {
         throw new Error("Token não encontrado");
       }
 
-      const response = await fetch(`/api/units/${slug}/logs`, {
+      const params = new URLSearchParams(queryParams);
+      const response = await fetch(`/api/units/${slug}/logs?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -99,6 +151,10 @@ export default function LogsPage() {
       return response.json();
     },
   });
+
+  const logs = logsResponse?.data || [];
+  const totalLogs = logsResponse?.total || 0;
+  const totalPages = logsResponse?.totalPages || 0;
 
   const getUserLabel = (log: Log): string => {
     if (log.log.userType === "unit") {
@@ -178,6 +234,9 @@ export default function LogsPage() {
     );
   }
 
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+
   return (
     <UnitLayout>
       <div className="space-y-4 sm:space-y-6">
@@ -190,6 +249,44 @@ export default function LogsPage() {
               Registro de ações realizadas na criação de atendimentos
             </p>
           </div>
+        </div>
+
+        {/* Date Filter */}
+        <DateFilterComponent
+          onDateRangeChange={handleDateRangeChange}
+          isLoading={isLoadingLogs ||
+            (dateFilter.startDate !== debouncedDateFilter.startDate ||
+              dateFilter.endDate !== debouncedDateFilter.endDate)}
+          initialRange={dateFilter}
+        />
+
+        {/* User Type Filter */}
+        <div className="flex flex-wrap gap-4 items-center">
+          <Select value={userTypeFilter} onValueChange={(value) => {
+            setUserTypeFilter(value);
+            setCurrentPage(1);
+          }}>
+            <SelectTrigger 
+              className="w-64 [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+              style={{
+                borderColor: 'var(--border-gray)',
+                background: 'white'
+              }}
+            >
+              <SelectValue placeholder="Filtrar por usuário" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                Todos os usuários
+              </SelectItem>
+              <SelectItem value="unit" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                Admin
+              </SelectItem>
+              <SelectItem value="veterinarian" className="data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
+                Veterinários
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="border rounded-lg overflow-hidden bg-white">
@@ -233,6 +330,48 @@ export default function LogsPage() {
             </Table>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalLogs > 10 && (
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              <div className="flex items-center space-x-2">
+                <p className="text-sm font-medium">
+                  {totalLogs > 0 ? (
+                    <>Mostrando {startIndex + 1} a {Math.min(endIndex, totalLogs)} de {totalLogs} logs</>
+                  ) : (
+                    "Nenhum log encontrado"
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Anterior
+              </Button>
+              <div className="flex items-center space-x-1">
+                <span className="text-sm font-medium">
+                  Página {currentPage} de {totalPages}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+              >
+                Próximo
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </UnitLayout>
   );

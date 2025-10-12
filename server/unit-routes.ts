@@ -1128,7 +1128,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
 
-  // Get action logs for unit (authenticated)
+  // Get action logs for unit (authenticated) with pagination and filters
   app.get("/api/units/:slug/logs", requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
       const unitId = req.unit?.unitId;
@@ -1137,10 +1137,57 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
-      const logs = await storage.getActionLogsByUnit(unitId);
+      // Get all logs for this unit
+      const allLogs = await storage.getActionLogsByUnit(unitId);
       
-      console.log(`✅ [UNIT] Retrieved ${logs.length} action logs for unit ${unitId}`);
-      res.json(logs);
+      // Apply filters
+      let filteredLogs = [...allLogs];
+      
+      // Filter by user type if specified
+      const { userType, startDate, endDate, page = '1', limit = '10' } = req.query;
+      
+      if (userType && userType !== 'all') {
+        filteredLogs = filteredLogs.filter((log: any) => log.log.userType === userType);
+      }
+      
+      // Filter by date range
+      if (startDate || endDate) {
+        filteredLogs = filteredLogs.filter((log: any) => {
+          const logDate = new Date(log.log.createdAt);
+          
+          if (startDate) {
+            const start = new Date(startDate as string);
+            start.setHours(0, 0, 0, 0);
+            if (logDate < start) return false;
+          }
+          
+          if (endDate) {
+            const end = new Date(endDate as string);
+            end.setHours(23, 59, 59, 999);
+            if (logDate > end) return false;
+          }
+          
+          return true;
+        });
+      }
+      
+      // Pagination
+      const currentPage = parseInt(page as string, 10);
+      const pageSize = parseInt(limit as string, 10);
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      
+      const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+      const totalPages = Math.ceil(filteredLogs.length / pageSize);
+      
+      console.log(`✅ [UNIT] Retrieved ${paginatedLogs.length} of ${filteredLogs.length} action logs for unit ${unitId}`);
+      
+      res.json({
+        data: paginatedLogs,
+        total: filteredLogs.length,
+        totalPages,
+        page: currentPage
+      });
     } catch (error) {
       console.error("❌ [UNIT] Error fetching action logs:", error);
       res.status(500).json({ error: "Erro ao buscar logs de ação" });
