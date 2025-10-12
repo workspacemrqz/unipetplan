@@ -8,7 +8,8 @@ import {
   LogOut,
   Plus,
   DollarSign,
-  Users
+  Users,
+  ScrollText
 } from "lucide-react";
 
 export default function UnitSidebar() {
@@ -35,6 +36,7 @@ export default function UnitSidebar() {
         },
         { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard },
         { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, icon: Users },
+        { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: ScrollText },
         { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign }
       ]
     }
