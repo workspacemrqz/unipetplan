@@ -271,7 +271,7 @@ export interface IStorage {
 
   // Action Logs
   createActionLog(data: InsertActionLog): Promise<ActionLog>;
-  getActionLogsByUnit(unitId: string): Promise<ActionLog[]>;
+  getActionLogsByUnit(unitId: string): Promise<any[]>;
 
   // Chat Conversations - Removed (table no longer exists)
 }
@@ -487,7 +487,7 @@ export class InMemoryStorage implements IStorage {
       createdAt: new Date() 
     } as ActionLog; 
   }
-  async getActionLogsByUnit(unitId: string): Promise<ActionLog[]> { return []; }
+  async getActionLogsByUnit(unitId: string): Promise<any[]> { return []; }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2243,7 +2243,7 @@ export class DatabaseStorage implements IStorage {
     return log;
   }
 
-  async getActionLogsByUnit(unitId: string): Promise<ActionLog[]> {
+  async getActionLogsByUnit(unitId: string): Promise<any[]> {
     const logs = await db
       .select({
         log: actionLogs,
@@ -2255,9 +2255,12 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(actionLogs.createdAt));
     
     return logs.map((row) => ({
-      ...row.log,
-      veterinarianName: row.veterinarian?.name || null,
-    })) as any;
+      log: row.log,
+      veterinarian: row.veterinarian ? {
+        id: row.veterinarian.id,
+        name: row.veterinarian.name,
+      } : null,
+    }));
   }
 
 }
