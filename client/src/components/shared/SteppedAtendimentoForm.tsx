@@ -77,6 +77,7 @@ export default function SteppedAtendimentoForm({
   const [isSearchingClient, setIsSearchingClient] = useState(false);
   const [selectedPet, setSelectedPet] = useState<any>(null);
   const [petHistory, setPetHistory] = useState<any[]>([]);
+  const [selectedProcedures, setSelectedProcedures] = useState<any[]>([]);  // Novo estado para múltiplos procedimentos
 
   // Função para formatar CPF
   const formatCpf = (value: string) => {
@@ -164,6 +165,7 @@ export default function SteppedAtendimentoForm({
     } else if (sanitizedCpf.length < 11 && selectedClient) {
       setSelectedClient(null);
       setClientPets([]);
+      setSelectedProcedures([]); // Limpar procedimentos selecionados
       form.setValue("clientId", "");
       form.setValue("petId", "");
       form.setValue("procedure", "");
@@ -225,6 +227,7 @@ export default function SteppedAtendimentoForm({
       form.setValue("procedure", "");
       form.setValue("generalNotes", "");
       form.setValue("value", "");
+      setSelectedProcedures([]); // Limpar procedimentos selecionados
       
       // Auto-selecionar se houver apenas um pet
       if (pets.length === 1) {
@@ -253,11 +256,21 @@ export default function SteppedAtendimentoForm({
   // Mutation para criar atendimento
   const mutation = useMutation({
     mutationFn: async (data: any) => {
+      // Adicionar array de procedimentos ao payload
+      const payload = {
+        ...data,
+        procedures: selectedProcedures.map(p => ({
+          name: p.name,
+          id: p.id,
+          value: p.coparticipation || 0
+        }))
+      };
+
       if (mode === 'admin') {
         const response = await fetch("/admin/api/atendimentos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload),
         });
         if (!response.ok) throw new Error("Erro ao criar atendimento");
         return response.json();
@@ -272,7 +285,7 @@ export default function SteppedAtendimentoForm({
             "Authorization": `Bearer ${token}`
           },
           body: JSON.stringify({
-            ...data,
+            ...payload,
             value: data.value ? parseFloat(data.value.replace(',', '.')) : 0
           }),
         });
@@ -470,6 +483,7 @@ export default function SteppedAtendimentoForm({
                                 form.setValue("procedure", "");
                                 form.setValue("generalNotes", "");
                                 form.setValue("value", "");
+                                setSelectedProcedures([]); // Limpar procedimentos selecionados ao trocar de pet
                                 
                                 // Buscar informações detalhadas do pet
                                 const pet = clientPets.find(p => p.id === value);
@@ -806,73 +820,110 @@ export default function SteppedAtendimentoForm({
 
                           return (
                             <FormItem>
-                              <FormLabel>Procedimento *</FormLabel>
-                              <Select 
-                                onValueChange={(value) => {
-                                  field.onChange(value);
-                                  setProcedureSearch("");
-                                  const selectedProc = availableProcedures?.procedures?.find((p: any) => p.name === value);
-                                  if (selectedProc) {
-                                    const coparticipationValue = selectedProc.coparticipation || 0;
-                                    form.setValue("value", coparticipationValue.toFixed(2).replace('.', ','));
-                                  }
-                                }} 
-                                value={field.value} 
-                                disabled={!petIdToFetch || proceduresLoading || !form.getValues("networkUnitId")}
+                              <FormLabel>Procedimentos *</FormLabel>
+                              
+                              {/* Campo de busca */}
+                              <div className="mb-2">
+                                <Input
+                                  placeholder="Digite para buscar procedimentos..."
+                                  value={procedureSearch}
+                                  onChange={(e) => setProcedureSearch(e.target.value)}
+                                  className="h-10"
+                                  style={{
+                                    borderColor: 'var(--border-gray)',
+                                    background: 'white'
+                                  }}
+                                  disabled={!petIdToFetch || proceduresLoading || !form.getValues("networkUnitId")}
+                                />
+                              </div>
+
+                              {/* Lista de procedimentos com checkboxes */}
+                              <div 
+                                className="border rounded-lg p-3 max-h-[250px] overflow-y-auto space-y-2"
+                                style={{
+                                  borderColor: 'var(--border-gray)',
+                                  background: 'white'
+                                }}
                               >
-                                <FormControl>
-                                  <SelectTrigger 
-                                    className="h-12 text-left"
-                                    style={{
-                                      borderColor: 'var(--border-gray)',
-                                      background: 'white'
-                                    }}
-                                  >
-                                    <SelectValue placeholder={
-                                      !form.getValues("networkUnitId")
-                                        ? "Selecione primeiro a rede credenciada"
-                                        : proceduresLoading 
-                                        ? "Carregando procedimentos..." 
-                                        : "Selecione o procedimento"
-                                    } />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="max-w-[90vw] md:max-w-full" align="center">
-                                  <div className="p-2 border-b">
-                                    <Input
-                                      placeholder="Digite para buscar..."
-                                      value={procedureSearch}
-                                      onChange={(e) => setProcedureSearch(e.target.value)}
-                                      className="h-8"
-                                      onClick={(e) => e.stopPropagation()}
-                                      onKeyDown={(e) => e.stopPropagation()}
-                                    />
-                                  </div>
-                                  
-                                  {filteredProcedures.length > 0 ? (
-                                    filteredProcedures.map((proc: any) => (
-                                      <SelectItem key={proc.id} value={proc.name}>
-                                        {proc.name}
+                                {!form.getValues("networkUnitId") ? (
+                                  <p className="text-sm text-muted-foreground text-center py-4">
+                                    Selecione primeiro a rede credenciada
+                                  </p>
+                                ) : proceduresLoading ? (
+                                  <p className="text-sm text-muted-foreground text-center py-4">
+                                    <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
+                                    Carregando procedimentos...
+                                  </p>
+                                ) : filteredProcedures.length > 0 ? (
+                                  filteredProcedures.map((proc: any) => (
+                                    <label
+                                      key={proc.id}
+                                      className="flex items-start space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        className="mt-1"
+                                        checked={selectedProcedures.some(p => p.name === proc.name)}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            const newProcedures = [...selectedProcedures, proc];
+                                            setSelectedProcedures(newProcedures);
+                                            
+                                            // Atualizar o campo procedure com lista concatenada
+                                            const procedureNames = newProcedures.map(p => p.name).join(", ");
+                                            field.onChange(procedureNames);
+                                            
+                                            // Calcular valor total
+                                            const totalValue = newProcedures.reduce((sum, p) => sum + (p.coparticipation || 0), 0);
+                                            form.setValue("value", totalValue.toFixed(2).replace('.', ','));
+                                          } else {
+                                            const newProcedures = selectedProcedures.filter(p => p.name !== proc.name);
+                                            setSelectedProcedures(newProcedures);
+                                            
+                                            // Atualizar o campo procedure com lista concatenada
+                                            const procedureNames = newProcedures.map(p => p.name).join(", ");
+                                            field.onChange(procedureNames || "");
+                                            
+                                            // Calcular valor total
+                                            const totalValue = newProcedures.reduce((sum, p) => sum + (p.coparticipation || 0), 0);
+                                            form.setValue("value", totalValue.toFixed(2).replace('.', ','));
+                                          }
+                                        }}
+                                      />
+                                      <div className="flex-1">
+                                        <span className="text-sm font-medium">{proc.name}</span>
                                         {proc.annualLimit && (
                                           <span className="text-xs text-muted-foreground ml-2">
                                             (Limite: {proc.remaining}/{proc.annualLimit})
                                           </span>
                                         )}
-                                      </SelectItem>
-                                    ))
-                                  ) : (
-                                    <div className="p-4 text-sm text-muted-foreground">
-                                      Nenhum procedimento encontrado
-                                    </div>
-                                  )}
-                                </SelectContent>
-                              </Select>
+                                        {proc.coparticipation > 0 && (
+                                          <div className="text-xs text-gray-500 mt-1">
+                                            Coparticipação: R$ {proc.coparticipation.toFixed(2).replace('.', ',')}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </label>
+                                  ))
+                                ) : (
+                                  <div className="p-4 text-sm text-muted-foreground text-center">
+                                    Nenhum procedimento encontrado
+                                  </div>
+                                )}
+                              </div>
+
                               <FormMessage />
                               
-                              {field.value && (
-                                <p className="text-sm text-primary mt-2">
-                                  Coparticipação: {form.getValues("value") === "0,00" ? "Sem coparticipação" : `R$ ${form.getValues("value")}`}
-                                </p>
+                              {/* Resumo dos procedimentos selecionados */}
+                              {selectedProcedures.length > 0 && (
+                                <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                                  <p className="text-sm font-medium text-gray-700">
+                                    {selectedProcedures.length} procedimento(s) selecionado(s)
+                                  </p>
+                                  <p className="text-sm text-primary mt-1">
+                                    Valor total: R$ {form.getValues("value") || "0,00"}
+                                  </p>
+                                </div>
                               )}
                             </FormItem>
                           );
