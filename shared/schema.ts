@@ -132,7 +132,7 @@ export const veterinarians = pgTable("veterinarians", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   networkUnitId: varchar("network_unit_id").notNull().references(() => networkUnits.id, { onDelete: 'cascade' }),
   name: text("name").notNull(),
-  crmv: text("crmv").notNull(), // Registro profissional
+  crmv: text("crmv"), // Registro profissional (opcional)
   email: text("email").notNull(),
   phone: text("phone").notNull(),
   specialty: text("specialty"), // Especialidade

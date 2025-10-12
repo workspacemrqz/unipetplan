@@ -1024,7 +1024,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       const { name, crmv, email, phone, specialty, type, login, password, canAccessAtendimentos } = req.body;
       
       // Validate required fields
-      if (!name || !crmv || !email || !phone || !type) {
+      if (!name || !email || !phone || !type) {
         return res.status(400).json({ error: "Campos obrigatórios não preenchidos" });
       }
       

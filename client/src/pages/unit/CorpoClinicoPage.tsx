@@ -34,7 +34,7 @@ import LoadingDots from "@/components/ui/LoadingDots";
 
 const veterinarianSchema = z.object({
   name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
-  crmv: z.string().min(3, "CRMV é obrigatório"),
+  crmv: z.string().optional(),
   email: z.string().email("Email inválido"),
   phone: z.string().min(10, "Telefone é obrigatório"),
   specialty: z.string().optional(),
@@ -589,7 +589,7 @@ export default function CorpoClinicoPage() {
                     name="crmv"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>CRMV *</FormLabel>
+                        <FormLabel>CRMV</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Ex: CRMV-SP 12345" />
                         </FormControl>
