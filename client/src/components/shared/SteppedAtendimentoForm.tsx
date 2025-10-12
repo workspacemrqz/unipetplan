@@ -399,7 +399,7 @@ export default function SteppedAtendimentoForm({
                 {/* Etapa 1: Cliente */}
                 {currentStep === 1 && (
                   <div className="space-y-4">
-                    <div className="text-center mb-6">
+                    <div className="text-left md:text-center mb-6">
                       <p className="text-gray-600">
                         Digite o CPF do cliente para buscar suas informações
                       </p>
@@ -451,7 +451,7 @@ export default function SteppedAtendimentoForm({
                 {/* Etapa 2: Pet */}
                 {currentStep === 2 && (
                   <div className="space-y-4">
-                    <div className="text-center mb-6">
+                    <div className="text-left md:text-center mb-6">
                       <p className="text-gray-600">
                         Selecione o pet do cliente {selectedClient?.fullName}
                       </p>
@@ -541,12 +541,12 @@ export default function SteppedAtendimentoForm({
                               >
                                 {/* Informações Pessoais do Pet */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                  <div className="flex items-center gap-3 mb-3">
+                                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-3">
                                     <h3 className="font-semibold text-lg text-[#277677]">
                                       Informações Pessoais do Pet
                                     </h3>
                                     <span 
-                                      className="px-3 py-1 rounded-full text-xs font-medium" 
+                                      className="px-3 py-1 rounded-full text-xs font-medium w-fit" 
                                       style={{ 
                                         backgroundColor: selectedPet.planId ? 'rgba(39, 118, 119, 0.1)' : 'rgba(128, 128, 128, 0.1)', 
                                         color: selectedPet.planId ? '#277677' : '#666666'
@@ -729,7 +729,7 @@ export default function SteppedAtendimentoForm({
                 {/* Etapa 3: Rede e Procedimento */}
                 {currentStep === 3 && (
                   <div className="space-y-6">
-                    <div className="text-center mb-6">
+                    <div className="text-left md:text-center mb-6">
                       <p className="text-gray-600">
                         Selecione a unidade e o procedimento
                       </p>
