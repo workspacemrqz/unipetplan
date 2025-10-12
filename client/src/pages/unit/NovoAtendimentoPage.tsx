@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
-import { Button } from "@/components/admin/ui/button";
-import { ArrowLeft } from "lucide-react";
 import UnitLayout from '@/components/unit/UnitLayout';
 import SteppedAtendimentoForm from "@/components/shared/SteppedAtendimentoForm";
 import LoadingDots from '@/components/ui/LoadingDots';
@@ -55,7 +53,7 @@ export default function NovoAtendimentoPage() {
     <UnitLayout>
       <div className="p-3 sm:p-4 lg:p-6 space-y-6">
         {/* Header */}
-        <div>
+        <div className="text-center">
           <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground break-words">
             Novo Atendimento
           </h1>
@@ -63,18 +61,6 @@ export default function NovoAtendimentoPage() {
             Siga as etapas para registrar um novo atendimento
           </p>
         </div>
-
-        {/* Back Button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setLocation(`/unidade/${slug}/atendimentos`)}
-          className="w-full sm:w-auto"
-          style={{ backgroundColor: '#FFFFFF' }}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar para Atendimentos
-        </Button>
 
         {/* Stepped Form */}
         {slug && (
@@ -84,7 +70,6 @@ export default function NovoAtendimentoPage() {
             networkUnitId={unitInfo?.id}
             networkUnitName={unitInfo?.name}
             onSuccess={() => setLocation(`/unidade/${slug}/atendimentos`)}
-            onCancel={() => setLocation(`/unidade/${slug}/atendimentos`)}
           />
         )}
       </div>
