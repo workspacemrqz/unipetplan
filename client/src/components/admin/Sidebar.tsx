@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/admin/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -65,6 +65,23 @@ export default function Sidebar() {
   
   // Estado para controlar quais seções estão expandidas
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+
+  // Expand section containing current route
+  useEffect(() => {
+    for (const section of navigation) {
+      const hasActiveItem = section.items.some(item => 
+        item.href === '/' ? location === item.href : location.startsWith(item.href)
+      );
+      if (hasActiveItem) {
+        setExpandedSections(prev => {
+          const newSet = new Set(prev);
+          newSet.add(section.name);
+          return newSet;
+        });
+        break;
+      }
+    }
+  }, [location]);
 
   // Função para alternar a expansão de uma seção
   const toggleSection = (sectionName: string) => {
