@@ -28,6 +28,13 @@ interface AtendimentoWithNetworkUnit {
   id: string;
   procedure: string;
   procedureName?: string;
+  procedures?: Array<{
+    procedureName?: string;
+    name?: string;
+    value?: string;
+    procedureId?: string;
+    coparticipacao?: string;
+  }>;
   status: string;
   value?: string;
   createdAt?: string;
@@ -424,8 +431,20 @@ export default function Atendimentos() {
               atendimentosData.map((atendimento: AtendimentoWithNetworkUnit) => (
                 <TableRow key={atendimento.id} className="bg-white border-b border-[#eaeaea]">
                   {visibleColumns.includes("Procedimento") && (
-                    <TableCell className="font-medium whitespace-nowrap bg-white">
-                      {atendimento.procedure || 'Não informado'}
+                    <TableCell className="font-medium bg-white">
+                      <div className="flex flex-wrap gap-1">
+                        {atendimento.procedures && atendimento.procedures.length > 0 ? (
+                          atendimento.procedures.map((proc: any, index: number) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {proc.procedureName || proc.name}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-muted-foreground">
+                            {atendimento.procedure || 'Não informado'}
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Unidade") && (
@@ -574,7 +593,19 @@ export default function Atendimentos() {
                   <h4 className="font-semibold text-foreground mb-2">Informações Básicas</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Procedimento:</strong> <span className="text-foreground">{selectedAtendimento.procedure || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Procedimentos:</strong></span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedAtendimento.procedures && selectedAtendimento.procedures.length > 0 ? (
+                        selectedAtendimento.procedures.map((proc: any, index: number) => (
+                          <Badge key={index} variant="secondary" className="text-sm">
+                            {proc.procedureName || proc.name}
+                            {proc.value && ` - R$ ${parseFloat(proc.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-foreground">{selectedAtendimento.procedure || 'Não informado'}</span>
+                      )}
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Valor:</strong> <span className="text-foreground">R$ {parseFloat(selectedAtendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
