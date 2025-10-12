@@ -444,31 +444,31 @@ export default function ContactSubmissions() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-primary">Nome Completo</label>
-                  <p className="text-foreground">{selectedSubmission.name}</p>
+                  <p className="text-foreground break-words whitespace-pre-wrap">{selectedSubmission.name}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Email</label>
-                  <p className="text-foreground">{selectedSubmission.email}</p>
+                  <p className="text-foreground break-words whitespace-pre-wrap">{selectedSubmission.email}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Telefone</label>
-                  <p className="text-foreground">{selectedSubmission.phone}</p>
+                  <p className="text-foreground break-words whitespace-pre-wrap">{selectedSubmission.phone}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Cidade</label>
-                  <p className="text-foreground">{selectedSubmission.city}</p>
+                  <p className="text-foreground break-words whitespace-pre-wrap">{selectedSubmission.city}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Nome do Pet</label>
-                  <p className="text-foreground">{selectedSubmission.petName}</p>
+                  <p className="text-foreground break-words whitespace-pre-wrap">{selectedSubmission.petName}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Tipo de Animal</label>
-                  <p className="text-foreground">{selectedSubmission.animalType}</p>
+                  <p className="text-foreground break-words whitespace-pre-wrap">{selectedSubmission.animalType}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Idade do Pet</label>
-                  <p className="text-foreground">{selectedSubmission.petAge}</p>
+                  <p className="text-foreground break-words whitespace-pre-wrap">{selectedSubmission.petAge}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Plano de Interesse</label>
@@ -480,7 +480,7 @@ export default function ContactSubmissions() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-primary">Data de Recebimento</label>
-                  <p className="text-foreground">
+                  <p className="text-foreground break-words whitespace-pre-wrap">
                     {selectedSubmission.createdAt && format(new Date(selectedSubmission.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                   </p>
                 </div>
@@ -490,7 +490,7 @@ export default function ContactSubmissions() {
                 <div>
                   <label className="text-sm font-medium text-primary">Mensagem</label>
                   <div className="mt-1 p-3 bg-muted/10 rounded-lg">
-                    <p className="text-muted-foreground whitespace-pre-wrap">{selectedSubmission.message}</p>
+                    <p className="text-muted-foreground break-words whitespace-pre-wrap">{selectedSubmission.message}</p>
                   </div>
                 </div>
               )}

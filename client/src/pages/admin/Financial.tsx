@@ -383,25 +383,25 @@ export default function Financial() {
                   <h4 className="font-semibold text-foreground mb-2">Informações do Pagamento</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nº Recibo:</strong> <span className="text-foreground">{selectedReceipt.receiptNumber}</span></span>
+                      <span><strong className="text-primary">Nº Recibo:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedReceipt.receiptNumber}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{selectedReceipt.clientName}</span></span>
+                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedReceipt.clientName}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Email:</strong> <span className="text-foreground">{selectedReceipt.clientEmail}</span></span>
+                      <span><strong className="text-primary">Email:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedReceipt.clientEmail}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Plano:</strong> <span className="text-foreground">{selectedReceipt.planName || "N/A"}</span></span>
+                      <span><strong className="text-primary">Plano:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedReceipt.planName || "N/A"}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Valor:</strong> <span className="font-bold text-foreground">{formatCurrency(selectedReceipt.paymentAmount)}</span></span>
+                      <span><strong className="text-primary">Valor:</strong> <span className="font-bold text-foreground break-words whitespace-pre-wrap">{formatCurrency(selectedReceipt.paymentAmount)}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Método de Pagamento:</strong> <span className="text-foreground">{paymentMethodLabels[selectedReceipt.paymentMethod] || selectedReceipt.paymentMethod}</span></span>
+                      <span><strong className="text-primary">Método de Pagamento:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{paymentMethodLabels[selectedReceipt.paymentMethod] || selectedReceipt.paymentMethod}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Data do Pagamento:</strong> <span className="text-foreground">{format(new Date(selectedReceipt.paymentDate), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
+                      <span><strong className="text-primary">Data do Pagamento:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{format(new Date(selectedReceipt.paymentDate), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Status:</strong> <Badge className={statusStyle}>{statusLabels[selectedReceipt.status] || selectedReceipt.status}</Badge></span>

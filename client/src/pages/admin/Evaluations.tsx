@@ -424,16 +424,16 @@ export default function Evaluations() {
                   <h4 className="font-semibold text-foreground mb-2">Informações do Cliente</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground">{selectedSurvey.clientName}</span></span>
+                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedSurvey.clientName}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Email:</strong> <span className="text-foreground">{selectedSurvey.clientEmail}</span></span>
+                      <span><strong className="text-primary">Email:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedSurvey.clientEmail}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Data:</strong> <span className="text-foreground">{format(new Date(selectedSurvey.respondedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
+                      <span><strong className="text-primary">Data:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{format(new Date(selectedSurvey.respondedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Tipo:</strong> <span className="text-foreground">{getSurveyType(selectedSurvey)}</span></span>
+                      <span><strong className="text-primary">Tipo:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{getSurveyType(selectedSurvey)}</span></span>
                     </div>
                   </div>
                 </div>
@@ -455,7 +455,7 @@ export default function Evaluations() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Feedback</h4>
                     <div className="p-3 bg-muted rounded-lg">
-                      <p className="text-sm text-foreground whitespace-pre-wrap">{selectedSurvey.feedback}</p>
+                      <p className="text-sm text-foreground break-words whitespace-pre-wrap">{selectedSurvey.feedback}</p>
                     </div>
                   </div>
                 )}
@@ -464,7 +464,7 @@ export default function Evaluations() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Sugestões</h4>
                     <div className="p-3 bg-muted rounded-lg">
-                      <p className="text-sm text-foreground whitespace-pre-wrap">{selectedSurvey.suggestions}</p>
+                      <p className="text-sm text-foreground break-words whitespace-pre-wrap">{selectedSurvey.suggestions}</p>
                     </div>
                   </div>
                 )}

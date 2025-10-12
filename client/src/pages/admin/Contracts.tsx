@@ -576,17 +576,17 @@ export default function Contracts() {
                   <h4 className="font-semibold text-foreground mb-2">Informações do Contrato</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nº Contrato:</strong> <span className="text-foreground">{selectedContract.contractNumber}</span></span>
+                      <span><strong className="text-primary">Nº Contrato:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.contractNumber}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Status:</strong> <Badge className={statusStyle}>{statusLabels[selectedContract.status] || selectedContract.status}</Badge></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Data de Início:</strong> <span className="text-foreground">{format(new Date(selectedContract.startDate), "dd/MM/yyyy", { locale: ptBR })}</span></span>
+                      <span><strong className="text-primary">Data de Início:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{format(new Date(selectedContract.startDate), "dd/MM/yyyy", { locale: ptBR })}</span></span>
                     </div>
                     {selectedContract.endDate && (
                       <div className="flex items-center space-x-2">
-                        <span><strong className="text-primary">Data de Término:</strong> <span className="text-foreground">{format(new Date(selectedContract.endDate), "dd/MM/yyyy", { locale: ptBR })}</span></span>
+                        <span><strong className="text-primary">Data de Término:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{format(new Date(selectedContract.endDate), "dd/MM/yyyy", { locale: ptBR })}</span></span>
                       </div>
                     )}
                   </div>
@@ -596,13 +596,13 @@ export default function Contracts() {
                   <h4 className="font-semibold text-foreground mb-2">Informações do Cliente</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground">{selectedContract.clientName || "N/A"}</span></span>
+                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.clientName || "N/A"}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Email:</strong> <span className="text-foreground">{selectedContract.clientEmail || "N/A"}</span></span>
+                      <span><strong className="text-primary">Email:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.clientEmail || "N/A"}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Telefone:</strong> <span className="text-foreground">{selectedContract.clientPhone || "N/A"}</span></span>
+                      <span><strong className="text-primary">Telefone:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.clientPhone || "N/A"}</span></span>
                     </div>
                   </div>
                 </div>
@@ -611,10 +611,10 @@ export default function Contracts() {
                   <h4 className="font-semibold text-foreground mb-2">Informações do Pet</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground">{selectedContract.petName || "N/A"}</span></span>
+                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.petName || "N/A"}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Espécie:</strong> <span className="text-foreground">{selectedContract.petSpecies || "N/A"}</span></span>
+                      <span><strong className="text-primary">Espécie:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.petSpecies || "N/A"}</span></span>
                     </div>
                   </div>
                 </div>
@@ -623,24 +623,24 @@ export default function Contracts() {
                   <h4 className="font-semibold text-foreground mb-2">Informações do Plano</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Plano:</strong> <span className="text-foreground">{selectedContract.planName || "N/A"}</span></span>
+                      <span><strong className="text-primary">Plano:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.planName || "N/A"}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Período de Cobrança:</strong> <span className="text-foreground">{billingPeriodLabels[selectedContract.billingPeriod] || selectedContract.billingPeriod}</span></span>
+                      <span><strong className="text-primary">Período de Cobrança:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{billingPeriodLabels[selectedContract.billingPeriod] || selectedContract.billingPeriod}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Valor Mensal:</strong> <span className="font-bold text-foreground">{formatCurrency(selectedContract.monthlyAmount)}</span></span>
+                      <span><strong className="text-primary">Valor Mensal:</strong> <span className="font-bold text-foreground break-words whitespace-pre-wrap">{formatCurrency(selectedContract.monthlyAmount)}</span></span>
                     </div>
                     {selectedContract.annualAmount && (
                       <div className="flex items-center space-x-2">
-                        <span><strong className="text-primary">Valor Anual:</strong> <span className="font-bold text-foreground">{formatCurrency(selectedContract.annualAmount)}</span></span>
+                        <span><strong className="text-primary">Valor Anual:</strong> <span className="font-bold text-foreground break-words whitespace-pre-wrap">{formatCurrency(selectedContract.annualAmount)}</span></span>
                       </div>
                     )}
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Método de Pagamento:</strong> <span className="text-foreground">{paymentMethodLabels[selectedContract.paymentMethod] || selectedContract.paymentMethod}</span></span>
+                      <span><strong className="text-primary">Método de Pagamento:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{paymentMethodLabels[selectedContract.paymentMethod] || selectedContract.paymentMethod}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Coparticipação:</strong> <span className="text-foreground">{selectedContract.hasCoparticipation ? "Sim" : "Não"}</span></span>
+                      <span><strong className="text-primary">Coparticipação:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedContract.hasCoparticipation ? "Sim" : "Não"}</span></span>
                     </div>
                   </div>
                 </div>

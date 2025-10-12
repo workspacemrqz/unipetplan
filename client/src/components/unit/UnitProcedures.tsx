@@ -343,16 +343,16 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm text-muted-foreground">Nome do Procedimento</label>
-                    <p className="font-medium">{selectedProcedure.name}</p>
+                    <p className="font-medium break-words whitespace-pre-wrap">{selectedProcedure.name}</p>
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground">Categoria</label>
-                    <p className="font-medium">{selectedProcedure.category}</p>
+                    <p className="font-medium break-words whitespace-pre-wrap">{selectedProcedure.category}</p>
                   </div>
                   {selectedProcedure.description && (
                     <div className="col-span-2">
                       <label className="text-sm text-muted-foreground">Descrição</label>
-                      <p className="text-sm mt-1">{selectedProcedure.description}</p>
+                      <p className="text-sm mt-1 break-words whitespace-pre-wrap">{selectedProcedure.description}</p>
                     </div>
                   )}
                 </div>
@@ -366,7 +366,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                     {selectedProcedure.plans.map((plan, index) => (
                       <div key={index} className="border rounded-lg p-4 bg-gray-50">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold text-lg text-primary">{plan.planName}</h4>
+                          <h4 className="font-semibold text-lg text-primary break-words whitespace-pre-wrap">{plan.planName}</h4>
                           <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                             Cobertura total com todos os benefícios inclusos
                           </span>
@@ -375,33 +375,33 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           <div>
                             <label className="text-sm text-muted-foreground">Valor Integral</label>
-                            <p className="font-semibold text-base">{formatPrice(plan.price)}</p>
+                            <p className="font-semibold text-base break-words whitespace-pre-wrap">{formatPrice(plan.price)}</p>
                           </div>
                           
                           <div>
                             <label className="text-sm text-muted-foreground">Receber</label>
-                            <p className="font-semibold text-base text-green-600">
+                            <p className="font-semibold text-base text-green-600 break-words whitespace-pre-wrap">
                               {formatPrice(plan.payValue)}
                             </p>
                           </div>
                           
                           <div>
                             <label className="text-sm text-muted-foreground">Coparticipação</label>
-                            <p className="font-semibold text-base text-orange-600">
+                            <p className="font-semibold text-base text-orange-600 break-words whitespace-pre-wrap">
                               {plan.coparticipacao > 0 ? formatPrice(plan.coparticipacao) : 'Sem coparticipação'}
                             </p>
                           </div>
                           
                           <div>
                             <label className="text-sm text-muted-foreground">Carência</label>
-                            <p className="font-medium text-sm">
+                            <p className="font-medium text-sm break-words whitespace-pre-wrap">
                               {plan.carencia || 'Sem carência'}
                             </p>
                           </div>
                           
                           <div className="md:col-span-2">
                             <label className="text-sm text-muted-foreground">Limites Anuais</label>
-                            <p className="font-medium text-sm">
+                            <p className="font-medium text-sm break-words whitespace-pre-wrap">
                               {plan.limitesAnuais || 'Sem limites anuais'}
                             </p>
                           </div>

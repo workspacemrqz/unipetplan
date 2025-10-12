@@ -533,21 +533,21 @@ export default function Network() {
                   <h4 className="font-semibold text-foreground mb-2">Informações Básicas</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground">{selectedUnit.name}</span></span>
+                      <span><strong className="text-primary">Nome:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedUnit.name}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Endereço:</strong> <span className="text-foreground">{selectedUnit.address}</span></span>
+                      <span><strong className="text-primary">Endereço:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedUnit.address}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Telefone:</strong> <span className="text-foreground">{formatBrazilianPhoneForDisplay(selectedUnit.phone)}</span></span>
+                      <span><strong className="text-primary">Telefone:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{formatBrazilianPhoneForDisplay(selectedUnit.phone)}</span></span>
                     </div>
                     {selectedUnit.whatsapp && (
                       <div className="flex items-center space-x-2">
-                        <span><strong className="text-primary">WhatsApp:</strong> <span className="text-foreground">{formatBrazilianPhoneForDisplay(selectedUnit.whatsapp)}</span></span>
+                        <span><strong className="text-primary">WhatsApp:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{formatBrazilianPhoneForDisplay(selectedUnit.whatsapp)}</span></span>
                       </div>
                     )}
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Status:</strong> <span className="text-foreground">{selectedUnit.isActive ? "Ativo" : "Inativo"}</span></span>
+                      <span><strong className="text-primary">Status:</strong> <span className="text-foreground break-words whitespace-pre-wrap">{selectedUnit.isActive ? "Ativo" : "Inativo"}</span></span>
                     </div>
                   </div>
                 </div>
@@ -558,7 +558,7 @@ export default function Network() {
                     <h4 className="font-semibold text-foreground mb-2">Serviços Oferecidos</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedUnit.services.map((service: string, index: number) => (
-                        <Badge key={index} variant="neutral">
+                        <Badge key={index} variant="neutral" className="break-words whitespace-pre-wrap">
                           {service}
                         </Badge>
                       ))}

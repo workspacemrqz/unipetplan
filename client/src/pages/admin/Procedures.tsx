@@ -1282,7 +1282,7 @@ export default function Procedures() {
               {/* Nome do Procedimento */}
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Nome do Procedimento</label>
-                <h3 className="text-lg font-medium mt-1">{viewingItem.name ?? ''}</h3>
+                <h3 className="text-lg font-medium mt-1 break-words whitespace-pre-wrap">{viewingItem.name ?? ''}</h3>
                 <Badge variant="neutral" className="mt-2">
                   {viewingItem.isActive ? "Ativo" : "Inativo"}
                 </Badge>
@@ -1299,9 +1299,9 @@ export default function Procedures() {
                         <div key={planItem.planId} className="border border-[#eaeaea] rounded-lg p-4 bg-white">
                           {/* Nome do Plano e Categoria */}
                           <div className="mb-3">
-                            <p className="font-semibold text-base">{plan?.name || 'Plano não encontrado'}</p>
+                            <p className="font-semibold text-base break-words whitespace-pre-wrap">{plan?.name || 'Plano não encontrado'}</p>
                             {plan?.description && (
-                              <p className="text-sm text-muted-foreground">{plan.description}</p>
+                              <p className="text-sm text-muted-foreground break-words whitespace-pre-wrap">{plan.description}</p>
                             )}
                           </div>
                           
@@ -1309,17 +1309,17 @@ export default function Procedures() {
                           <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                             <div>
                               <p className="text-xs text-muted-foreground">Valor Integral</p>
-                              <p className="font-medium">R$ {(planItem.price / 100).toFixed(2).replace('.', ',')}</p>
+                              <p className="font-medium break-words whitespace-pre-wrap">R$ {(planItem.price / 100).toFixed(2).replace('.', ',')}</p>
                             </div>
 
                             <div>
                               <p className="text-xs text-muted-foreground">Pagar (R$)</p>
-                              <p className="font-medium">R$ {planItem.payValue ? (planItem.payValue / 100).toFixed(2).replace('.', ',') : '0,00'}</p>
+                              <p className="font-medium break-words whitespace-pre-wrap">R$ {planItem.payValue ? (planItem.payValue / 100).toFixed(2).replace('.', ',') : '0,00'}</p>
                             </div>
 
                             <div>
                               <p className="text-xs text-muted-foreground">Coparticipação</p>
-                              <p className="font-medium">
+                              <p className="font-medium break-words whitespace-pre-wrap">
                                 {planItem.coparticipacao > 0 
                                   ? `R$ ${(planItem.coparticipacao / 100).toFixed(2).replace('.', ',')}` 
                                   : 'Sem coparticipação'}
@@ -1328,12 +1328,12 @@ export default function Procedures() {
 
                             <div>
                               <p className="text-xs text-muted-foreground">Carência</p>
-                              <p className="font-medium">{planItem.carencia || '60 dias'}</p>
+                              <p className="font-medium break-words whitespace-pre-wrap">{planItem.carencia || '60 dias'}</p>
                             </div>
 
                             <div className="col-span-2">
                               <p className="text-xs text-muted-foreground">Limites Anuais</p>
-                              <p className="font-medium">{planItem.limitesAnuais || '10 vezes no ano'}</p>
+                              <p className="font-medium break-words whitespace-pre-wrap">{planItem.limitesAnuais || '10 vezes no ano'}</p>
                             </div>
                           </div>
 
