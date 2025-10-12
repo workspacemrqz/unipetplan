@@ -2056,7 +2056,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get all guides with network units info using the proper function
       const result = await storage.getAtendimentosWithNetworkUnits({});
-      const allGuides = result?.guides || [];
+      const allGuides = result?.atendimentos || [];
       
       // Apply filters
       let filteredGuides = allGuides;
