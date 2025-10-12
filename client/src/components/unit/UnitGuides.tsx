@@ -116,7 +116,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
   const { data: guides, isLoading } = useQuery<GuidesResponse>({
     queryKey: [`/api/units/${unitSlug}/guides`, queryParams],
     queryFn: async () => {
-      const token = localStorage.getItem('unitAuthToken');
+      const token = localStorage.getItem('unit-token');
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
