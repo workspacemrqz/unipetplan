@@ -544,52 +544,79 @@ export default function SteppedAtendimentoForm({
                                   <h3 className="font-semibold text-lg mb-3 text-[#277677]">
                                     📋 Informações Pessoais do Pet
                                   </h3>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                    <div>
-                                      <span className="font-medium text-gray-600">Nome:</span>
-                                      <span className="ml-2 text-gray-900">{selectedPet.name}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Espécie:</span>
-                                      <span className="ml-2 text-gray-900">{selectedPet.species || 'Não informado'}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Raça:</span>
-                                      <span className="ml-2 text-gray-900">{selectedPet.breed || 'Não informada'}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Idade:</span>
-                                      <span className="ml-2 text-gray-900">{selectedPet.age || 'Não informada'}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Sexo:</span>
-                                      <span className="ml-2 text-gray-900">{selectedPet.sex || 'Não informado'}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Castrado:</span>
-                                      <span className="ml-2 text-gray-900">
-                                        {selectedPet.castrated === true ? 'Sim' : selectedPet.castrated === false ? 'Não' : 'Não informado'}
-                                      </span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Cor:</span>
-                                      <span className="ml-2 text-gray-900">{selectedPet.color || 'Não informada'}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Peso:</span>
-                                      <span className="ml-2 text-gray-900">
-                                        {selectedPet.weight ? `${selectedPet.weight} kg` : 'Não informado'}
-                                      </span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Microchip:</span>
-                                      <span className="ml-2 text-gray-900">{selectedPet.microchip || 'Não informado'}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium text-gray-600">Plano:</span>
-                                      <span className="ml-2 text-gray-900">
-                                        {selectedPet.planId ? 'Ativo' : 'Sem plano'}
-                                      </span>
+                                  <div className="flex gap-4">
+                                    {/* Foto do Pet */}
+                                    {selectedPet.imageUrl && (
+                                      <div className="flex-shrink-0">
+                                        <img 
+                                          src={selectedPet.imageUrl} 
+                                          alt={selectedPet.name}
+                                          className="w-20 h-20 rounded-lg object-cover border border-gray-200"
+                                        />
+                                      </div>
+                                    )}
+                                    {/* Informações do Pet */}
+                                    <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                      <div>
+                                        <span className="font-medium text-gray-600">Nome:</span>
+                                        <span className="ml-2 text-gray-900">{selectedPet.name}</span>
+                                      </div>
+                                      {selectedPet.species && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Espécie:</span>
+                                          <span className="ml-2 text-gray-900">{selectedPet.species}</span>
+                                        </div>
+                                      )}
+                                      {selectedPet.breed && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Raça:</span>
+                                          <span className="ml-2 text-gray-900">{selectedPet.breed}</span>
+                                        </div>
+                                      )}
+                                      {selectedPet.age && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Idade:</span>
+                                          <span className="ml-2 text-gray-900">{selectedPet.age}</span>
+                                        </div>
+                                      )}
+                                      {selectedPet.sex && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Sexo:</span>
+                                          <span className="ml-2 text-gray-900">{selectedPet.sex}</span>
+                                        </div>
+                                      )}
+                                      {selectedPet.castrated !== undefined && selectedPet.castrated !== null && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Castrado:</span>
+                                          <span className="ml-2 text-gray-900">
+                                            {selectedPet.castrated === true ? 'Sim' : 'Não'}
+                                          </span>
+                                        </div>
+                                      )}
+                                      {selectedPet.color && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Cor:</span>
+                                          <span className="ml-2 text-gray-900">{selectedPet.color}</span>
+                                        </div>
+                                      )}
+                                      {selectedPet.weight && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Peso:</span>
+                                          <span className="ml-2 text-gray-900">{selectedPet.weight} kg</span>
+                                        </div>
+                                      )}
+                                      {selectedPet.microchip && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Microchip:</span>
+                                          <span className="ml-2 text-gray-900">{selectedPet.microchip}</span>
+                                        </div>
+                                      )}
+                                      {selectedPet.planId && (
+                                        <div>
+                                          <span className="font-medium text-gray-600">Plano:</span>
+                                          <span className="ml-2 text-gray-900">Ativo</span>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                   
