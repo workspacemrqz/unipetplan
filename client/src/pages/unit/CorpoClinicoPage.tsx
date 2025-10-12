@@ -300,111 +300,138 @@ export default function CorpoClinicoPage() {
 
   const renderVeterinarianTable = (vets: Veterinarian[], currentPage: number, totalPages: number, setCurrentPage: (page: number) => void) => (
     <>
-      <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {visibleColumns.includes("Nome") && <TableHead>Nome</TableHead>}
-              {visibleColumns.includes("CRMV") && <TableHead>CRMV</TableHead>}
-              {visibleColumns.includes("Email") && <TableHead>Email</TableHead>}
-              {visibleColumns.includes("Telefone") && <TableHead>Telefone</TableHead>}
-              {visibleColumns.includes("Especialidade") && <TableHead>Especialidade</TableHead>}
-              {visibleColumns.includes("Credenciais") && <TableHead>Credenciais</TableHead>}
-              {visibleColumns.includes("Acesso Atendimentos") && <TableHead>Acesso Atendimentos</TableHead>}
-              {visibleColumns.includes("Status") && <TableHead>Status</TableHead>}
-              {visibleColumns.includes("Ações") && <TableHead className="text-right">Ações</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {vets.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={visibleColumns.length} className="text-center py-8 text-muted-foreground">
-                  Nenhum veterinário encontrado
-                </TableCell>
+      {/* Modern Table Container */}
+      <div className="container my-10 space-y-4 border border-[#eaeaea] rounded-lg bg-white shadow-sm">
+        
+        {/* Table */}
+        <div className="rounded-lg overflow-hidden">
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow className="bg-white border-b border-[#eaeaea]">
+                {visibleColumns.includes("Nome") && <TableHead className="bg-white">Nome</TableHead>}
+                {visibleColumns.includes("CRMV") && <TableHead className="bg-white">CRMV</TableHead>}
+                {visibleColumns.includes("Email") && <TableHead className="bg-white">Email</TableHead>}
+                {visibleColumns.includes("Telefone") && <TableHead className="bg-white">Telefone</TableHead>}
+                {visibleColumns.includes("Especialidade") && <TableHead className="bg-white">Especialidade</TableHead>}
+                {visibleColumns.includes("Credenciais") && <TableHead className="bg-white">Credenciais</TableHead>}
+                {visibleColumns.includes("Acesso Atendimentos") && <TableHead className="bg-white">Acesso Atendimentos</TableHead>}
+                {visibleColumns.includes("Status") && <TableHead className="bg-white">Status</TableHead>}
+                {visibleColumns.includes("Ações") && <TableHead className="text-right bg-white">Ações</TableHead>}
               </TableRow>
-            ) : (
-              vets.map((vet) => (
-                <TableRow key={vet.id}>
-                  {visibleColumns.includes("Nome") && <TableCell className="font-medium">{vet.name}</TableCell>}
-                  {visibleColumns.includes("CRMV") && <TableCell>{vet.crmv}</TableCell>}
-                  {visibleColumns.includes("Email") && <TableCell>{vet.email}</TableCell>}
-                  {visibleColumns.includes("Telefone") && <TableCell>{vet.phone}</TableCell>}
-                  {visibleColumns.includes("Especialidade") && <TableCell>{vet.specialty || "-"}</TableCell>}
-                  {visibleColumns.includes("Credenciais") && (
-                    <TableCell>
-                      <Badge variant={vet.login ? "default" : "secondary"}>
-                        {vet.login ? "Configurado" : "Não configurado"}
-                      </Badge>
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Acesso Atendimentos") && (
-                    <TableCell>
-                      <Badge variant={vet.canAccessAtendimentos ? "default" : "secondary"}>
-                        {vet.canAccessAtendimentos ? "Sim" : "Não"}
-                      </Badge>
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Status") && (
-                    <TableCell>
-                      <Switch
-                        checked={vet.isActive}
-                        onCheckedChange={() => handleToggleStatus(vet.id, vet.isActive)}
-                      />
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Ações") && (
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(vet)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(vet.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  )}
+            </TableHeader>
+            <TableBody>
+              {vets.length === 0 ? (
+                <TableRow className="bg-white border-b border-[#eaeaea]">
+                  <TableCell colSpan={visibleColumns.length} className="text-center py-12 bg-white">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      {searchQuery.length > 0
+                        ? "Nenhum veterinário encontrado para a busca."
+                        : "Nenhum veterinário cadastrado ainda."
+                      }
+                    </p>
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-2 py-4">
-          <div className="text-sm text-muted-foreground">
-            Página {currentPage} de {totalPages}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+              ) : (
+                vets.map((vet) => (
+                  <TableRow key={vet.id} className="bg-white border-b border-[#eaeaea]">
+                    {visibleColumns.includes("Nome") && <TableCell className="font-medium bg-white">{vet.name}</TableCell>}
+                    {visibleColumns.includes("CRMV") && <TableCell className="bg-white">{vet.crmv}</TableCell>}
+                    {visibleColumns.includes("Email") && <TableCell className="bg-white">{vet.email}</TableCell>}
+                    {visibleColumns.includes("Telefone") && <TableCell className="bg-white">{vet.phone}</TableCell>}
+                    {visibleColumns.includes("Especialidade") && <TableCell className="bg-white">{vet.specialty || "-"}</TableCell>}
+                    {visibleColumns.includes("Credenciais") && (
+                      <TableCell className="bg-white">
+                        <Badge variant={vet.login ? "default" : "secondary"}>
+                          {vet.login ? "Configurado" : "Não configurado"}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Acesso Atendimentos") && (
+                      <TableCell className="bg-white">
+                        <Badge variant={vet.canAccessAtendimentos ? "default" : "secondary"}>
+                          {vet.canAccessAtendimentos ? "Sim" : "Não"}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Status") && (
+                      <TableCell className="bg-white">
+                        <Switch
+                          checked={vet.isActive}
+                          onCheckedChange={() => handleToggleStatus(vet.id, vet.isActive)}
+                        />
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Ações") && (
+                      <TableCell className="text-right bg-white">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(vet)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(vet.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
-      )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              <div className="flex items-center space-x-2">
+                <p className="text-sm font-medium">
+                  {vets.length > 0 ? (
+                    <>Mostrando {((currentPage - 1) * pageSize) + 1} a {Math.min(currentPage * pageSize, vets.length)} de {vets.length} veterinários</>
+                  ) : (
+                    "Nenhum veterinário encontrado"
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Anterior
+              </Button>
+              <div className="flex items-center space-x-1">
+                <span className="text-sm font-medium">
+                  Página {currentPage} de {totalPages}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+              >
+                Próximo
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 
@@ -422,28 +449,39 @@ export default function CorpoClinicoPage() {
   return (
     <UnitLayout>
       <div className="space-y-4 sm:space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Corpo Clínico</h1>
             <p className="text-sm text-muted-foreground">Gerencie os veterinários da unidade</p>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar por nome, CRMV ou email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full"
-            />
+        {/* Filters and Column Controls */}
+        <div className="flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex gap-2 flex-wrap">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-80"
+              />
+            </div>
           </div>
 
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex-1 sm:flex-initial">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  style={{
+                    borderColor: 'var(--border-gray)',
+                    background: 'white'
+                  }}
+                >
                   <MoreHorizontal className="h-4 w-4 mr-2" />
                   Colunas
                 </Button>
@@ -454,6 +492,7 @@ export default function CorpoClinicoPage() {
                     key={column}
                     checked={visibleColumns.includes(column)}
                     onCheckedChange={() => toggleColumn(column)}
+                    className="mb-1"
                   >
                     {column}
                   </DropdownMenuCheckboxItem>
@@ -478,7 +517,6 @@ export default function CorpoClinicoPage() {
                 });
                 setDialogOpen(true);
               }}
-              className="flex-1 sm:flex-initial"
             >
               <Plus className="h-4 w-4 mr-2" />
               Novo Veterinário
@@ -627,46 +665,82 @@ export default function CorpoClinicoPage() {
                       </FormItem>
                     )}
                   />
+                </div>
+
+                <div className="border-t pt-4">
+                  <h3 className="font-medium mb-4">Credenciais de Acesso (Opcional)</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Configure login e senha para permitir que o veterinário acesse o sistema
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="login"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Login</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="nome.sobrenome" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {editingVet ? "Nova Senha (deixe em branco para manter)" : "Senha"}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                {...field}
+                                type={showPassword ? "text" : "password"}
+                                placeholder={editingVet ? "••••••••" : "Senha forte"}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                  <Eye className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   <FormField
                     control={form.control}
-                    name="login"
+                    name="canAccessAtendimentos"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Login de Acesso</FormLabel>
+                      <FormItem className="flex items-center justify-between rounded-lg border p-3 mt-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">
+                            Permitir criar atendimentos
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            O veterinário poderá criar e gerenciar atendimentos
+                          </p>
+                        </div>
                         <FormControl>
-                          <Input {...field} placeholder="Opcional" />
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Senha</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              {...field}
-                              type={showPassword ? "text" : "password"}
-                              placeholder={editingVet ? "Deixe em branco para manter" : "Senha de acesso"}
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute right-0 top-0 h-full px-3"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -674,35 +748,14 @@ export default function CorpoClinicoPage() {
 
                 <FormField
                   control={form.control}
-                  name="canAccessAtendimentos"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Acesso a Atendimentos</FormLabel>
-                        <div className="text-sm text-muted-foreground">
-                          Permitir que este veterinário acesse e gerencie atendimentos
-                        </div>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="isActive"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <FormItem className="flex items-center justify-between rounded-lg border p-3">
                       <div className="space-y-0.5">
-                        <FormLabel className="text-base">Status Ativo</FormLabel>
-                        <div className="text-sm text-muted-foreground">
-                          Veterinário ativo pode acessar o sistema
-                        </div>
+                        <FormLabel className="text-base">Ativo</FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Veterinário está ativo no sistema
+                        </p>
                       </div>
                       <FormControl>
                         <Switch
@@ -714,20 +767,17 @@ export default function CorpoClinicoPage() {
                   )}
                 />
 
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setDialogOpen(false);
-                      setEditingVet(null);
-                      form.reset();
-                    }}
-                  >
+                <div className="flex justify-end gap-3">
+                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                     Cancelar
                   </Button>
                   <Button type="submit" disabled={createMutation.isPending}>
-                    {createMutation.isPending ? "Salvando..." : editingVet ? "Atualizar" : "Criar"}
+                    {createMutation.isPending ? (
+                      <>
+                        <LoadingDots size="sm" color="#fff" />
+                        Salvando...
+                      </>
+                    ) : editingVet ? "Atualizar" : "Criar"}
                   </Button>
                 </div>
               </form>
