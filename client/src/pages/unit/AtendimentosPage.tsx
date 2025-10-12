@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import UnitLayout from '@/components/unit/UnitLayout';
-import UnitGuides from "@/components/unit/UnitGuides";
+import UnitAtendimentos from "@/components/unit/UnitAtendimentos";
 import LoadingDots from '@/components/ui/LoadingDots';
 
-export default function GuiasPage() {
+export default function AtendimentosPage() {
   const { slug } = useParams();
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function GuiasPage() {
 
   return (
     <UnitLayout>
-      <UnitGuides unitSlug={slug || ''} />
+      <UnitAtendimentos unitSlug={slug || ''} />
     </UnitLayout>
   );
 }

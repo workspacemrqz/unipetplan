@@ -191,7 +191,7 @@ export default function GuideForm() {
       }
     },
     onSuccess: async () => {
-      // Invalidar todas as queries relacionadas a guias para atualizar a lista (em paralelo)
+      // Invalidar todas as queries relacionadas a atendimentos para atualizar a lista (em paralelo)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["/admin/api/guides"] }),
         queryClient.invalidateQueries({ queryKey: ["/admin/api/guides/with-network-units"] }),
@@ -204,7 +204,7 @@ export default function GuideForm() {
       });
       
       // Redirecionar imediatamente após invalidar as queries
-      setLocation("/guias");
+      setLocation("/atendimentos");
     },
     onError: () => {
       toast({
@@ -306,10 +306,10 @@ export default function GuideForm() {
       {/* Header */}
       <div>
         <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground break-words">
-          {isEdit ? "Editar Guia" : "Nova Guia"}
+          {isEdit ? "Editar Guia" : "Novo Atendimento"}
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
-          {isEdit ? "Atualize as informações da guia" : "Crie uma nova guia de atendimento"}
+          {isEdit ? "Atualize as Informações do Atendimento" : "Crie uma Novo Atendimento de atendimento"}
         </p>
       </div>
 
@@ -317,7 +317,7 @@ export default function GuideForm() {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => setLocation("/guias")}
+        onClick={() => setLocation("/atendimentos")}
         data-testid="button-back-to-guides"
         className="w-full sm:w-auto"
         style={{ backgroundColor: '#FFFFFF' }}
@@ -332,7 +332,7 @@ export default function GuideForm() {
           {/* Guide Information */}
           <Card style={{ backgroundColor: '#FFFFFF' }}>
             <CardHeader>
-              <CardTitle className="text-foreground">Informações da Guia</CardTitle>
+              <CardTitle className="text-foreground">Informações do Atendimento</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -659,7 +659,7 @@ export default function GuideForm() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setLocation("/guias")}
+              onClick={() => setLocation("/atendimentos")}
               data-testid="button-cancel"
               className="md:w-auto w-full md:h-10 h-12 md:text-sm text-base"
             >

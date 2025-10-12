@@ -752,7 +752,7 @@ export default function UnitDashboard() {
           <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1">
             <TabsTrigger value="guides" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Guias</span>
+              <span className="hidden sm:inline">Atendimentos</span>
             </TabsTrigger>
             <TabsTrigger value="clients" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -780,7 +780,7 @@ export default function UnitDashboard() {
           <TabsContent value="guides">
             <div className="space-y-4">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold mb-4">Guias de Atendimento</h3>
+                <h3 className="text-lg font-semibold mb-4">Atendimentos</h3>
                 <Tabs defaultValue="open" className="space-y-4">
                   <TabsList className="grid w-full grid-cols-3 gap-1">
                     <TabsTrigger value="open">Abertas</TabsTrigger>
@@ -867,7 +867,7 @@ export default function UnitDashboard() {
                                               status === "cancelled" ? "cancelada" : "encontrada"}
                               </h3>
                               <p className="text-gray-500">
-                                As guias aparecerão aqui quando houver solicitações.
+                                As atendimentos aparecerão aqui quando houver solicitações.
                               </p>
                             </CardContent>
                           </Card>
@@ -987,9 +987,9 @@ export default function UnitDashboard() {
           <TabsContent value="create-guide">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Lançar Nova Guia</h3>
+                <h3 className="text-lg font-semibold">Lançar Novo Atendimento</h3>
                 <p className="text-sm text-gray-600">
-                  Crie uma nova guia de atendimento para um cliente
+                  Crie uma Novo Atendimento de atendimento para um cliente
                 </p>
               </div>
 
@@ -1311,13 +1311,13 @@ export default function UnitDashboard() {
                 <Card className="bg-green-50">
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-green-600">{guides.filter(g => g.unitStatus === 'closed').length}</div>
-                    <div className="text-sm text-green-600">Guias Concluídas</div>
+                    <div className="text-sm text-green-600">Atendimentos Concluídas</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-yellow-50">
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-yellow-600">{guides.filter(g => g.unitStatus === 'open').length}</div>
-                    <div className="text-sm text-yellow-600">Guias Pendentes</div>
+                    <div className="text-sm text-yellow-600">Atendimentos Pendentes</div>
                   </CardContent>
                 </Card>
               </div>

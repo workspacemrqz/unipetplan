@@ -150,7 +150,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       });
     } catch (error) {
       console.error("❌ [UNIT] Error fetching guides:", error);
-      res.status(500).json({ error: "Erro ao buscar guias" });
+      res.status(500).json({ error: "Erro ao buscar atendimentos" });
     }
   });
   

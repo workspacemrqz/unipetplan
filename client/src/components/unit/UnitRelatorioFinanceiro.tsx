@@ -96,7 +96,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
         if (response.status === 401) {
           throw new Error('Token inválido ou expirado');
         }
-        throw new Error(`Erro ao buscar guias: ${response.statusText}`);
+        throw new Error(`Erro ao buscar atendimentos: ${response.statusText}`);
       }
 
       return response.json();

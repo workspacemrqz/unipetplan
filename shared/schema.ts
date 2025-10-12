@@ -522,10 +522,10 @@ export const procedureUsage = pgTable("procedure_usage", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// === ADMIN GUIDES SYSTEM (different from UNIPET general guides) ===
+// === ADMIN ATENDIMENTOS SYSTEM (different from UNIPET general atendimentos) ===
 
-// Admin guides table (client-specific guides)
-export const guides = pgTable("guides", {
+// Admin atendimentos table (client-specific atendimentos)
+export const atendimentos = pgTable("atendimentos", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   clientId: varchar("client_id").notNull().references(() => clients.id),
   petId: varchar("pet_id").notNull().references(() => pets.id),
@@ -536,7 +536,7 @@ export const guides = pgTable("guides", {
   value: decimal("value"),
   status: text("status").default("open"), // 'open', 'closed', 'cancelled'
   unitStatus: text("unit_status").default("open"), // 'open', 'closed', 'cancelled' - status specific for network units
-  createdByUnitId: varchar("created_by_unit_id"), // Track which unit created this guide
+  createdByUnitId: varchar("created_by_unit_id"), // Track which unit created this atendimento
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -1016,7 +1016,7 @@ export const insertRulesSettingsSchema = createInsertSchema(rulesSettings).omit(
     z.number()
   ]).optional().refine(val => val === undefined || (val >= 0 && val <= 100), "Porcentagem de comissão recorrente deve estar entre 0 e 100")
 });
-export const insertGuideSchema = createInsertSchema(guides).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertAtendimentoSchema = createInsertSchema(atendimentos).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Credential update schema for network units
 export const updateNetworkUnitCredentialsSchema = z.object({
@@ -1070,8 +1070,8 @@ export type ServiceHistory = typeof serviceHistory.$inferSelect;
 export type InsertServiceHistory = typeof serviceHistory.$inferInsert;
 export type Protocol = typeof protocols.$inferSelect;
 export type InsertProtocol = typeof protocols.$inferInsert;
-export type Guide = typeof guides.$inferSelect;
-export type InsertGuide = typeof guides.$inferInsert;
+export type Atendimento = typeof atendimentos.$inferSelect;
+export type InsertAtendimento = typeof atendimentos.$inferInsert;
 export type ProcedureUsage = typeof procedureUsage.$inferSelect;
 export type InsertProcedureUsage = typeof procedureUsage.$inferInsert;
 export type SatisfactionSurvey = typeof satisfactionSurveys.$inferSelect;

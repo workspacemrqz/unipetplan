@@ -2039,7 +2039,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(guides);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching guides:", error);
-      res.status(500).json({ error: "Erro ao buscar guias" });
+      res.status(500).json({ error: "Erro ao buscar atendimentos" });
     }
   });
 
@@ -2117,7 +2117,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(response);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching guides with network units:", error);
-      res.status(500).json({ error: "Erro ao buscar guias" });
+      res.status(500).json({ error: "Erro ao buscar atendimentos" });
     }
   });
 
@@ -6053,18 +6053,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
-      // Por enquanto, retornar array vazio pois não há guias específicas por pet
-      // Em futuras implementações, isso pode ser expandido para guias personalizadas
+      // Por enquanto, retornar array vazio pois não há atendimentos específicas por pet
+      // Em futuras implementações, isso pode ser expandido para atendimentos personalizadas
       const guides = [];
       
       res.json({ 
         guides: guides,
-        message: guides.length === 0 ? "Nenhuma guia encontrada para este pet" : "Guias carregadas com sucesso"
+        message: guides.length === 0 ? "Nenhuma guia encontrada para este pet" : "Atendimentos carregadas com sucesso"
       });
       
     } catch (error) {
       console.error("❌ Error fetching pet guides:", error);
-      res.status(500).json({ error: "Erro ao carregar guias" });
+      res.status(500).json({ error: "Erro ao carregar atendimentos" });
     }
   });
 

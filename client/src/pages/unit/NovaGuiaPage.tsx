@@ -159,7 +159,7 @@ export default function NovaGuiaPage() {
         description: "Guia foi criada com sucesso.",
       });
       
-      setLocation(`/unidade/${slug}/guias`);
+      setLocation(`/unidade/${slug}/atendimentos`);
     },
     onError: (error: any) => {
       toast({
@@ -291,10 +291,10 @@ export default function NovaGuiaPage() {
         {/* Header */}
         <div>
           <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground break-words">
-            Nova Guia
+            Novo Atendimento
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Crie uma nova guia de atendimento para sua unidade
+            Crie uma Novo Atendimento de atendimento para sua unidade
           </p>
         </div>
 
@@ -302,7 +302,7 @@ export default function NovaGuiaPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setLocation(`/unidade/${slug}/guias`)}
+          onClick={() => setLocation(`/unidade/${slug}/atendimentos`)}
           className="w-full sm:w-auto"
           style={{ backgroundColor: '#FFFFFF' }}
         >
@@ -316,7 +316,7 @@ export default function NovaGuiaPage() {
             {/* Guide Information */}
             <Card style={{ backgroundColor: '#FFFFFF' }}>
               <CardHeader>
-                <CardTitle className="text-foreground">Informações da Guia</CardTitle>
+                <CardTitle className="text-foreground">Informações do Atendimento</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -558,7 +558,7 @@ export default function NovaGuiaPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setLocation(`/unidade/${slug}/guias`)}
+                  onClick={() => setLocation(`/unidade/${slug}/atendimentos`)}
                   style={{ backgroundColor: '#FFFFFF' }}
                 >
                   Cancelar

@@ -717,7 +717,7 @@ export default function Clients() {
                               size="sm"
                               onClick={() => {
                                 setDetailsOpen(false);
-                                setLocation(`/guias/novo?clientId=${selectedClient.id}&petId=${pet.id}`);
+                                setLocation(`/atendimentos/novo?clientId=${selectedClient.id}&petId=${pet.id}`);
                               }}
                               className="text-xs"
                             >

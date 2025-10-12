@@ -137,7 +137,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
         if (response.status === 401) {
           throw new Error('Token inválido ou expirado');
         }
-        throw new Error(`Erro ao buscar guias: ${response.statusText}`);
+        throw new Error(`Erro ao buscar atendimentos: ${response.statusText}`);
       }
 
       return response.json();
@@ -214,7 +214,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
     
     // Cabeçalho
     text += "=".repeat(50) + "\n";
-    text += "INFORMAÇÕES DA GUIA DE ATENDIMENTO\n";
+    text += "Informações do Atendimento DE ATENDIMENTO\n";
     text += "=".repeat(50) + "\n\n";
 
     // Informações Básicas
@@ -310,8 +310,8 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Guias de Atendimento</h1>
-          <p className="text-sm text-muted-foreground">Visualize as guias geradas pela sua unidade</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Atendimentos</h1>
+          <p className="text-sm text-muted-foreground">Visualize as atendimentos geradas pela sua unidade</p>
         </div>
       </div>
 
@@ -367,7 +367,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
           <Button 
             variant="admin-action"
             size="sm"
-            onClick={() => setLocation(`/unidade/${unitSlug}/guias/novo`)}
+            onClick={() => setLocation(`/unidade/${unitSlug}/atendimentos/novo`)}
           >
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
@@ -506,7 +506,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
               <div className="flex items-center space-x-2">
                 <p className="text-sm font-medium">
                   {totalGuides > 0 ? (
-                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalGuides)} de {totalGuides} guias</>
+                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalGuides)} de {totalGuides} atendimentos</>
                   ) : (
                     "Nenhuma guia encontrada"
                   )}

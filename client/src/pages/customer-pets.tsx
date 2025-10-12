@@ -253,11 +253,11 @@ export default function CustomerPets() {
         setGuides(result.guides || []);
       } else {
         const errorData = await response.json();
-        setGuidesError(errorData.error || 'Erro ao carregar guias');
+        setGuidesError(errorData.error || 'Erro ao carregar atendimentos');
       }
     } catch (error) {
       console.error('Error fetching guides:', error);
-      setGuidesError('Erro ao carregar guias');
+      setGuidesError('Erro ao carregar atendimentos');
     } finally {
       setLoadingGuides(false);
     }
@@ -806,7 +806,7 @@ export default function CustomerPets() {
                       </>
                     ) : (
                       <>
-                        {/* When not editing: Show Editar, Guias, and Apagar buttons */}
+                        {/* When not editing: Show Editar, Atendimentos, and Apagar buttons */}
                         <button
                           onClick={() => startEditing(pet)}
                           className="flex items-center space-x-1 px-3 py-2 rounded-lg"
@@ -821,7 +821,7 @@ export default function CustomerPets() {
                           style={{ background: 'var(--bg-beige)', color: 'var(--text-dark-secondary)' }}
                         >
                           <FileText className="w-4 h-4" />
-                          <span>Guias</span>
+                          <span>Atendimentos</span>
                         </button>
                       </>
                     )}
@@ -847,7 +847,7 @@ export default function CustomerPets() {
               <div className="flex items-center space-x-3">
                 <FileText className="w-6 h-6" style={{ color: 'var(--text-teal)' }} />
                 <h3 className="text-xl font-semibold" style={{ color: 'var(--text-dark-primary)' }}>
-                  Guias do Pet
+                  Atendimentos do Pet
                 </h3>
               </div>
               <button
@@ -866,7 +866,7 @@ export default function CustomerPets() {
                   <div className="text-center">
                     <div className="w-8 h-8 border-4 rounded-full animate-spin mx-auto mb-4" 
                       style={{borderColor: 'var(--text-teal)', borderTopColor: 'transparent'}}></div>
-                    <p style={{ color: 'var(--text-dark-secondary)' }}>Carregando guias...</p>
+                    <p style={{ color: 'var(--text-dark-secondary)' }}>Carregando atendimentos...</p>
                   </div>
                 </div>
               ) : guidesError ? (
@@ -877,7 +877,7 @@ export default function CustomerPets() {
                       <X className="w-6 h-6" style={{ color: 'rgb(var(--destructive))' }} />
                     </div>
                     <p className="text-lg font-medium" style={{ color: 'var(--text-dark-primary)' }}>
-                      Erro ao carregar guias
+                      Erro ao carregar atendimentos
                     </p>
                     <button
                       onClick={() => fetchPetGuides(showGuides)}
@@ -896,7 +896,7 @@ export default function CustomerPets() {
                       <FileText className="w-8 h-8" style={{ color: 'var(--text-teal)' }} />
                     </div>
                     <p className="text-lg font-medium" style={{ color: 'var(--text-dark-primary)' }}>
-                      Não há guias vinculadas ao pet
+                      Não há atendimentos vinculadas ao pet
                     </p>
                   </div>
                 </div>

@@ -30,7 +30,7 @@ const navigation = [
     items: [
       { name: "Clientes & Pets", href: "/clientes", icon: Users },
       { name: "Contratos", href: "/contratos", icon: FileText },
-      { name: "Guias de Atendimento", href: "/guias", icon: File }
+      { name: "Atendimentos", href: "/atendimentos", icon: File }
     ]
   },
   {

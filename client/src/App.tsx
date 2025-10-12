@@ -13,7 +13,7 @@ import FAQ from "@/pages/faq";
 import Network from "@/pages/network";
 import UnitLoginPage from "@/pages/unit-login";
 import UnitDashboard from "@/pages/unit-dashboard";
-import GuiasPage from "@/pages/unit/GuiasPage";
+import AtendimentosPage from "@/pages/unit/AtendimentosPage";
 import NovaGuiaPage from "@/pages/unit/NovaGuiaPage";
 import RelatorioFinanceiroPage from "@/pages/unit/RelatorioFinanceiroPage";
 import ProcedimentosPage from "@/pages/unit/ProcedimentosPage";
@@ -61,8 +61,8 @@ function GlobalLoading() {
 import AdminClients from './pages/admin/Clients';
 import AdminClientForm from './pages/admin/ClientForm';
 import AdminPetForm from './pages/admin/PetForm';
-import AdminGuides from './pages/admin/Guides';
-import AdminGuideForm from './pages/admin/GuideForm';
+import AdminGuides from './pages/admin/Atendimentos';
+import AdminGuideForm from './pages/admin/AtendimentoForm';
 import AdminPlans from './pages/admin/Plans';
 import AdminPlanForm from './pages/admin/PlanForm';
 import AdminNetwork from './pages/admin/Network';
@@ -111,9 +111,9 @@ function AdminRouter() {
             <Route path="/pets/:id/editar" component={AdminPetForm} />
             
             {/* Guide management routes */}
-            <Route path="/guias" component={AdminGuides} />
-            <Route path="/guias/novo" component={AdminGuideForm} />
-            <Route path="/guias/:id/editar" component={AdminGuideForm} />
+            <Route path="/atendimentos" component={AdminGuides} />
+            <Route path="/atendimentos/novo" component={AdminGuideForm} />
+            <Route path="/atendimentos/:id/editar" component={AdminGuideForm} />
             
             {/* Plan management routes */}
             <Route path="/planos" component={AdminPlans} />
@@ -199,8 +199,8 @@ function Router() {
         
         {/* Unit Routes - specific paths first */}
         <Route path="/unidade/:slug/painel" component={UnitDashboard} />
-        <Route path="/unidade/:slug/guias/novo" component={NovaGuiaPage} />
-        <Route path="/unidade/:slug/guias" component={GuiasPage} />
+        <Route path="/unidade/:slug/atendimentos/novo" component={NovaGuiaPage} />
+        <Route path="/unidade/:slug/atendimentos" component={AtendimentosPage} />
         <Route path="/unidade/:slug/relatorio-financeiro" component={RelatorioFinanceiroPage} />
         <Route path="/unidade/:slug/procedimentos" component={ProcedimentosPage} />
         

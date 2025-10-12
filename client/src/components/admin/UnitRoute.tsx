@@ -22,7 +22,7 @@ export default function UnitRoute() {
     
     // Skip known admin routes
     const adminRoutes = [
-      '', 'clientes', 'pets', 'guias', 'planos', 'rede', 
+      '', 'clientes', 'pets', 'atendimentos', 'planos', 'rede', 
       'perguntas-frequentes', 'formularios', 'configuracoes', 'administracao',
       'procedimentos'
     ];

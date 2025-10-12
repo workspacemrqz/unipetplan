@@ -283,7 +283,7 @@ export default function Dashboard() {
             ) : (() => {
               const chartData = [
                 { name: 'Formulários', quantidade: contactSubmissions?.length || 0 },
-                { name: 'Guias', quantidade: allGuides?.length || 0 },
+                { name: 'Atendimentos', quantidade: allGuides?.length || 0 },
                 { name: 'Clientes', quantidade: clients?.length || 0 },
                 { name: 'Pets', quantidade: stats?.registeredPets || 0 },
                 { name: 'Planos', quantidade: (dashboardData as any)?.plans?.length || 0 },

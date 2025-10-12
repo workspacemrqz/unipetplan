@@ -21,7 +21,7 @@ const navigation = [
     items: [
       { name: "Clientes & Pets", href: "/clientes", iconName: "Cliente e Pet" },
       { name: "Contratos", href: "/contratos", iconName: "Contrato" },
-      { name: "Guias de Atendimento", href: "/guias", iconName: "Guia" }
+      { name: "Atendimentos", href: "/atendimentos", iconName: "Guia" }
     ]
   },
   {
@@ -82,7 +82,7 @@ export default function Sidebar() {
   const getPageTypeFromPath = (href: string): 'clients' | 'guides' | 'plans' | 'dashboard' | null => {
     if (href === '/') return 'dashboard';
     if (href.startsWith('/clientes')) return 'clients';
-    if (href.startsWith('/guias')) return 'guides';
+    if (href.startsWith('/atendimentos')) return 'guides';
     if (href.startsWith('/planos')) return 'plans';
     return null;
   };

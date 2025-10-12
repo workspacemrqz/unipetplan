@@ -317,7 +317,7 @@ export default function PlanForm() {
               <CardContent>
                 {Array.isArray(planProcedures) && planProcedures.length > 0 ? (
                   <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-foreground">Guias</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Atendimentos</h3>
                     
                     {/* Tabela simples estilo página de Clientes */}
                     <div className="rounded-lg overflow-hidden border border-[#eaeaea]">

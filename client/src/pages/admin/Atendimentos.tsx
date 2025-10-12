@@ -199,7 +199,7 @@ export default function Guides() {
     
     // Cabeçalho
     text += "=".repeat(50) + "\n";
-    text += "INFORMAÇÕES DA GUIA DE ATENDIMENTO\n";
+    text += "Informações do Atendimento DE ATENDIMENTO\n";
     text += "=".repeat(50) + "\n\n";
 
     // Informações Básicas
@@ -292,8 +292,8 @@ export default function Guides() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Guias de Atendimento</h1>
-          <p className="text-sm text-muted-foreground">Visualize todas as guias geradas pelas unidades da rede</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Atendimentos</h1>
+          <p className="text-sm text-muted-foreground">Visualize todas as atendimentos geradas pelas unidades da rede</p>
         </div>
       </div>
 
@@ -356,7 +356,7 @@ export default function Guides() {
           <Button 
             variant="admin-action"
             size="sm"
-            onClick={() => setLocation("/guias/novo")}
+            onClick={() => setLocation("/atendimentos/novo")}
           >
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
@@ -495,7 +495,7 @@ export default function Guides() {
               <div className="flex items-center space-x-2">
                 <p className="text-sm font-medium">
                   {totalGuides > 0 ? (
-                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalGuides)} de {totalGuides} guias</>
+                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalGuides)} de {totalGuides} atendimentos</>
                   ) : (
                     "Nenhuma guia encontrada"
                   )}

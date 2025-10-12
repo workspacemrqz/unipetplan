@@ -30,8 +30,8 @@ import {
   type InsertServiceHistory,
   type Protocol,
   type InsertProtocol,
-  type Guide,
-  type InsertGuide,
+  type Atendimento,
+  type InsertAtendimento,
   type SatisfactionSurvey,
   type InsertSatisfactionSurvey,
   contactSubmissions,
@@ -51,7 +51,7 @@ import {
   planProcedures,
   serviceHistory,
   protocols,
-  guides,
+  atendimentos,
   satisfactionSurveys,
   paymentReceipts,
   users,
@@ -188,13 +188,13 @@ export interface IStorage {
   getAllProtocols(): Promise<Protocol[]>;
   deleteProtocol(id: string): Promise<boolean>;
 
-  // Guides
-  createGuide(guide: InsertGuide): Promise<Guide>;
-  updateGuide(id: string, guide: Partial<InsertGuide>): Promise<Guide | undefined>;
-  getGuide(id: string): Promise<Guide | undefined>;
-  getAllGuides(): Promise<Guide[]>;
-  getActiveGuides(): Promise<Guide[]>;
-  deleteGuide(id: string): Promise<boolean>;
+  // Atendimentos
+  createAtendimento(atendimento: InsertAtendimento): Promise<Atendimento>;
+  updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined>;
+  getAtendimento(id: string): Promise<Atendimento | undefined>;
+  getAllAtendimentos(): Promise<Atendimento[]>;
+  getActiveAtendimentos(): Promise<Atendimento[]>;
+  deleteAtendimento(id: string): Promise<boolean>;
 
   // Satisfaction Surveys
   createSatisfactionSurvey(survey: InsertSatisfactionSurvey): Promise<SatisfactionSurvey>;
@@ -247,7 +247,7 @@ export interface IStorage {
   updateContractInstallment(id: string, installment: any): Promise<any | undefined>;
   getContractInstallmentsByContractId(contractId: string): Promise<any[]>;
   getContractInstallmentById(id: string): Promise<any | undefined>;
-  getGuidesWithNetworkUnits(filters: any): Promise<any>;
+  getAtendimentosWithNetworkUnits(filters: any): Promise<any>;
   getContractInstallmentByCieloPaymentId(cieloPaymentId: string): Promise<any | undefined>;
 
   // Chat Conversations - Removed (table no longer exists)
@@ -384,12 +384,12 @@ export class InMemoryStorage implements IStorage {
   async getProtocolsByClientId(clientId: string): Promise<Protocol[]> { return []; }
   async getAllProtocols(): Promise<Protocol[]> { return []; }
   async deleteProtocol(id: string): Promise<boolean> { return true; }
-  async createGuide(guide: InsertGuide): Promise<Guide> { return guide as any; }
-  async updateGuide(id: string, guide: Partial<InsertGuide>): Promise<Guide | undefined> { return undefined; }
-  async getGuide(id: string): Promise<Guide | undefined> { return undefined; }
-  async getAllGuides(): Promise<Guide[]> { return []; }
-  async getActiveGuides(): Promise<Guide[]> { return []; }
-  async deleteGuide(id: string): Promise<boolean> { return true; }
+  async createAtendimento(atendimento: InsertAtendimento): Promise<Atendimento> { return atendimento as any; }
+  async updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined> { return undefined; }
+  async getAtendimento(id: string): Promise<Atendimento | undefined> { return undefined; }
+  async getAllAtendimentos(): Promise<Atendimento[]> { return []; }
+  async getActiveAtendimentos(): Promise<Atendimento[]> { return []; }
+  async deleteAtendimento(id: string): Promise<boolean> { return true; }
   async createSatisfactionSurvey(survey: InsertSatisfactionSurvey): Promise<SatisfactionSurvey> { return survey as any; }
   async getSatisfactionSurvey(id: string): Promise<SatisfactionSurvey | undefined> { return undefined; }
   async getSatisfactionSurveysByClientId(clientId: string): Promise<SatisfactionSurvey[]> { return []; }
@@ -437,7 +437,7 @@ export class InMemoryStorage implements IStorage {
   async updateContractInstallment(id: string, installment: any): Promise<any | undefined> { return installment; }
   async getContractInstallmentsByContractId(contractId: string): Promise<any[]> { return []; }
   async getContractInstallmentById(id: string): Promise<any | undefined> { return undefined; }
-  async getGuidesWithNetworkUnits(filters: any): Promise<any> { return { guides: [], total: 0 }; }
+  async getAtendimentosWithNetworkUnits(filters: any): Promise<any> { return { atendimentos: [], total: 0 }; }
   async getContractInstallmentByCieloPaymentId(cieloPaymentId: string): Promise<any | undefined> { return undefined; }
 }
 
@@ -1519,36 +1519,36 @@ export class DatabaseStorage implements IStorage {
     return (result.rowCount || 0) > 0;
   }
 
-  // Guides
-  async createGuide(guide: InsertGuide): Promise<Guide> {
-    const [newGuide] = await db.insert(guides).values(guide as any).returning();
-    return newGuide;
+  // Atendimentos
+  async createAtendimento(atendimento: InsertAtendimento): Promise<Atendimento> {
+    const [newAtendimento] = await db.insert(atendimentos).values(atendimento as any).returning();
+    return newAtendimento;
   }
 
-  async updateGuide(id: string, guide: Partial<InsertGuide>): Promise<Guide | undefined> {
-    const [updatedGuide] = await db
-      .update(guides)
-      .set({ ...guide, updatedAt: new Date() })
-      .where(eq(guides.id, id))
+  async updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined> {
+    const [updatedAtendimento] = await db
+      .update(atendimentos)
+      .set({ ...atendimento, updatedAt: new Date() })
+      .where(eq(atendimentos.id, id))
       .returning();
-    return updatedGuide || undefined;
+    return updatedAtendimento || undefined;
   }
 
-  async getGuide(id: string): Promise<Guide | undefined> {
-    const [guide] = await db.select().from(guides).where(eq(guides.id, id));
-    return guide || undefined;
+  async getAtendimento(id: string): Promise<Atendimento | undefined> {
+    const [atendimento] = await db.select().from(atendimentos).where(eq(atendimentos.id, id));
+    return atendimento || undefined;
   }
 
-  async getAllGuides(): Promise<Guide[]> {
-    return await db.select().from(guides);
+  async getAllAtendimentos(): Promise<Atendimento[]> {
+    return await db.select().from(atendimentos);
   }
 
-  async getActiveGuides(): Promise<Guide[]> {
-    return await db.select().from(guides).where(eq(guides.status, "open"));
+  async getActiveAtendimentos(): Promise<Atendimento[]> {
+    return await db.select().from(atendimentos).where(eq(atendimentos.status, "open"));
   }
 
-  async deleteGuide(id: string): Promise<boolean> {
-    const result = await db.delete(guides).where(eq(guides.id, id));
+  async deleteAtendimento(id: string): Promise<boolean> {
+    const result = await db.delete(atendimentos).where(eq(atendimentos.id, id));
     return (result.rowCount || 0) > 0;
   }
 
@@ -1970,43 +1970,43 @@ export class DatabaseStorage implements IStorage {
     return installment || undefined;
   }
 
-  async getGuidesWithNetworkUnits(filters: any): Promise<any> {
+  async getAtendimentosWithNetworkUnits(filters: any): Promise<any> {
     const conditions: any[] = [];
     
     // Build filter conditions
     if (filters.networkUnitId) {
-      conditions.push(eq(guides.networkUnitId, filters.networkUnitId));
+      conditions.push(eq(atendimentos.networkUnitId, filters.networkUnitId));
     }
     if (filters.clientId) {
-      conditions.push(eq(guides.clientId, filters.clientId));
+      conditions.push(eq(atendimentos.clientId, filters.clientId));
     }
     if (filters.petId) {
-      conditions.push(eq(guides.petId, filters.petId));
+      conditions.push(eq(atendimentos.petId, filters.petId));
     }
     if (filters.status) {
-      conditions.push(eq(guides.status, filters.status));
+      conditions.push(eq(atendimentos.status, filters.status));
     }
 
     // Build and execute query with client and pet data
     const baseQuery = db
       .select({
-        guide: guides,
+        atendimento: atendimentos,
         networkUnit: networkUnits,
         client: clients,
         pet: pets,
       })
-      .from(guides)
-      .leftJoin(networkUnits, eq(guides.networkUnitId, networkUnits.id))
-      .leftJoin(clients, eq(guides.clientId, clients.id))
-      .leftJoin(pets, eq(guides.petId, pets.id));
+      .from(atendimentos)
+      .leftJoin(networkUnits, eq(atendimentos.networkUnitId, networkUnits.id))
+      .leftJoin(clients, eq(atendimentos.clientId, clients.id))
+      .leftJoin(pets, eq(atendimentos.petId, pets.id));
 
     const results = conditions.length > 0
-      ? await baseQuery.where(and(...conditions)).orderBy(desc(guides.createdAt))
-      : await baseQuery.orderBy(desc(guides.createdAt));
+      ? await baseQuery.where(and(...conditions)).orderBy(desc(atendimentos.createdAt))
+      : await baseQuery.orderBy(desc(atendimentos.createdAt));
     
     return {
-      guides: results.map(r => ({
-        ...r.guide,
+      atendimentos: results.map(r => ({
+        ...r.atendimento,
         networkUnit: r.networkUnit,
         clientName: r.client?.fullName || null,
         petName: r.pet?.name || null,

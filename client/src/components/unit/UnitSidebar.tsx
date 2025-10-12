@@ -23,7 +23,7 @@ export default function UnitSidebar() {
     {
       name: "Gestão",
       items: [
-        { name: "Guias de Atendimento", href: `/unidade/${slug}/guias`, icon: FileText },
+        { name: "Atendimentos", href: `/unidade/${slug}/atendimentos`, icon: FileText },
         { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign },
         { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard }
       ]

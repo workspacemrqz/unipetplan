@@ -43,7 +43,7 @@ export default function UnitDashboard() {
     const token = localStorage.getItem('unit-token');
     const newStats = { ...stats };
     
-    // Buscar guias
+    // Buscar atendimentos
     try {
       const guidesResponse = await fetch(`/api/units/${slug}/guides`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -53,7 +53,7 @@ export default function UnitDashboard() {
         newStats.totalGuides = guidesData.total || guidesData.data?.length || 0;
       }
     } catch (error) {
-      console.error('Erro ao buscar guias:', error);
+      console.error('Erro ao buscar atendimentos:', error);
     }
     
     // Buscar clientes
@@ -116,14 +116,14 @@ export default function UnitDashboard() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Guias de Atendimento</p>
+                <p className="text-sm font-medium text-gray-600">Atendimentos</p>
                 <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalGuides}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
                 <FileText className="h-6 w-6" style={{ color: '#257273' }} />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-3">Total de guias geradas</p>
+            <p className="text-xs text-gray-500 mt-3">Total de atendimentos geradas</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">

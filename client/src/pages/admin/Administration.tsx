@@ -44,7 +44,7 @@ const AVAILABLE_PERMISSIONS = [
   { id: "contracts", label: "Contratos", description: "Acesso à seção de contratos de planos" },
   { id: "payments", label: "Financeiro", description: "Acesso à seção de pagamentos e transações" },
   { id: "procedures", label: "Procedimentos", description: "Acesso à seção de procedimentos médicos" },
-  { id: "guides", label: "Guias", description: "Acesso à seção de guias de atendimento" },
+  { id: "guides", label: "Atendimentos", description: "Acesso à seção de Atendimentos" },
   { id: "plans", label: "Planos", description: "Acesso à seção de planos de saúde" },
   { id: "network", label: "Rede", description: "Acesso à seção de rede credenciada" },
   { id: "faq", label: "FAQ", description: "Acesso à seção de perguntas frequentes" },
