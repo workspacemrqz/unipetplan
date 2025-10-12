@@ -541,9 +541,20 @@ export default function SteppedAtendimentoForm({
                               >
                                 {/* Informações Pessoais do Pet */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                  <h3 className="font-semibold text-lg mb-3 text-[#277677]">
-                                    Informações Pessoais do Pet
-                                  </h3>
+                                  <div className="flex items-center gap-3 mb-3">
+                                    <h3 className="font-semibold text-lg text-[#277677]">
+                                      Informações Pessoais do Pet
+                                    </h3>
+                                    <span 
+                                      className="px-3 py-1 rounded-full text-xs font-medium" 
+                                      style={{ 
+                                        backgroundColor: selectedPet.planId ? 'rgba(39, 118, 119, 0.1)' : 'rgba(128, 128, 128, 0.1)', 
+                                        color: selectedPet.planId ? '#277677' : '#666666'
+                                      }}
+                                    >
+                                      {selectedPet.planId ? 'Plano Ativo' : 'Sem Plano'}
+                                    </span>
+                                  </div>
                                   <div className="flex gap-4">
                                     {/* Foto do Pet */}
                                     {selectedPet.imageUrl && (
@@ -609,12 +620,6 @@ export default function SteppedAtendimentoForm({
                                         <div>
                                           <span className="font-medium text-gray-600">Microchip:</span>
                                           <span className="ml-2 text-gray-900">{selectedPet.microchip}</span>
-                                        </div>
-                                      )}
-                                      {selectedPet.planId && (
-                                        <div>
-                                          <span className="font-medium text-gray-600">Plano:</span>
-                                          <span className="ml-2 text-gray-900">Ativo</span>
                                         </div>
                                       )}
                                     </div>
