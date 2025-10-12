@@ -898,7 +898,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
   // Veterinarian login
   app.post("/api/veterinarian-auth/login", async (req: Request, res: Response) => {
     try {
-      const { login, password } = req.body;
+      const { login, password, slug } = req.body;
       
       if (!login || !password) {
         return res.status(400).json({ error: "Dados incompletos" });
@@ -930,16 +930,30 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Credenciais inválidas" });
       }
       
-      // ✅ SECURITY FIX: Enforce SESSION_SECRET without fallback
-      if (!process.env.SESSION_SECRET) {
-        console.error('❌ [SECURITY] SESSION_SECRET not configured for JWT');
-        return res.status(500).json({ error: 'Configuração de segurança ausente' });
-      }
-      
       // Get unit info
       const unit = await storage.getNetworkUnitById(veterinarian.networkUnitId);
       if (!unit) {
         return res.status(500).json({ error: "Erro ao buscar informações da unidade" });
+      }
+      
+      // IMPORTANT: If slug is provided, validate that the veterinarian belongs to this specific unit
+      if (slug) {
+        const requestedUnit = await storage.getNetworkUnitBySlug(slug);
+        if (!requestedUnit) {
+          return res.status(404).json({ error: "Unidade não encontrada" });
+        }
+        
+        // Validate that the veterinarian belongs to the requested unit
+        if (veterinarian.networkUnitId !== requestedUnit.id) {
+          console.log(`⚠️ [VET-AUTH] Veterinarian ${veterinarian.name} (unit: ${veterinarian.networkUnitId}) tried to login through unit ${requestedUnit.id}`);
+          return res.status(403).json({ error: "Você não tem permissão para acessar esta unidade" });
+        }
+      }
+      
+      // ✅ SECURITY FIX: Enforce SESSION_SECRET without fallback
+      if (!process.env.SESSION_SECRET) {
+        console.error('❌ [SECURITY] SESSION_SECRET not configured for JWT');
+        return res.status(500).json({ error: 'Configuração de segurança ausente' });
       }
       
       // Generate JWT token
