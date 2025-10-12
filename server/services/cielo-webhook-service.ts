@@ -298,32 +298,53 @@ export class CieloWebhookService {
       }
 
       // Map Cielo status to contract status
-      let contractStatus: 'active' | 'inactive' | 'suspended' | 'cancelled' = 'inactive';
+      // ✅ FIX: Preserve current contract status to prevent unwanted downgrades
+      let contractStatus: 'active' | 'inactive' | 'suspended' | 'cancelled' | 'pending' = contract.status;
       let updatedAt = new Date();
       let receivedDate: Date | null = null;
 
       switch (status) {
         case 1: // Authorized
-          contractStatus = 'inactive'; // Authorized but not captured yet
+          // Only update to inactive if not already active
+          if (contract.status !== 'active') {
+            contractStatus = 'inactive'; // Authorized but not captured yet
+          }
           break;
         case 2: // Paid/Captured
           contractStatus = 'active'; // Successfully paid and captured
           receivedDate = updatedAt;
           break;
         case 3: // Denied
-          contractStatus = 'inactive'; // Payment denied
+          // ✅ FIX: Do NOT downgrade active contracts - payment may have been captured before denial
+          if (contract.status !== 'active') {
+            contractStatus = 'inactive'; // Payment denied
+          }
           break;
         case 10: // Voided/Cancelled
-          contractStatus = 'cancelled'; // Payment cancelled
+          // ✅ FIX: Do NOT downgrade active contracts - may be a retroactive notification
+          if (contract.status !== 'active') {
+            contractStatus = 'cancelled'; // Payment cancelled
+          }
           break;
         case 11: // Refunded
-          contractStatus = 'inactive'; // Refunded, may need manual review
+          // ✅ FIX: Do NOT downgrade active contracts - refunds need manual review
+          if (contract.status !== 'active') {
+            contractStatus = 'inactive'; // Refunded, may need manual review
+          }
           break;
-        case 12: // Pending
-          contractStatus = 'inactive'; // Still pending
+        case 12: // Pending (PIX)
+          // ✅ FIX: Do NOT downgrade active contracts to inactive for pending status
+          // PIX payments can send status 12 (pending) even after being paid
+          // Only set to inactive if contract is not already active
+          if (contract.status !== 'active') {
+            contractStatus = 'inactive'; // Still pending
+          }
           break;
         default:
-          contractStatus = 'inactive'; // Unknown status, default to inactive
+          // ✅ FIX: Do NOT downgrade active contracts to inactive for unknown status
+          if (contract.status !== 'active') {
+            contractStatus = 'inactive'; // Unknown status, default to inactive
+          }
       }
 
       // Prepare update data
@@ -339,6 +360,42 @@ export class CieloWebhookService {
         updateData.receivedDate = receivedDate;
       }
 
+      // ✅ AUDIT LOG: Track all status changes (prevented or executed)
+      if (contract.status !== contractStatus) {
+        const isDowngrade = contract.status === 'active' && contractStatus !== 'active';
+        const logLevel = isDowngrade ? 'warn' : 'info';
+        const logMessage = isDowngrade 
+          ? '⚠️ [CIELO-WEBHOOK] STATUS DOWNGRADE DETECTED'
+          : '📝 [CIELO-WEBHOOK] STATUS CHANGE DETECTED';
+        
+        console[logLevel](logMessage, {
+          correlationId,
+          contractId: contract.id,
+          contractNumber: contract.contractNumber,
+          paymentId,
+          previousStatus: contract.status,
+          newStatus: contractStatus,
+          statusChanged: true,
+          isDowngrade,
+          cieloStatus: status,
+          returnCode,
+          returnMessage,
+          action: isDowngrade ? 'DOWNGRADE PREVENTED - keeping contract active' : 'Status updated normally'
+        });
+      } else if (contract.status === 'active') {
+        // Log when webhook tried to change status but was prevented
+        console.info('✅ [CIELO-WEBHOOK] STATUS PRESERVED - Active contract maintained', {
+          correlationId,
+          contractId: contract.id,
+          contractNumber: contract.contractNumber,
+          paymentId,
+          status: contract.status,
+          cieloStatus: status,
+          returnCode,
+          returnMessage
+        });
+      }
+
       // Update the contract
       const updatedContract = await storage.updateContract(contract.id, updateData);
       
@@ -349,6 +406,7 @@ export class CieloWebhookService {
         paymentId,
         oldStatus: contract.status,
         newStatus: contractStatus,
+        statusChanged: contract.status !== contractStatus,
         cieloStatus: status,
         returnCode,
         returnMessage
