@@ -2165,25 +2165,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new atendimento
   app.post("/admin/api/atendimentos", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
-      const atendimentoData = insertAtendimentoSchema.parse(req.body);
+      const { procedures, ...atendimentoData } = req.body;
+      
+      // Validar dados básicos (temporariamente sem procedure obrigatório)
+      const validatedData = {
+        ...atendimentoData,
+        procedure: procedures && procedures.length > 0 
+          ? procedures.map((p: any) => p.name).join(", ")  // Concatenar nomes dos procedimentos
+          : atendimentoData.procedure
+      };
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
       let processedValue: string | undefined;
-      if (atendimentoData.value && typeof atendimentoData.value === 'string') {
-        processedValue = atendimentoData.value.replace('.', '').replace(',', '.');
+      if (validatedData.value && typeof validatedData.value === 'string') {
+        processedValue = validatedData.value.replace('.', '').replace(',', '.');
       }
       
       const processedAtendimentoData: InsertAtendimento = {
-        ...atendimentoData,
-        clientId: atendimentoData.clientId!,
-        petId: atendimentoData.petId!,
-        procedure: atendimentoData.procedure!,
+        ...validatedData,
+        clientId: validatedData.clientId!,
+        petId: validatedData.petId!,
+        procedure: validatedData.procedure!,
         value: processedValue
       };
       
-      console.log(`📝 [ADMIN] Creating new atendimento:`, processedAtendimentoData);
+      console.log(`📝 [ADMIN] Creating new atendimento with ${procedures?.length || 1} procedures`);
       
       const newAtendimento = await storage.createAtendimento(processedAtendimentoData);
+      
+      // Salvar múltiplos procedimentos na tabela de relacionamento
+      if (procedures && procedures.length > 0) {
+        await storage.createAtendimentoProcedures(newAtendimento.id, procedures);
+        console.log(`✅ [ADMIN] Saved ${procedures.length} procedures for atendimento ${newAtendimento.id}`);
+      }
       
       // Automatically register procedure usage when atendimento is created
       if (atendimentoData.petId && atendimentoData.procedure) {

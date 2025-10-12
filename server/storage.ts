@@ -52,6 +52,7 @@ import {
   serviceHistory,
   protocols,
   atendimentos,
+  atendimentoProcedures,
   satisfactionSurveys,
   paymentReceipts,
   users,
@@ -190,6 +191,7 @@ export interface IStorage {
 
   // Atendimentos
   createAtendimento(atendimento: InsertAtendimento): Promise<Atendimento>;
+  createAtendimentoProcedures(atendimentoId: string, procedures: any[]): Promise<void>;
   updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined>;
   getAtendimento(id: string): Promise<Atendimento | undefined>;
   getAllAtendimentos(): Promise<Atendimento[]>;
@@ -386,6 +388,7 @@ export class InMemoryStorage implements IStorage {
   async getAllProtocols(): Promise<Protocol[]> { return []; }
   async deleteProtocol(id: string): Promise<boolean> { return true; }
   async createAtendimento(atendimento: InsertAtendimento): Promise<Atendimento> { return atendimento as any; }
+  async createAtendimentoProcedures(atendimentoId: string, procedures: any[]): Promise<void> { /* No-op for in-memory storage */ }
   async updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined> { return undefined; }
   async getAtendimento(id: string): Promise<Atendimento | undefined> { return undefined; }
   async getAllAtendimentos(): Promise<Atendimento[]> { return []; }
@@ -1525,6 +1528,21 @@ export class DatabaseStorage implements IStorage {
   async createAtendimento(atendimento: InsertAtendimento): Promise<Atendimento> {
     const [newAtendimento] = await db.insert(atendimentos).values(atendimento as any).returning();
     return newAtendimento;
+  }
+
+  async createAtendimentoProcedures(atendimentoId: string, procedures: any[]): Promise<void> {
+    if (!procedures || procedures.length === 0) return;
+    
+    for (const proc of procedures) {
+      await db.insert(atendimentoProcedures).values({
+        atendimentoId: atendimentoId,
+        procedureName: proc.name,
+        procedureId: proc.id || null,
+        value: proc.value?.toString() || null,
+        coparticipacao: proc.coparticipacao?.toString() || null,
+        notes: proc.notes || null
+      });
+    }
   }
 
   async updateAtendimento(id: string, atendimento: Partial<InsertAtendimento>): Promise<Atendimento | undefined> {

@@ -174,18 +174,30 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
   app.post(["/api/unit/:slug/atendimentos", "/api/units/:slug/atendimentos"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
       const unitId = req.unit?.unitId;
-      const atendimentoData = req.body;
+      const { procedures, ...atendimentoData } = req.body;
       
       if (!unitId) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
-      // Add unit ID to track which unit created this atendimento
-      const newAtendimento = await storage.createAtendimento({
+      // Processar múltiplos procedimentos
+      const processedData = {
         ...atendimentoData,
         networkUnitId: unitId,
-        createdByUnitId: unitId
-      });
+        createdByUnitId: unitId,
+        procedure: procedures && procedures.length > 0 
+          ? procedures.map((p: any) => p.name).join(", ")
+          : atendimentoData.procedure
+      };
+      
+      // Add unit ID to track which unit created this atendimento
+      const newAtendimento = await storage.createAtendimento(processedData);
+      
+      // Salvar múltiplos procedimentos na tabela de relacionamento
+      if (procedures && procedures.length > 0) {
+        await storage.createAtendimentoProcedures(newAtendimento.id, procedures);
+        console.log(`✅ [UNIT] Saved ${procedures.length} procedures for atendimento ${newAtendimento.id}`);
+      }
       
       // Automatically register procedure usage when atendimento is created
       if (atendimentoData.petId && atendimentoData.procedureId) {
