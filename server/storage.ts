@@ -38,11 +38,14 @@ import {
   type InsertVeterinarian,
   type ActionLog,
   type InsertActionLog,
+  type AdminActionLog,
+  type InsertAdminActionLog,
   contactSubmissions,
   plans,
   networkUnits,
   veterinarians,
   actionLogs,
+  adminActionLogs,
   faqItems,
   siteSettings,
   chatSettings,
@@ -273,6 +276,18 @@ export interface IStorage {
   createActionLog(data: InsertActionLog): Promise<ActionLog>;
   getActionLogsByUnit(unitId: string): Promise<any[]>;
 
+  // Admin Action Logs
+  createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog>;
+  getAdminActionLogs(filters: {
+    startDate?: string;
+    endDate?: string;
+    adminUserId?: string;
+    actionType?: string;
+    entityType?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: AdminActionLog[]; total: number; totalPages: number; page: number }>;
+
   // Chat Conversations - Removed (table no longer exists)
 }
 
@@ -488,6 +503,18 @@ export class InMemoryStorage implements IStorage {
     } as ActionLog; 
   }
   async getActionLogsByUnit(unitId: string): Promise<any[]> { return []; }
+  
+  // Admin Action Logs
+  async createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog> { 
+    return { 
+      ...data, 
+      id: crypto.randomUUID(), 
+      createdAt: new Date() 
+    } as AdminActionLog; 
+  }
+  async getAdminActionLogs(filters: any): Promise<{ data: AdminActionLog[]; total: number; totalPages: number; page: number }> { 
+    return { data: [], total: 0, totalPages: 0, page: 1 }; 
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2261,6 +2288,80 @@ export class DatabaseStorage implements IStorage {
         name: row.veterinarian.name,
       } : null,
     }));
+  }
+
+  // Admin Action Logs
+  async createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog> {
+    const [log] = await db
+      .insert(adminActionLogs)
+      .values(data)
+      .returning();
+    return log;
+  }
+
+  async getAdminActionLogs(filters: {
+    startDate?: string;
+    endDate?: string;
+    adminUserId?: string;
+    actionType?: string;
+    entityType?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: AdminActionLog[]; total: number; totalPages: number; page: number }> {
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const offset = (page - 1) * limit;
+
+    // Build where conditions
+    const conditions: any[] = [];
+    
+    if (filters.adminUserId) {
+      conditions.push(eq(adminActionLogs.adminUserId, filters.adminUserId));
+    }
+    
+    if (filters.actionType) {
+      conditions.push(eq(adminActionLogs.actionType, filters.actionType));
+    }
+    
+    if (filters.entityType) {
+      conditions.push(eq(adminActionLogs.entityType, filters.entityType));
+    }
+    
+    if (filters.startDate) {
+      conditions.push(sql`${adminActionLogs.createdAt} >= ${filters.startDate}`);
+    }
+    
+    if (filters.endDate) {
+      conditions.push(sql`${adminActionLogs.createdAt} <= ${filters.endDate}`);
+    }
+
+    // Get total count
+    const countQuery = conditions.length > 0
+      ? db.select({ count: sql<number>`count(*)` }).from(adminActionLogs).where(and(...conditions))
+      : db.select({ count: sql<number>`count(*)` }).from(adminActionLogs);
+    
+    const [{ count: total }] = await countQuery;
+
+    // Get paginated data
+    const dataQuery = db
+      .select()
+      .from(adminActionLogs)
+      .orderBy(desc(adminActionLogs.createdAt))
+      .limit(limit)
+      .offset(offset);
+    
+    const data = conditions.length > 0
+      ? await dataQuery.where(and(...conditions))
+      : await dataQuery;
+
+    const totalPages = Math.ceil(Number(total) / limit);
+
+    return {
+      data,
+      total: Number(total),
+      totalPages,
+      page,
+    };
   }
 
 }

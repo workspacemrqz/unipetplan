@@ -74,6 +74,7 @@ import AdminFAQ from './pages/admin/FAQ';
 import AdminContactSubmissions from './pages/admin/ContactSubmissions';
 import AdminSettings from './pages/admin/Settings';
 import AdminAdministration from './pages/admin/Administration';
+import AdminLogsPage from './pages/admin/AdminLogsPage';
 import AdminUnitDashboard from './pages/admin/UnitDashboard';
 import AdminFinancial from './pages/admin/Financial';
 import AdminContracts from './pages/admin/Contracts';
@@ -150,6 +151,7 @@ function AdminRouter() {
             <Route path="/avaliacoes" component={AdminEvaluations} />
             <Route path="/configuracoes" component={AdminSettings} />
             <Route path="/administracao" component={AdminAdministration} />
+            <Route path="/logs" component={AdminLogsPage} />
             
             {/* Unit Dashboard (special case) */}
             <Route path="/unidade/:slug" component={AdminUnitDashboard} />

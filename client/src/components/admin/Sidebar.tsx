@@ -53,6 +53,7 @@ const navigation = [
       { name: "Procedimentos", href: "/procedimentos", iconName: "Procedimento" },
       { name: "FAQ", href: "/perguntas-frequentes", iconName: "FAQ" },
       { name: "Administração", href: "/administracao", iconName: "Admin" },
+      { name: "Logs de Ações", href: "/logs", iconName: "Formularios" },
       { name: "Configurações", href: "/configuracoes", iconName: "Configurações" }
     ]
   }

@@ -3086,6 +3086,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // === ADMIN ACTION LOGS ROUTES ===
+  
+  // Create admin action log
+  app.post("/admin/api/logs", requireAdmin, async (req, res) => {
+    try {
+      // SECURITY: Use authenticated admin ID from session, never trust client-provided ID
+      const adminUserId = req.session.admin?.userId || req.session.admin?.login;
+      
+      if (!adminUserId) {
+        return res.status(401).json({ error: "Sessão de administrador inválida" });
+      }
+      
+      const logData = {
+        adminUserId,
+        actionType: req.body.actionType,
+        entityType: req.body.entityType,
+        entityId: req.body.entityId,
+        metadata: req.body.metadata,
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      };
+      
+      const log = await storage.createAdminActionLog(logData);
+      res.json(log);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error creating admin action log:", error);
+      res.status(500).json({ error: "Erro ao criar log de ação" });
+    }
+  });
+
+  // Get admin action logs with filters and pagination
+  app.get("/admin/api/logs", requireAdmin, async (req, res) => {
+    try {
+      const { startDate, endDate, adminUserId, actionType, entityType, page, limit } = req.query;
+      
+      const filters = {
+        startDate: startDate as string,
+        endDate: endDate as string,
+        adminUserId: adminUserId as string,
+        actionType: actionType as string,
+        entityType: entityType as string,
+        page: page ? parseInt(page as string) : 1,
+        limit: limit ? parseInt(limit as string) : 10,
+      };
+      
+      const result = await storage.getAdminActionLogs(filters);
+      res.json(result);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching admin action logs:", error);
+      res.status(500).json({ error: "Erro ao buscar logs de ações" });
+    }
+  });
+
   // === COUPON ROUTES ===
   
   // Get all coupons

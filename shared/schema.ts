@@ -585,6 +585,19 @@ export const actionLogs = pgTable("action_logs", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+// Admin action logs table for tracking administrative actions
+export const adminActionLogs = pgTable("admin_action_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  adminUserId: varchar("admin_user_id").notNull().references(() => users.id),
+  actionType: varchar("action_type").notNull(), // "created", "updated", "deleted", "viewed"
+  entityType: varchar("entity_type").notNull(), // "client", "contract", "plan", "procedure"
+  entityId: varchar("entity_id").notNull(),
+  metadata: json("metadata"), // Additional action data
+  ip: varchar("ip"),
+  userAgent: varchar("user_agent"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
 // === VALIDATION SCHEMAS ===
 
 export const insertContactSubmissionSchema = z.object({
@@ -1128,6 +1141,8 @@ export type Atendimento = typeof atendimentos.$inferSelect;
 export type InsertAtendimento = typeof atendimentos.$inferInsert;
 export type ActionLog = typeof actionLogs.$inferSelect;
 export type InsertActionLog = typeof actionLogs.$inferInsert;
+export type AdminActionLog = typeof adminActionLogs.$inferSelect;
+export type InsertAdminActionLog = typeof adminActionLogs.$inferInsert;
 export type ProcedureUsage = typeof procedureUsage.$inferSelect;
 export type InsertProcedureUsage = typeof procedureUsage.$inferInsert;
 export type SatisfactionSurvey = typeof satisfactionSurveys.$inferSelect;
