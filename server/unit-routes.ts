@@ -127,6 +127,13 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       
       const allAtendimentos = result?.atendimentos || [];
       
+      // Sort by createdAt descending (newest first)
+      allAtendimentos.sort((a: any, b: any) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      
       // Calculate pagination
       const filteredTotal = allAtendimentos.length;
       const totalPages = Math.ceil(filteredTotal / limit);
