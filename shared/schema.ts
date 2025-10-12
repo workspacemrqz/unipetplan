@@ -530,7 +530,7 @@ export const atendimentos = pgTable("atendimentos", {
   clientId: varchar("client_id").notNull().references(() => clients.id),
   petId: varchar("pet_id").notNull().references(() => pets.id),
   networkUnitId: varchar("network_unit_id").references(() => networkUnits.id),
-  procedure: text("procedure").notNull(),
+  procedure: text("procedure").notNull(), // Mantido para compatibilidade, armazenará lista concatenada de procedimentos
   procedureNotes: text("procedure_notes"),
   generalNotes: text("general_notes"),
   value: decimal("value"),
@@ -539,6 +539,18 @@ export const atendimentos = pgTable("atendimentos", {
   createdByUnitId: varchar("created_by_unit_id"), // Track which unit created this atendimento
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Tabela de relacionamento para múltiplos procedimentos por atendimento
+export const atendimentoProcedures = pgTable("atendimento_procedures", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  atendimentoId: varchar("atendimento_id").notNull().references(() => atendimentos.id, { onDelete: "cascade" }),
+  procedureName: text("procedure_name").notNull(), // Nome do procedimento
+  procedureId: varchar("procedure_id").references(() => procedures.id), // Opcional, referência ao procedimento se existir
+  value: decimal("value"), // Valor individual do procedimento
+  coparticipacao: decimal("coparticipacao"), // Coparticipação individual
+  notes: text("notes"), // Notas específicas deste procedimento
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // === VALIDATION SCHEMAS ===
