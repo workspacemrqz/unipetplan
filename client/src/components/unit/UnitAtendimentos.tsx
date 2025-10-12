@@ -39,6 +39,7 @@ interface AtendimentoWithNetworkUnit {
   value?: string;
   createdAt?: string;
   updatedAt?: string;
+  numeroSequencial?: number;
   networkUnit?: {
     id: string;
     name: string;
@@ -431,15 +432,12 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                 </TableRow>
               ))
             ) : atendimentosData && atendimentosData.length > 0 ? (
-              atendimentosData.map((atendimento: AtendimentoWithNetworkUnit, index: number) => {
-                const startIndex = (currentPage - 1) * pageSize;
-                const sequentialNumber = startIndex + index + 1;
-                
+              atendimentosData.map((atendimento: AtendimentoWithNetworkUnit) => {
                 return (
                   <TableRow key={atendimento.id} className="bg-white border-b border-[#eaeaea]">
                     {visibleColumns.includes("Nº") && (
                       <TableCell className="font-medium bg-white">
-                        {sequentialNumber}
+                        {atendimento.numeroSequencial || '-'}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Procedimento") && (

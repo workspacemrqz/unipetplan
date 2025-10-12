@@ -248,6 +248,7 @@ export interface IStorage {
   getContractInstallmentsByContractId(contractId: string): Promise<any[]>;
   getContractInstallmentById(id: string): Promise<any | undefined>;
   getAtendimentosWithNetworkUnits(filters: any): Promise<any>;
+  getUnitAtendimentosWithSequentialNumber(unitId: string, filters: any): Promise<any>;
   getContractInstallmentByCieloPaymentId(cieloPaymentId: string): Promise<any | undefined>;
 
   // Chat Conversations - Removed (table no longer exists)
@@ -438,6 +439,7 @@ export class InMemoryStorage implements IStorage {
   async getContractInstallmentsByContractId(contractId: string): Promise<any[]> { return []; }
   async getContractInstallmentById(id: string): Promise<any | undefined> { return undefined; }
   async getAtendimentosWithNetworkUnits(filters: any): Promise<any> { return { atendimentos: [], total: 0 }; }
+  async getUnitAtendimentosWithSequentialNumber(unitId: string, filters: any): Promise<any> { return { atendimentos: [], total: 0 }; }
   async getContractInstallmentByCieloPaymentId(cieloPaymentId: string): Promise<any | undefined> { return undefined; }
 }
 
@@ -2012,6 +2014,93 @@ export class DatabaseStorage implements IStorage {
         petName: r.pet?.name || null,
       })),
       total: results.length,
+    };
+  }
+
+  async getUnitAtendimentosWithSequentialNumber(unitId: string, filters: any): Promise<any> {
+    // SQL query with ROW_NUMBER() calculated BEFORE filters (permanent numbering)
+    // Then filter the results in outer query while preserving the original sequential number
+    const query = sql`
+      WITH numbered_atendimentos AS (
+        SELECT 
+          a.*,
+          ROW_NUMBER() OVER (ORDER BY a.created_at ASC) as numero_sequencial,
+          nu.id as nu_id, nu.name as nu_name, nu.address as nu_address, nu.cidade as nu_cidade,
+          nu.phone as nu_phone, nu.services as nu_services, nu.image_url as nu_image_url,
+          nu.is_active as nu_is_active, nu.created_at as nu_created_at, nu.whatsapp as nu_whatsapp,
+          nu.google_maps_url as nu_google_maps_url, nu.image_data as nu_image_data,
+          nu.url_slug as nu_url_slug, nu.login as nu_login, nu.senha_hash as nu_senha_hash,
+          c.id as c_id, c.full_name as c_full_name, c.email as c_email, c.phone as c_phone,
+          c.cpf as c_cpf, c.cep as c_cep, c.address as c_address, c.number as c_number,
+          c.complement as c_complement, c.district as c_district, c.state as c_state,
+          c.city as c_city, c.cpf_hash as c_cpf_hash, c.image as c_image, c.image_url as c_image_url,
+          c.created_by_unit_id as c_created_by_unit_id, c.created_at as c_created_at, c.updated_at as c_updated_at,
+          p.id as p_id, p.client_id as p_client_id, p.name as p_name, p.species as p_species,
+          p.breed as p_breed, p.birth_date as p_birth_date, p.age as p_age, p.sex as p_sex,
+          p.castrated as p_castrated, p.color as p_color, p.weight as p_weight, p.microchip as p_microchip,
+          p.previous_diseases as p_previous_diseases, p.surgeries as p_surgeries, p.allergies as p_allergies,
+          p.current_medications as p_current_medications, p.hereditary_conditions as p_hereditary_conditions,
+          p.vaccine_data as p_vaccine_data, p.last_checkup as p_last_checkup,
+          p.parasite_treatments as p_parasite_treatments, p.plan_id as p_plan_id,
+          p.image as p_image, p.image_url as p_image_url, p.is_active as p_is_active,
+          p.created_by_unit_id as p_created_by_unit_id, p.created_at as p_created_at, p.updated_at as p_updated_at
+        FROM atendimentos a
+        LEFT JOIN network_units nu ON a.network_unit_id = nu.id
+        LEFT JOIN clients c ON a.client_id = c.id
+        LEFT JOIN pets p ON a.pet_id = p.id
+        WHERE a.created_by_unit_id = ${unitId}
+      )
+      SELECT * FROM numbered_atendimentos
+      WHERE TRUE
+        ${filters.status && filters.status !== 'all' ? sql`AND status = ${filters.status}` : sql``}
+        ${filters.startDate && filters.endDate ? sql`AND created_at >= ${filters.startDate} AND created_at <= ${filters.endDate}` : sql``}
+      ORDER BY created_at DESC
+    `;
+
+    const results = await db.execute(query);
+    
+    console.log(`✅ [UNIT] getUnitAtendimentosWithSequentialNumber - Found ${results.rows.length} atendimentos`);
+    if (results.rows.length > 0) {
+      console.log(`✅ [UNIT] Sample row numero_sequencial:`, results.rows[0].numero_sequencial);
+    }
+    
+    return {
+      atendimentos: results.rows.map((row: any) => ({
+        id: row.id,
+        clientId: row.client_id,
+        petId: row.pet_id,
+        networkUnitId: row.network_unit_id,
+        procedure: row.procedure,
+        procedureNotes: row.procedure_notes,
+        generalNotes: row.general_notes,
+        value: row.value,
+        status: row.status,
+        unitStatus: row.unit_status,
+        createdByUnitId: row.created_by_unit_id,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        numeroSequencial: row.numero_sequencial ? Number(row.numero_sequencial) : undefined,
+        networkUnit: row.nu_id ? {
+          id: row.nu_id,
+          name: row.nu_name,
+          address: row.nu_address,
+          cidade: row.nu_cidade,
+          phone: row.nu_phone,
+          services: row.nu_services,
+          imageUrl: row.nu_image_url,
+          isActive: row.nu_is_active,
+          createdAt: row.nu_created_at,
+          whatsapp: row.nu_whatsapp,
+          googleMapsUrl: row.nu_google_maps_url,
+          imageData: row.nu_image_data,
+          urlSlug: row.nu_url_slug,
+          login: row.nu_login,
+          senhaHash: row.nu_senha_hash,
+        } : null,
+        clientName: row.c_full_name || null,
+        petName: row.p_name || null,
+      })),
+      total: results.rows.length,
     };
   }
 

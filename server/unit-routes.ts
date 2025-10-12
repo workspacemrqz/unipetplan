@@ -114,33 +114,25 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Get query parameters
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const search = req.query.search as string;
       const status = req.query.status as string;
-      const type = req.query.type as string;
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
       
-      // Get atendimentos with network units info
-      const result = await storage.getAtendimentosWithNetworkUnits({
-        page,
-        limit,
-        search,
+      // Get atendimentos with sequential numbering
+      const result = await storage.getUnitAtendimentosWithSequentialNumber(unitId, {
         status: status !== 'all' ? status : undefined,
-        type: type !== 'all' ? type : undefined,
         startDate,
         endDate
       });
       
-      // Filter to only show atendimentos created by this unit
       const allAtendimentos = result?.atendimentos || [];
-      const unitAtendimentos = allAtendimentos.filter((atendimento: any) => atendimento.createdByUnitId === unitId);
       
-      // Recalculate pagination for filtered results
-      const filteredTotal = unitAtendimentos.length;
+      // Calculate pagination
+      const filteredTotal = allAtendimentos.length;
       const totalPages = Math.ceil(filteredTotal / limit);
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
-      const paginatedAtendimentos = unitAtendimentos.slice(startIndex, endIndex);
+      const paginatedAtendimentos = allAtendimentos.slice(startIndex, endIndex);
       
       res.json({
         data: paginatedAtendimentos,
