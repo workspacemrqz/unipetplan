@@ -109,39 +109,39 @@ export class CacheManager {
       })
     );
     
-    // Guides might reference pets
+    // Atendimentos might reference pets
     invalidationPromises.push(
       this.queryClient.invalidateQueries({ 
         predicate: (query) => 
-          query.queryKey[0] === "/admin/api/guides" || 
-          query.queryKey[0] === "/admin/api/guides/with-network-units"
+          query.queryKey[0] === "/admin/api/atendimentos" || 
+          query.queryKey[0] === "/admin/api/atendimentos/with-network-units"
       })
     );
 
     return Promise.all(invalidationPromises);
   }
 
-  // Invalidate all queries related to guides
+  // Invalidate all queries related to atendimentos
   invalidateGuideData(guideId?: string) {
     const invalidationPromises = [];
     
-    // Invalidate all guide-related queries
+    // Invalidate all atendimento-related queries
     invalidationPromises.push(
       this.queryClient.invalidateQueries({ 
         predicate: (query) => 
-          query.queryKey[0] === "/admin/api/guides" || 
-          query.queryKey[0] === "/admin/api/guides/with-network-units"
+          query.queryKey[0] === "/admin/api/atendimentos" || 
+          query.queryKey[0] === "/admin/api/atendimentos/with-network-units"
       })
     );
     
-    // If specific guide, invalidate its details
+    // If specific atendimento, invalidate its details
     if (guideId) {
       invalidationPromises.push(
-        this.queryClient.invalidateQueries({ queryKey: ["/admin/api/guides", guideId] })
+        this.queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos", guideId] })
       );
     }
     
-    // Dashboard shows guide counts
+    // Dashboard shows atendimento counts
     invalidationPromises.push(
       this.queryClient.invalidateQueries({ 
         predicate: (query) => 
@@ -222,7 +222,7 @@ export class CacheManager {
         return Promise.all([
           this.queryClient.invalidateQueries({ queryKey: ["/admin/api/network-units"] }),
           this.queryClient.invalidateQueries({ queryKey: ["/admin/api/network-units/credentials"] }),
-          this.invalidateGuideData(), // Guides reference network units
+          this.invalidateGuideData(), // Atendimentos reference network units
           this.queryClient.invalidateQueries({ 
             predicate: (query) => query.queryKey[0] === "/admin/api/dashboard/all"
           })
@@ -231,7 +231,7 @@ export class CacheManager {
         return Promise.all([
           this.queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] }),
           this.invalidatePlanData(), // Procedures are related to plans
-          this.invalidateGuideData() // Guides reference procedures
+          this.invalidateGuideData() // Atendimentos reference procedures
         ]);
       default:
         // Generic fallback
@@ -280,14 +280,14 @@ export class CacheManager {
     
     prefetchPromises.push(
       this.queryClient.prefetchQuery({
-        queryKey: ["/admin/api/guides"],
+        queryKey: ["/admin/api/atendimentos"],
         staleTime: 10 * 60 * 1000, // 10 minutes
       })
     );
     
     prefetchPromises.push(
       this.queryClient.prefetchQuery({
-        queryKey: ["/admin/api/guides/with-network-units"],
+        queryKey: ["/admin/api/atendimentos/with-network-units"],
         staleTime: 10 * 60 * 1000, // 10 minutes
       })
     );
@@ -315,7 +315,7 @@ export class CacheManager {
   }
 
   // Prefetch specific page data when hovering over navigation
-  async prefetchPageData(pageType: 'clients' | 'guides' | 'plans' | 'dashboard') {
+  async prefetchPageData(pageType: 'clients' | 'atendimentos' | 'plans' | 'dashboard') {
     const prefetchPromises = [];
     
     switch (pageType) {
@@ -329,17 +329,17 @@ export class CacheManager {
         );
         break;
         
-      case 'guides':
-        // Prefetch guides with network units
+      case 'atendimentos':
+        // Prefetch atendimentos with network units
         prefetchPromises.push(
           this.queryClient.prefetchQuery({
-            queryKey: ["/admin/api/guides"],
+            queryKey: ["/admin/api/atendimentos"],
             staleTime: 10 * 60 * 1000,
           })
         );
         prefetchPromises.push(
           this.queryClient.prefetchQuery({
-            queryKey: ["/admin/api/guides/with-network-units"],
+            queryKey: ["/admin/api/atendimentos/with-network-units"],
             staleTime: 10 * 60 * 1000,
           })
         );
@@ -435,10 +435,10 @@ export class CacheManager {
         break;
         
       case 'clients':
-        // From clients page, users might check specific client pets or go to guides/plans
+        // From clients page, users might check specific client pets or go to atendimentos/plans
         prefetchPromises.push(
           this.queryClient.prefetchQuery({
-            queryKey: ["/admin/api/guides"],
+            queryKey: ["/admin/api/atendimentos"],
             staleTime: 10 * 60 * 1000,
           })
         );
@@ -450,8 +450,8 @@ export class CacheManager {
         );
         break;
         
-      case 'guides':
-        // From guides page, users might need client data or plan information
+      case 'atendimentos':
+        // From atendimentos page, users might need client data or plan information
         prefetchPromises.push(
           this.queryClient.prefetchQuery({
             queryKey: ["/admin/api/clients"],

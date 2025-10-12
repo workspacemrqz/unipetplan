@@ -277,7 +277,7 @@ export default function UnitDashboard() {
 
   const loadGuides = async () => {
     try {
-      const response = await fetch(`/admin/api/unit/${authState.unit?.id}/guides`, {
+      const response = await fetch(`/admin/api/unit/${authState.unit?.id}/atendimentos`, {
         credentials: 'include'
       });
 
@@ -552,7 +552,7 @@ export default function UnitDashboard() {
 
     setSubmittingGuide(true);
     try {
-      const response = await fetch('/admin/api/unit/guides', {
+      const response = await fetch('/admin/api/unit/atendimentos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -597,7 +597,7 @@ export default function UnitDashboard() {
 
   const updateGuideStatus = async (guideId: string, unitStatus: string) => {
     try {
-      const response = await fetch(`/admin/api/unit/guides/${guideId}/status`, {
+      const response = await fetch(`/admin/api/unit/atendimentos/${guideId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',

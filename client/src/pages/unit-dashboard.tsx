@@ -45,7 +45,7 @@ export default function UnitDashboard() {
     
     // Buscar atendimentos
     try {
-      const guidesResponse = await fetch(`/api/units/${slug}/guides`, {
+      const guidesResponse = await fetch(`/api/units/${slug}/atendimentos`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (guidesResponse.ok) {

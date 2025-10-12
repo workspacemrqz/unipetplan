@@ -259,8 +259,8 @@ export const queryOptions = {
       gcTime: 30 * 60 * 1000, // 30 minutos
     },
     
-    // Guides can change frequently
-    guides: {
+    // Atendimentos can change frequently
+    atendimentos: {
       staleTime: 10 * 60 * 1000, // 10 minutos
       gcTime: 20 * 60 * 1000, // 20 minutos
     },
@@ -327,10 +327,10 @@ export const queryKeys = {
     procedures: (id: string) => ["/admin/api/plans", id, "procedures"] as const,
   },
   
-  guides: {
-    all: () => ["/admin/api/guides"] as const,
-    withUnits: (params?: Record<string, any>) => ["/admin/api/guides/with-network-units", params] as const,
-    detail: (id: string) => ["/admin/api/guides", id] as const,
+  atendimentos: {
+    all: () => ["/admin/api/atendimentos"] as const,
+    withUnits: (params?: Record<string, any>) => ["/admin/api/atendimentos/with-network-units", params] as const,
+    detail: (id: string) => ["/admin/api/atendimentos", id] as const,
   },
   
   pets: {

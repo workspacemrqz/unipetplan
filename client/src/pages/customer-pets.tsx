@@ -244,7 +244,7 @@ export default function CustomerPets() {
     setGuidesError(null);
     
     try {
-      const response = await fetch(`/api/clients/pets/${petId}/guides`, {
+      const response = await fetch(`/api/clients/pets/${petId}/atendimentos`, {
         credentials: 'include'
       });
 

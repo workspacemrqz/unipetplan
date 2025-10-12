@@ -79,14 +79,14 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
   };
 
   const { data: guides, isLoading, isError, error } = useQuery<AtendimentosResponse>({
-    queryKey: [`/api/units/${unitSlug}/guides`],
+    queryKey: [`/api/units/${unitSlug}/atendimentos`],
     queryFn: async () => {
       const token = localStorage.getItem('unit-token');
       if (!token) {
         throw new Error('Token de autenticação não encontrado');
       }
 
-      const response = await fetch(`/api/units/${unitSlug}/guides?page=1&limit=1000`, {
+      const response = await fetch(`/api/units/${unitSlug}/atendimentos?page=1&limit=1000`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

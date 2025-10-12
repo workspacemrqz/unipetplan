@@ -71,7 +71,7 @@ const allColumns = [
   "Ações",
 ] as const;
 
-export default function Guides() {
+export default function Atendimentos() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -82,7 +82,7 @@ export default function Guides() {
   const [newStatus, setNewStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
-  const { visibleColumns, toggleColumn } = useColumnPreferences('guides.columns', allColumns);
+  const { visibleColumns, toggleColumn } = useColumnPreferences('atendimentos.columns', allColumns);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
@@ -127,8 +127,8 @@ export default function Guides() {
   };
 
   const { data: guides, isLoading } = useQuery<AtendimentosResponse>({
-    queryKey: ["/admin/api/guides/with-network-units", queryParams],
-    ...getQueryOptions('guides'),
+    queryKey: ["/admin/api/atendimentos/with-network-units", queryParams],
+    ...getQueryOptions('atendimentos'),
     // Using standard queryClient fetcher that supports [path, params] format and handles 401s globally
   });
 
@@ -156,7 +156,7 @@ export default function Guides() {
     setIsSaving(true);
     
     try {
-      const response = await fetch(`/admin/api/guides/${editingGuide.id}`, {
+      const response = await fetch(`/admin/api/atendimentos/${editingGuide.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -179,8 +179,8 @@ export default function Guides() {
       setEditingGuide(null);
       
       // Invalidar as queries para recarregar os dados
-      await queryClient.invalidateQueries({ queryKey: ["/admin/api/guides/with-network-units"] });
-      await queryClient.invalidateQueries({ queryKey: ["/admin/api/guides"] });
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos/with-network-units"] });
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos"] });
     } catch (error) {
       toast({
         title: "Erro",

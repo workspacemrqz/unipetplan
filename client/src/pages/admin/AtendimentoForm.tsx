@@ -15,7 +15,7 @@ import { apiRequest } from "@/lib/admin/queryClient";
 import { z } from "zod";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
-export default function GuideForm() {
+export default function AtendimentoForm() {
   const [, setLocation] = useLocation();
   const params = useParams();
   const { toast } = useToast();
@@ -54,7 +54,7 @@ export default function GuideForm() {
   const urlPetId = urlParams.get('petId');
 
   const { data: guide, isLoading: guideLoading } = useQuery<any>({
-    queryKey: ["/admin/api/guides", params['id']],
+    queryKey: ["/admin/api/atendimentos", params['id']],
     enabled: isEdit,
   });
 
@@ -185,22 +185,22 @@ export default function GuideForm() {
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       if (isEdit) {
-        await apiRequest("PUT", `/admin/api/guides/${params['id']}`, data);
+        await apiRequest("PUT", `/admin/api/atendimentos/${params['id']}`, data);
       } else {
-        await apiRequest("POST", "/admin/api/guides", data);
+        await apiRequest("POST", "/admin/api/atendimentos", data);
       }
     },
     onSuccess: async () => {
       // Invalidar todas as queries relacionadas a atendimentos para atualizar a lista (em paralelo)
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["/admin/api/guides"] }),
-        queryClient.invalidateQueries({ queryKey: ["/admin/api/guides/with-network-units"] }),
+        queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos"] }),
+        queryClient.invalidateQueries({ queryKey: ["/admin/api/atendimentos/with-network-units"] }),
         queryClient.invalidateQueries({ queryKey: ["/admin/api/dashboard/all"] })
       ]);
       
       toast({
-        title: isEdit ? "Atendimento atualizada" : "Atendimento criada",
-        description: isEdit ? "Atendimento foi atualizada com sucesso." : "Atendimento foi criada com sucesso.",
+        title: isEdit ? "Atendimento atualizado" : "Atendimento criado",
+        description: isEdit ? "Atendimento foi atualizado com sucesso." : "Atendimento foi criado com sucesso.",
       });
       
       // Redirecionar imediatamente após invalidar as queries
