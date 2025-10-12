@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import UnitLayout from '@/components/unit/UnitLayout';
+import { AtendimentoUnitStepForm } from '@/components/unit/AtendimentoStepForm';
 
 export default function NovoAtendimentoPage() {
   const [, setLocation] = useLocation();
