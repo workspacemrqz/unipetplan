@@ -123,7 +123,7 @@ export default function UnitDashboard() {
                 <FileText className="h-6 w-6" style={{ color: '#257273' }} />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-3">Total de atendimentos geradas</p>
+            <p className="text-xs text-gray-500 mt-3">Total de atendimentos gerados</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">

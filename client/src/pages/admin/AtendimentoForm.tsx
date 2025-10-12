@@ -309,7 +309,7 @@ export default function AtendimentoForm() {
           {isEdit ? "Editar Atendimento" : "Novo Atendimento"}
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
-          {isEdit ? "Atualize as Informações do Atendimento" : "Crie uma Novo Atendimento de atendimento"}
+          {isEdit ? "Atualize as Informações do Atendimento" : "Inicie um novo atendimento"}
         </p>
       </div>
 
@@ -640,7 +640,7 @@ export default function AtendimentoForm() {
                           <FormControl>
                             <Textarea 
                               {...field} 
-                              placeholder="Observações gerais sobre a atendimento..."
+                              placeholder="Observações gerais sobre o atendimento..."
                               data-testid="textarea-general-notes" 
                             />
                           </FormControl>

@@ -311,7 +311,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Atendimentos</h1>
-          <p className="text-sm text-muted-foreground">Visualize as atendimentos geradas pela sua unidade</p>
+          <p className="text-sm text-muted-foreground">Visualize os atendimentos gerados pela sua unidade</p>
         </div>
       </div>
 
@@ -464,7 +464,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleViewDetails(guide)}
+                          onClick={() => handleViewDetails(atendimento)}
                           data-testid={`button-view-${atendimento.id}`}
                         >
                           <Eye className="h-4 w-4" />
@@ -472,7 +472,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEdit(guide)}
+                          onClick={() => handleEdit(atendimento)}
                           data-testid={`button-edit-${atendimento.id}`}
                         >
                           <Edit className="h-4 w-4" />

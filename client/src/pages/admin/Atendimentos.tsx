@@ -293,7 +293,7 @@ export default function Atendimentos() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Atendimentos</h1>
-          <p className="text-sm text-muted-foreground">Visualize todas as atendimentos geradas pelas unidades da rede</p>
+          <p className="text-sm text-muted-foreground">Visualize todos os atendimentos gerados pelas unidades da rede</p>
         </div>
       </div>
 

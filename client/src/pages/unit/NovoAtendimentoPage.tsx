@@ -294,7 +294,7 @@ export default function NovoAtendimentoPage() {
             Novo Atendimento
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Crie uma Novo Atendimento de atendimento para sua unidade
+            Inicie um novo atendimento para sua unidade
           </p>
         </div>
 

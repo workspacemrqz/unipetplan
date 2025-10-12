@@ -569,7 +569,7 @@ export default function UnitDashboard() {
       });
 
       if (response.ok) {
-        alert("Atendimento criada com sucesso!");
+        alert("Atendimento criado com sucesso!");
         setGuideForm({
           clientId: "",
           petId: "",
@@ -862,12 +862,12 @@ export default function UnitDashboard() {
                             <CardContent className="p-3 sm:p-4 lg:p-6 text-center">
                               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                Nenhuma atendimento {status === "open" ? "aberta" : 
-                                              status === "closed" ? "concluída" :
-                                              status === "cancelled" ? "cancelada" : "encontrada"}
+                                Nenhum atendimento {status === "open" ? "aberto" : 
+                                              status === "closed" ? "concluído" :
+                                              status === "cancelled" ? "cancelado" : "encontrado"}
                               </h3>
                               <p className="text-gray-500">
-                                As atendimentos aparecerão aqui quando houver solicitações.
+                                Os atendimentos aparecerão aqui quando houver solicitações.
                               </p>
                             </CardContent>
                           </Card>
@@ -989,7 +989,7 @@ export default function UnitDashboard() {
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Lançar Novo Atendimento</h3>
                 <p className="text-sm text-gray-600">
-                  Crie uma Novo Atendimento de atendimento para um cliente
+                  Inicie um novo atendimento para um cliente
                 </p>
               </div>
 
