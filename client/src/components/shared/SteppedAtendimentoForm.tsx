@@ -400,7 +400,7 @@ export default function SteppedAtendimentoForm({
                 {currentStep === 1 && (
                   <div className="space-y-4">
                     <div className="text-left md:text-center mb-6">
-                      <p className="text-gray-600">
+                      <p className="text-sm md:text-base text-gray-600">
                         Digite o CPF do cliente para buscar suas informações
                       </p>
                     </div>
@@ -452,7 +452,7 @@ export default function SteppedAtendimentoForm({
                 {currentStep === 2 && (
                   <div className="space-y-4">
                     <div className="text-left md:text-center mb-6">
-                      <p className="text-gray-600">
+                      <p className="text-sm md:text-base text-gray-600">
                         Selecione o pet do cliente {selectedClient?.fullName}
                       </p>
                     </div>
@@ -542,7 +542,7 @@ export default function SteppedAtendimentoForm({
                                 {/* Informações Pessoais do Pet */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
                                   <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-3">
-                                    <h3 className="font-semibold text-lg text-[#277677]">
+                                    <h3 className="font-semibold text-base md:text-lg text-[#277677]">
                                       Informações Pessoais do Pet
                                     </h3>
                                     <span 
@@ -661,7 +661,7 @@ export default function SteppedAtendimentoForm({
                                 
                                 {/* Histórico de Atendimentos */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                  <h3 className="font-semibold text-lg mb-3 text-[#277677]">
+                                  <h3 className="font-semibold text-base md:text-lg mb-3 text-[#277677]">
                                     Histórico de Atendimentos
                                   </h3>
                                   {petHistory && petHistory.length > 0 ? (
@@ -730,7 +730,7 @@ export default function SteppedAtendimentoForm({
                 {currentStep === 3 && (
                   <div className="space-y-6">
                     <div className="text-left md:text-center mb-6">
-                      <p className="text-gray-600">
+                      <p className="text-sm md:text-base text-gray-600">
                         Selecione a unidade e o procedimento
                       </p>
                     </div>
