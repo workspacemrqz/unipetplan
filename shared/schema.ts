@@ -35,6 +35,9 @@ export const couponTypeEnum = pgEnum("coupon_type_enum", ["percentage", "fixed_v
 // Enum para tipo de chave PIX
 export const pixKeyTypeEnum = pgEnum("pix_key_type_enum", ["cpf", "cnpj", "email", "phone", "random"]);
 
+// Enum para tipo de veterinário
+export const veterinarianTypeEnum = pgEnum("veterinarian_type_enum", ["permanente", "volante"]);
+
 // === ADMIN-SPECIFIC TABLES ===
 
 // Users table for authentication and administration (Admin only)
@@ -122,6 +125,24 @@ export const networkUnits = pgTable("network_units", {
   urlSlug: text("url_slug").unique(),
   login: text("login").unique(),
   senhaHash: text("senha_hash"),
+});
+
+// Veterinarians table for unit staff management
+export const veterinarians = pgTable("veterinarians", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  networkUnitId: varchar("network_unit_id").notNull().references(() => networkUnits.id, { onDelete: 'cascade' }),
+  name: text("name").notNull(),
+  crmv: text("crmv").notNull(), // Registro profissional
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  specialty: text("specialty"), // Especialidade
+  type: veterinarianTypeEnum("type").notNull().default("permanente"),
+  login: text("login").unique(),
+  passwordHash: text("password_hash"),
+  canAccessAtendimentos: boolean("can_access_atendimentos").default(false).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // FAQ items table (identical in both systems)
@@ -1051,6 +1072,8 @@ export type Plan = typeof plans.$inferSelect;
 export type InsertPlan = typeof plans.$inferInsert;
 export type NetworkUnit = typeof networkUnits.$inferSelect;
 export type InsertNetworkUnit = typeof networkUnits.$inferInsert;
+export type Veterinarian = typeof veterinarians.$inferSelect;
+export type InsertVeterinarian = typeof veterinarians.$inferInsert;
 export type FaqItem = typeof faqItems.$inferSelect;
 export type InsertFaqItem = typeof faqItems.$inferInsert;
 export type SiteSettings = typeof siteSettings.$inferSelect;

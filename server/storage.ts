@@ -34,9 +34,12 @@ import {
   type InsertAtendimento,
   type SatisfactionSurvey,
   type InsertSatisfactionSurvey,
+  type Veterinarian,
+  type InsertVeterinarian,
   contactSubmissions,
   plans,
   networkUnits,
+  veterinarians,
   faqItems,
   siteSettings,
   chatSettings,
@@ -2136,6 +2139,55 @@ export class DatabaseStorage implements IStorage {
       .from(contractInstallments)
       .where(eq(contractInstallments.cieloPaymentId, cieloPaymentId));
     return installment || undefined;
+  }
+
+  // Veterinarians management
+  async getVeterinariansByUnitId(unitId: string): Promise<Veterinarian[]> {
+    return await db
+      .select()
+      .from(veterinarians)
+      .where(eq(veterinarians.networkUnitId, unitId))
+      .orderBy(desc(veterinarians.createdAt));
+  }
+
+  async getVeterinarianById(id: string): Promise<Veterinarian | undefined> {
+    const [vet] = await db
+      .select()
+      .from(veterinarians)
+      .where(eq(veterinarians.id, id));
+    return vet;
+  }
+
+  async getVeterinarianByLogin(login: string): Promise<Veterinarian | undefined> {
+    const [vet] = await db
+      .select()
+      .from(veterinarians)
+      .where(eq(veterinarians.login, login));
+    return vet;
+  }
+
+  async createVeterinarian(data: InsertVeterinarian): Promise<Veterinarian> {
+    const [vet] = await db
+      .insert(veterinarians)
+      .values(data)
+      .returning();
+    return vet;
+  }
+
+  async updateVeterinarian(id: string, data: Partial<InsertVeterinarian>): Promise<Veterinarian | undefined> {
+    const [vet] = await db
+      .update(veterinarians)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(veterinarians.id, id))
+      .returning();
+    return vet;
+  }
+
+  async deleteVeterinarian(id: string): Promise<boolean> {
+    const result = await db
+      .delete(veterinarians)
+      .where(eq(veterinarians.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
 }
