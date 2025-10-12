@@ -209,15 +209,18 @@ export default function Atendimentos() {
     text += `Status: ${getStatusLabel(selectedAtendimento.status)}\n`;
     text += `Valor: R$ ${selectedAtendimento.value || 'Não informado'}\n\n`;
 
-    // Informações do Cliente e Pet
-    if (selectedAtendimento.clientName || selectedAtendimento.petName) {
-      text += "INFORMAÇÕES DO CLIENTE E PET:\n";
-      text += "-".repeat(30) + "\n";
+    // Informações do Cliente, Pet e Unidade
+    if (selectedAtendimento.clientName || selectedAtendimento.petName || selectedAtendimento.networkUnit?.name) {
+      text += "INFORMAÇÕES DO CLIENTE, PET E UNIDADE:\n";
+      text += "-".repeat(40) + "\n";
       if (selectedAtendimento.clientName) {
         text += `Cliente: ${selectedAtendimento.clientName}\n`;
       }
       if (selectedAtendimento.petName) {
         text += `Pet: ${selectedAtendimento.petName}\n`;
+      }
+      if (selectedAtendimento.networkUnit?.name) {
+        text += `Unidade: ${selectedAtendimento.networkUnit.name}\n`;
       }
       text += "\n";
     }
@@ -582,35 +585,50 @@ export default function Atendimentos() {
                         {getStatusLabel(selectedAtendimento.status)}
                       </Badge>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Criada em:</strong> <span className="text-foreground">{selectedAtendimento.createdAt && format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
-                    </div>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Observações</h4>
+                  <h4 className="font-semibold text-foreground mb-2">Cliente e Pet</h4>
                   <div className="space-y-2 text-sm">
-                    {selectedAtendimento.procedureNotes && (
-                      <div>
-                        <span className="font-medium text-primary">Observações do Procedimento:</span>
-                        <p className="text-muted-foreground mt-1 p-2 bg-muted/10 rounded">
-                          {selectedAtendimento.procedureNotes}
-                        </p>
-                      </div>
-                    )}
-                    {selectedAtendimento.generalNotes && (
-                      <div>
-                        <span className="font-medium text-primary">Anotações Gerais:</span>
-                        <p className="text-muted-foreground mt-1 p-2 bg-muted/10 rounded">
-                          {selectedAtendimento.generalNotes}
-                        </p>
-                      </div>
-                    )}
-                    {!selectedAtendimento.procedureNotes && !selectedAtendimento.generalNotes && (
-                      <p className="text-muted-foreground italic">Nenhuma observação registrada.</p>
-                    )}
+                    <div>
+                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{selectedAtendimento.clientName || 'Não informado'}</span></span>
+                    </div>
+                    <div>
+                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{selectedAtendimento.petName || 'Não informado'}</span></span>
+                    </div>
+                    <div>
+                      <span><strong className="text-primary">Unidade:</strong> <span className="text-foreground">{selectedAtendimento.networkUnit?.name || 'Não informada'}</span></span>
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              {selectedAtendimento.procedureNotes && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Notas do Procedimento</h4>
+                  <p className="text-sm text-foreground">{selectedAtendimento.procedureNotes}</p>
+                </div>
+              )}
+
+              {selectedAtendimento.generalNotes && (
+                <div>
+                  <h4 className="font-semibold text-foreground mb-2">Notas Gerais</h4>
+                  <p className="text-sm text-foreground">{selectedAtendimento.generalNotes}</p>
+                </div>
+              )}
+
+              <div className="pt-4 border-t">
+                <h4 className="font-semibold text-foreground mb-2">Informações do Sistema</h4>
+                <div className="space-y-1 text-sm">
+                  <div>
+                    <span><strong className="text-primary">Data de Criação:</strong> <span className="text-foreground">{selectedAtendimento.createdAt ? format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}</span></span>
+                  </div>
+                  {selectedAtendimento.updatedAt && (
+                    <div>
+                      <span><strong className="text-primary">Última Atualização:</strong> <span className="text-foreground">{format(new Date(selectedAtendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
