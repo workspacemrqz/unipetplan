@@ -6,7 +6,8 @@ import {
   FileText,
   Clipboard,
   LogOut,
-  Plus
+  Plus,
+  DollarSign
 } from "lucide-react";
 
 export default function UnitSidebar() {
@@ -31,7 +32,8 @@ export default function UnitSidebar() {
             { name: "Novo Atendimento", href: `/unidade/${slug}/atendimentos/novo`, icon: Plus }
           ]
         },
-        { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard }
+        { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard },
+        { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign }
       ]
     }
   ];
