@@ -38,48 +38,72 @@ export default function UnitSidebar() {
   // Estado para controlar quais seções estão expandidas
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   
-  const navigation: NavigationSection[] = [
-    {
-      name: "Principal",
-      items: [
-        { name: "Dashboard", href: `/unidade/${slug}/painel`, icon: Home }
-      ]
-    },
-    {
-      name: "Atendimentos",
-      items: [
-        { 
-          name: "Atendimentos", 
-          href: `/unidade/${slug}/atendimentos`, 
-          icon: FileText
-        },
-        { 
-          name: "Novo Atendimento", 
-          href: `/unidade/${slug}/atendimentos/novo`, 
-          icon: Plus 
+  // Detectar tipo de usuário baseado no token armazenado
+  const isVeterinarian = !!localStorage.getItem('veterinarian-token');
+  
+  // Definir navegação baseada no tipo de usuário
+  const navigation: NavigationSection[] = isVeterinarian 
+    ? [
+        // Menu reduzido para veterinários
+        {
+          name: "Atendimentos",
+          items: [
+            { 
+              name: "Atendimentos", 
+              href: `/unidade/${slug}/atendimentos`, 
+              icon: FileText
+            },
+            { 
+              name: "Novo Atendimento", 
+              href: `/unidade/${slug}/atendimentos/novo`, 
+              icon: Plus 
+            }
+          ]
         }
       ]
-    },
-    {
-      name: "Gestão",
-      items: [
-        { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard },
-        { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, icon: Users }
-      ]
-    },
-    {
-      name: "Financeiro",
-      items: [
-        { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign }
-      ]
-    },
-    {
-      name: "Sistema",
-      items: [
-        { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: Search }
-      ]
-    }
-  ];
+    : [
+        // Menu completo para unidades
+        {
+          name: "Principal",
+          items: [
+            { name: "Dashboard", href: `/unidade/${slug}/painel`, icon: Home }
+          ]
+        },
+        {
+          name: "Atendimentos",
+          items: [
+            { 
+              name: "Atendimentos", 
+              href: `/unidade/${slug}/atendimentos`, 
+              icon: FileText
+            },
+            { 
+              name: "Novo Atendimento", 
+              href: `/unidade/${slug}/atendimentos/novo`, 
+              icon: Plus 
+            }
+          ]
+        },
+        {
+          name: "Gestão",
+          items: [
+            { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard },
+            { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, icon: Users }
+          ]
+        },
+        {
+          name: "Financeiro",
+          items: [
+            { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign }
+          ]
+        },
+        {
+          name: "Sistema",
+          items: [
+            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: Search }
+          ]
+        }
+      ];
 
   // Expand section containing current route on mount and route change
   useEffect(() => {
@@ -118,9 +142,19 @@ export default function UnitSidebar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('unit-token');
+    // Remover tokens baseado no tipo de usuário
+    if (isVeterinarian) {
+      localStorage.removeItem('veterinarian-token');
+      localStorage.removeItem('veterinarian-name');
+    } else {
+      localStorage.removeItem('unit-token');
+    }
+    
+    // Remover dados comuns
     localStorage.removeItem('unit-slug');
     localStorage.removeItem('unit-name');
+    
+    // Redirecionar para a página de login da unidade
     window.location.href = `/unidade/${slug}`;
   };
 
