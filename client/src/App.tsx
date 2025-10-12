@@ -16,6 +16,7 @@ import UnitDashboard from "@/pages/unit-dashboard";
 import AtendimentosPage from "@/pages/unit/AtendimentosPage";
 import NovoAtendimentoPage from "@/pages/unit/NovoAtendimentoPage";
 import ProcedimentosPage from "@/pages/unit/ProcedimentosPage";
+import RelatorioFinanceiroPage from "@/pages/unit/RelatorioFinanceiroPage";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfUse from "@/pages/terms-of-use";
 import CheckoutPage from "@/pages/checkout";
@@ -79,6 +80,7 @@ import AdminEvaluations from './pages/admin/Evaluations';
 import AdminSellers from './pages/admin/Sellers';
 import AdminSellerForm from './pages/admin/SellerForm';
 import AdminSellerPayments from './pages/admin/SellerPayments';
+import AdminRelatorioFinanceiro from './pages/admin/RelatorioFinanceiro';
 import AdminNotFound from './pages/admin/not-found';
 import { AuthProvider } from './contexts/AuthContext';
 import { SellerAuthProvider } from './contexts/SellerAuthContext';
@@ -132,6 +134,7 @@ function AdminRouter() {
             
             {/* Financial and Contracts routes */}
             <Route path="/financeiro" component={AdminFinancial} />
+            <Route path="/relatorio-financeiro" component={AdminRelatorioFinanceiro} />
             <Route path="/cupom" component={AdminCoupons} />
             <Route path="/contratos" component={AdminContracts} />
             
@@ -201,6 +204,7 @@ function Router() {
         <Route path="/unidade/:slug/atendimentos/novo" component={NovoAtendimentoPage} />
         <Route path="/unidade/:slug/atendimentos" component={AtendimentosPage} />
         <Route path="/unidade/:slug/procedimentos" component={ProcedimentosPage} />
+        <Route path="/unidade/:slug/relatorio-financeiro" component={RelatorioFinanceiroPage} />
         
         {/* Public Routes with Layout - MUST come before /:slug */}
         <Route path="/" component={() => (
