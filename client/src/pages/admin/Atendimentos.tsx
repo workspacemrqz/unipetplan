@@ -24,7 +24,7 @@ import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight,
 import { useLocation } from "wouter";
 
 // Types for guides data
-interface GuideWithNetworkUnit {
+interface AtendimentoWithNetworkUnit {
   id: string;
   procedure: string;
   procedureName?: string;
@@ -42,8 +42,8 @@ interface GuideWithNetworkUnit {
   generalNotes?: string;
 }
 
-interface GuidesResponse {
-  data: GuideWithNetworkUnit[];
+interface AtendimentosResponse {
+  data: AtendimentoWithNetworkUnit[];
   total: number;
   totalPages: number;
   page: number;
@@ -75,10 +75,10 @@ export default function Guides() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedGuide, setSelectedGuide] = useState<GuideWithNetworkUnit | null>(null);
+  const [selectedGuide, setSelectedGuide] = useState<AtendimentoWithNetworkUnit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [editingGuide, setEditingGuide] = useState<GuideWithNetworkUnit | null>(null);
+  const [editingGuide, setEditingGuide] = useState<AtendimentoWithNetworkUnit | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
@@ -126,7 +126,7 @@ export default function Guides() {
     ...dateParams
   };
 
-  const { data: guides, isLoading } = useQuery<GuidesResponse>({
+  const { data: guides, isLoading } = useQuery<AtendimentosResponse>({
     queryKey: ["/admin/api/guides/with-network-units", queryParams],
     ...getQueryOptions('guides'),
     // Using standard queryClient fetcher that supports [path, params] format and handles 401s globally
@@ -139,12 +139,12 @@ export default function Guides() {
 
 
 
-  const handleViewDetails = (guide: GuideWithNetworkUnit) => {
+  const handleViewDetails = (guide: AtendimentoWithNetworkUnit) => {
     setSelectedGuide(guide);
     setDetailsOpen(true);
   };
 
-  const handleEdit = (guide: GuideWithNetworkUnit) => {
+  const handleEdit = (guide: AtendimentoWithNetworkUnit) => {
     setEditingGuide(guide);
     setNewStatus(guide.status);
     setEditOpen(true);
@@ -172,7 +172,7 @@ export default function Guides() {
 
       toast({
         title: "Status atualizado",
-        description: "O status da guia foi atualizado com sucesso.",
+        description: "O status do atendimento foi atualizado com sucesso.",
       });
 
       setEditOpen(false);
@@ -418,7 +418,7 @@ export default function Guides() {
                 </TableRow>
               ))
             ) : guidesData && guidesData.length > 0 ? (
-              guidesData.map((guide: GuideWithNetworkUnit) => (
+              guidesData.map((guide: AtendimentoWithNetworkUnit) => (
                 <TableRow key={guide.id} className="bg-white border-b border-[#eaeaea]">
                   {visibleColumns.includes("Procedimento") && (
                     <TableCell className="font-medium whitespace-nowrap bg-white">
@@ -477,7 +477,7 @@ export default function Guides() {
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">
                     {searchQuery || statusFilter !== "all" 
-                      ? "Nenhuma guia encontrada com os filtros aplicados." 
+                      ? "Nenhum atendimento encontrado com os filtros aplicados." 
                       : "Nenhuma guia foi gerada pelas unidades da rede ainda."
                     }
                   </p>
@@ -497,7 +497,7 @@ export default function Guides() {
                   {totalGuides > 0 ? (
                     <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalGuides)} de {totalGuides} atendimentos</>
                   ) : (
-                    "Nenhuma guia encontrada"
+                    "Nenhum atendimento encontrado"
                   )}
                 </p>
               </div>
@@ -537,7 +537,7 @@ export default function Guides() {
           <DialogHeader className="flex flex-row items-center justify-between pr-2">
             <DialogTitle className="flex items-center space-x-2">
               <FileText className="h-5 w-5 text-primary" />
-              <span>Detalhes da Guia</span>
+              <span>Detalhes do Atendimento</span>
             </DialogTitle>
             <div className="flex items-center gap-2">
               <Button
@@ -622,7 +622,7 @@ export default function Guides() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Editar Status da Guia</DialogTitle>
+            <DialogTitle>Editar Status do Atendimento</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4">

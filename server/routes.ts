@@ -18,7 +18,7 @@ import {
   updatePetSchema,
   insertCouponSchema,
   updateCouponSchema,
-  insertGuideSchema,
+  insertAtendimentoSchema,
   insertSellerPaymentSchema,
   type InsertNetworkUnit,
   type InsertSiteSettings,
@@ -28,7 +28,7 @@ import {
   type InsertPet,
   type Pet,
   type InsertSeller,
-  type InsertGuide
+  type InsertAtendimento
 } from "../shared/schema.js";
 import { sanitizeText } from "./utils/text-sanitizer.js";
 import { sanitizeEmail } from "./utils/log-sanitizer.js";
@@ -801,7 +801,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         allPets,
         allPaymentReceipts
       ] = await Promise.all([
-        storage.getAllGuides(),
+        storage.getAllAtendimentos(),
         storage.getNetworkUnits(), 
         storage.getAllClients(),
         storage.getAllContactSubmissions(),
@@ -2035,7 +2035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/admin/api/guides", requireAdmin, async (req, res) => {
     
     try {
-      const guides = await storage.getAllGuides();
+      const guides = await storage.getAllAtendimentos();
       res.json(guides);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching guides:", error);
@@ -2055,7 +2055,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const endDate = req.query.endDate as string;
       
       // Get all guides with network units info using the proper function
-      const result = await storage.getGuidesWithNetworkUnits({});
+      const result = await storage.getAtendimentosWithNetworkUnits({});
       const allGuides = result?.guides || [];
       
       // Apply filters
@@ -2123,21 +2123,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/admin/api/guides/:id", requireAdmin, async (req, res) => {
     try {
-      const guide = await storage.getGuide(req.params.id);
+      const guide = await storage.getAtendimento(req.params.id);
       if (!guide) {
-        return res.status(404).json({ error: "Guia não encontrado" });
+        return res.status(404).json({ error: "atendimento não encontrado" });
       }
       res.json(guide);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching guide:", error);
-      res.status(500).json({ error: "Erro ao buscar guia" });
+      res.status(500).json({ error: "Erro ao buscar atendimento" });
     }
   });
 
   // Create new guide
   app.post("/admin/api/guides", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
-      const guideData = insertGuideSchema.parse(req.body);
+      const guideData = insertAtendimentoSchema.parse(req.body);
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
       let processedValue: string | undefined;
@@ -2145,7 +2145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         processedValue = guideData.value.replace('.', '').replace(',', '.');
       }
       
-      const processedGuideData: InsertGuide = {
+      const processedGuideData: InsertAtendimento = {
         ...guideData,
         clientId: guideData.clientId!,
         petId: guideData.petId!,
@@ -2155,7 +2155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`📝 [ADMIN] Creating new guide:`, processedGuideData);
       
-      const newGuide = await storage.createGuide(processedGuideData);
+      const newGuide = await storage.createAtendimento(processedGuideData);
       
       // Automatically register procedure usage when guide is created
       if (guideData.petId && guideData.procedure) {
@@ -2198,25 +2198,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: "Dados inválidos", details: error.errors });
       }
-      res.status(500).json({ error: "Erro ao criar guia" });
+      res.status(500).json({ error: "Erro ao criar atendimento" });
     }
   });
 
   // Update guide
   app.put("/admin/api/guides/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
-      const guideData = insertGuideSchema.partial().parse(req.body);
+      const guideData = insertAtendimentoSchema.partial().parse(req.body);
       
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
-      const processedGuideData = { ...guideData } as Partial<InsertGuide>;
+      const processedGuideData = { ...guideData } as Partial<InsertAtendimento>;
       if (guideData.value && typeof guideData.value === 'string') {
         processedGuideData.value = guideData.value.replace('.', '').replace(',', '.') as string;
       }
       
-      const updatedGuide = await storage.updateGuide(req.params.id, processedGuideData);
+      const updatedGuide = await storage.updateAtendimento(req.params.id, processedGuideData);
       
       if (!updatedGuide) {
-        return res.status(404).json({ error: "Guia não encontrado" });
+        return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
       console.log(`✅ [ADMIN] Guide updated:`, updatedGuide.id);
@@ -2226,24 +2226,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: "Dados inválidos", details: error.errors });
       }
-      res.status(500).json({ error: "Erro ao atualizar guia" });
+      res.status(500).json({ error: "Erro ao atualizar atendimento" });
     }
   });
 
   // Delete guide
   app.delete("/admin/api/guides/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
-      const success = await storage.deleteGuide(req.params.id);
+      const success = await storage.deleteAtendimento(req.params.id);
       
       if (!success) {
-        return res.status(404).json({ error: "Guia não encontrado" });
+        return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
       console.log(`✅ [ADMIN] Guide deleted:`, req.params.id);
       res.json({ success: true });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting guide:", error);
-      res.status(500).json({ error: "Erro ao deletar guia" });
+      res.status(500).json({ error: "Erro ao deletar atendimento" });
     }
   });
 
@@ -6059,7 +6059,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ 
         guides: guides,
-        message: guides.length === 0 ? "Nenhuma guia encontrada para este pet" : "Atendimentos carregadas com sucesso"
+        message: guides.length === 0 ? "Nenhuma atendimento encontrada para este pet" : "Atendimentos carregadas com sucesso"
       });
       
     } catch (error) {

@@ -15,7 +15,7 @@ import { z } from "zod";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import UnitLayout from '@/components/unit/UnitLayout';
 
-export default function NovaGuiaPage() {
+export default function NovoAtendimentoPage() {
   const [, setLocation] = useLocation();
   const { slug } = useParams();
   const { toast } = useToast();
@@ -55,7 +55,7 @@ export default function NovaGuiaPage() {
     enabled: !!slug,
   });
 
-  const guideFormSchema = z.object({
+  const atendimentoFormSchema = z.object({
     clientId: z.string().min(1, "Cliente é obrigatório"),
     petId: z.string().min(1, "Pet é obrigatório"),
     procedure: z.string().min(1, "Procedimento é obrigatório"),
@@ -66,7 +66,7 @@ export default function NovaGuiaPage() {
   });
 
   const form = useForm({
-    resolver: zodResolver(guideFormSchema),
+    resolver: zodResolver(atendimentoFormSchema),
     mode: 'onChange',
     defaultValues: {
       clientId: "",
@@ -135,7 +135,7 @@ export default function NovaGuiaPage() {
         throw new Error('Token de autenticação não encontrado');
       }
 
-      const response = await fetch(`/api/units/${slug}/guides`, {
+      const response = await fetch(`/api/units/${slug}/atendimentos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,17 +146,17 @@ export default function NovaGuiaPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Erro ao criar guia');
+        throw new Error(error.error || 'Erro ao criar atendimento');
       }
 
       return response.json();
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [`/api/units/${slug}/guides`] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/units/${slug}/atendimentos`] });
       
       toast({
-        title: "Guia criada",
-        description: "Guia foi criada com sucesso.",
+        title: "Atendimento criado",
+        description: "Atendimento foi criado com sucesso.",
       });
       
       setLocation(`/unidade/${slug}/atendimentos`);
@@ -164,7 +164,7 @@ export default function NovaGuiaPage() {
     onError: (error: any) => {
       toast({
         title: "Erro",
-        description: error.message || "Falha ao criar guia.",
+        description: error.message || "Falha ao criar atendimento.",
         variant: "destructive",
       });
     },
@@ -313,7 +313,7 @@ export default function NovaGuiaPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-            {/* Guide Information */}
+            {/* Atendimento Information */}
             <Card style={{ backgroundColor: '#FFFFFF' }}>
               <CardHeader>
                 <CardTitle className="text-foreground">Informações do Atendimento</CardTitle>
@@ -574,7 +574,7 @@ export default function NovaGuiaPage() {
                       Criando...
                     </>
                   ) : (
-                    "Criar Guia"
+                    "Criar Atendimento"
                   )}
                 </Button>
               </div>

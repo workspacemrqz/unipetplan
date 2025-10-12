@@ -102,8 +102,8 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   };
   
-  // Get unit guides (authenticated) - supports both /api/unit and /api/units paths
-  app.get(["/api/unit/:slug/guides", "/api/units/:slug/guides"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+  // Get unit atendimentos (authenticated) - supports both /api/unit and /api/units paths
+  app.get(["/api/unit/:slug/atendimentos", "/api/units/:slug/atendimentos"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
       const unitId = req.unit?.unitId;
       
@@ -120,8 +120,8 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
       
-      // Get guides with network units info
-      const result = await storage.getGuidesWithNetworkUnits({
+      // Get atendimentos with network units info
+      const result = await storage.getAtendimentosWithNetworkUnits({
         page,
         limit,
         search,
@@ -131,7 +131,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         endDate
       });
       
-      // Filter to only show guides created by this unit
+      // Filter to only show atendimentos created by this unit
       const allGuides = result?.guides || [];
       const unitGuides = allGuides.filter((guide: any) => guide.createdByUnitId === unitId);
       
@@ -149,13 +149,13 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         page
       });
     } catch (error) {
-      console.error("❌ [UNIT] Error fetching guides:", error);
+      console.error("❌ [UNIT] Error fetching atendimentos:", error);
       res.status(500).json({ error: "Erro ao buscar atendimentos" });
     }
   });
   
-  // Create new guide (authenticated)
-  app.post(["/api/unit/:slug/guides", "/api/units/:slug/guides"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+  // Create new atendimento (authenticated)
+  app.post(["/api/unit/:slug/atendimentos", "/api/units/:slug/atendimentos"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
       const unitId = req.unit?.unitId;
       const guideData = req.body;
@@ -164,14 +164,14 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
-      // Add unit ID to track which unit created this guide
-      const newGuide = await storage.createGuide({
+      // Add unit ID to track which unit created this atendimento
+      const newGuide = await storage.createAtendimento({
         ...guideData,
         networkUnitId: unitId,
         createdByUnitId: unitId
       });
       
-      // Automatically register procedure usage when guide is created
+      // Automatically register procedure usage when atendimento is created
       if (guideData.petId && guideData.procedureId) {
         try {
           const year = new Date().getFullYear();
@@ -203,21 +203,21 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
             }
           }
         } catch (error) {
-          // Log error but don't fail the guide creation
+          // Log error but don't fail the atendimento creation
           console.error("❌ [UNIT] Error registering procedure usage:", error);
         }
       }
       
-      console.log(`✅ [UNIT] Guide created by unit ${unitId}:`, newGuide.id);
+      console.log(`✅ [UNIT] Atendimento created by unit ${unitId}:`, newGuide.id);
       res.status(201).json(newGuide);
     } catch (error) {
-      console.error("❌ [UNIT] Error creating guide:", error);
-      res.status(500).json({ error: "Erro ao criar guia" });
+      console.error("❌ [UNIT] Error creating atendimento:", error);
+      res.status(500).json({ error: "Erro ao criar atendimento" });
     }
   });
   
-  // Update guide status (authenticated)
-  app.put(["/api/unit/:slug/guides/:id", "/api/units/:slug/guides/:id"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+  // Update atendimento status (authenticated)
+  app.put(["/api/unit/:slug/atendimentos/:id", "/api/units/:slug/atendimentos/:id"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
       const unitId = req.unit?.unitId;
       const guideId = req.params.id;
@@ -227,24 +227,24 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
-      // Verify that the guide was created by this unit
-      const guide = await storage.getGuide(guideId);
+      // Verify that the atendimento was created by this unit
+      const guide = await storage.getAtendimento(guideId);
       if (!guide) {
-        return res.status(404).json({ error: "Guia não encontrada" });
+        return res.status(404).json({ error: "Atendimento não encontrado" });
       }
       
       if (guide.createdByUnitId !== unitId) {
-        return res.status(403).json({ error: "Você não tem permissão para editar esta guia" });
+        return res.status(403).json({ error: "Você não tem permissão para editar este atendimento" });
       }
       
-      // Update the guide status
-      const updatedGuide = await storage.updateGuide(guideId, { status });
+      // Update the atendimento status
+      const updatedGuide = await storage.updateAtendimento(guideId, { status });
       
-      console.log(`✅ [UNIT] Guide ${guideId} status updated by unit ${unitId} to ${status}`);
+      console.log(`✅ [UNIT] Atendimento ${guideId} status updated by unit ${unitId} to ${status}`);
       res.json(updatedGuide);
     } catch (error) {
-      console.error("❌ [UNIT] Error updating guide:", error);
-      res.status(500).json({ error: "Erro ao atualizar guia" });
+      console.error("❌ [UNIT] Error updating atendimento:", error);
+      res.status(500).json({ error: "Erro ao atualizar atendimento" });
     }
   });
   
@@ -301,7 +301,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           name: proc.name,
           description: proc.description,
           price: parseFloat(proc.price || '0'),
-          category: proc.category || 'Guia',
+          category: proc.category || 'Atendimento',
           isActive: proc.isActive
         }));
       
@@ -353,7 +353,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           id: proc.id,
           name: proc.name,
           description: proc.description,
-          category: proc.category || 'Guia',
+          category: proc.category || 'Atendimento',
           isActive: proc.isActive,
           plans: planProceduresByProcedureId[proc.id] || []
         }));

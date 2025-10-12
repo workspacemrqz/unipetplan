@@ -30,8 +30,8 @@ import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 
-// Types for guides data
-interface GuideWithNetworkUnit {
+// Types for atendimentos data
+interface AtendimentoWithNetworkUnit {
   id: string;
   procedure: string;
   procedureName?: string;
@@ -49,8 +49,8 @@ interface GuideWithNetworkUnit {
   generalNotes?: string;
 }
 
-interface GuidesResponse {
-  data: GuideWithNetworkUnit[];
+interface AtendimentosResponse {
+  data: AtendimentoWithNetworkUnit[];
   total: number;
   totalPages: number;
   page: number;
@@ -65,18 +65,18 @@ const allColumns = [
   "Ações",
 ] as const;
 
-export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
+export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedGuide, setSelectedGuide] = useState<GuideWithNetworkUnit | null>(null);
+  const [selectedAtendimento, setSelectedAtendimento] = useState<AtendimentoWithNetworkUnit | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [editingGuide, setEditingGuide] = useState<GuideWithNetworkUnit | null>(null);
+  const [editingAtendimento, setEditingAtendimento] = useState<AtendimentoWithNetworkUnit | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
-  const { visibleColumns, toggleColumn } = useColumnPreferences('unit.guides.columns', allColumns);
+  const { visibleColumns, toggleColumn } = useColumnPreferences('unit.atendimentos.columns', allColumns);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
@@ -118,8 +118,8 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
     ...dateParams
   };
 
-  const { data: guides, isLoading } = useQuery<GuidesResponse>({
-    queryKey: [`/api/units/${unitSlug}/guides`, queryParams],
+  const { data: atendimentos, isLoading } = useQuery<AtendimentosResponse>({
+    queryKey: [`/api/units/${unitSlug}/atendimentos`, queryParams],
     queryFn: async () => {
       const token = localStorage.getItem('unit-token');
       if (!token) {
@@ -127,7 +127,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
       }
 
       const queryString = new URLSearchParams(queryParams).toString();
-      const response = await fetch(`/api/units/${unitSlug}/guides?${queryString}`, {
+      const response = await fetch(`/api/units/${unitSlug}/atendimentos?${queryString}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -145,23 +145,23 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
     enabled: !!unitSlug
   });
 
-  const guidesData = guides?.data || [];
-  const totalGuides = guides?.total || 0;
-  const totalPages = guides?.totalPages || 1;
+  const atendimentosData = atendimentos?.data || [];
+  const totalAtendimentos = atendimentos?.total || 0;
+  const totalPages = atendimentos?.totalPages || 1;
 
-  const handleViewDetails = (guide: GuideWithNetworkUnit) => {
-    setSelectedGuide(guide);
+  const handleViewDetails = (atendimento: AtendimentoWithNetworkUnit) => {
+    setSelectedAtendimento(atendimento);
     setDetailsOpen(true);
   };
 
-  const handleEdit = (guide: GuideWithNetworkUnit) => {
-    setEditingGuide(guide);
-    setNewStatus(guide.status);
+  const handleEdit = (atendimento: AtendimentoWithNetworkUnit) => {
+    setEditingAtendimento(atendimento);
+    setNewStatus(atendimento.status);
     setEditOpen(true);
   };
 
   const handleSaveStatus = async () => {
-    if (!editingGuide) return;
+    if (!editingAtendimento) return;
     
     setIsSaving(true);
     
@@ -171,7 +171,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
         throw new Error('Token de autenticação não encontrado');
       }
 
-      const response = await fetch(`/api/units/${unitSlug}/guides/${editingGuide.id}`, {
+      const response = await fetch(`/api/units/${unitSlug}/atendimentos/${editingAtendimento.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -188,14 +188,14 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
 
       toast({
         title: "Status atualizado",
-        description: "O status da guia foi atualizado com sucesso.",
+        description: "O status do atendimento foi atualizado com sucesso.",
       });
 
       setEditOpen(false);
-      setEditingGuide(null);
+      setEditingAtendimento(null);
       
       // Invalidar as queries para recarregar os dados
-      await queryClient.invalidateQueries({ queryKey: [`/api/units/${unitSlug}/guides`] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/units/${unitSlug}/atendimentos`] });
     } catch (error) {
       toast({
         title: "Erro",
@@ -207,8 +207,8 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
     }
   };
 
-  const generateGuideText = () => {
-    if (!selectedGuide) return "";
+  const generateAtendimentoText = () => {
+    if (!selectedAtendimento) return "";
 
     let text = "";
     
@@ -220,46 +220,46 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
     // Informações Básicas
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome do Procedimento: ${selectedGuide.procedure || selectedGuide.procedureName || 'Não informado'}\n`;
-    text += `Status: ${getStatusLabel(selectedGuide.status)}\n`;
-    text += `Valor: R$ ${selectedGuide.value || 'Não informado'}\n\n`;
+    text += `Nome do Procedimento: ${selectedAtendimento.procedure || selectedAtendimento.procedureName || 'Não informado'}\n`;
+    text += `Status: ${getStatusLabel(selectedAtendimento.status)}\n`;
+    text += `Valor: R$ ${selectedAtendimento.value || 'Não informado'}\n\n`;
 
     // Informações do Cliente, Pet e Unidade
-    if (selectedGuide.clientName || selectedGuide.petName || selectedGuide.networkUnit?.name) {
+    if (selectedAtendimento.clientName || selectedAtendimento.petName || selectedAtendimento.networkUnit?.name) {
       text += "INFORMAÇÕES DO CLIENTE, PET E UNIDADE:\n";
       text += "-".repeat(40) + "\n";
-      if (selectedGuide.clientName) {
-        text += `Cliente: ${selectedGuide.clientName}\n`;
+      if (selectedAtendimento.clientName) {
+        text += `Cliente: ${selectedAtendimento.clientName}\n`;
       }
-      if (selectedGuide.petName) {
-        text += `Pet: ${selectedGuide.petName}\n`;
+      if (selectedAtendimento.petName) {
+        text += `Pet: ${selectedAtendimento.petName}\n`;
       }
-      if (selectedGuide.networkUnit?.name) {
-        text += `Unidade: ${selectedGuide.networkUnit.name}\n`;
+      if (selectedAtendimento.networkUnit?.name) {
+        text += `Unidade: ${selectedAtendimento.networkUnit.name}\n`;
       }
       text += "\n";
     }
 
     // Notas do Procedimento
-    if (selectedGuide.procedureNotes) {
+    if (selectedAtendimento.procedureNotes) {
       text += "NOTAS DO PROCEDIMENTO:\n";
       text += "-".repeat(25) + "\n";
-      text += `${selectedGuide.procedureNotes}\n\n`;
+      text += `${selectedAtendimento.procedureNotes}\n\n`;
     }
 
     // Notas Gerais
-    if (selectedGuide.generalNotes) {
+    if (selectedAtendimento.generalNotes) {
       text += "NOTAS GERAIS:\n";
       text += "-".repeat(15) + "\n";
-      text += `${selectedGuide.generalNotes}\n\n`;
+      text += `${selectedAtendimento.generalNotes}\n\n`;
     }
 
     // Informações do Cadastro
     text += "INFORMAÇÕES DO CADASTRO:\n";
     text += "-".repeat(25) + "\n";
-    text += `Data de Criação: ${selectedGuide.createdAt ? format(new Date(selectedGuide.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : "Não informado"}\n`;
-    if (selectedGuide.updatedAt) {
-      text += `Última Atualização: ${format(new Date(selectedGuide.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}\n`;
+    text += `Data de Criação: ${selectedAtendimento.createdAt ? format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : "Não informado"}\n`;
+    if (selectedAtendimento.updatedAt) {
+      text += `Última Atualização: ${format(new Date(selectedAtendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}\n`;
     }
 
     text += "\n" + "=".repeat(50) + "\n";
@@ -274,7 +274,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
     
     try {
       setCopyState('copying');
-      const text = generateGuideText();
+      const text = generateAtendimentoText();
       await navigator.clipboard.writeText(text);
       
       setCopyState('copied');
@@ -337,7 +337,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                 setCurrentPage(1); // Reset para página 1 ao buscar
               }}
               className="pl-10 w-80"
-              data-testid="input-search-guides"
+              data-testid="input-search-atendimentos"
             />
           </div>
           <Select value={statusFilter} onValueChange={(value) => {
@@ -428,34 +428,34 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                   </TableCell>
                 </TableRow>
               ))
-            ) : guidesData && guidesData.length > 0 ? (
-              guidesData.map((guide: GuideWithNetworkUnit) => (
-                <TableRow key={guide.id} className="bg-white border-b border-[#eaeaea]">
+            ) : atendimentosData && atendimentosData.length > 0 ? (
+              atendimentosData.map((atendimento: AtendimentoWithNetworkUnit) => (
+                <TableRow key={atendimento.id} className="bg-white border-b border-[#eaeaea]">
                   {visibleColumns.includes("Procedimento") && (
                     <TableCell className="font-medium whitespace-nowrap bg-white">
-                      {guide.procedure || 'Não informado'}
+                      {atendimento.procedure || 'Não informado'}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Unidade") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      {guide.networkUnit?.name || "Não informada"}
+                      {atendimento.networkUnit?.name || "Não informada"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Valor") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      R$ {parseFloat(guide.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      R$ {parseFloat(atendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Status") && (
                     <TableCell className="whitespace-nowrap bg-white">
                       <Badge className={cn("whitespace-nowrap", getStatusColor())}>
-                        {getStatusLabel(guide.status)}
+                        {getStatusLabel(atendimento.status)}
                       </Badge>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Data") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      {guide.createdAt && format(new Date(guide.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                      {atendimento.createdAt && format(new Date(atendimento.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Ações") && (
@@ -465,7 +465,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                           variant="outline"
                           size="sm"
                           onClick={() => handleViewDetails(guide)}
-                          data-testid={`button-view-${guide.id}`}
+                          data-testid={`button-view-${atendimento.id}`}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -473,7 +473,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEdit(guide)}
-                          data-testid={`button-edit-${guide.id}`}
+                          data-testid={`button-edit-${atendimento.id}`}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -488,7 +488,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">
                     {searchQuery || statusFilter !== "all" 
-                      ? "Nenhuma guia encontrada com os filtros aplicados." 
+                      ? "Nenhum atendimento encontrado com os filtros aplicados." 
                       : "Nenhuma guia foi gerada pela sua unidade ainda."
                     }
                   </p>
@@ -500,15 +500,15 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
         </div>
         
         {/* Pagination */}
-        {totalGuides > 10 && (
+        {totalAtendimentos > 10 && (
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-6 lg:space-x-8">
               <div className="flex items-center space-x-2">
                 <p className="text-sm font-medium">
-                  {totalGuides > 0 ? (
-                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalGuides)} de {totalGuides} atendimentos</>
+                  {totalAtendimentos > 0 ? (
+                    <>Mostrando {(currentPage - 1) * pageSize + 1} a {Math.min(currentPage * pageSize, totalAtendimentos)} de {totalAtendimentos} atendimentos</>
                   ) : (
-                    "Nenhuma guia encontrada"
+                    "Nenhum atendimento encontrado"
                   )}
                 </p>
               </div>
@@ -548,7 +548,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
           <DialogHeader className="flex flex-row items-center justify-between pr-2">
             <DialogTitle className="flex items-center space-x-2">
               <FileText className="h-5 w-5 text-primary" />
-              <span>Detalhes da Guia</span>
+              <span>Detalhes do Atendimento</span>
             </DialogTitle>
             <div className="flex items-center gap-2">
               <Button
@@ -575,22 +575,22 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
             </div>
           </DialogHeader>
           
-          {selectedGuide && (
+          {selectedAtendimento && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Informações Básicas</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Procedimento:</strong> <span className="text-foreground">{selectedGuide.procedure || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Procedimento:</strong> <span className="text-foreground">{selectedAtendimento.procedure || 'Não informado'}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Valor:</strong> <span className="text-foreground">R$ {parseFloat(selectedGuide.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
+                      <span><strong className="text-primary">Valor:</strong> <span className="text-foreground">R$ {parseFloat(selectedAtendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Status:</strong></span>
                       <Badge className={getStatusColor()}>
-                        {getStatusLabel(selectedGuide.status)}
+                        {getStatusLabel(selectedAtendimento.status)}
                       </Badge>
                     </div>
                   </div>
@@ -600,29 +600,29 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                   <h4 className="font-semibold text-foreground mb-2">Cliente e Pet</h4>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{selectedGuide.clientName || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{selectedAtendimento.clientName || 'Não informado'}</span></span>
                     </div>
                     <div>
-                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{selectedGuide.petName || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{selectedAtendimento.petName || 'Não informado'}</span></span>
                     </div>
                     <div>
-                      <span><strong className="text-primary">Unidade:</strong> <span className="text-foreground">{selectedGuide.networkUnit?.name || 'Não informada'}</span></span>
+                      <span><strong className="text-primary">Unidade:</strong> <span className="text-foreground">{selectedAtendimento.networkUnit?.name || 'Não informada'}</span></span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {selectedGuide.procedureNotes && (
+              {selectedAtendimento.procedureNotes && (
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Notas do Procedimento</h4>
-                  <p className="text-sm text-foreground">{selectedGuide.procedureNotes}</p>
+                  <p className="text-sm text-foreground">{selectedAtendimento.procedureNotes}</p>
                 </div>
               )}
 
-              {selectedGuide.generalNotes && (
+              {selectedAtendimento.generalNotes && (
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Notas Gerais</h4>
-                  <p className="text-sm text-foreground">{selectedGuide.generalNotes}</p>
+                  <p className="text-sm text-foreground">{selectedAtendimento.generalNotes}</p>
                 </div>
               )}
 
@@ -630,11 +630,11 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
                 <h4 className="font-semibold text-foreground mb-2">Informações do Sistema</h4>
                 <div className="space-y-1 text-sm">
                   <div>
-                    <span><strong className="text-primary">Data de Criação:</strong> <span className="text-foreground">{selectedGuide.createdAt ? format(new Date(selectedGuide.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}</span></span>
+                    <span><strong className="text-primary">Data de Criação:</strong> <span className="text-foreground">{selectedAtendimento.createdAt ? format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}</span></span>
                   </div>
-                  {selectedGuide.updatedAt && (
+                  {selectedAtendimento.updatedAt && (
                     <div>
-                      <span><strong className="text-primary">Última Atualização:</strong> <span className="text-foreground">{format(new Date(selectedGuide.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
+                      <span><strong className="text-primary">Última Atualização:</strong> <span className="text-foreground">{format(new Date(selectedAtendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span></span>
                     </div>
                   )}
                 </div>
@@ -648,7 +648,7 @@ export default function UnitGuides({ unitSlug }: { unitSlug: string }) {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Editar Status da Guia</DialogTitle>
+            <DialogTitle>Editar Status do Atendimento</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4">

@@ -32,7 +32,7 @@ interface GuideWithRelations {
   petName?: string;
 }
 
-interface GuidesResponse {
+interface AtendimentosResponse {
   data: GuideWithRelations[];
   total: number;
   totalPages: number;
@@ -78,7 +78,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
     setCurrentPage(1); // Reset para página 1 ao filtrar por data
   };
 
-  const { data: guides, isLoading, isError, error } = useQuery<GuidesResponse>({
+  const { data: guides, isLoading, isError, error } = useQuery<AtendimentosResponse>({
     queryKey: [`/api/units/${unitSlug}/guides`],
     queryFn: async () => {
       const token = localStorage.getItem('unit-token');

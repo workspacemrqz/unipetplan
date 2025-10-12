@@ -569,7 +569,7 @@ export default function UnitDashboard() {
       });
 
       if (response.ok) {
-        alert("Guia criada com sucesso!");
+        alert("Atendimento criada com sucesso!");
         setGuideForm({
           clientId: "",
           petId: "",
@@ -586,10 +586,10 @@ export default function UnitDashboard() {
         loadGuides(); // Reload guides
       } else {
         const error = await response.json();
-        alert(`Erro ao criar guia: ${error.message}`);
+        alert(`Erro ao criar atendimento: ${error.message}`);
       }
     } catch (error) {
-      alert("Erro de conexão ao criar guia.");
+      alert("Erro de conexão ao criar atendimento.");
     } finally {
       setSubmittingGuide(false);
     }
@@ -862,7 +862,7 @@ export default function UnitDashboard() {
                             <CardContent className="p-3 sm:p-4 lg:p-6 text-center">
                               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                Nenhuma guia {status === "open" ? "aberta" : 
+                                Nenhuma atendimento {status === "open" ? "aberta" : 
                                               status === "closed" ? "concluída" :
                                               status === "cancelled" ? "cancelada" : "encontrada"}
                               </h3>
@@ -1291,7 +1291,7 @@ export default function UnitDashboard() {
                         ) : (
                           <>
                             <Plus className="h-4 w-4 mr-2" />
-                            Criar Guia
+                            Criar Atendimento
                           </>
                         )}
                       </Button>
@@ -1735,7 +1735,7 @@ export default function UnitDashboard() {
                       className="flex-1"
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
-                      Aceitar Guia
+                      Aceitar Atendimento
                     </Button>
                     <Button
                       variant="outline"
@@ -1744,7 +1744,7 @@ export default function UnitDashboard() {
                       className="flex-1"
                     >
                       <XCircle className="h-4 w-4 mr-2" />
-                      Rejeitar Guia
+                      Rejeitar Atendimento
                     </Button>
                   </div>
                 )}

@@ -916,7 +916,7 @@ export default function CustomerPets() {
                         <div className="flex items-center space-x-2">
                           <span className="px-2 py-1 rounded-full text-xs font-medium"
                             style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
-                            Guia
+                            Atendimento
                           </span>
                         </div>
                       </div>

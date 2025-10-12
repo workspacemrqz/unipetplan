@@ -199,8 +199,8 @@ export default function GuideForm() {
       ]);
       
       toast({
-        title: isEdit ? "Guia atualizada" : "Guia criada",
-        description: isEdit ? "Guia foi atualizada com sucesso." : "Guia foi criada com sucesso.",
+        title: isEdit ? "Atendimento atualizada" : "Atendimento criada",
+        description: isEdit ? "Atendimento foi atualizada com sucesso." : "Atendimento foi criada com sucesso.",
       });
       
       // Redirecionar imediatamente após invalidar as queries
@@ -209,7 +209,7 @@ export default function GuideForm() {
     onError: () => {
       toast({
         title: "Erro",
-        description: isEdit ? "Falha ao atualizar guia." : "Falha ao criar guia.",
+        description: isEdit ? "Falha ao atualizar atendimento." : "Falha ao criar atendimento.",
         variant: "destructive",
       });
     },
@@ -306,7 +306,7 @@ export default function GuideForm() {
       {/* Header */}
       <div>
         <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground break-words">
-          {isEdit ? "Editar Guia" : "Novo Atendimento"}
+          {isEdit ? "Editar Atendimento" : "Novo Atendimento"}
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
           {isEdit ? "Atualize as Informações do Atendimento" : "Crie uma Novo Atendimento de atendimento"}
@@ -640,7 +640,7 @@ export default function GuideForm() {
                           <FormControl>
                             <Textarea 
                               {...field} 
-                              placeholder="Observações gerais sobre a guia..."
+                              placeholder="Observações gerais sobre a atendimento..."
                               data-testid="textarea-general-notes" 
                             />
                           </FormControl>
@@ -676,7 +676,7 @@ export default function GuideForm() {
               {mutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                isEdit ? "Atualizar" : "Criar Guia"
+                isEdit ? "Atualizar" : "Criar Atendimento"
               )}
             </Button>
           </div>
