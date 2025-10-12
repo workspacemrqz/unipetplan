@@ -3,7 +3,6 @@ import { useParams } from "wouter";
 import { cn } from "@/lib/admin/utils";
 import {
   Home,
-  Users,
   FileText,
   Clipboard,
   DollarSign,
@@ -26,7 +25,6 @@ export default function UnitSidebar() {
       items: [
         { name: "Guias de Atendimento", href: `/unidade/${slug}/guias`, icon: FileText },
         { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign },
-        { name: "Clientes & Pets", href: `/unidade/${slug}/clientes`, icon: Users },
         { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard }
       ]
     }
