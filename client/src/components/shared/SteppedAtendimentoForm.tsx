@@ -666,13 +666,19 @@ export default function SteppedAtendimentoForm({
                                   </h3>
                                   {petHistory && petHistory.length > 0 ? (
                                     <div 
-                                      className={`space-y-3 ${petHistory.length > 5 ? 'max-h-[400px] overflow-y-auto pr-2' : ''}`}
-                                      style={petHistory.length > 5 ? { 
+                                      className="space-y-3 max-h-[300px] overflow-y-auto pr-2"
+                                      style={{ 
                                         scrollbarWidth: 'thin',
                                         scrollbarColor: '#277677 #f0f0f0'
-                                      } : {}}
+                                      }}
                                     >
-                                      {petHistory.map((atendimento: any, index: number) => (
+                                      {petHistory
+                                        .sort((a: any, b: any) => {
+                                          const dateA = new Date(a.createdAt || a.created_at).getTime();
+                                          const dateB = new Date(b.createdAt || b.created_at).getTime();
+                                          return dateB - dateA; // Mais recentes primeiro
+                                        })
+                                        .map((atendimento: any, index: number) => (
                                         <div key={atendimento.id || index} className="border-l-2 border-[#277677] pl-3 text-sm">
                                           <div className="flex justify-between items-start gap-2">
                                             <div className="flex-1 min-w-0">
