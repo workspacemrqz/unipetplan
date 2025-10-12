@@ -678,31 +678,36 @@ export default function SteppedAtendimentoForm({
                                           const dateB = new Date(b.createdAt || b.created_at).getTime();
                                           return dateB - dateA; // Mais recentes primeiro
                                         })
-                                        .map((atendimento: any, index: number) => (
-                                        <div key={atendimento.id || index} className="border-l-2 border-[#277677] pl-3 text-sm">
-                                          <div className="flex justify-between items-start gap-2">
-                                            <div className="flex-1 min-w-0">
-                                              <p className="font-medium text-gray-900 break-words">
-                                                {atendimento.procedure || 'Procedimento não especificado'}
-                                              </p>
-                                              <p className="text-gray-600 text-xs break-words">
-                                                {new Date(atendimento.createdAt || atendimento.created_at).toLocaleDateString('pt-BR')}
-                                                {atendimento.networkUnit && ` - ${atendimento.networkUnit.name}`}
-                                              </p>
-                                              {atendimento.generalNotes && (
-                                                <p className="text-gray-700 mt-1 break-all" style={{ wordWrap: 'break-word', overflowWrap: 'anywhere' }}>
-                                                  Observação: {atendimento.generalNotes}
+                                        .map((atendimento: any, index: number, array: any[]) => (
+                                        <div key={atendimento.id || index}>
+                                          <div className="border-l-2 border-[#277677] pl-3 text-sm pb-3">
+                                            <div className="flex justify-between items-start gap-2">
+                                              <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-gray-900 break-words">
+                                                  {atendimento.procedure || 'Procedimento não especificado'}
                                                 </p>
-                                              )}
+                                                <p className="text-gray-600 text-xs break-words">
+                                                  {new Date(atendimento.createdAt || atendimento.created_at).toLocaleDateString('pt-BR')}
+                                                  {atendimento.networkUnit && ` - ${atendimento.networkUnit.name}`}
+                                                </p>
+                                                {atendimento.generalNotes && (
+                                                  <p className="text-gray-700 mt-1 break-all" style={{ wordWrap: 'break-word', overflowWrap: 'anywhere' }}>
+                                                    Observação: {atendimento.generalNotes}
+                                                  </p>
+                                                )}
+                                              </div>
+                                              <span className="flex-shrink-0 px-2 py-1 rounded text-xs" style={{ backgroundColor: 'rgba(39, 118, 119, 0.1)', color: '#277677' }}>
+                                                {atendimento.status === 'completed' || atendimento.status === 'closed' ? 'Concluída' :
+                                                 atendimento.status === 'pending' ? 'Pendente' :
+                                                 atendimento.status === 'open' ? 'Aberta' :
+                                                 atendimento.status === 'cancelled' ? 'Cancelada' :
+                                                 'Em andamento'}
+                                              </span>
                                             </div>
-                                            <span className="flex-shrink-0 px-2 py-1 rounded text-xs" style={{ backgroundColor: 'rgba(39, 118, 119, 0.1)', color: '#277677' }}>
-                                              {atendimento.status === 'completed' || atendimento.status === 'closed' ? 'Concluída' :
-                                               atendimento.status === 'pending' ? 'Pendente' :
-                                               atendimento.status === 'open' ? 'Aberta' :
-                                               atendimento.status === 'cancelled' ? 'Cancelada' :
-                                               'Em andamento'}
-                                            </span>
                                           </div>
+                                          {index < array.length - 1 && (
+                                            <hr className="border-gray-200 mb-3" />
+                                          )}
                                         </div>
                                       ))}
                                     </div>
