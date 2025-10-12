@@ -514,7 +514,7 @@ export default function SteppedAtendimentoForm({
                                   } />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent className="max-w-[90vw] md:max-w-full">
+                              <SelectContent className="max-w-[90vw] md:max-w-full" align="center">
                                 {clientPets.map((pet) => (
                                   <SelectItem 
                                     key={pet.id} 
@@ -767,7 +767,7 @@ export default function SteppedAtendimentoForm({
                                     } />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent className="max-w-[90vw] md:max-w-full">
+                                <SelectContent className="max-w-[90vw] md:max-w-full" align="center">
                                   {networkUnits.map((unit: any) => (
                                     <SelectItem key={unit.id} value={unit.id}>
                                       {unit.name}
@@ -839,7 +839,7 @@ export default function SteppedAtendimentoForm({
                                     } />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent className="max-w-[90vw] md:max-w-full">
+                                <SelectContent className="max-w-[90vw] md:max-w-full" align="center">
                                   <div className="p-2 border-b">
                                     <Input
                                       placeholder="Digite para buscar..."
