@@ -13,6 +13,7 @@ import DigitalCard from "@/components/DigitalCard";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import LoadingDots from "@/components/ui/LoadingDots";
 import SteppedAtendimentoForm from "@/components/shared/SteppedAtendimentoForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface NetworkUnit {
   id: string;
@@ -122,6 +123,7 @@ interface AuthState {
 }
 
 export default function UnitDashboard() {
+  const { toast } = useToast();
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     unit: null,
@@ -996,8 +998,8 @@ export default function UnitDashboard() {
 
               <SteppedAtendimentoForm
                 mode="admin"
-                networkUnitId={selectedUnitId}
-                networkUnitName={selectedUnit?.name}
+                networkUnitId={authState.unit?.id}
+                networkUnitName={authState.unit?.name}
                 onSuccess={() => {
                   toast({
                     title: "Atendimento criado",
