@@ -2088,6 +2088,10 @@ export class DatabaseStorage implements IStorage {
     if (filters.status) {
       conditions.push(eq(atendimentos.status, filters.status));
     }
+    // Filter by veterinarianId if provided
+    if (filters.veterinarianId) {
+      conditions.push(eq(atendimentos.veterinarianId, filters.veterinarianId));
+    }
 
     // Build and execute query with client and pet data
     const baseQuery = db

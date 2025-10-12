@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import type { IStorage } from './storage.js';
 import { db } from './db.js';
 import { atendimentos, type InsertVeterinarian } from '../shared/schema.js';
-import { sql, eq } from 'drizzle-orm';
+import { sql, eq, and } from 'drizzle-orm';
 
 interface UnitRequest extends Request {
   unit?: {
@@ -158,11 +158,20 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
       
-      // Get atendimentos for this unit
-      const result = await storage.getAtendimentosWithNetworkUnits({
+      // Build filters based on user type
+      const filters: any = {
         networkUnitId: unitId,
         status: status !== 'all' ? status : undefined
-      });
+      };
+      
+      // If it's a veterinarian, filter by their ID
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+        filters.veterinarianId = req.unit.veterinarianId;
+        console.log(`✅ [UNIT] Filtering atendimentos for veterinarian ${req.unit.veterinarianId}`);
+      }
+      
+      // Get atendimentos with filters
+      const result = await storage.getAtendimentosWithNetworkUnits(filters);
       
       let allAtendimentos = result?.atendimentos || [];
       
@@ -230,23 +239,32 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
+      // Build conditions based on user type
+      const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
+      
+      // If it's a veterinarian, filter by their ID
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+        conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+        console.log(`✅ [UNIT] Filtering dashboard stats for veterinarian ${req.unit.veterinarianId}`);
+      }
+      
       // Count DISTINCT clients using SQL aggregation
       const uniqueClientsResult = await db
         .select({ count: sql<number>`count(distinct ${atendimentos.clientId})` })
         .from(atendimentos)
-        .where(eq(atendimentos.createdByUnitId, unitId));
+        .where(and(...conditions));
       
       // Count DISTINCT pets using SQL aggregation
       const uniquePetsResult = await db
         .select({ count: sql<number>`count(distinct ${atendimentos.petId})` })
         .from(atendimentos)
-        .where(eq(atendimentos.createdByUnitId, unitId));
+        .where(and(...conditions));
       
       // Count total atendimentos
       const totalAtendimentosResult = await db
         .select({ count: sql<number>`count(*)` })
         .from(atendimentos)
-        .where(eq(atendimentos.createdByUnitId, unitId));
+        .where(and(...conditions));
       
       const uniqueClients = uniqueClientsResult[0]?.count || 0;
       const uniquePets = uniquePetsResult[0]?.count || 0;
@@ -284,6 +302,12 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           ? procedures.map((p: any) => p.name).join(", ")
           : atendimentoData.procedure
       };
+      
+      // If it's a veterinarian creating the atendimento, add their ID
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+        processedData.veterinarianId = req.unit.veterinarianId;
+        console.log(`✅ [UNIT] Atendimento being created by veterinarian ${req.unit.veterinarianId}`);
+      }
       
       // Add unit ID to track which unit created this atendimento
       const newAtendimento = await storage.createAtendimento(processedData);
