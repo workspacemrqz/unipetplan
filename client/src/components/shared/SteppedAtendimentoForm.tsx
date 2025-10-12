@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Check, Loader2, User, Heart, FileText, CheckCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -687,12 +687,6 @@ export default function SteppedAtendimentoForm({
                 {/* Etapa 4: Observações e Confirmação */}
                 {currentStep === 4 && (
                   <div className="space-y-6">
-                    <div className="text-center mb-6">
-                      <p className="text-gray-600">
-                        Adicione observações e confirme o atendimento
-                      </p>
-                    </div>
-                    
                     <FormField
                       control={form.control}
                       name="generalNotes"
