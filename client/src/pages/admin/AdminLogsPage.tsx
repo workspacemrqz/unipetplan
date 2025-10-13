@@ -167,7 +167,50 @@ export default function AdminLogsPage() {
         throw new Error('Erro ao buscar logs');
       }
 
-      return response.json();
+      const data = await response.json();
+      
+      // Map snake_case to camelCase
+      if (data.data && Array.isArray(data.data)) {
+        data.data = data.data.map((log: any) => {
+          if (sourceFilter === "units" && log.log) {
+            // Unit log structure - map all fields from snake_case to camelCase
+            return {
+              log: {
+                id: log.log.id,
+                actionType: log.log.action_type,
+                networkUnitId: log.log.network_unit_id,
+                userType: log.log.user_type,
+                veterinarianId: log.log.veterinarian_id,
+                actionData: log.log.action_data,
+                createdAt: log.log.created_at,
+              },
+              veterinarian: log.veterinarian ? {
+                id: log.veterinarian.id,
+                name: log.veterinarian.name,
+              } : null,
+              networkUnit: log.network_unit ? {
+                id: log.network_unit.id,
+                name: log.network_unit.name,
+              } : null,
+            };
+          } else {
+            // Admin log structure
+            return {
+              id: log.id,
+              adminUserId: log.admin_user_id,
+              actionType: log.action_type,
+              entityType: log.entity_type,
+              entityId: log.entity_id,
+              metadata: log.metadata,
+              ip: log.ip,
+              userAgent: log.user_agent,
+              createdAt: log.created_at,
+            };
+          }
+        });
+      }
+      
+      return data;
     },
   });
 
