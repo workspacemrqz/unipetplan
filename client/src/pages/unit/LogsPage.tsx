@@ -39,6 +39,10 @@ const actionTypeTranslations: Record<string, string> = {
   "procedure_added": "Procedimento Adicionado",
   "atendimento_created": "Atendimento Criado",
   "step_changed": "Mudança de Etapa",
+  "veterinarian_created": "Veterinário Criado",
+  "veterinarian_updated": "Veterinário Atualizado",
+  "veterinarian_deleted": "Veterinário Removido",
+  "veterinarian_status_changed": "Status de Veterinário Alterado",
 };
 
 const getActionTypeLabel = (actionType: string): string => {
@@ -205,6 +209,40 @@ export default function LogsPage() {
             return `Finalizou e criou o atendimento com sucesso`;
           }
           break;
+        
+        case "veterinarian_created":
+          if (actionData.name) {
+            const type = actionData.type === 'permanente' ? 'Permanente' : 'Volante';
+            const access = actionData.canAccessAtendimentos ? 'com acesso a atendimentos' : 'sem acesso a atendimentos';
+            return `Criou o veterinário ${type}: ${actionData.name} (${access})`;
+          }
+          break;
+        
+        case "veterinarian_updated":
+          if (actionData.name) {
+            const details = [];
+            if (actionData.type) details.push(`Tipo: ${actionData.type === 'permanente' ? 'Permanente' : 'Volante'}`);
+            if (actionData.canAccessAtendimentos !== undefined) {
+              details.push(`Acesso atendimentos: ${actionData.canAccessAtendimentos ? 'Sim' : 'Não'}`);
+            }
+            if (actionData.isActive !== undefined) {
+              details.push(`Status: ${actionData.isActive ? 'Ativo' : 'Inativo'}`);
+            }
+            return `Atualizou o veterinário: ${actionData.name} (${details.join(', ')})`;
+          }
+          break;
+        
+        case "veterinarian_deleted":
+          if (actionData.name) {
+            return `Removeu o veterinário: ${actionData.name}`;
+          }
+          break;
+        
+        case "veterinarian_status_changed":
+          if (actionData.name && actionData.newStatus) {
+            return `Alterou status do veterinário ${actionData.name} de ${actionData.oldStatus} para ${actionData.newStatus}`;
+          }
+          break;
       }
       
       // Fallback: format object as readable string if no specific format matched
@@ -246,7 +284,7 @@ export default function LogsPage() {
               Logs de Ações
             </h1>
             <p className="text-sm text-muted-foreground">
-              Registro de ações realizadas na criação de atendimentos
+              Registro de todas as ações realizadas no sistema (atendimentos, veterinários, etc.)
             </p>
           </div>
         </div>
