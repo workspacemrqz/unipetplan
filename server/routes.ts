@@ -2536,6 +2536,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newPlan = await storage.createPlan(newPlanData);
       
+      // Log admin action
+      await logAdminAction(req, 'created', 'plan', newPlan.id, { 
+        name: newPlanData.name, 
+        planType: newPlanData.planType,
+        basePrice: newPlanData.basePrice 
+      });
+      
       console.log(`✅ [ADMIN] New plan created successfully:`, newPlan.id);
       res.status(201).json(newPlan);
     } catch (error) {
@@ -2583,6 +2590,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedPlan) {
         return res.status(404).json({ error: "Plano não encontrado" });
       }
+      
+      // Log admin action
+      await logAdminAction(req, 'updated', 'plan', planId, planUpdateData);
       
       console.log(`✅ [ADMIN] Plan ${planId} updated successfully`);
       res.json(updatedPlan);
