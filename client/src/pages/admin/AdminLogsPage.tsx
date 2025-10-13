@@ -468,7 +468,7 @@ export default function AdminLogsPage() {
                     return (
                       <TableRow key={log.log.id} className="bg-white border-b border-[#eaeaea]">
                         <TableCell className="whitespace-nowrap bg-white">
-                          {format(new Date(log.log.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          {log.log.createdAt ? format(new Date(log.log.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "-"}
                         </TableCell>
                         <TableCell className="whitespace-nowrap bg-white">
                           {log.networkUnit?.name || "N/A"}
@@ -492,7 +492,7 @@ export default function AdminLogsPage() {
                     return (
                       <TableRow key={adminLog.id} className="bg-white border-b border-[#eaeaea]">
                         <TableCell className="whitespace-nowrap bg-white">
-                          {format(new Date(adminLog.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          {adminLog.createdAt ? format(new Date(adminLog.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "-"}
                         </TableCell>
                         <TableCell className="whitespace-nowrap bg-white">
                           {adminLog.adminUserId || "N/A"}
