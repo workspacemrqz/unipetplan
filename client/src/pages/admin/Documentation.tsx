@@ -3,16 +3,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Book, 
-  FileCode, 
+  FileText, 
   Database, 
   Shield, 
-  GitBranch, 
   Globe, 
   Settings,
   CheckCircle,
-  Command,
-  LayoutDashboard
+  Clipboard
 } from "lucide-react";
 
 export default function Documentation() {
@@ -20,7 +17,7 @@ export default function Documentation() {
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Book className="h-8 w-8 text-primary" />
+          <FileText className="h-8 w-8 text-primary" />
           <h1 className="text-3xl font-bold">Documentação Técnica</h1>
         </div>
         <p className="text-muted-foreground">
@@ -44,7 +41,7 @@ export default function Documentation() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileCode className="h-5 w-5" />
+                <FileText className="h-5 w-5" />
                 Resumo Técnico do Projeto
               </CardTitle>
               <CardDescription>Visão geral da arquitetura e tecnologias utilizadas</CardDescription>
@@ -61,7 +58,7 @@ export default function Documentation() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="border rounded-lg p-4">
                   <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Command className="h-4 w-4" />
+                    <Clipboard className="h-4 w-4" />
                     Frontend
                   </h4>
                   <ul className="space-y-1 text-sm text-muted-foreground">
@@ -77,7 +74,7 @@ export default function Documentation() {
 
                 <div className="border rounded-lg p-4">
                   <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <LayoutDashboard className="h-4 w-4" />
+                    <Settings className="h-4 w-4" />
                     Backend
                   </h4>
                   <ul className="space-y-1 text-sm text-muted-foreground">
@@ -131,7 +128,7 @@ export default function Documentation() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <GitBranch className="h-5 w-5" />
+                <Settings className="h-5 w-5" />
                 Funcionalidades Implementadas
               </CardTitle>
               <CardDescription>Descrição detalhada de todas as funcionalidades do sistema</CardDescription>
@@ -448,7 +445,7 @@ export default function Documentation() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Command className="h-5 w-5" />
+                <Clipboard className="h-5 w-5" />
                 Principais Funções Implementadas
               </CardTitle>
               <CardDescription>Descrição das funções mais importantes do sistema</CardDescription>
@@ -614,8 +611,8 @@ export default function Documentation() {
                       <p><span className="font-medium text-foreground">Endpoints utilizados:</span></p>
                       <ul className="ml-6 space-y-1">
                         <li>• POST /sales - Criação de transação com cartão</li>
-                        <li>• POST /sales/{id}/capture - Captura de pagamento autorizado</li>
-                        <li>• GET /sales/{id} - Consulta status de pagamento</li>
+                        <li>• POST /sales/&#123;id&#125;/capture - Captura de pagamento autorizado</li>
+                        <li>• GET /sales/&#123;id&#125; - Consulta status de pagamento</li>
                         <li>• POST /pix/qrcode - Geração de QR Code PIX</li>
                       </ul>
                       <p><span className="font-medium text-foreground">Funcionalidades:</span></p>
@@ -637,7 +634,7 @@ export default function Documentation() {
                     </div>
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <p><span className="font-medium text-foreground">Propósito:</span> Busca automática de endereço por CEP</p>
-                      <p><span className="font-medium text-foreground">Endpoint:</span> GET https://viacep.com.br/ws/{cep}/json/</p>
+                      <p><span className="font-medium text-foreground">Endpoint:</span> GET https://viacep.com.br/ws/&#123;cep&#125;/json/</p>
                       <p><span className="font-medium text-foreground">Funcionalidades:</span></p>
                       <ul className="ml-6 space-y-1">
                         <li>• Preenchimento automático de endereço em formulários</li>
