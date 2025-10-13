@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import type { IStorage } from './storage.js';
 import { db } from './db.js';
 import { atendimentos, atendimentoProcedures, veterinarians, type InsertVeterinarian } from '../shared/schema.js';
-import { sql, eq, and } from 'drizzle-orm';
+import { sql, eq, and, inArray } from 'drizzle-orm';
 
 interface UnitRequest extends Request {
   unit?: {
@@ -1315,7 +1315,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           count: sql<number>`count(*)::int`
         })
         .from(atendimentoProcedures)
-        .where(sql`${atendimentoProcedures.atendimentoId} = ANY(${atendimentoIds})`)
+        .where(inArray(atendimentoProcedures.atendimentoId, atendimentoIds))
         .groupBy(atendimentoProcedures.procedureName)
         .orderBy(sql`count(*) DESC`)
         .limit(10);
@@ -1364,7 +1364,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       const vetsData = vetIds.length > 0 
         ? await db.select({ id: veterinarians.id, name: veterinarians.name })
             .from(veterinarians)
-            .where(sql`${veterinarians.id} = ANY(${vetIds})`)
+            .where(inArray(veterinarians.id, vetIds))
         : [];
 
       const vetMap = new Map(vetsData.map(v => [v.id, v.name]));
