@@ -222,19 +222,40 @@ export default function AdminLogsPage() {
     if (!metadata) return "-";
     
     try {
-      // Format metadata to show key details
+      // Format metadata to show key details in a more readable way
       if (typeof metadata === 'object') {
         const keys = Object.keys(metadata);
         if (keys.length === 0) return "-";
         
-        // Show first few key-value pairs
+        // Prioritize displaying the most important fields first
+        const name = metadata.name || metadata.clientName || metadata.procedureName || metadata.planName;
+        const action = metadata.action;
+        const changes = metadata.changes;
+        const email = metadata.email;
+        const code = metadata.code;
+        
+        // Build a human-readable string
+        const parts: string[] = [];
+        
+        if (name) parts.push(name);
+        if (email && !name?.includes(email)) parts.push(email);
+        if (code) parts.push(`Código: ${code}`);
+        if (action) parts.push(`(${action})`);
+        if (changes) parts.push(changes);
+        
+        // If we have custom formatted parts, use them
+        if (parts.length > 0) {
+          return parts.join(', ');
+        }
+        
+        // Fallback: show key values in a simpler format
         const preview = keys.slice(0, 2).map(key => {
           const value = metadata[key];
-          if (typeof value === 'object') return `${key}: {...}`;
-          return `${key}: ${value}`;
+          if (typeof value === 'object') return `${value}`;
+          return String(value);
         }).join(', ');
         
-        return keys.length > 2 ? `${preview}, ...` : preview;
+        return keys.length > 2 ? `${preview}...` : preview;
       }
       
       return String(metadata);
