@@ -2093,18 +2093,20 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(atendimentos.veterinarianId, filters.veterinarianId));
     }
 
-    // Build and execute query with client and pet data
+    // Build and execute query with client, pet and veterinarian data
     const baseQuery = db
       .select({
         atendimento: atendimentos,
         networkUnit: networkUnits,
         client: clients,
         pet: pets,
+        veterinarian: veterinarians,
       })
       .from(atendimentos)
       .leftJoin(networkUnits, eq(atendimentos.networkUnitId, networkUnits.id))
       .leftJoin(clients, eq(atendimentos.clientId, clients.id))
-      .leftJoin(pets, eq(atendimentos.petId, pets.id));
+      .leftJoin(pets, eq(atendimentos.petId, pets.id))
+      .leftJoin(veterinarians, eq(atendimentos.veterinarianId, veterinarians.id));
 
     const results = conditions.length > 0
       ? await baseQuery.where(and(...conditions)).orderBy(desc(atendimentos.createdAt))
@@ -2116,6 +2118,7 @@ export class DatabaseStorage implements IStorage {
         networkUnit: r.networkUnit,
         clientName: r.client?.fullName || null,
         petName: r.pet?.name || null,
+        veterinarianName: r.veterinarian?.name || null,
       })),
       total: results.length,
     };
