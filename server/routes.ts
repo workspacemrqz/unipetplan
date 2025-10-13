@@ -397,6 +397,34 @@ export async function createNextAnnualInstallmentIfNeeded(
   }
 }
 
+// Helper function to automatically log admin actions
+async function logAdminAction(
+  req: any,
+  actionType: 'created' | 'updated' | 'deleted' | 'viewed',
+  entityType: string,
+  entityId: string,
+  metadata: any = {}
+) {
+  try {
+    const adminUserId = req.session.admin?.userId || req.session.admin?.login || 'unknown';
+    
+    await storage.createAdminActionLog({
+      adminUserId,
+      actionType,
+      entityType,
+      entityId,
+      metadata,
+      ip: req.ip || req.connection.remoteAddress,
+      userAgent: req.headers['user-agent']
+    });
+    
+    console.log(`📝 [ADMIN-LOG] ${actionType} ${entityType} ${entityId} by ${adminUserId}`);
+  } catch (error) {
+    // Log errors silently - we don't want logging failures to break operations
+    console.error('❌ [ADMIN-LOG] Error creating admin log:', error);
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
 
   // Static file serving disabled - using Supabase Storage for all images
