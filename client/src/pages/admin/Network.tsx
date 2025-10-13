@@ -51,6 +51,7 @@ interface NetworkUnit {
   imageUrl?: string;
   urlSlug?: string;
   createdAt?: string;
+  login?: string;
 }
 
 const allColumns = [
