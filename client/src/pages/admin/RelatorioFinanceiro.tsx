@@ -171,18 +171,6 @@ export default function RelatorioFinanceiro() {
     }
   };
 
-  const prepareExportData = async () => {
-    return filteredEntries.map(entry => ({
-      'Data': entry.date ? format(new Date(entry.date), "dd/MM/yyyy", { locale: ptBR }) : 'Não informado',
-      'Cliente': entry.clientName || '',
-      'Pet': entry.petName || 'Não informado',
-      'Procedimento': entry.procedure || '',
-      'Coparticipação': formatCurrency(entry.coparticipacao),
-      'Valor Pago': formatCurrency(entry.value),
-      'Unidade': entry.networkUnitName || 'Não informado',
-      'Data de Criação': entry.createdAt ? format(new Date(entry.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
-    }));
-  };
 
   return (
     <div className="space-y-4 sm:space-y-6">

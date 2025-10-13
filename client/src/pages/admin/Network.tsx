@@ -29,13 +29,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
 import { Plus, Search, Edit, Trash2, Building, ExternalLink, Eye, Copy, Globe, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2 } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
-import type { NetworkUnit } from "@shared/schema";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import { ExportButton } from "@/components/admin/ExportButton";
+
+interface NetworkUnit {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  whatsapp?: string;
+  isActive: boolean;
+  services?: string[];
+  googleMapsUrl?: string;
+  cidade?: string;
+  imageUrl?: string;
+  urlSlug?: string;
+  createdAt?: string;
+}
 
 const allColumns = [
   "Nome",

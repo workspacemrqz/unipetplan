@@ -120,6 +120,10 @@ export function ExportButton({
           variant="outline"
           size="sm"
           disabled={disabled || isExporting || isPreparingData || !data || data.length === 0}
+          style={{
+            borderColor: 'var(--border-gray)',
+            background: 'white'
+          }}
         >
           {isExporting || isPreparingData ? (
             <>

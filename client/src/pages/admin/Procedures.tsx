@@ -1434,7 +1434,7 @@ export default function Procedures() {
           </Dialog>
           
           <ExportButton 
-            data={filteredProcedures}
+            data={filteredItems}
             filename="procedimentos"
             title="Exportação de Procedimentos"
             pageName="Procedimentos"
@@ -1447,7 +1447,7 @@ export default function Procedures() {
               { key: 'createdAt', label: 'Data de Criação', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
               { key: 'updatedAt', label: 'Última Atualização', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
             ]}
-            disabled={isLoading || filteredProcedures.length === 0}
+            disabled={isLoading || filteredItems.length === 0}
           />
           
           {/* Controle de Colunas */}
