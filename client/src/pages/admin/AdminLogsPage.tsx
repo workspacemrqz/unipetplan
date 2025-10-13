@@ -504,7 +504,7 @@ export default function AdminLogsPage() {
                           {getEntityTypeLabel(adminLog.entityType)}
                         </TableCell>
                         <TableCell className="whitespace-nowrap bg-white font-mono text-xs">
-                          {adminLog.entityId.substring(0, 8)}...
+                          {adminLog.entityId ? `${adminLog.entityId.substring(0, 8)}...` : "-"}
                         </TableCell>
                         <TableCell className="bg-white">
                           <div className="text-sm text-muted-foreground truncate max-w-md">
