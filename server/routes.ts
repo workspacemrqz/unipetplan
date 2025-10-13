@@ -2640,6 +2640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create the network unit
       const newUnit = await storage.createNetworkUnit(unitData);
+      await logAdminAction(req, 'created', 'network_unit', newUnit.id, { name: unitData.name });
       console.log("✨ [ADMIN] Network unit created successfully:", newUnit.id);
       
       res.status(201).json(newUnit);
@@ -2702,6 +2703,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Unidade não encontrada" });
       }
       
+      await logAdminAction(req, 'updated', 'network_unit_credentials', id, { credentialsUpdated: true });
       console.log(`✅ [CREDENTIALS] Credenciais atualizadas com sucesso para unidade: ${updatedUnit.name} (${updatedUnit.urlSlug})`);
       console.log(`🔑 [CREDENTIALS] Login: ${login} | Use esta senha para acessar: ${password}`);
       
@@ -2921,6 +2923,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Unidade não encontrada" });
       }
       
+      await logAdminAction(req, 'updated', 'network_unit', id, updateData);
       res.json(updatedUnit);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating network unit:", error);
@@ -2939,6 +2942,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Unidade não encontrada" });
       }
       
+      await logAdminAction(req, 'deleted', 'network_unit', id, {});
       res.status(204).send();
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting network unit:", error);
@@ -2975,6 +2979,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("📝 [ADMIN] Creating new procedure:", req.body);
       const newProcedure = await storage.createProcedure(req.body);
+      await logAdminAction(req, 'created', 'procedure', newProcedure.id, { name: req.body.name, category: req.body.category });
       console.log("✅ [ADMIN] Procedure created successfully:", newProcedure);
       res.status(201).json(newProcedure);
     } catch (error) {
@@ -2995,6 +3000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Procedimento não encontrado" });
       }
       
+      await logAdminAction(req, 'updated', 'procedure', id, req.body);
       console.log("✅ [ADMIN] Procedure updated successfully:", updatedProcedure);
       res.json(updatedProcedure);
     } catch (error) {
@@ -3015,6 +3021,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Procedimento não encontrado" });
       }
       
+      await logAdminAction(req, 'deleted', 'procedure', id, {});
       console.log("✅ [ADMIN] Procedure deleted successfully");
       res.status(204).send();
     } catch (error) {
@@ -3050,6 +3057,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Delete existing relations and insert new ones atomically
       await storage.updateProcedurePlans(id, procedurePlans);
       
+      await logAdminAction(req, 'updated', 'procedure_plans', id, { plans: procedurePlans });
       console.log("✅ [ADMIN] Procedure plans updated successfully");
       res.json({ success: true });
     } catch (error) {
