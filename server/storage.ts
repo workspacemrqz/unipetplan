@@ -275,6 +275,13 @@ export interface IStorage {
   // Action Logs
   createActionLog(data: InsertActionLog): Promise<ActionLog>;
   getActionLogsByUnit(unitId: string): Promise<any[]>;
+  getAllActionLogs(filters?: {
+    startDate?: string;
+    endDate?: string;
+    userType?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: any[]; total: number; totalPages: number; page: number }>;
 
   // Admin Action Logs
   createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog>;
@@ -503,6 +510,9 @@ export class InMemoryStorage implements IStorage {
     } as ActionLog; 
   }
   async getActionLogsByUnit(unitId: string): Promise<any[]> { return []; }
+  async getAllActionLogs(filters?: any): Promise<{ data: any[]; total: number; totalPages: number; page: number }> {
+    return { data: [], total: 0, totalPages: 0, page: 1 };
+  }
   
   // Admin Action Logs
   async createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog> { 
@@ -2295,6 +2305,79 @@ export class DatabaseStorage implements IStorage {
         name: row.veterinarian.name,
       } : null,
     }));
+  }
+
+  async getAllActionLogs(filters?: {
+    startDate?: string;
+    endDate?: string;
+    userType?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: any[]; total: number; totalPages: number; page: number }> {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const offset = (page - 1) * limit;
+
+    // Build where conditions
+    const conditions: any[] = [];
+    
+    if (filters?.userType && filters.userType !== 'all') {
+      conditions.push(eq(actionLogs.userType, filters.userType));
+    }
+    
+    if (filters?.startDate) {
+      conditions.push(sql`${actionLogs.createdAt} >= ${filters.startDate}`);
+    }
+    
+    if (filters?.endDate) {
+      conditions.push(sql`${actionLogs.createdAt} <= ${filters.endDate}`);
+    }
+
+    // Get total count
+    const countQuery = conditions.length > 0
+      ? db.select({ count: sql<number>`count(*)` }).from(actionLogs).where(and(...conditions))
+      : db.select({ count: sql<number>`count(*)` }).from(actionLogs);
+    
+    const [{ count: total }] = await countQuery;
+
+    // Get paginated data with join
+    const dataQuery = db
+      .select({
+        log: actionLogs,
+        veterinarian: veterinarians,
+        networkUnit: networkUnits,
+      })
+      .from(actionLogs)
+      .leftJoin(veterinarians, eq(actionLogs.veterinarianId, veterinarians.id))
+      .leftJoin(networkUnits, eq(actionLogs.networkUnitId, networkUnits.id))
+      .orderBy(desc(actionLogs.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    const logs = conditions.length > 0
+      ? await dataQuery.where(and(...conditions))
+      : await dataQuery;
+    
+    const totalPages = Math.ceil(total / limit);
+
+    const mappedData = logs.map((row) => ({
+      log: row.log,
+      veterinarian: row.veterinarian ? {
+        id: row.veterinarian.id,
+        name: row.veterinarian.name,
+      } : null,
+      networkUnit: row.networkUnit ? {
+        id: row.networkUnit.id,
+        name: row.networkUnit.name,
+      } : null,
+    }));
+
+    return {
+      data: mappedData,
+      total,
+      totalPages,
+      page,
+    };
   }
 
   // Admin Action Logs

@@ -3134,20 +3134,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get admin action logs with filters and pagination
   app.get("/admin/api/logs", requireAdmin, async (req, res) => {
     try {
-      const { startDate, endDate, adminUserId, actionType, entityType, page, limit } = req.query;
+      const { startDate, endDate, adminUserId, actionType, entityType, page, limit, source } = req.query;
       
-      const filters = {
-        startDate: startDate as string,
-        endDate: endDate as string,
-        adminUserId: adminUserId as string,
-        actionType: actionType as string,
-        entityType: entityType as string,
-        page: page ? parseInt(page as string) : 1,
-        limit: limit ? parseInt(limit as string) : 10,
-      };
-      
-      const result = await storage.getAdminActionLogs(filters);
-      res.json(result);
+      // If source is 'units', return unit logs instead
+      if (source === 'units') {
+        const filters = {
+          startDate: startDate as string,
+          endDate: endDate as string,
+          userType: req.query.userType as string,
+          page: page ? parseInt(page as string) : 1,
+          limit: limit ? parseInt(limit as string) : 10,
+        };
+        
+        const result = await storage.getAllActionLogs(filters);
+        res.json(result);
+      } else {
+        // Default: admin logs
+        const filters = {
+          startDate: startDate as string,
+          endDate: endDate as string,
+          adminUserId: adminUserId as string,
+          actionType: actionType as string,
+          entityType: entityType as string,
+          page: page ? parseInt(page as string) : 1,
+          limit: limit ? parseInt(limit as string) : 10,
+        };
+        
+        const result = await storage.getAdminActionLogs(filters);
+        res.json(result);
+      }
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching admin action logs:", error);
       res.status(500).json({ error: "Erro ao buscar logs de ações" });
