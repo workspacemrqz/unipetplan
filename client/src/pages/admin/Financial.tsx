@@ -148,6 +148,20 @@ export default function Financial() {
     }
   };
 
+  const prepareExportData = async () => {
+    return filteredReceipts.map(receipt => ({
+      'Nº Recibo': receipt.receiptNumber || '',
+      'Cliente': receipt.clientName || '',
+      'Email do Cliente': receipt.clientEmail || '',
+      'Plano': receipt.planName || 'N/A',
+      'Valor': formatCurrency(receipt.paymentAmount),
+      'Método de Pagamento': paymentMethodLabels[receipt.paymentMethod] || receipt.paymentMethod,
+      'Data do Pagamento': format(new Date(receipt.paymentDate), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+      'Status': statusLabels[receipt.status] || receipt.status,
+      'Data de Criação': receipt.createdAt ? format(new Date(receipt.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
+    }));
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -181,16 +195,7 @@ export default function Financial() {
             filename="dados_financeiros"
             title="Exportação de Dados Financeiros"
             pageName="Financeiro"
-            columns={[
-              { key: 'receiptNumber', label: 'Nº Recibo', formatter: (v) => v || '' },
-              { key: 'clientName', label: 'Cliente', formatter: (v) => v || '' },
-              { key: 'clientEmail', label: 'Email', formatter: (v) => v || '' },
-              { key: 'planName', label: 'Plano', formatter: (v) => v || 'N/A' },
-              { key: 'paymentAmount', label: 'Valor', formatter: (v) => formatCurrency(v) },
-              { key: 'paymentMethod', label: 'Método de Pagamento', formatter: (v) => paymentMethodLabels[v] || v },
-              { key: 'paymentDate', label: 'Data do Pagamento', formatter: (v) => format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) },
-              { key: 'status', label: 'Status', formatter: (v) => statusLabels[v] || v }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || filteredReceipts.length === 0}
           />
           

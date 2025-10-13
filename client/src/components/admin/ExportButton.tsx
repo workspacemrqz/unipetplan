@@ -21,6 +21,7 @@ interface ExportButtonProps {
   title?: string;
   pageName?: string;
   disabled?: boolean;
+  prepareData?: () => Promise<any[]>;
 }
 
 export function ExportButton({
@@ -30,15 +31,29 @@ export function ExportButton({
   title,
   pageName,
   disabled = false,
+  prepareData,
 }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
+  const [isPreparingData, setIsPreparingData] = useState(false);
   const { toast } = useToast();
 
   const handleExportPDF = async () => {
     try {
       setIsExporting(true);
+      
+      let exportData = data;
+      if (prepareData) {
+        setIsPreparingData(true);
+        toast({
+          title: "Preparando dados...",
+          description: "Buscando informações completas para exportação.",
+        });
+        exportData = await prepareData();
+        setIsPreparingData(false);
+      }
+      
       await exportToPDF({
-        data,
+        data: exportData,
         columns: columns || [],
         filename: `${filename}.pdf`,
         title: title || filename,
@@ -55,6 +70,7 @@ export function ExportButton({
         variant: "destructive",
       });
     } finally {
+      setIsPreparingData(false);
       setIsExporting(false);
     }
   };
@@ -62,8 +78,20 @@ export function ExportButton({
   const handleExportExcel = async () => {
     try {
       setIsExporting(true);
+      
+      let exportData = data;
+      if (prepareData) {
+        setIsPreparingData(true);
+        toast({
+          title: "Preparando dados...",
+          description: "Buscando informações completas para exportação.",
+        });
+        exportData = await prepareData();
+        setIsPreparingData(false);
+      }
+      
       await exportToExcel({
-        data,
+        data: exportData,
         columns: columns || [],
         filename: `${filename}.xlsx`,
         sheetName: pageName || filename,
@@ -80,6 +108,7 @@ export function ExportButton({
         variant: "destructive",
       });
     } finally {
+      setIsPreparingData(false);
       setIsExporting(false);
     }
   };
@@ -90,12 +119,12 @@ export function ExportButton({
         <Button
           variant="outline"
           size="sm"
-          disabled={disabled || isExporting || !data || data.length === 0}
+          disabled={disabled || isExporting || isPreparingData || !data || data.length === 0}
         >
-          {isExporting ? (
+          {isExporting || isPreparingData ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Exportando...
+              {isPreparingData ? "Preparando..." : "Exportando..."}
             </>
           ) : (
             <>

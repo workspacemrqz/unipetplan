@@ -250,6 +250,27 @@ export default function Contracts() {
     }
   };
 
+  const prepareExportData = async () => {
+    return filteredContracts.map(contract => ({
+      'Nº Contrato': contract.contractNumber || '',
+      'Cliente': contract.clientName || 'N/A',
+      'Email do Cliente': contract.clientEmail || 'N/A',
+      'Telefone do Cliente': contract.clientPhone || 'N/A',
+      'Pet': contract.petName || 'N/A',
+      'Espécie do Pet': contract.petSpecies || 'N/A',
+      'Plano': contract.planName || 'N/A',
+      'Status': statusLabels[contract.status] || contract.status,
+      'Período de Cobrança': billingPeriodLabels[contract.billingPeriod] || contract.billingPeriod,
+      'Valor Mensal': formatCurrency(contract.monthlyAmount),
+      'Valor Anual': contract.annualAmount ? formatCurrency(contract.annualAmount) : 'N/A',
+      'Método de Pagamento': paymentMethodLabels[contract.paymentMethod] || contract.paymentMethod,
+      'Coparticipação': contract.hasCoparticipation ? 'Sim' : 'Não',
+      'Data de Início': format(new Date(contract.startDate), "dd/MM/yyyy", { locale: ptBR }),
+      'Data de Término': contract.endDate ? format(new Date(contract.endDate), "dd/MM/yyyy", { locale: ptBR }) : 'N/A',
+      'Data de Criação': contract.createdAt ? format(new Date(contract.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
+    }));
+  };
+
   const handleEditContract = (contract: ContractWithDetails) => {
     setEditingContract(contract);
     setEditMonthlyAmount(contract.monthlyAmount);
@@ -396,22 +417,7 @@ export default function Contracts() {
             filename="contratos"
             title="Exportação de Contratos"
             pageName="Contratos"
-            columns={[
-              { key: 'contractNumber', label: 'Nº Contrato', formatter: (v) => v || '' },
-              { key: 'clientName', label: 'Cliente', formatter: (v) => v || 'N/A' },
-              { key: 'clientEmail', label: 'Email', formatter: (v) => v || 'N/A' },
-              { key: 'clientPhone', label: 'Telefone', formatter: (v) => v || 'N/A' },
-              { key: 'petName', label: 'Pet', formatter: (v) => v || 'N/A' },
-              { key: 'petSpecies', label: 'Espécie', formatter: (v) => v || 'N/A' },
-              { key: 'planName', label: 'Plano', formatter: (v) => v || 'N/A' },
-              { key: 'status', label: 'Status', formatter: (v) => statusLabels[v] || v },
-              { key: 'billingPeriod', label: 'Período', formatter: (v) => billingPeriodLabels[v] || v },
-              { key: 'monthlyAmount', label: 'Valor Mensal', formatter: (v) => formatCurrency(v) },
-              { key: 'paymentMethod', label: 'Método de Pagamento', formatter: (v) => paymentMethodLabels[v] || v },
-              { key: 'hasCoparticipation', label: 'Coparticipação', formatter: (v) => v ? 'Sim' : 'Não' },
-              { key: 'startDate', label: 'Data de Início', formatter: (v) => format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) },
-              { key: 'endDate', label: 'Data de Término', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : 'N/A' }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || filteredContracts.length === 0}
           />
           

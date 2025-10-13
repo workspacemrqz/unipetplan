@@ -286,6 +286,77 @@ export default function Clients() {
     }
   };
 
+  const prepareExportData = async () => {
+    const enrichedData = [];
+    
+    for (const client of filteredClients) {
+      try {
+        const response = await fetch(`/admin/api/clients/${client.id}/pets`);
+        const pets: Pet[] = response.ok ? await response.json() : [];
+        
+        const exportData: any = {
+          'Nome Completo': client.fullName || client.full_name || '',
+          'Email': client.email || 'Não informado',
+          'Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
+          'CPF': client.cpf || '',
+          'CEP': client.cep || 'Não informado',
+          'Endereço': client.address || 'Não informado',
+          'Cidade': client.city || 'Não informado',
+          'Estado': client.state || 'Não informado',
+          'Data de Cadastro': client.createdAt ? format(new Date(client.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+          'Última Atualização': client.updatedAt ? format(new Date(client.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+        };
+        
+        if (pets && pets.length > 0) {
+          pets.forEach((pet, index) => {
+            const petPrefix = `Pet ${index + 1}`;
+            exportData[`${petPrefix} - Nome`] = pet.name || '';
+            exportData[`${petPrefix} - Espécie`] = pet.species || '';
+            exportData[`${petPrefix} - Raça`] = pet.breed || 'Não informado';
+            exportData[`${petPrefix} - Idade`] = pet.age || 'Não informado';
+            exportData[`${petPrefix} - Sexo`] = pet.sex || 'Não informado';
+            exportData[`${petPrefix} - Cor`] = pet.color || 'Não informado';
+            exportData[`${petPrefix} - Peso (kg)`] = pet.weight ? String(pet.weight) : 'Não informado';
+            exportData[`${petPrefix} - Data de Nascimento`] = pet.birthDate ? format(new Date(pet.birthDate), "dd/MM/yyyy", { locale: ptBR }) : 'Não informado';
+            exportData[`${petPrefix} - Castrado`] = pet.castrated !== null ? (pet.castrated ? 'Sim' : 'Não') : 'Não informado';
+            exportData[`${petPrefix} - Microchip`] = pet.microchip || 'Não informado';
+            exportData[`${petPrefix} - Último Check-up`] = pet.lastCheckup ? format(new Date(pet.lastCheckup), "dd/MM/yyyy", { locale: ptBR }) : 'Não informado';
+            exportData[`${petPrefix} - Doenças Anteriores`] = pet.previousDiseases || 'Nenhuma';
+            exportData[`${petPrefix} - Cirurgias`] = pet.surgeries || 'Nenhuma';
+            exportData[`${petPrefix} - Alergias`] = pet.allergies || 'Nenhuma';
+            exportData[`${petPrefix} - Medicações Atuais`] = pet.currentMedications || 'Nenhuma';
+            exportData[`${petPrefix} - Condições Hereditárias`] = pet.hereditaryConditions || 'Nenhuma';
+            exportData[`${petPrefix} - Tratamentos Antiparasitários`] = pet.parasiteTreatments || 'Nenhum';
+            
+            if (pet.vaccineData && Array.isArray(pet.vaccineData) && pet.vaccineData.length > 0) {
+              const vaccines = pet.vaccineData.map((v: any) => 
+                `${v.vaccine}: ${format(new Date(v.date), "dd/MM/yyyy", { locale: ptBR })}`
+              ).join('; ');
+              exportData[`${petPrefix} - Vacinas`] = vaccines;
+            } else {
+              exportData[`${petPrefix} - Vacinas`] = 'Nenhuma vacina registrada';
+            }
+          });
+        } else {
+          exportData['Pets'] = 'Nenhum pet cadastrado';
+        }
+        
+        enrichedData.push(exportData);
+      } catch (error) {
+        console.error(`Erro ao buscar pets para cliente ${client.id}:`, error);
+        enrichedData.push({
+          'Nome Completo': client.fullName || client.full_name || '',
+          'Email': client.email || 'Não informado',
+          'Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
+          'CPF': client.cpf || '',
+          'Erro': 'Erro ao carregar dados completos'
+        });
+      }
+    }
+    
+    return enrichedData;
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -335,17 +406,7 @@ export default function Clients() {
             filename="clientes"
             title="Exportação de Clientes"
             pageName="Clientes"
-            columns={[
-              { key: 'fullName', label: 'Nome', formatter: (v) => v || '' },
-              { key: 'email', label: 'Email', formatter: (v) => v || 'Não informado' },
-              { key: 'phone', label: 'Telefone', formatter: (v) => formatBrazilianPhoneForDisplay(v || '') },
-              { key: 'cpf', label: 'CPF', formatter: (v) => v || '' },
-              { key: 'city', label: 'Cidade', formatter: (v) => v || 'Não informado' },
-              { key: 'state', label: 'Estado', formatter: (v) => v || 'Não informado' },
-              { key: 'cep', label: 'CEP', formatter: (v) => v || 'Não informado' },
-              { key: 'address', label: 'Endereço', formatter: (v) => v || 'Não informado' },
-              { key: 'createdAt', label: 'Data de Cadastro', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : '' }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || searchLoading || filteredClients.length === 0}
           />
           

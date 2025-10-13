@@ -287,6 +287,24 @@ export default function Atendimentos() {
     }
   };
 
+  const prepareExportData = async () => {
+    return atendimentosData.map(atendimento => ({
+      'Procedimentos': atendimento.procedures && atendimento.procedures.length > 0 
+        ? atendimento.procedures.map((p: any) => p.procedureName || p.name).join(', ') 
+        : 'Não informado',
+      'Unidade': atendimento.networkUnit?.name || 'Não informada',
+      'Cliente': atendimento.clientName || 'Não informado',
+      'Pet': atendimento.petName || 'Não informado',
+      'Valor': `R$ ${parseFloat(atendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      'Status': getStatusLabel(atendimento.status),
+      'Veterinário': atendimento.veterinarianName || 'Unidade',
+      'Notas do Procedimento': atendimento.procedureNotes || '',
+      'Notas Gerais': atendimento.generalNotes || '',
+      'Data de Criação': atendimento.createdAt ? format(new Date(atendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+      'Última Atualização': atendimento.updatedAt ? format(new Date(atendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
+    }));
+  };
+
   const getStatusColor = () => {
     return "border border-border rounded-lg bg-background text-foreground";
   };
@@ -380,18 +398,7 @@ export default function Atendimentos() {
             filename="atendimentos"
             title="Exportação de Atendimentos"
             pageName="Atendimentos"
-            columns={[
-              { key: 'procedures', label: 'Procedimentos', formatter: (v) => v && v.length > 0 ? v.map((p: any) => p.procedureName || p.name).join(', ') : 'Não informado' },
-              { key: 'networkUnit', label: 'Unidade', formatter: (v) => v?.name || 'Não informada' },
-              { key: 'clientName', label: 'Cliente', formatter: (v) => v || 'Não informado' },
-              { key: 'petName', label: 'Pet', formatter: (v) => v || 'Não informado' },
-              { key: 'value', label: 'Valor', formatter: (v) => `R$ ${parseFloat(v || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-              { key: 'status', label: 'Status', formatter: (v) => getStatusLabel(v) },
-              { key: 'veterinarianName', label: 'Veterinário', formatter: (v) => v || 'Unidade' },
-              { key: 'procedureNotes', label: 'Notas do Procedimento', formatter: (v) => v || '' },
-              { key: 'generalNotes', label: 'Notas Gerais', formatter: (v) => v || '' },
-              { key: 'createdAt', label: 'Data de Criação', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || atendimentosData.length === 0}
           />
 

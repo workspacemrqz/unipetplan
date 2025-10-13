@@ -159,6 +159,20 @@ export default function ContactSubmissions() {
     }
   };
 
+  const prepareExportData = async () => {
+    return allFilteredSubmissions.map(submission => ({
+      'Nome': submission.name || '',
+      'Email': submission.email || '',
+      'Telefone': formatBrazilianPhoneForDisplay(submission.phone),
+      'Nome do Pet': submission.petName || '',
+      'Tipo de Animal': submission.animalType || '',
+      'Idade do Pet': submission.petAge || '',
+      'Plano de Interesse': submission.planInterest || '',
+      'Mensagem': submission.message || '',
+      'Data de Envio': submission.createdAt ? format(new Date(submission.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
+    }));
+  };
+
   const handleWhatsApp = (submission: any) => {
     // Remove caracteres não numéricos do telefone
     const phoneNumber = submission.phone.replace(/\D/g, '');
@@ -215,18 +229,7 @@ export default function ContactSubmissions() {
             filename="formularios_contato"
             title="Exportação de Formulários de Contato"
             pageName="Formulários de Contato"
-            columns={[
-              { key: 'name', label: 'Nome', formatter: (v) => v || '' },
-              { key: 'email', label: 'Email', formatter: (v) => v || '' },
-              { key: 'phone', label: 'Telefone', formatter: (v) => formatBrazilianPhoneForDisplay(v || '') },
-              { key: 'city', label: 'Cidade', formatter: (v) => v || 'Não informado' },
-              { key: 'petName', label: 'Nome do Pet', formatter: (v) => v || '' },
-              { key: 'animalType', label: 'Tipo de Animal', formatter: (v) => v || '' },
-              { key: 'petAge', label: 'Idade do Pet', formatter: (v) => v || '' },
-              { key: 'planInterest', label: 'Plano de Interesse', formatter: (v) => v || '' },
-              { key: 'message', label: 'Mensagem', formatter: (v) => v || '' },
-              { key: 'createdAt', label: 'Data de Envio', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || allFilteredSubmissions.length === 0}
           />
           

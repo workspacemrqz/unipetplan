@@ -246,6 +246,22 @@ export default function Network() {
     }
   };
 
+  const prepareExportData = async () => {
+    return filteredUnits.map(unit => ({
+      'Nome': unit.name || '',
+      'Endereço': unit.address || '',
+      'Cidade': unit.cidade || '',
+      'Telefone': formatBrazilianPhoneForDisplay(unit.phone),
+      'WhatsApp': unit.whatsapp ? formatBrazilianPhoneForDisplay(unit.whatsapp) : 'N/A',
+      'Serviços Oferecidos': unit.services && Array.isArray(unit.services) ? unit.services.join(', ') : 'N/A',
+      'Google Maps URL': unit.googleMapsUrl || 'N/A',
+      'URL Slug': unit.urlSlug || '',
+      'Login': unit.login || '',
+      'Status': unit.isActive ? 'Ativo' : 'Inativo',
+      'Data de Criação': unit.createdAt ? format(new Date(unit.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
+    }));
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -290,16 +306,7 @@ export default function Network() {
             filename="rede_credenciada"
             title="Exportação de Rede Credenciada"
             pageName="Rede Credenciada"
-            columns={[
-              { key: 'name', label: 'Nome', formatter: (v) => v || '' },
-              { key: 'address', label: 'Endereço', formatter: (v) => v || 'Não informado' },
-              { key: 'phone', label: 'Telefone', formatter: (v) => formatBrazilianPhoneForDisplay(v || '') },
-              { key: 'whatsapp', label: 'WhatsApp', formatter: (v) => v ? formatBrazilianPhoneForDisplay(v) : 'Não informado' },
-              { key: 'cidade', label: 'Cidade', formatter: (v) => v || 'Não informado' },
-              { key: 'services', label: 'Serviços', formatter: (v) => Array.isArray(v) ? v.join(', ') : 'Não informado' },
-              { key: 'googleMapsUrl', label: 'Google Maps', formatter: (v) => v || 'Não informado' },
-              { key: 'isActive', label: 'Status', formatter: (v) => v ? 'Ativo' : 'Inativo' }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || filteredUnits.length === 0}
           />
           

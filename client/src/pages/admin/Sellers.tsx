@@ -249,6 +249,33 @@ export default function Sellers() {
     }
   };
 
+  const prepareExportData = async () => {
+    return filteredSellers.map(seller => ({
+      'Nome Completo': seller.fullName || '',
+      'CPF': cpfMask(seller.cpf),
+      'Email': seller.email || '',
+      'Telefone': phoneMask(seller.phone),
+      'CEP': cepMask(seller.cep),
+      'Endereço': `${seller.address}, ${seller.number}`,
+      'Complemento': seller.complement || '',
+      'Bairro': seller.district || '',
+      'Cidade': seller.city || '',
+      'Estado': seller.state || '',
+      'Chave PIX': seller.pixKey || '',
+      'Tipo de Chave PIX': seller.pixKeyType || '',
+      'Banco': seller.bank || '',
+      'Conta Corrente': seller.accountNumber || '',
+      'Agência': seller.agency || '',
+      'Nome Completo (Conta)': seller.fullNameForPayment || '',
+      'CPA (%)': seller.cpaPercentage || '',
+      'Comissão Recorrente (%)': seller.recurringCommissionPercentage || '',
+      'URL Whitelabel': seller.whitelabelUrl || 'N/A',
+      'Status': seller.isActive ? 'Ativo' : 'Inativo',
+      'Data de Cadastro': seller.createdAt ? format(new Date(seller.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+      'Última Atualização': seller.updatedAt ? format(new Date(seller.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
+    }));
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -288,22 +315,7 @@ export default function Sellers() {
             filename="vendedores"
             title="Exportação de Vendedores"
             pageName="Vendedores"
-            columns={[
-              { key: 'fullName', label: 'Nome Completo', formatter: (v) => v || '' },
-              { key: 'cpf', label: 'CPF', formatter: (v) => cpfMask(v || '') },
-              { key: 'email', label: 'Email', formatter: (v) => v || '' },
-              { key: 'phone', label: 'Telefone', formatter: (v) => phoneMask(v || '') },
-              { key: 'city', label: 'Cidade', formatter: (v) => v || '' },
-              { key: 'state', label: 'Estado', formatter: (v) => v || '' },
-              { key: 'cpaPercentage', label: 'Comissão CPA (%)', formatter: (v) => v ? `${v}%` : '0%' },
-              { key: 'recurringCommissionPercentage', label: 'Comissão Recorrente (%)', formatter: (v) => v ? `${v}%` : '0%' },
-              { key: 'pixKey', label: 'Chave PIX', formatter: (v) => v || '' },
-              { key: 'bank', label: 'Banco', formatter: (v) => v || '' },
-              { key: 'accountNumber', label: 'Conta', formatter: (v) => v || '' },
-              { key: 'agency', label: 'Agência', formatter: (v) => v || '' },
-              { key: 'isActive', label: 'Status', formatter: (v) => v ? 'Ativo' : 'Inativo' },
-              { key: 'createdAt', label: 'Data de Cadastro', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || filteredSellers.length === 0}
           />
           
