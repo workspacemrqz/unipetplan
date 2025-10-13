@@ -1,14 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import UnitLayout from '@/components/unit/UnitLayout';
-import { FileText, Users, Clipboard } from "lucide-react";
+import { FileText, Users, Clipboard, BarChart3, DollarSign } from "lucide-react";
 import LoadingDots from '@/components/ui/LoadingDots';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DashboardStats {
   totalGuides: number;
   totalClients: number;
   totalPets: number;
   totalProcedures: number;
+}
+
+interface ProceduresSoldData {
+  name: string;
+  count: number;
+}
+
+interface ValueByUserData {
+  name: string;
+  value: number;
+}
+
+interface TotalSalesData {
+  totalValue: number;
+  totalCount: number;
+  averageValue: number;
 }
 
 export default function UnitDashboard() {
@@ -21,10 +39,28 @@ export default function UnitDashboard() {
     totalPets: 0,
     totalProcedures: 0
   });
+  const [proceduresSold, setProceduresSold] = useState<ProceduresSoldData[]>([]);
+  const [valueByUser, setValueByUser] = useState<ValueByUserData[]>([]);
+  const [totalSales, setTotalSales] = useState<TotalSalesData>({
+    totalValue: 0,
+    totalCount: 0,
+    averageValue: 0
+  });
 
   useEffect(() => {
     checkAuthentication();
   }, [slug]);
+
+  // Auto-refresh dos gráficos a cada 30 segundos
+  useEffect(() => {
+    if (!loading) {
+      const interval = setInterval(() => {
+        fetchChartData();
+      }, 30000); // 30 segundos
+
+      return () => clearInterval(interval);
+    }
+  }, [loading, slug]);
 
   const checkAuthentication = async () => {
     const token = localStorage.getItem('unit-token');
@@ -72,6 +108,52 @@ export default function UnitDashboard() {
     }
     
     setStats(newStats);
+    
+    // Buscar dados dos gráficos
+    fetchChartData();
+  };
+
+  const fetchChartData = async () => {
+    const token = localStorage.getItem('unit-token');
+    
+    // Buscar procedimentos vendidos
+    try {
+      const response = await fetch(`/api/units/${slug}/charts/procedures-sold`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProceduresSold(data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar procedimentos vendidos:', error);
+    }
+    
+    // Buscar valor por usuário
+    try {
+      const response = await fetch(`/api/units/${slug}/charts/value-by-user`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setValueByUser(data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar valor por usuário:', error);
+    }
+    
+    // Buscar total de vendas
+    try {
+      const response = await fetch(`/api/units/${slug}/charts/total-sales`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTotalSales(data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar total de vendas:', error);
+    }
   };
 
   if (loading) {
@@ -150,6 +232,113 @@ export default function UnitDashboard() {
             <p className="text-xs text-gray-500 mt-3">Total de procedimentos disponíveis</p>
           </div>
         </div>
+
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Gráfico de Procedimentos Vendidos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" style={{ color: '#257273' }} />
+                Procedimentos Vendidos
+              </CardTitle>
+              <CardDescription>Quantidade por procedimento (Top 10)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {proceduresSold.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={proceduresSold}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="name" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      style={{ fontSize: '12px' }}
+                    />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#257273" name="Quantidade" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                  Sem dados disponíveis
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Gráfico de Valor por Usuário */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" style={{ color: '#257273' }} />
+                Valor por Usuário
+              </CardTitle>
+              <CardDescription>Total (R$) por criador dos atendimentos</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {valueByUser.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={valueByUser}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      label
+                    >
+                      {valueByUser.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#257273' : '#3a9b9d'} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => `R$ ${value.toFixed(2)}`} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                  Sem dados disponíveis
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Card de Total de Vendas */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" style={{ color: '#257273' }} />
+              Total de Vendas
+            </CardTitle>
+            <CardDescription>Resumo de recebimentos</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-600">Valor Total</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  R$ {totalSales.totalValue.toFixed(2)}
+                </p>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-600">Total de Atendimentos</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  {totalSales.totalCount}
+                </p>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-600">Valor Médio</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  R$ {totalSales.averageValue.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </UnitLayout>
   );

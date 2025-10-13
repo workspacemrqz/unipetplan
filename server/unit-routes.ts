@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { IStorage } from './storage.js';
 import { db } from './db.js';
-import { atendimentos, type InsertVeterinarian } from '../shared/schema.js';
+import { atendimentos, atendimentoProcedures, veterinarians, type InsertVeterinarian } from '../shared/schema.js';
 import { sql, eq, and } from 'drizzle-orm';
 
 interface UnitRequest extends Request {
@@ -1276,6 +1276,150 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     } catch (error) {
       console.error("❌ [UNIT] Error fetching action logs:", error);
       res.status(500).json({ error: "Erro ao buscar logs de ação" });
+    }
+  });
+
+  // Chart endpoint: Get procedures sold count (authenticated)
+  app.get("/api/units/:slug/charts/procedures-sold", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+
+      // Build conditions based on user type
+      const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
+      
+      // If it's a veterinarian, filter by their ID
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+        conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+      }
+
+      // Get all atendimentos for this unit
+      const unitAtendimentos = await db
+        .select({ id: atendimentos.id })
+        .from(atendimentos)
+        .where(and(...conditions));
+
+      const atendimentoIds = unitAtendimentos.map(a => a.id);
+
+      if (atendimentoIds.length === 0) {
+        return res.json([]);
+      }
+
+      // Get procedures count grouped by procedure name
+      const proceduresCount = await db
+        .select({
+          name: atendimentoProcedures.procedureName,
+          count: sql<number>`count(*)::int`
+        })
+        .from(atendimentoProcedures)
+        .where(sql`${atendimentoProcedures.atendimentoId} = ANY(${atendimentoIds})`)
+        .groupBy(atendimentoProcedures.procedureName)
+        .orderBy(sql`count(*) DESC`)
+        .limit(10);
+
+      console.log(`✅ [UNIT] Retrieved procedures sold chart data for unit ${unitId}`);
+      res.json(proceduresCount);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching procedures sold chart:", error);
+      res.status(500).json({ error: "Erro ao buscar dados do gráfico" });
+    }
+  });
+
+  // Chart endpoint: Get value by user who created atendimentos (authenticated)
+  app.get("/api/units/:slug/charts/value-by-user", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+
+      // Build conditions based on user type
+      const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
+      
+      // If it's a veterinarian, filter by their ID
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+        conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+      }
+
+      // Get value grouped by veterinarian
+      const valuesByVet = await db
+        .select({
+          veterinarianId: atendimentos.veterinarianId,
+          totalValue: sql<string>`COALESCE(SUM(CAST(${atendimentos.value} AS NUMERIC)), 0)`
+        })
+        .from(atendimentos)
+        .where(and(...conditions))
+        .groupBy(atendimentos.veterinarianId);
+
+      // Get veterinarian names
+      const vetIds = valuesByVet
+        .filter(v => v.veterinarianId)
+        .map(v => v.veterinarianId!);
+
+      const vetsData = vetIds.length > 0 
+        ? await db.select({ id: veterinarians.id, name: veterinarians.name })
+            .from(veterinarians)
+            .where(sql`${veterinarians.id} = ANY(${vetIds})`)
+        : [];
+
+      const vetMap = new Map(vetsData.map(v => [v.id, v.name]));
+
+      // Format response
+      const chartData = valuesByVet.map(v => ({
+        name: v.veterinarianId ? (vetMap.get(v.veterinarianId) || 'Veterinário Desconhecido') : 'Unidade',
+        value: parseFloat(v.totalValue || '0')
+      })).filter(d => d.value > 0);
+
+      console.log(`✅ [UNIT] Retrieved value by user chart data for unit ${unitId}`);
+      res.json(chartData);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching value by user chart:", error);
+      res.status(500).json({ error: "Erro ao buscar dados do gráfico" });
+    }
+  });
+
+  // Chart endpoint: Get total sales value (authenticated)
+  app.get("/api/units/:slug/charts/total-sales", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+
+      // Build conditions based on user type
+      const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
+      
+      // If it's a veterinarian, filter by their ID
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+        conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+      }
+
+      // Get total sales value from atendimentos
+      const totalSalesResult = await db
+        .select({
+          totalValue: sql<string>`COALESCE(SUM(CAST(${atendimentos.value} AS NUMERIC)), 0)`,
+          count: sql<number>`COUNT(*)::int`
+        })
+        .from(atendimentos)
+        .where(and(...conditions));
+
+      const totalValue = parseFloat(totalSalesResult[0]?.totalValue || '0');
+      const totalCount = totalSalesResult[0]?.count || 0;
+
+      console.log(`✅ [UNIT] Retrieved total sales chart data for unit ${unitId}`);
+      res.json({
+        totalValue,
+        totalCount,
+        averageValue: totalCount > 0 ? totalValue / totalCount : 0
+      });
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching total sales chart:", error);
+      res.status(500).json({ error: "Erro ao buscar dados do gráfico" });
     }
   });
 }
