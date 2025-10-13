@@ -406,10 +406,12 @@ async function logAdminAction(
   metadata: any = {}
 ) {
   try {
-    const adminUserId = req.session.admin?.userId || req.session.admin?.login || 'unknown';
+    const adminUserId = req.session.admin?.userId || null; // Only use userId if it exists
+    const adminIdentifier = req.session.admin?.login || req.session.admin?.email || req.session.admin?.userId || 'unknown';
     
     await storage.createAdminActionLog({
       adminUserId,
+      adminIdentifier,
       actionType,
       entityType,
       entityId,
@@ -418,7 +420,7 @@ async function logAdminAction(
       userAgent: req.headers['user-agent']
     });
     
-    console.log(`📝 [ADMIN-LOG] ${actionType} ${entityType} ${entityId} by ${adminUserId}`);
+    console.log(`📝 [ADMIN-LOG] ${actionType} ${entityType} ${entityId} by ${adminIdentifier}`);
   } catch (error) {
     // Log errors silently - we don't want logging failures to break operations
     console.error('❌ [ADMIN-LOG] Error creating admin log:', error);
@@ -3181,14 +3183,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/admin/api/logs", requireAdmin, async (req, res) => {
     try {
       // SECURITY: Use authenticated admin ID from session, never trust client-provided ID
-      const adminUserId = req.session.admin?.userId || req.session.admin?.login;
-      
-      if (!adminUserId) {
-        return res.status(401).json({ error: "Sessão de administrador inválida" });
-      }
+      const adminUserId = req.session.admin?.userId || null;
+      const adminIdentifier = req.session.admin?.login || req.session.admin?.email || req.session.admin?.userId || 'unknown';
       
       const logData = {
         adminUserId,
+        adminIdentifier,
         actionType: req.body.actionType,
         entityType: req.body.entityType,
         entityId: req.body.entityId,

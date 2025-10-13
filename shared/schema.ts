@@ -589,7 +589,8 @@ export const actionLogs = pgTable("action_logs", {
 // Admin action logs table for tracking administrative actions
 export const adminActionLogs = pgTable("admin_action_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  adminUserId: varchar("admin_user_id").notNull().references(() => users.id),
+  adminUserId: varchar("admin_user_id").references(() => users.id), // Nullable to support env-based admins
+  adminIdentifier: varchar("admin_identifier").notNull(), // Always stores login/email for tracking
   actionType: varchar("action_type").notNull(), // "created", "updated", "deleted", "viewed"
   entityType: varchar("entity_type").notNull(), // "client", "contract", "plan", "procedure"
   entityId: varchar("entity_id").notNull(),

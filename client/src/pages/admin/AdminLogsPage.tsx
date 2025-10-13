@@ -57,7 +57,8 @@ const getEntityTypeLabel = (entityType: string): string => {
 
 interface AdminActionLog {
   id: string;
-  adminUserId: string;
+  adminUserId: string | null;
+  adminIdentifier: string;
   actionType: string;
   entityType: string;
   entityId: string;
@@ -198,6 +199,7 @@ export default function AdminLogsPage() {
             return {
               id: log.id,
               adminUserId: log.adminUserId,
+              adminIdentifier: log.adminIdentifier,
               actionType: log.actionType,
               entityType: log.entityType,
               entityId: log.entityId,
@@ -587,7 +589,7 @@ export default function AdminLogsPage() {
                           {adminLog.createdAt ? format(new Date(adminLog.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "-"}
                         </TableCell>
                         <TableCell className="whitespace-nowrap bg-white">
-                          {adminLog.adminUserId || "N/A"}
+                          {adminLog.adminIdentifier || "N/A"}
                         </TableCell>
                         <TableCell className="whitespace-nowrap bg-white">
                           {getActionTypeLabel(adminLog.actionType)}
