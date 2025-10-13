@@ -6,7 +6,7 @@ Verifique se cada uma das implementações abaixo foi completamente realizada co
 
 3. Na página '/unidade/clinica-veterinaria-pet-center' foi criada a página 'Corpo Clínico' com botão de acesso no menu, permitindo cadastrar, editar e listar 'Veterinários' e 'Veterinários Volantes' conforme interface de '/admin/administracao'. Veterinários cadastrados possuem as funções necessárias para acessar e utilizar a funcionalidade de atendimentos na rota '/unidade/clinica-veterinaria-pet-center/atendimentos/novo'.
 
-4. Na página '/unidade/clinica-veterinaria-pet-center/atendimentos/novo', foi criada a página 'Logs' com botão de acesso no menu, exibindo o registro completo das ações realizadas por usuários nas páginas dessa rota, com data, tipo de ação, usuário responsável, nome do veterinário em caso de criação de usuários e identificação 'Admin' para o usuário principal. A listagem é completa e clara. O escopo está restrito à criação da página de logs e rastreamento das ações descritas.
+4. Na página '/unidade/clinica-veterinaria-pet-center/atendimentos/novo', foi criada a página 'Logs' com botão de acesso no menu, exibindo o registro completo das ações realizadas por usuários nas páginas dessa rota, com data, Ação, usuário responsável, nome do veterinário em caso de criação de usuários e identificação 'Admin' para o usuário principal. A listagem é completa e clara. O escopo está restrito à criação da página de logs e rastreamento das ações descritas.
 
 5. Na página '/admin/administracao', o popup 'Novo Usuário' foi totalmente alterado para seguir o mesmo estilo e cores do popup 'Novo Procedimento'.
 

@@ -531,7 +531,7 @@ export default function AdminLogsPage() {
                 {sourceFilter === "admin" ? (
                   <>
                     <TableHead className="w-[120px] bg-white">Admin</TableHead>
-                    <TableHead className="w-[120px] bg-white">Tipo de Ação</TableHead>
+                    <TableHead className="w-[120px] bg-white">Ação</TableHead>
                     <TableHead className="w-[150px] bg-white">Entidade</TableHead>
                     <TableHead className="bg-white">Detalhes</TableHead>
                   </>
@@ -539,7 +539,7 @@ export default function AdminLogsPage() {
                   <>
                     <TableHead className="w-[150px] bg-white">Unidade</TableHead>
                     <TableHead className="w-[120px] bg-white">Usuário</TableHead>
-                    <TableHead className="w-[150px] bg-white">Tipo de Ação</TableHead>
+                    <TableHead className="w-[150px] bg-white">Ação</TableHead>
                     <TableHead className="bg-white">Detalhes</TableHead>
                   </>
                 )}

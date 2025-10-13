@@ -341,7 +341,7 @@ export default function LogsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Data/Hora</TableHead>
-                  <TableHead>Tipo de Ação</TableHead>
+                  <TableHead>Ação</TableHead>
                   <TableHead>Usuário</TableHead>
                   <TableHead>Detalhes</TableHead>
                 </TableRow>
