@@ -47,6 +47,7 @@ interface AtendimentoWithNetworkUnit {
   petName?: string;
   procedureNotes?: string;
   generalNotes?: string;
+  veterinarianName?: string;
 }
 
 interface AtendimentosResponse {
