@@ -108,6 +108,24 @@ export default function CorpoClinicoPage() {
     setLoading(false);
   };
 
+  const logAction = async (actionType: string, actionData?: any) => {
+    const token = localStorage.getItem('unit-token');
+    if (!token || !slug) return;
+    
+    try {
+      await fetch(`/api/units/${slug}/logs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ actionType, actionData })
+      });
+    } catch (error) {
+      console.error('Erro ao registrar log:', error);
+    }
+  };
+
   const { data: veterinarians = [], isLoading: isLoadingVets } = useQuery<Veterinarian[]>({
     queryKey: [`/api/units/${slug}/veterinarios`],
     queryFn: async () => {
@@ -166,8 +184,26 @@ export default function CorpoClinicoPage() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result, data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/units/${slug}/veterinarios`] });
+      
+      if (editingVet) {
+        logAction('veterinarian_updated', {
+          veterinarianId: editingVet.id,
+          name: data.name,
+          type: data.type,
+          canAccessAtendimentos: data.canAccessAtendimentos,
+          isActive: data.isActive
+        });
+      } else {
+        logAction('veterinarian_created', {
+          veterinarianId: result.id,
+          name: data.name,
+          type: data.type,
+          canAccessAtendimentos: data.canAccessAtendimentos
+        });
+      }
+      
       toast({
         title: editingVet ? "Veterinário atualizado" : "Veterinário criado",
         description: editingVet ? "Veterinário foi atualizado com sucesso." : "Veterinário foi criado com sucesso.",
@@ -202,8 +238,16 @@ export default function CorpoClinicoPage() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      const deletedVet = veterinarians.find(v => v.id === id);
+      
       queryClient.invalidateQueries({ queryKey: [`/api/units/${slug}/veterinarios`] });
+      
+      logAction('veterinarian_deleted', {
+        veterinarianId: id,
+        name: deletedVet?.name || 'Desconhecido'
+      });
+      
       toast({
         title: "Veterinário removido",
         description: "Veterinário foi removido com sucesso.",
@@ -237,8 +281,18 @@ export default function CorpoClinicoPage() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (_, { id, isActive }) => {
+      const vet = veterinarians.find(v => v.id === id);
+      
       queryClient.invalidateQueries({ queryKey: [`/api/units/${slug}/veterinarios`] });
+      
+      logAction('veterinarian_status_changed', {
+        veterinarianId: id,
+        name: vet?.name || 'Desconhecido',
+        oldStatus: !isActive ? 'Ativo' : 'Inativo',
+        newStatus: isActive ? 'Ativo' : 'Inativo'
+      });
+      
       toast({
         title: "Status atualizado",
         description: "Status do veterinário foi atualizado.",
