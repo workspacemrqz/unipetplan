@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import UnitLayout from '@/components/unit/UnitLayout';
-import { FileText, Users, Clipboard, TrendingUp, DollarSign } from "lucide-react";
+import { FileText, Users, Clipboard } from "lucide-react";
 import LoadingDots from '@/components/ui/LoadingDots';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DashboardStats {
   totalGuides: number;
@@ -60,6 +60,7 @@ export default function UnitDashboard() {
 
       return () => clearInterval(interval);
     }
+    return undefined;
   }, [loading, slug]);
 
   const checkAuthentication = async () => {
@@ -180,69 +181,74 @@ export default function UnitDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Atendimentos</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalGuides}</p>
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Atendimentos</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalGuides}</p>
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground">Total de atendimentos gerados</p>
+                  </div>
+                </div>
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
               </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <FileText className="h-6 w-6" style={{ color: '#257273' }} />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">Total de atendimentos gerados</p>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Clientes</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalClients}</p>
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Clientes</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalClients}</p>
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground">Clientes únicos atendidos</p>
+                  </div>
+                </div>
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
               </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <Users className="h-6 w-6" style={{ color: '#257273' }} />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">Clientes únicos atendidos</p>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Pets</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalPets}</p>
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Pets</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalPets}</p>
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground">Pets únicos atendidos</p>
+                  </div>
+                </div>
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
               </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <Users className="h-6 w-6" style={{ color: '#257273' }} />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">Pets únicos atendidos</p>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Procedimentos</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalProcedures}</p>
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Procedimentos</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalProcedures}</p>
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground">Total de procedimentos disponíveis</p>
+                  </div>
+                </div>
+                <Clipboard className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
               </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: '#e8f4f4' }}>
-                <Clipboard className="h-6 w-6" style={{ color: '#257273' }} />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">Total de procedimentos disponíveis</p>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Gráficos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           {/* Gráfico de Procedimentos Vendidos */}
-          <Card>
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" style={{ color: '#257273' }} />
-                Procedimentos Vendidos
-              </CardTitle>
-              <CardDescription>Quantidade por procedimento (Top 10)</CardDescription>
+              <CardTitle className="text-foreground min-w-0">Procedimentos Vendidos</CardTitle>
+              <p className="text-sm text-muted-foreground">Quantidade por procedimento (Top 10)</p>
             </CardHeader>
             <CardContent>
               {proceduresSold.length > 0 ? (
@@ -270,20 +276,17 @@ export default function UnitDashboard() {
           </Card>
 
           {/* Gráfico de Valor por Usuário */}
-          <Card>
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" style={{ color: '#257273' }} />
-                Valor por Usuário
-              </CardTitle>
-              <CardDescription>Total (R$) por criador dos atendimentos</CardDescription>
+              <CardTitle className="text-foreground min-w-0">Valor por Usuário</CardTitle>
+              <p className="text-sm text-muted-foreground">Total (R$) por criador dos atendimentos</p>
             </CardHeader>
             <CardContent>
               {valueByUser.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={valueByUser}
+                      data={valueByUser as any}
                       dataKey="value"
                       nameKey="name"
                       cx="50%"
@@ -308,13 +311,10 @@ export default function UnitDashboard() {
         </div>
 
         {/* Card de Total de Vendas */}
-        <Card className="mt-6">
+        <Card className="mt-6" style={{ backgroundColor: '#FFFFFF' }}>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" style={{ color: '#257273' }} />
-              Total de Vendas
-            </CardTitle>
-            <CardDescription>Resumo de recebimentos</CardDescription>
+            <CardTitle className="text-foreground min-w-0">Total de Vendas</CardTitle>
+            <p className="text-sm text-muted-foreground">Resumo de recebimentos</p>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
