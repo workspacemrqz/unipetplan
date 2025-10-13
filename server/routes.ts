@@ -1165,6 +1165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const newClient = await storage.createClient(dbClientData);
+      await logAdminAction(req, 'created', 'client', newClient.id, { name: clientData.full_name, email: clientData.email });
       res.status(201).json(newClient);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1203,6 +1204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Client updated:", req.params.id);
+      await logAdminAction(req, 'updated', 'client', req.params.id, dbClientData);
       res.json(updatedClient);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating client:", error);
@@ -1226,6 +1228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Client deleted:", req.params.id);
+      await logAdminAction(req, 'deleted', 'client', req.params.id, {});
       res.status(200).json({ success: true });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting client:", error);
@@ -1291,6 +1294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newSeller = await storage.createSeller(dbSellerData);
       console.log("✅ [ADMIN] Seller created:", newSeller.id);
+      await logAdminAction(req, 'created', 'seller', newSeller.id, { name: sellerData.fullName });
       res.status(201).json(newSeller);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating seller:", error);
@@ -1332,6 +1336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Seller updated:", req.params.id);
+      await logAdminAction(req, 'updated', 'seller', req.params.id, dbSellerData);
       res.json(updatedSeller);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating seller:", error);
@@ -1355,6 +1360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Seller deleted:", req.params.id);
+      await logAdminAction(req, 'deleted', 'seller', req.params.id, {});
       res.status(200).json({ success: true });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting seller:", error);
@@ -1413,6 +1419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       console.log("✅ [ADMIN] Seller payment created:", payment.id);
+      await logAdminAction(req, 'created', 'seller_payment', payment.id, { sellerId: paymentData.sellerId, amount: paymentData.amount });
       res.json(payment);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating seller payment:", error);
@@ -3248,6 +3255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // SECURITY: Use Zod schema validation to prevent mass assignment attacks
       const validatedCouponData = insertCouponSchema.parse(req.body);
       const coupon = await storage.createCoupon(validatedCouponData);
+      await logAdminAction(req, 'created', 'coupon', coupon.id, { code: validatedCouponData.code, discountType: validatedCouponData.discountType });
       res.status(201).json(coupon);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating coupon:", error);
@@ -3264,6 +3272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedCoupon) {
         return res.status(404).json({ error: "Cupom não encontrado" });
       }
+      await logAdminAction(req, 'updated', 'coupon', req.params.id, validatedCouponData);
       res.json(updatedCoupon);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating coupon:", error);
@@ -3278,6 +3287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!deleted) {
         return res.status(404).json({ error: "Cupom não encontrado" });
       }
+      await logAdminAction(req, 'deleted', 'coupon', req.params.id, {});
       res.json({ success: true, message: "Cupom removido com sucesso" });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting coupon:", error);
