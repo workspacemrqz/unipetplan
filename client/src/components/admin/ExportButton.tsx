@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Download, FileSpreadsheet, FileText, Loader2 } from "lucide-react";
+import { Download, File, FileText, Loader2 } from "lucide-react";
 import { exportToPDF, exportToExcel } from "@/lib/export-utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -118,7 +118,7 @@ export function ExportButton({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
+          className="h-12"
           disabled={disabled || isExporting || isPreparingData || !data || data.length === 0}
           style={{
             borderColor: 'var(--border-gray)',
@@ -138,13 +138,13 @@ export function ExportButton({
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="rounded-lg shadow-lg shadow-primary/10">
         <DropdownMenuItem onClick={handleExportPDF}>
           <FileText className="h-4 w-4 mr-2" />
           Exportar como PDF
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleExportExcel}>
-          <FileSpreadsheet className="h-4 w-4 mr-2" />
+          <File className="h-4 w-4 mr-2" />
           Exportar como Excel
         </DropdownMenuItem>
       </DropdownMenuContent>
