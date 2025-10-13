@@ -2857,6 +2857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📝 [ADMIN] aboutImageUrl field:", req.body.aboutImageUrl);
       const updatedSettings = await storage.updateSiteSettings(req.body);
       console.log("✅ [ADMIN] Site settings updated successfully, aboutImageUrl:", updatedSettings?.aboutImageUrl);
+      await logAdminAction(req, 'updated', 'site_settings', 'general', req.body);
       res.json(updatedSettings);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating site settings:", error);
@@ -2882,6 +2883,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/admin/api/settings/rules", requireAdmin, async (req, res) => {
     try {
       const updatedSettings = await storage.updateRulesSettings(req.body);
+      await logAdminAction(req, 'updated', 'site_settings', 'rules', req.body);
       res.json(updatedSettings);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating rules settings:", error);
@@ -2910,6 +2912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📝 [ADMIN] Received chat settings update:", req.body);
       const updatedSettings = await storage.updateChatSettings(req.body);
       console.log("✅ [ADMIN] Chat settings updated successfully");
+      await logAdminAction(req, 'updated', 'site_settings', 'chat', req.body);
       res.json(updatedSettings);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating chat settings:", error);
@@ -3110,6 +3113,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword
       });
       
+      await logAdminAction(req, 'created', 'admin_user', newUser.id, { username: validatedData.username, email: validatedData.email });
+      
       // Remove password from response
       const { password, ...userResponse } = newUser;
       res.status(201).json(userResponse);
@@ -3136,8 +3141,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
       
+      // Prepare update data without password for logging
+      const { password, ...updateData } = validatedData;
+      await logAdminAction(req, 'updated', 'admin_user', id, updateData);
+      
       // Remove password from response
-      const { password, ...userResponse } = updatedUser;
+      const { password: _, ...userResponse } = updatedUser;
       res.json(userResponse);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating user:", error);
@@ -3158,6 +3167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!deleted) {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
+      await logAdminAction(req, 'deleted', 'admin_user', id, {});
       res.json({ success: true, message: "Usuário removido com sucesso" });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting user:", error);
