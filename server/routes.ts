@@ -3276,7 +3276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // SECURITY: Use Zod schema validation to prevent mass assignment attacks
       const validatedCouponData = insertCouponSchema.parse(req.body);
       const coupon = await storage.createCoupon(validatedCouponData);
-      await logAdminAction(req, 'created', 'coupon', coupon.id, { code: validatedCouponData.code, discountType: validatedCouponData.discountType });
+      await logAdminAction(req, 'created', 'coupon', coupon.id, { code: validatedCouponData.code, type: validatedCouponData.type });
       res.status(201).json(coupon);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating coupon:", error);
