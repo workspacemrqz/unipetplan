@@ -1855,11 +1855,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update contract
-      await storage.updateContract(id, {
+      const updateData = {
         monthlyAmount: amount.toString(),
         status,
-      });
+      };
+      await storage.updateContract(id, updateData);
 
+      await logAdminAction(req, 'updated', 'contract', id, updateData);
       res.json({ 
         success: true,
         message: "Contrato atualizado com sucesso" 
@@ -1979,6 +1981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } as any; // Type assertion para permitir campos opcionais
       
       const newPet = await storage.createPet(processedPetData);
+      await logAdminAction(req, 'created', 'pet', newPet.id, { name: processedPetData.name, species: processedPetData.species });
       res.status(201).json(newPet);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating pet:", error);
@@ -2007,6 +2010,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Pet não encontrado" });
       }
       
+      await logAdminAction(req, 'updated', 'pet', req.params.id, processedPetData);
       console.log("✅ [ADMIN] Pet updated:", req.params.id);
       res.json(updatedPet);
     } catch (error) {
@@ -2024,6 +2028,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Pet não encontrado" });
       }
       
+      await logAdminAction(req, 'deleted', 'pet', req.params.id, {});
       console.log("✅ [ADMIN] Pet deleted:", req.params.id);
       res.status(200).json({ success: true });
     } catch (error) {
@@ -2065,6 +2070,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: validatedData.isActive
       };
       const newItem = await storage.createFaqItem(faqData);
+      await logAdminAction(req, 'created', 'faq', newItem.id, { question: faqData.question });
       console.log("✅ [ADMIN] FAQ item created:", newItem.id);
       res.json(newItem);
     } catch (error) {
@@ -2087,6 +2093,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedItem) {
         return res.status(404).json({ error: "Item do FAQ não encontrado" });
       }
+      await logAdminAction(req, 'updated', 'faq', req.params.id, updateData);
       console.log("✅ [ADMIN] FAQ item updated:", req.params.id);
       res.json(updatedItem);
     } catch (error) {
@@ -2101,6 +2108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!success) {
         return res.status(404).json({ error: "Item do FAQ não encontrado" });
       }
+      await logAdminAction(req, 'deleted', 'faq', req.params.id, {});
       console.log("✅ [ADMIN] FAQ item deleted:", req.params.id);
       res.json({ success: true });
     } catch (error) {
@@ -2398,6 +2406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      await logAdminAction(req, 'created', 'atendimento', newAtendimento.id, { clientId: atendimentoData.clientId, networkUnitId: atendimentoData.networkUnitId });
       console.log(`✅ [ADMIN] Atendimento created:`, newAtendimento.id);
       res.status(201).json(newAtendimento);
     } catch (error: any) {
@@ -2426,6 +2435,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
+      await logAdminAction(req, 'updated', 'atendimento', req.params.id, processedAtendimentoData);
       console.log(`✅ [ADMIN] Atendimento updated:`, updatedAtendimento.id);
       res.json(updatedAtendimento);
     } catch (error: any) {
@@ -2446,6 +2456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
+      await logAdminAction(req, 'deleted', 'atendimento', req.params.id, {});
       console.log(`✅ [ADMIN] Atendimento deleted:`, req.params.id);
       res.json({ success: true });
     } catch (error) {
