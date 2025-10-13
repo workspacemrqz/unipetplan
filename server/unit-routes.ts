@@ -1345,13 +1345,14 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
       }
 
-      // Get value grouped by veterinarian
+      // Get value grouped by veterinarian from atendimento_procedures
       const valuesByVet = await db
         .select({
           veterinarianId: atendimentos.veterinarianId,
-          totalValue: sql<string>`COALESCE(SUM(CAST(${atendimentos.value} AS NUMERIC)), 0)`
+          totalValue: sql<string>`COALESCE(SUM(CAST(${atendimentoProcedures.value} AS NUMERIC)), 0)`
         })
         .from(atendimentos)
+        .leftJoin(atendimentoProcedures, eq(atendimentos.id, atendimentoProcedures.atendimentoId))
         .where(and(...conditions))
         .groupBy(atendimentos.veterinarianId);
 
@@ -1399,13 +1400,14 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
       }
 
-      // Get total sales value from atendimentos
+      // Get total sales value from atendimento_procedures
       const totalSalesResult = await db
         .select({
-          totalValue: sql<string>`COALESCE(SUM(CAST(${atendimentos.value} AS NUMERIC)), 0)`,
-          count: sql<number>`COUNT(*)::int`
+          totalValue: sql<string>`COALESCE(SUM(CAST(${atendimentoProcedures.value} AS NUMERIC)), 0)`,
+          count: sql<number>`COUNT(DISTINCT ${atendimentos.id})::int`
         })
         .from(atendimentos)
+        .leftJoin(atendimentoProcedures, eq(atendimentos.id, atendimentoProcedures.atendimentoId))
         .where(and(...conditions));
 
       const totalValue = parseFloat(totalSalesResult[0]?.totalValue || '0');

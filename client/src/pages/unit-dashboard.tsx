@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import UnitLayout from '@/components/unit/UnitLayout';
-import { FileText, Users, Clipboard, BarChart3, DollarSign } from "lucide-react";
+import { FileText, Users, Clipboard, TrendingUp, DollarSign } from "lucide-react";
 import LoadingDots from '@/components/ui/LoadingDots';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -239,7 +239,7 @@ export default function UnitDashboard() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" style={{ color: '#257273' }} />
+                <TrendingUp className="h-5 w-5" style={{ color: '#257273' }} />
                 Procedimentos Vendidos
               </CardTitle>
               <CardDescription>Quantidade por procedimento (Top 10)</CardDescription>
