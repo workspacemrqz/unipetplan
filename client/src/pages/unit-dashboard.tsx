@@ -124,7 +124,10 @@ export default function UnitDashboard() {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('📊 Procedimentos vendidos recebidos:', data);
         setProceduresSold(data);
+      } else {
+        console.error('Erro na resposta de procedimentos:', response.status);
       }
     } catch (error) {
       console.error('Erro ao buscar procedimentos vendidos:', error);
@@ -137,7 +140,10 @@ export default function UnitDashboard() {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('💰 Valor por usuário recebido:', data);
         setValueByUser(data);
+      } else {
+        console.error('Erro na resposta de valor por usuário:', response.status);
       }
     } catch (error) {
       console.error('Erro ao buscar valor por usuário:', error);
@@ -150,7 +156,10 @@ export default function UnitDashboard() {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('💵 Total de vendas recebido:', data);
         setTotalSales(data);
+      } else {
+        console.error('Erro na resposta de total de vendas:', response.status);
       }
     } catch (error) {
       console.error('Erro ao buscar total de vendas:', error);
@@ -251,16 +260,17 @@ export default function UnitDashboard() {
               <p className="text-sm text-muted-foreground">Quantidade por procedimento (Top 10)</p>
             </CardHeader>
             <CardContent>
-              {proceduresSold.length > 0 ? (
+              {proceduresSold && proceduresSold.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={proceduresSold}>
+                  <BarChart data={proceduresSold} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
                       dataKey="name" 
                       angle={-45}
                       textAnchor="end"
                       height={100}
-                      style={{ fontSize: '12px' }}
+                      interval={0}
+                      tick={{ fontSize: 10 }}
                     />
                     <YAxis />
                     <Tooltip />
@@ -269,7 +279,7 @@ export default function UnitDashboard() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-gray-500">
-                  Sem dados disponíveis
+                  <p>Carregando gráfico...</p>
                 </div>
               )}
             </CardContent>
@@ -282,7 +292,7 @@ export default function UnitDashboard() {
               <p className="text-sm text-muted-foreground">Total (R$) por criador dos atendimentos</p>
             </CardHeader>
             <CardContent>
-              {valueByUser.length > 0 ? (
+              {valueByUser && valueByUser.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
@@ -292,7 +302,7 @@ export default function UnitDashboard() {
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
-                      label
+                      label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
                     >
                       {valueByUser.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#257273' : '#3a9b9d'} />
@@ -303,7 +313,7 @@ export default function UnitDashboard() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-gray-500">
-                  Sem dados disponíveis
+                  <p>Carregando gráfico...</p>
                 </div>
               )}
             </CardContent>
