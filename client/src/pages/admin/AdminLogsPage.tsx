@@ -533,7 +533,6 @@ export default function AdminLogsPage() {
                     <TableHead className="w-[120px] bg-white">Admin</TableHead>
                     <TableHead className="w-[120px] bg-white">Tipo de Ação</TableHead>
                     <TableHead className="w-[150px] bg-white">Entidade</TableHead>
-                    <TableHead className="w-[120px] bg-white">ID Entidade</TableHead>
                     <TableHead className="bg-white">Detalhes</TableHead>
                   </>
                 ) : (
@@ -550,7 +549,7 @@ export default function AdminLogsPage() {
               {isLoading ? (
                 [...Array(5)].map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell colSpan={sourceFilter === "admin" ? 6 : 5} className="text-center py-6">
+                    <TableCell colSpan={sourceFilter === "admin" ? 5 : 5} className="text-center py-6">
                       <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
                     </TableCell>
                   </TableRow>
@@ -597,9 +596,6 @@ export default function AdminLogsPage() {
                         <TableCell className="whitespace-nowrap bg-white">
                           {getEntityTypeLabel(adminLog.entityType)}
                         </TableCell>
-                        <TableCell className="whitespace-nowrap bg-white font-mono text-xs">
-                          {adminLog.entityId ? `${adminLog.entityId.substring(0, 8)}...` : "-"}
-                        </TableCell>
                         <TableCell className="bg-white">
                           <div className="text-sm truncate max-w-md">
                             {formatAdminLogDetails(adminLog.actionType, adminLog.entityType, adminLog.metadata)}
@@ -611,7 +607,7 @@ export default function AdminLogsPage() {
                 })
               ) : (
                 <TableRow className="bg-white border-b border-[#eaeaea]">
-                  <TableCell colSpan={sourceFilter === "admin" ? 6 : 5} className="text-center py-12 bg-white">
+                  <TableCell colSpan={sourceFilter === "admin" ? 5 : 5} className="text-center py-12 bg-white">
                     <File className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">
                       Nenhum log encontrado para os filtros selecionados.
