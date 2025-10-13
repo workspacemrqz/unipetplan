@@ -84,6 +84,7 @@ import AdminSellers from './pages/admin/Sellers';
 import AdminSellerForm from './pages/admin/SellerForm';
 import AdminSellerPayments from './pages/admin/SellerPayments';
 import AdminRelatorioFinanceiro from './pages/admin/RelatorioFinanceiro';
+import AdminDocumentation from './pages/admin/Documentation';
 import AdminNotFound from './pages/admin/not-found';
 import { AuthProvider } from './contexts/AuthContext';
 import { SellerAuthProvider } from './contexts/SellerAuthContext';
@@ -150,6 +151,7 @@ function AdminRouter() {
             <Route path="/formularios" component={AdminContactSubmissions} />
             <Route path="/avaliacoes" component={AdminEvaluations} />
             <Route path="/configuracoes" component={AdminSettings} />
+            <Route path="/documentacao" component={AdminDocumentation} />
             <Route path="/administracao" component={AdminAdministration} />
             <Route path="/logs" component={AdminLogsPage} />
             

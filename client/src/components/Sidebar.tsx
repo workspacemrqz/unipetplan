@@ -15,7 +15,8 @@ import {
   FileText,
   Heart,
   CreditCard,
-  File
+  File,
+  Book
 } from "lucide-react";
 
 const navigation = [
@@ -55,7 +56,8 @@ const navigation = [
       { name: "Procedimentos", href: "/procedimentos", icon: Clipboard },
       { name: "FAQ", href: "/perguntas-frequentes", icon: HelpCircle },
       { name: "Administração", href: "/administracao", icon: User },
-      { name: "Configurações", href: "/configuracoes", icon: Settings }
+      { name: "Configurações", href: "/configuracoes", icon: Settings },
+      { name: "Documentação", href: "/documentacao", icon: Book }
     ]
   }
 ];
