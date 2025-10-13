@@ -118,7 +118,7 @@ export function ExportButton({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="h-12"
+          size="sm"
           disabled={disabled || isExporting || isPreparingData || !data || data.length === 0}
           style={{
             borderColor: 'var(--border-gray)',
