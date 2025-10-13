@@ -26,6 +26,7 @@ import { getQueryOptions } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMasks } from "@/hooks/admin/use-masks";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 interface Seller {
   id: string;
@@ -77,6 +78,7 @@ export default function Sellers() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { applyCPFMask: cpfMask, applyPhoneMask: phoneMask, applyCEPMask: cepMask } = useMasks();
+  const { logAction } = useAdminLogger();
 
   const { data: sellers = [], isLoading } = useQuery<Seller[]>({
     queryKey: ["/admin/api/sellers"],
@@ -112,11 +114,23 @@ export default function Sellers() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/sellers"] });
       toast({
         title: "Status atualizado",
         description: "Status do vendedor foi atualizado.",
+      });
+      
+      const seller = sellers.find(s => s.id === variables.id);
+      await logAction({
+        actionType: "updated",
+        entityType: "seller",
+        entityId: variables.id,
+        metadata: { 
+          name: seller?.fullName || "Unknown",
+          email: seller?.email || "Unknown",
+          newStatus: variables.isActive ? "Ativo" : "Inativo"
+        }
       });
     },
     onError: () => {
@@ -128,9 +142,19 @@ export default function Sellers() {
     },
   });
 
-  const handleViewDetails = (seller: Seller) => {
+  const handleViewDetails = async (seller: Seller) => {
     setSelectedSeller(seller);
     setDetailsOpen(true);
+    
+    await logAction({
+      actionType: "viewed",
+      entityType: "seller",
+      entityId: seller.id,
+      metadata: { 
+        name: seller.fullName, 
+        email: seller.email 
+      }
+    });
   };
 
   const handleToggleStatus = (id: string, newStatus: boolean) => {

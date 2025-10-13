@@ -47,6 +47,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/admin/queryClient";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 interface Coupon {
   id: string;
@@ -74,6 +75,7 @@ const allColumns = [
 export default function Coupons() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logAction } = useAdminLogger();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -110,7 +112,19 @@ export default function Coupons() {
       if (!res.ok) throw new Error('Erro ao criar cupom');
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: async (coupon) => {
+      if (coupon?.id) {
+        try {
+          await logAction({
+            actionType: 'created',
+            entityType: 'coupon',
+            entityId: coupon.id,
+            metadata: { code: coupon.code, type: coupon.type, value: coupon.value }
+          });
+        } catch (error) {
+          console.error("Failed to log action:", error);
+        }
+      }
       queryClient.invalidateQueries({ queryKey: ['/admin/api/coupons'] });
       toast({ title: 'Cupom criado com sucesso!' });
       handleCloseDialog();
@@ -131,7 +145,19 @@ export default function Coupons() {
       if (!res.ok) throw new Error('Erro ao atualizar cupom');
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: async (coupon) => {
+      if (coupon?.id) {
+        try {
+          await logAction({
+            actionType: 'updated',
+            entityType: 'coupon',
+            entityId: coupon.id,
+            metadata: { code: coupon.code, type: coupon.type, value: coupon.value, isActive: coupon.isActive }
+          });
+        } catch (error) {
+          console.error("Failed to log action:", error);
+        }
+      }
       queryClient.invalidateQueries({ queryKey: ['/admin/api/coupons'] });
       toast({ title: 'Cupom atualizado com sucesso!' });
       handleCloseDialog();
@@ -150,7 +176,19 @@ export default function Coupons() {
       if (!res.ok) throw new Error('Erro ao excluir cupom');
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: async (_, deletedId) => {
+      if (deletedId) {
+        try {
+          await logAction({
+            actionType: 'deleted',
+            entityType: 'coupon',
+            entityId: deletedId,
+            metadata: {}
+          });
+        } catch (error) {
+          console.error("Failed to log action:", error);
+        }
+      }
       queryClient.invalidateQueries({ queryKey: ['/admin/api/coupons'] });
       toast({ title: 'Cupom excluído com sucesso!' });
     },

@@ -24,6 +24,7 @@ import { apiRequest, getQueryOptions } from "@/lib/admin/queryClient";
 import { createSmartInvalidation } from "@/lib/admin/cacheUtils";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import type { Plan } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
@@ -44,6 +45,7 @@ export default function Plans() {
   const queryClient = useQueryClient();
   const smartCache = createSmartInvalidation(queryClient);
   const { toast } = useToast();
+  const { logAction } = useAdminLogger();
 
   const { data: plans, isLoading } = useQuery<Plan[]>({
     queryKey: ["/admin/api/plans"],
@@ -63,12 +65,27 @@ export default function Plans() {
       
       return { previousPlans };
     },
-    onSuccess: (_, { id }) => {
+    onSuccess: async (_, { id, isActive }) => {
       smartCache.invalidatePlanData(id);
       toast({
         title: "Status atualizado",
         description: "Status do plano foi atualizado.",
       });
+
+      // Log the update action
+      const plan = Array.isArray(plans) ? plans.find((p: Plan) => p.id === id) : null;
+      if (plan) {
+        await logAction({
+          actionType: "updated",
+          entityType: "plan",
+          entityId: id,
+          metadata: { 
+            name: plan.name,
+            isActive,
+            basePrice: plan.basePrice
+          }
+        });
+      }
     },
     onError: (_, __, context) => {
       // Restore previous data on error

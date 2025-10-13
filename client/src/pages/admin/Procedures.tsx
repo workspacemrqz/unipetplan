@@ -39,6 +39,7 @@ import { Plus, Search, Edit, Trash2, Clipboard, Eye, X, MoreHorizontal, ChevronL
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { z } from "zod";
 
 // Definir tipos locais
@@ -134,8 +135,10 @@ export default function Procedures() {
   const [planErrors, setPlanErrors] = useState<{[key: number]: string}>({});
   const [manuallyEditedFields, setManuallyEditedFields] = useState<{[key: number]: {[field: string]: boolean}}>({});
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
+  const [procedureToDelete, setProcedureToDelete] = useState<Procedure | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { logAction } = useAdminLogger();
 
   const { data: procedures, isLoading } = useQuery<Procedure[]>({
     queryKey: ["/admin/api/procedures"],
@@ -397,7 +400,7 @@ export default function Procedures() {
     // Clear error when limitesAnuais field becomes valid
     if (field === 'limitesAnuais' && value && planErrors[index]) {
       const numericMatch = value.match(/(\d+)/);
-      const numericValue = numericMatch ? parseInt(numericMatch[1], 10) : 0;
+      const numericValue = numericMatch && numericMatch[1] ? parseInt(numericMatch[1], 10) : 0;
       if (numericValue >= 1) {
         const newErrors = { ...planErrors };
         delete newErrors[index];
@@ -423,7 +426,7 @@ export default function Procedures() {
     } else {
       // Quando habilitar a coparticipação, calcular automaticamente baseado no valor integral
       if (field === 'enableCoparticipacao') {
-        const receberValue = updated[index].receber;
+        const receberValue = updated[index]?.receber;
         if (receberValue && receberValue.trim() !== '' && receberValue !== '0,00') {
           const calculatedCoparticipation = calculateCoparticipationValue(receberValue);
           (updated[index] as any)['coparticipacao'] = calculatedCoparticipation;
@@ -590,14 +593,29 @@ export default function Procedures() {
       // Isso substitui DELETE + POST em uma única transação
       await apiRequest("PUT", `/admin/api/procedures/${procedureId}/plans`, { procedurePlans });
 
-      return procedureResponse;
+      return { procedureResponse, formData: data, isEdit: !!editingItem };
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
+      const { procedureResponse, formData, isEdit } = result;
+      const procedureId = isEdit ? editingItem!.id : procedureResponse.id;
+      
       queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] });
       queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures", editingItem?.id, "plans"] });
       // Invalidar cache dos planos também para atualizar a página de edição de planos
       queryClient.invalidateQueries({ queryKey: ["/admin/api/plans"] });
       queryClient.invalidateQueries({ queryKey: ["/admin/api/plans", "active"] });
+      
+      await logAction({
+        actionType: isEdit ? "updated" : "created",
+        entityType: "procedure",
+        entityId: procedureId,
+        metadata: { 
+          name: formData.name,
+          category: formData.category || null,
+          description: formData.description || null
+        }
+      });
+      
       toast({
         title: editingItem ? "Procedimento atualizado" : "Procedimento criado",
         description: editingItem ? "Procedimento foi atualizado com sucesso." : "Procedimento foi criado com sucesso.",
@@ -618,12 +636,27 @@ export default function Procedures() {
     mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/admin/api/procedures/${id}`);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] });
+      
+      if (procedureToDelete) {
+        await logAction({
+          actionType: "deleted",
+          entityType: "procedure",
+          entityId: procedureToDelete.id,
+          metadata: { 
+            name: procedureToDelete.name,
+            category: procedureToDelete.category || null
+          }
+        });
+      }
+      
       toast({
         title: "Procedimento removido",
         description: "Procedimento foi removido com sucesso.",
       });
+      
+      setProcedureToDelete(null);
     },
     onError: () => {
       toast({
@@ -631,6 +664,7 @@ export default function Procedures() {
         description: "Falha ao remover procedimento.",
         variant: "destructive",
       });
+      setProcedureToDelete(null);
     },
   });
 
@@ -686,6 +720,16 @@ export default function Procedures() {
   const handleView = async (item: any) => {
     setViewingItem(item);
     setViewDialogOpen(true);
+    
+    await logAction({
+      actionType: "viewed",
+      entityType: "procedure",
+      entityId: item.id,
+      metadata: { 
+        name: item.name,
+        category: item.category || null
+      }
+    });
   };
 
   const generateProcedureText = () => {
@@ -774,6 +818,8 @@ export default function Procedures() {
   };
 
   const handleDelete = (id: string) => {
+    const procedure = Array.isArray(procedures) ? procedures.find((p: Procedure) => p.id === id) : null;
+    setProcedureToDelete(procedure || null);
     setItemToDelete(id);
     setDeletePassword("");
     setDeletePasswordError("");
@@ -841,7 +887,7 @@ export default function Procedures() {
         } else {
           // Extract numeric value from string like "2 vezes no ano"
           const numericMatch = plan.limitesAnuais.match(/(\d+)/);
-          const numericValue = numericMatch ? parseInt(numericMatch[1], 10) : 0;
+          const numericValue = numericMatch && numericMatch[1] ? parseInt(numericMatch[1], 10) : 0;
           if (numericValue < 1) {
             errors[index] = 'Limites anuais deve ser maior ou igual a 1';
             hasErrors = true;
@@ -948,11 +994,11 @@ export default function Procedures() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {categories && Array.isArray(categories) && categories.map((category: any) => (
+                              {categories && Array.isArray(categories) ? (categories as any[]).map((category: any) => (
                                 <SelectItem key={category.id} value={category.name}>
                                   {category.name}
                                 </SelectItem>
-                              ))}
+                              )) : null}
                             </SelectContent>
                           </Select>
                           <FormMessage />

@@ -11,6 +11,7 @@ import { InputMasked } from "@/components/ui/input-masked";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertNetworkUnitSchema } from "@shared/schema";
 import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
@@ -21,6 +22,7 @@ export default function NetworkForm() {
   const [, setLocation] = useLocation();
   const params = useParams();
   const { toast } = useToast();
+  const { logAction } = useAdminLogger();
   const queryClient = useQueryClient();
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [generatedSlug, setGeneratedSlug] = useState<string>("");
@@ -45,7 +47,7 @@ export default function NetworkForm() {
       address: "",
       cidade: "",
       phone: "",
-      services: [],
+      services: [] as string[],
       imageUrl: "",
       isActive: true,
       whatsapp: "",
@@ -102,13 +104,28 @@ export default function NetworkForm() {
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
+      let response;
       if (isEdit) {
-        await apiRequest("PUT", `/admin/api/network-units/${params.id}`, data);
+        response = await apiRequest("PUT", `/admin/api/network-units/${params.id}`, data);
       } else {
-        await apiRequest("POST", "/admin/api/network-units", data);
+        response = await apiRequest("POST", "/admin/api/network-units", data);
       }
+      return { ...response, submittedData: data, isEdit };
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
+      const unitId = result.isEdit ? params.id : result.id;
+      if (unitId) {
+        try {
+          await logAction({
+            actionType: result.isEdit ? "updated" : "created",
+            entityType: "network_unit",
+            entityId: unitId,
+            metadata: { name: result.submittedData.name, city: result.submittedData.cidade }
+          });
+        } catch (error) {
+          console.error("Failed to log action:", error);
+        }
+      }
       queryClient.invalidateQueries({ queryKey: ["/admin/api/network-units"] });
       toast({
         title: isEdit ? "Unidade atualizada" : "Unidade cadastrada",
@@ -416,7 +433,7 @@ export default function NetworkForm() {
                       <Checkbox
                         id={`service-${procedure.id}`}
                         checked={selectedServices.includes(procedure.name)}
-                        onCheckedChange={(checked) => handleServiceChange(procedure.name, checked as boolean)}
+                        onCheckedChange={(checked: boolean) => handleServiceChange(procedure.name, checked)}
                         data-testid={`checkbox-service-${procedure.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')}`}
                       />
                       <label 

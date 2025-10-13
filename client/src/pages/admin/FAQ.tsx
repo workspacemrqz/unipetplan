@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -65,6 +66,7 @@ export default function FAQ() {
   const pageSize = 10;
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { logAction } = useAdminLogger();
 
   const { data: faqItems, isLoading } = useQuery({
     queryKey: ["/admin/api/faq"],
@@ -82,18 +84,35 @@ export default function FAQ() {
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       if (editingItem) {
-        await apiRequest("PUT", `/admin/api/faq/${editingItem.id}`, data);
+        const result = await apiRequest("PUT", `/admin/api/faq/${editingItem.id}`, data);
+        return { result, id: editingItem.id, isEdit: true };
       } else {
-        // Calcular o próximo displayOrder baseado no número de itens existentes
         const nextOrder = Array.isArray(faqItems) ? faqItems.length + 1 : 1;
-        await apiRequest("POST", "/admin/api/faq", { ...data, displayOrder: nextOrder });
+        const result = await apiRequest("POST", "/admin/api/faq", { ...data, displayOrder: nextOrder });
+        return { result, id: result?.id, isEdit: false };
       }
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/faq"] });
+      
+      if (data.id) {
+        try {
+          await logAction({
+            actionType: data.isEdit ? "updated" : "created",
+            entityType: "faq",
+            entityId: data.id,
+            metadata: {
+              action: data.isEdit ? "edit" : "create"
+            }
+          });
+        } catch (error) {
+          console.error("Failed to log action:", error);
+        }
+      }
+      
       toast({
-        title: editingItem ? "Item atualizado" : "Item criado",
-        description: editingItem ? "Item foi atualizado com sucesso." : "Item foi criado com sucesso.",
+        title: data.isEdit ? "Item atualizado" : "Item criado",
+        description: data.isEdit ? "Item foi atualizado com sucesso." : "Item foi criado com sucesso.",
       });
       setDialogOpen(false);
       setEditingItem(null);
@@ -111,9 +130,24 @@ export default function FAQ() {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/admin/api/faq/${id}`);
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: async (id) => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/faq"] });
+      
+      try {
+        await logAction({
+          actionType: "deleted",
+          entityType: "faq",
+          entityId: id,
+          metadata: {
+            action: "delete"
+          }
+        });
+      } catch (error) {
+        console.error("Failed to log action:", error);
+      }
+      
       toast({
         title: "Item removido",
         description: "Item foi removido com sucesso.",

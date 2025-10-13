@@ -18,12 +18,13 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, Eye, MoreHorizontal, ChevronLeft, ChevronRight, Star, Copy, Check, Loader2, MessageSquare, CreditCard } from "lucide-react";
+import { Search, Eye, MoreHorizontal, ChevronLeft, ChevronRight, Star, Copy, Check, Loader2, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 interface SatisfactionSurvey {
   id: string;
@@ -59,6 +60,7 @@ export default function Evaluations() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
+  const { logAction } = useAdminLogger();
 
   const { data: surveys = [], isLoading } = useQuery<SatisfactionSurvey[]>({
     queryKey: ["/admin/api/satisfaction-surveys"],
@@ -79,9 +81,16 @@ export default function Evaluations() {
   const endIndex = startIndex + pageSize;
   const displaySurveys = filteredSurveys.slice(startIndex, endIndex);
 
-  const handleViewDetails = (survey: SatisfactionSurvey) => {
+  const handleViewDetails = async (survey: SatisfactionSurvey) => {
     setSelectedSurvey(survey);
     setDetailsOpen(true);
+    
+    await logAction({
+      actionType: "viewed",
+      entityType: "evaluation",
+      entityId: survey.id,
+      metadata: { clientName: survey.clientName, rating: survey.rating }
+    });
   };
 
   const renderStars = (rating: number) => {

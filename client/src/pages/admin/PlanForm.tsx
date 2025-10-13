@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/admin/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { PLAN_TYPES } from "@/lib/constants";
@@ -42,6 +43,7 @@ export default function PlanForm() {
   const params = useParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logAction } = useAdminLogger();
 
   const planId = params['id'] as string | undefined;
   const isEdit = Boolean(planId);
@@ -112,8 +114,21 @@ export default function PlanForm() {
         displayOrder: planData.displayOrder || 0,
         isActive: planData.isActive ?? true,
       });
+
+      // Log the view action when plan is loaded for editing
+      if (planId) {
+        logAction({
+          actionType: "viewed",
+          entityType: "plan",
+          entityId: planId,
+          metadata: { 
+            name: planData.name,
+            basePrice: planData.basePrice
+          }
+        });
+      }
     }
-  }, [plan, form]);
+  }, [plan, form, planId, logAction]);
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
@@ -148,12 +163,37 @@ export default function PlanForm() {
         price: Math.round(parseFloat(data.price.replace(',', '.')) * 100), // Convert to cents
       };
 
+      let result;
       if (isEdit) {
-        await apiRequest("PUT", `/admin/api/plans/${planId}`, planData);
+        result = await apiRequest("PUT", `/admin/api/plans/${planId}`, planData);
+        
+        // Log UPDATE action
+        await logAction({
+          actionType: "updated",
+          entityType: "plan",
+          entityId: planId!,
+          metadata: { 
+            name: data.name,
+            basePrice: planData.price
+          }
+        });
       } else {
-        await apiRequest("POST", "/admin/api/plans", planData);
+        result = await apiRequest("POST", "/admin/api/plans", planData);
+        
+        // Log CREATE action - use the returned plan ID if available
+        const createdPlanId = result?.id || result?.data?.id;
+        if (createdPlanId) {
+          await logAction({
+            actionType: "created",
+            entityType: "plan",
+            entityId: createdPlanId,
+            metadata: { 
+              name: data.name,
+              basePrice: planData.price
+            }
+          });
+        }
       }
-
 
       queryClient.invalidateQueries({ queryKey: ["/admin/api/plans"] });
       toast({

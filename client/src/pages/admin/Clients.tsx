@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
@@ -25,6 +25,7 @@ import { getQueryOptions } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 // Interfaces
 interface Pet {
@@ -32,13 +33,20 @@ interface Pet {
   name: string;
   species: string;
   breed: string;
-  gender: string;
+  gender?: string;
+  sex?: string;
+  age?: string;
+  color?: string;
+  castrated?: boolean;
   weight?: number;
   birthDate?: string;
+  lastCheckup?: string;
   microchip?: string;
   allergies?: string;
   surgeries?: string;
   medications?: string;
+  previousDiseases?: string;
+  currentMedications?: string;
   observations?: string;
   chronicConditions?: string;
   hereditaryConditions?: string;
@@ -101,6 +109,7 @@ export default function Clients() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
+  const { logAction } = useAdminLogger();
 
   const { data: clients = [], isLoading } = useQuery<Client[]>({
     queryKey: ["/admin/api/clients"],
@@ -151,9 +160,20 @@ export default function Clients() {
   });
 
 
-  const handleViewDetails = (client: Client) => {
+  const handleViewDetails = async (client: Client) => {
     setSelectedClient(client);
     setDetailsOpen(true);
+    
+    // Log da ação administrativa
+    await logAction({
+      actionType: "viewed",
+      entityType: "client",
+      entityId: client.id,
+      metadata: { 
+        name: client.fullName || client.full_name, 
+        cpf: client.cpf 
+      }
+    });
   };
 
   const generateClientText = () => {

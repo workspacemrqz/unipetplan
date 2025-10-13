@@ -28,6 +28,7 @@ import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 interface ContractWithDetails {
   id: string;
@@ -96,6 +97,7 @@ export default function Contracts() {
   const pageSize = 10;
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logAction } = useAdminLogger();
 
   const [dateFilter, setDateFilter] = useState<{
     startDate: CalendarDate | null;
@@ -169,9 +171,21 @@ export default function Contracts() {
   const endIndex = startIndex + pageSize;
   const displayContracts = filteredContracts.slice(startIndex, endIndex);
 
-  const handleViewDetails = (contract: ContractWithDetails) => {
+  const handleViewDetails = async (contract: ContractWithDetails) => {
     setSelectedContract(contract);
     setDetailsOpen(true);
+    
+    await logAction({
+      actionType: "viewed",
+      entityType: "contract",
+      entityId: contract.id,
+      metadata: {
+        contractNumber: contract.contractNumber,
+        clientName: contract.clientName,
+        petName: contract.petName,
+        status: contract.status,
+      }
+    });
   };
 
   const formatCurrency = (value: string | number) => {
@@ -253,7 +267,24 @@ export default function Contracts() {
         }
       );
     },
-    onSuccess: () => {
+    onSuccess: async (_data, variables) => {
+      if (editingContract) {
+        await logAction({
+          actionType: "updated",
+          entityType: "contract",
+          entityId: variables.id,
+          metadata: {
+            contractNumber: editingContract.contractNumber,
+            clientName: editingContract.clientName,
+            petName: editingContract.petName,
+            oldStatus: editingContract.status,
+            newStatus: variables.status,
+            oldMonthlyAmount: editingContract.monthlyAmount,
+            newMonthlyAmount: variables.monthlyAmount,
+          }
+        });
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/admin/api/contracts'] });
       toast({
         title: "Sucesso",

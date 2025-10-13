@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Badge } from "@/components/admin/ui/badge";
@@ -33,6 +32,7 @@ import { Plus, Search, Edit, Trash2, Building, ExternalLink, Eye, Copy, Globe, M
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import type { NetworkUnit } from "@shared/schema";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 
@@ -52,22 +52,30 @@ export default function Network() {
   const [itemToDelete, setItemToDelete] = useState<string>("");
   const [deletePassword, setDeletePassword] = useState("");
   const [deletePasswordError, setDeletePasswordError] = useState("");
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const { visibleColumns, toggleColumn } = useColumnPreferences('network.columns', allColumns);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { logAction } = useAdminLogger();
 
   const { data: units, isLoading } = useQuery<NetworkUnit[]>({
     queryKey: ["/admin/api/network-units"],
   });
 
   const deleteUnitMutation = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async ({ id, unit }: { id: string; unit: NetworkUnit }) => {
       await apiRequest("DELETE", `/admin/api/network-units/${id}`);
+      return unit;
     },
-    onSuccess: () => {
+    onSuccess: async (deletedUnit) => {
+      await logAction({
+        actionType: "deleted",
+        entityType: "network_unit",
+        entityId: deletedUnit.id,
+        metadata: { name: deletedUnit.name, city: deletedUnit.cidade }
+      });
       queryClient.invalidateQueries({ queryKey: ["/admin/api/network-units"] });
       toast({
         title: "Unidade removida",
@@ -134,8 +142,16 @@ export default function Network() {
         return;
       }
 
+      // Encontrar unidade para deletar
+      const unitToDelete = units?.find((u: NetworkUnit) => u.id === itemToDelete);
+      
+      if (!unitToDelete) {
+        setDeletePasswordError("Unidade não encontrada");
+        return;
+      }
+
       // Deletar unidade
-      deleteUnitMutation.mutate(itemToDelete);
+      deleteUnitMutation.mutate({ id: itemToDelete, unit: unitToDelete });
       setDeleteDialogOpen(false);
       setDeletePassword("");
       setDeletePasswordError("");
@@ -149,9 +165,16 @@ export default function Network() {
     toggleUnitMutation.mutate({ id, isActive: newStatus });
   };
 
-  const handleViewDetails = (unit: NetworkUnit) => {
+  const handleViewDetails = async (unit: NetworkUnit) => {
     setSelectedUnit(unit);
     setDetailsOpen(true);
+    
+    await logAction({
+      actionType: "viewed",
+      entityType: "network_unit",
+      entityId: unit.id,
+      metadata: { name: unit.name, city: unit.cidade }
+    });
   };
 
   const generateUnitText = () => {

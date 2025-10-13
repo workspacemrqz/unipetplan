@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/admin/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -25,6 +26,7 @@ export default function Settings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const hasInitializedRef = useRef(false);
+  const { logAction } = useAdminLogger();
 
   const { data: siteSettings, isLoading: siteLoading } = useQuery({
     queryKey: ["/admin/api/settings/site"],
@@ -101,12 +103,22 @@ export default function Settings() {
 
   const saveSiteMutation = useMutation({
     mutationFn: async (data: any) => {
-      await apiRequest("PUT", "/admin/api/settings/site", data);
+      const result = await apiRequest("PUT", "/admin/api/settings/site", data);
+      return result;
     },
-    onSuccess: async () => {
-      // Invalidate both admin and public caches
+    onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: ["/admin/api/settings/site"] });
       await queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+      
+      await logAction({
+        actionType: "updated",
+        entityType: "settings",
+        entityId: result?.id || "site-settings",
+        metadata: {
+          type: "site",
+          action: "update_site_settings"
+        }
+      });
       
       toast({
         title: "Configurações salvas",
@@ -124,10 +136,22 @@ export default function Settings() {
 
   const saveRulesMutation = useMutation({
     mutationFn: async (data: any) => {
-      await apiRequest("PUT", "/admin/api/settings/rules", data);
+      const result = await apiRequest("PUT", "/admin/api/settings/rules", data);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/settings/rules"] });
+      
+      await logAction({
+        actionType: "updated",
+        entityType: "settings",
+        entityId: result?.id || "rules-settings",
+        metadata: {
+          type: "rules",
+          action: "update_rules_settings"
+        }
+      });
+      
       toast({
         title: "Regras salvas",
         description: "Configurações de regras foram salvas com sucesso.",
@@ -144,11 +168,23 @@ export default function Settings() {
 
   const saveChatMutation = useMutation({
     mutationFn: async (data: any) => {
-      await apiRequest("PUT", "/admin/api/settings/chat", data);
+      const result = await apiRequest("PUT", "/admin/api/settings/chat", data);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/settings/chat"] });
       queryClient.invalidateQueries({ queryKey: ["/api/chat/settings"] });
+      
+      await logAction({
+        actionType: "updated",
+        entityType: "settings",
+        entityId: result?.id || "chat-settings",
+        metadata: {
+          type: "chat",
+          action: "update_chat_settings"
+        }
+      });
+      
       toast({
         title: "Configurações do chat salvas",
         description: "Configurações do chat foram salvas com sucesso.",

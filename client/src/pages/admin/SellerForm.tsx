@@ -10,14 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
-import { insertSellerSchema } from "@shared/schema";
+import { insertSellerSchema, type RulesSettings } from "@shared/schema";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 export default function SellerForm() {
   const [, setLocation] = useLocation();
   const params = useParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logAction } = useAdminLogger();
 
   const isEdit = Boolean(params.id);
 
@@ -26,7 +28,7 @@ export default function SellerForm() {
     enabled: isEdit,
   });
 
-  const { data: rulesSettings } = useQuery({
+  const { data: rulesSettings } = useQuery<RulesSettings>({
     queryKey: ["/admin/api/settings/rules"],
   });
 
@@ -91,17 +93,31 @@ export default function SellerForm() {
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       if (isEdit) {
-        await apiRequest("PUT", `/admin/api/sellers/${params.id}`, data);
+        const result = await apiRequest("PUT", `/admin/api/sellers/${params.id}`, data);
+        return { ...result, formData: data };
       } else {
-        await apiRequest("POST", "/admin/api/sellers", data);
+        const result = await apiRequest("POST", "/admin/api/sellers", data);
+        return { ...result, formData: data };
       }
     },
-    onSuccess: () => {
+    onSuccess: async (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/sellers"] });
       toast({
         title: isEdit ? "Vendedor atualizado" : "Vendedor cadastrado",
         description: isEdit ? "Vendedor foi atualizado com sucesso." : "Vendedor foi cadastrado com sucesso.",
       });
+      
+      const sellerId = isEdit ? params.id : response.id;
+      await logAction({
+        actionType: isEdit ? "updated" : "created",
+        entityType: "seller",
+        entityId: sellerId,
+        metadata: { 
+          name: response.formData?.fullName || variables.fullName,
+          email: response.formData?.email || variables.email
+        }
+      });
+      
       setLocation("/vendedores");
     },
     onError: () => {

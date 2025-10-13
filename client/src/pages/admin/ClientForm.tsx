@@ -13,12 +13,14 @@ import { apiRequest } from "@/lib/admin/queryClient";
 import { insertClientAdminSchema } from "@shared/schema";
 import { ArrowLeft, Plus, Edit, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 export default function ClientForm() {
   const [, setLocation] = useLocation();
   const params = useParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logAction } = useAdminLogger();
 
   const isEdit = Boolean(params.id);
 
@@ -86,13 +88,31 @@ export default function ClientForm() {
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       if (isEdit) {
-        await apiRequest("PUT", `/admin/api/clients/${params.id}`, data);
+        return await apiRequest("PUT", `/admin/api/clients/${params.id}`, data);
       } else {
-        await apiRequest("POST", "/admin/api/clients", data);
+        return await apiRequest("POST", "/admin/api/clients", data);
       }
     },
-    onSuccess: () => {
+    onSuccess: async (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/clients"] });
+      
+      const clientId = isEdit ? params.id : response?.id;
+      if (clientId) {
+        try {
+          await logAction({
+            actionType: isEdit ? "updated" : "created",
+            entityType: "client",
+            entityId: clientId,
+            metadata: { 
+              name: variables.full_name, 
+              cpf: variables.cpf 
+            }
+          });
+        } catch (error) {
+          console.error("Failed to log action:", error);
+        }
+      }
+      
       toast({
         title: isEdit ? "Cliente atualizado" : "Cliente cadastrado",
         description: isEdit ? "Cliente foi atualizado com sucesso." : "Cliente foi cadastrado com sucesso.",
