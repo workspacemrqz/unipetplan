@@ -228,7 +228,7 @@ export default function AdminLogsPage() {
   };
 
   const isUnitLog = (log: any): log is UnitActionLog => {
-    return 'log' in log && 'log' in (log as any);
+    return log && typeof log === 'object' && 'log' in log && log.log && 'actionType' in log.log;
   };
 
   return (
