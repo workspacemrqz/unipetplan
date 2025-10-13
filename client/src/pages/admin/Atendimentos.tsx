@@ -250,6 +250,7 @@ export default function Atendimentos() {
     // Informações do Cadastro
     text += "INFORMAÇÕES DO CADASTRO:\n";
     text += "-".repeat(25) + "\n";
+    text += `Criado por: ${selectedAtendimento.veterinarianName || 'Unidade'}\n`;
     text += `Data de Criação: ${selectedAtendimento.createdAt ? format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : "Não informado"}\n`;
     if (selectedAtendimento.updatedAt) {
       text += `Última Atualização: ${format(new Date(selectedAtendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}\n`;
@@ -662,6 +663,9 @@ export default function Atendimentos() {
               <div className="pt-4 border-t">
                 <h4 className="font-semibold text-foreground mb-2">Informações do Sistema</h4>
                 <div className="space-y-1 text-sm">
+                  <div>
+                    <span><strong className="text-primary">Criado por:</strong> <span className="text-foreground">{selectedAtendimento.veterinarianName || 'Unidade'}</span></span>
+                  </div>
                   <div>
                     <span><strong className="text-primary">Data de Criação:</strong> <span className="text-foreground">{selectedAtendimento.createdAt ? format(new Date(selectedAtendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 'Não informado'}</span></span>
                   </div>
