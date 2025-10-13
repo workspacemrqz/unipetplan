@@ -218,48 +218,88 @@ export default function AdminLogsPage() {
   const totalLogs = logsResponse?.total || 0;
   const totalPages = logsResponse?.totalPages || 0;
 
-  const formatMetadata = (metadata: any): string => {
+  const formatAdminLogDetails = (actionType: string, entityType: string, metadata: any): string => {
     if (!metadata) return "-";
     
     try {
-      // Format metadata to show key details in a more readable way
-      if (typeof metadata === 'object') {
-        const keys = Object.keys(metadata);
-        if (keys.length === 0) return "-";
-        
-        // Prioritize displaying the most important fields first
-        const name = metadata.name || metadata.clientName || metadata.procedureName || metadata.planName;
-        const action = metadata.action;
-        const changes = metadata.changes;
-        const email = metadata.email;
-        const code = metadata.code;
-        
-        // Build a human-readable string
-        const parts: string[] = [];
-        
-        if (name) parts.push(name);
-        if (email && !name?.includes(email)) parts.push(email);
-        if (code) parts.push(`Código: ${code}`);
-        if (action) parts.push(`(${action})`);
-        if (changes) parts.push(changes);
-        
-        // If we have custom formatted parts, use them
-        if (parts.length > 0) {
-          return parts.join(', ');
+      const name = metadata.name || metadata.clientName || metadata.procedureName || metadata.planName;
+      const email = metadata.email;
+      const code = metadata.code;
+      const changes = metadata.changes;
+      const cpf = metadata.cpf;
+      const action = metadata.action;
+      const updatedFields = metadata.updated_fields;
+      
+      // Build descriptive sentences based on action and entity type
+      const actionVerbs: Record<string, { created: string; updated: string; deleted: string; viewed: string }> = {
+        client: {
+          created: `Cliente '${name}'${email ? ` com email ${email}` : ''}${cpf ? ` e CPF ${cpf}` : ''} foi criado`,
+          updated: `Cliente '${name}' foi atualizado${updatedFields ? ` (${updatedFields})` : changes ? ` - ${changes}` : ''}`,
+          deleted: `Cliente '${name}' foi excluído`,
+          viewed: `Cliente '${name}' foi visualizado`
+        },
+        contract: {
+          created: `Novo contrato foi criado${name ? ` para '${name}'` : ''}`,
+          updated: `Contrato foi atualizado${changes ? ` - ${changes}` : ''}`,
+          deleted: `Contrato foi excluído${name ? ` de '${name}'` : ''}`,
+          viewed: `Contrato foi visualizado${name ? ` de '${name}'` : ''}`
+        },
+        plan: {
+          created: `Foi criado um novo plano nomeado '${name}'`,
+          updated: `Plano '${name}' foi atualizado${changes ? ` - ${changes}` : ''}`,
+          deleted: `Plano '${name}' foi excluído`,
+          viewed: `Plano '${name}' foi visualizado`
+        },
+        procedure: {
+          created: `Foi criado um novo procedimento '${name}'${metadata.category ? ` na categoria ${metadata.category}` : ''}`,
+          updated: `Procedimento '${name}' foi atualizado${changes ? ` - ${changes}` : ''}`,
+          deleted: `Procedimento '${name}' foi excluído`,
+          viewed: `Procedimento '${name}' foi visualizado`
+        },
+        coupon: {
+          created: `Cupom com código '${code || name}' foi criado`,
+          updated: `Cupom '${code || name}' foi atualizado${changes ? ` - ${changes}` : ''}`,
+          deleted: `Cupom com código '${code || name}' foi excluído`,
+          viewed: `Cupom '${code || name}' foi visualizado`
+        },
+        network_unit: {
+          created: `Unidade da rede '${name}' foi criada`,
+          updated: `Unidade '${name}' foi atualizada${action === 'update' && changes ? ` - ${changes}` : ''}`,
+          deleted: `Unidade '${name}' foi excluída`,
+          viewed: `Unidade '${name}' foi visualizada`
+        },
+        user: {
+          created: `Usuário '${name}' foi criado${email ? ` com email ${email}` : ''}`,
+          updated: `Usuário '${name}' foi atualizado${changes ? ` - ${changes}` : ''}`,
+          deleted: `Usuário '${name}' foi excluído`,
+          viewed: `Usuário '${name}' foi visualizado`
+        },
+        seller: {
+          created: `Vendedor '${name}' foi criado${email ? ` com email ${email}` : ''}`,
+          updated: `Vendedor '${name}' foi atualizado${changes ? ` - ${changes}` : ''}`,
+          deleted: `Vendedor '${name}' foi excluído`,
+          viewed: `Vendedor '${name}' foi visualizado`
         }
-        
-        // Fallback: show key values in a simpler format
-        const preview = keys.slice(0, 2).map(key => {
-          const value = metadata[key];
-          if (typeof value === 'object') return `${value}`;
-          return String(value);
-        }).join(', ');
-        
-        return keys.length > 2 ? `${preview}...` : preview;
+      };
+      
+      // Get the appropriate message based on entity and action type
+      if (actionVerbs[entityType] && actionVerbs[entityType][actionType as keyof typeof actionVerbs[typeof entityType]]) {
+        return actionVerbs[entityType][actionType as keyof typeof actionVerbs[typeof entityType]];
       }
       
-      return String(metadata);
-    } catch {
+      // Fallback for unknown combinations
+      if (name) {
+        const actionText = actionType === 'created' ? 'foi criado' : 
+                          actionType === 'updated' ? 'foi atualizado' : 
+                          actionType === 'deleted' ? 'foi excluído' : 
+                          actionType === 'viewed' ? 'foi visualizado' : actionType;
+        return `${getEntityTypeLabel(entityType)} '${name}' ${actionText}`;
+      }
+      
+      // Final fallback
+      return `${getActionTypeLabel(actionType)} - ${getEntityTypeLabel(entityType)}`;
+    } catch (error) {
+      console.error('Error formatting admin log details:', error);
       return "-";
     }
   };
@@ -268,25 +308,56 @@ export default function AdminLogsPage() {
     if (!actionData) return "-";
     
     try {
+      const clientName = actionData.clientName || actionData.name;
+      const petName = actionData.petName || actionData.name;
+      const procedureName = actionData.procedureName || actionData.name;
+      const veterinarianName = actionData.name;
+      const value = actionData.value;
+      const coparticipation = actionData.coparticipation;
+      
       switch (actionType) {
         case "client_selected":
-          return actionData.clientName || actionData.name || actionData.cpf || "-";
+          return `Cliente '${clientName}' foi selecionado para atendimento`;
+        
         case "pet_selected":
-          return actionData.petName || actionData.name || "-";
+          return `Pet '${petName}' foi selecionado para atendimento`;
+        
         case "procedure_added":
-          return `${actionData.procedureName || actionData.name || "Procedimento"} ${actionData.value ? `- R$ ${actionData.value}` : ""}`;
+          const priceInfo = value ? ` no valor de R$ ${value}` : '';
+          const copartInfo = coparticipation ? ` (coparticipação: R$ ${coparticipation})` : '';
+          return `Procedimento '${procedureName || 'Procedimento'}' foi adicionado${priceInfo}${copartInfo}`;
+        
         case "atendimento_created":
-          return "Atendimento finalizado";
+          return "Atendimento foi finalizado e registrado no sistema";
+        
+        case "step_changed":
+          const from = actionData.from;
+          const to = actionData.to;
+          return `Etapa do atendimento foi alterada${from && to ? ` da etapa ${from} para etapa ${to}` : ''}`;
+        
         case "veterinarian_created":
+          return `Veterinário '${veterinarianName}' foi cadastrado no sistema`;
+        
         case "veterinarian_updated":
+          return `Dados do veterinário '${veterinarianName}' foram atualizados`;
+        
         case "veterinarian_deleted":
-          return actionData.name || "-";
+          return `Veterinário '${veterinarianName}' foi removido do sistema`;
+        
         case "veterinarian_status_changed":
-          return `${actionData.name}: ${actionData.oldStatus} → ${actionData.newStatus}`;
+          const oldStatus = actionData.oldStatus === 'active' ? 'ativo' : 'inativo';
+          const newStatus = actionData.newStatus === 'active' ? 'ativo' : 'inativo';
+          return `Status do veterinário '${veterinarianName}' foi alterado de ${oldStatus} para ${newStatus}`;
+        
         default:
-          return formatMetadata(actionData);
+          // Fallback for unknown action types
+          if (clientName || petName || procedureName) {
+            return `Ação '${getActionTypeLabel(actionType)}' realizada`;
+          }
+          return getActionTypeLabel(actionType);
       }
-    } catch {
+    } catch (error) {
+      console.error('Error formatting unit action data:', error);
       return "-";
     }
   };
@@ -501,7 +572,7 @@ export default function AdminLogsPage() {
                           {getActionTypeLabel(log.log.actionType)}
                         </TableCell>
                         <TableCell className="bg-white">
-                          <div className="text-sm text-muted-foreground truncate max-w-md">
+                          <div className="text-sm truncate max-w-md">
                             {formatUnitActionData(log.log.actionType, log.log.actionData)}
                           </div>
                         </TableCell>
@@ -528,8 +599,8 @@ export default function AdminLogsPage() {
                           {adminLog.entityId ? `${adminLog.entityId.substring(0, 8)}...` : "-"}
                         </TableCell>
                         <TableCell className="bg-white">
-                          <div className="text-sm text-muted-foreground truncate max-w-md">
-                            {formatMetadata(adminLog.metadata)}
+                          <div className="text-sm truncate max-w-md">
+                            {formatAdminLogDetails(adminLog.actionType, adminLog.entityType, adminLog.metadata)}
                           </div>
                         </TableCell>
                       </TableRow>
