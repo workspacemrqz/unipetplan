@@ -169,42 +169,42 @@ export default function AdminLogsPage() {
 
       const data = await response.json();
       
-      // Map snake_case to camelCase
+      // Data already comes in camelCase from backend, just ensure correct structure
       if (data.data && Array.isArray(data.data)) {
         data.data = data.data.map((log: any) => {
           if (sourceFilter === "units" && log.log) {
-            // Unit log structure - map all fields from snake_case to camelCase
+            // Unit log structure - already in camelCase
             return {
               log: {
                 id: log.log.id,
-                actionType: log.log.action_type,
-                networkUnitId: log.log.network_unit_id,
-                userType: log.log.user_type,
-                veterinarianId: log.log.veterinarian_id,
-                actionData: log.log.action_data,
-                createdAt: log.log.created_at,
+                actionType: log.log.actionType,
+                networkUnitId: log.log.networkUnitId,
+                userType: log.log.userType,
+                veterinarianId: log.log.veterinarianId,
+                actionData: log.log.actionData,
+                createdAt: log.log.createdAt,
               },
               veterinarian: log.veterinarian ? {
                 id: log.veterinarian.id,
                 name: log.veterinarian.name,
               } : null,
-              networkUnit: log.network_unit ? {
-                id: log.network_unit.id,
-                name: log.network_unit.name,
+              networkUnit: log.networkUnit ? {
+                id: log.networkUnit.id,
+                name: log.networkUnit.name,
               } : null,
             };
           } else {
-            // Admin log structure
+            // Admin log structure - already in camelCase
             return {
               id: log.id,
-              adminUserId: log.admin_user_id,
-              actionType: log.action_type,
-              entityType: log.entity_type,
-              entityId: log.entity_id,
+              adminUserId: log.adminUserId,
+              actionType: log.actionType,
+              entityType: log.entityType,
+              entityId: log.entityId,
               metadata: log.metadata,
               ip: log.ip,
-              userAgent: log.user_agent,
-              createdAt: log.created_at,
+              userAgent: log.userAgent,
+              createdAt: log.createdAt,
             };
           }
         });
