@@ -69,6 +69,7 @@ import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import { getQueryOptions } from "@/lib/admin/queryClient";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 const allColumns = [
   "Procedimento",
@@ -373,6 +374,26 @@ export default function Atendimentos() {
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
+
+          <ExportButton 
+            data={atendimentosData}
+            filename="atendimentos"
+            title="Exportação de Atendimentos"
+            pageName="Atendimentos"
+            columns={[
+              { key: 'procedures', label: 'Procedimentos', formatter: (v) => v && v.length > 0 ? v.map((p: any) => p.procedureName || p.name).join(', ') : 'Não informado' },
+              { key: 'networkUnit', label: 'Unidade', formatter: (v) => v?.name || 'Não informada' },
+              { key: 'clientName', label: 'Cliente', formatter: (v) => v || 'Não informado' },
+              { key: 'petName', label: 'Pet', formatter: (v) => v || 'Não informado' },
+              { key: 'value', label: 'Valor', formatter: (v) => `R$ ${parseFloat(v || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+              { key: 'status', label: 'Status', formatter: (v) => getStatusLabel(v) },
+              { key: 'veterinarianName', label: 'Veterinário', formatter: (v) => v || 'Unidade' },
+              { key: 'procedureNotes', label: 'Notas do Procedimento', formatter: (v) => v || '' },
+              { key: 'generalNotes', label: 'Notas Gerais', formatter: (v) => v || '' },
+              { key: 'createdAt', label: 'Data de Criação', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
+            ]}
+            disabled={isLoading || atendimentosData.length === 0}
+          />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

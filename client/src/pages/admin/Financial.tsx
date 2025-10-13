@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 interface PaymentReceipt {
   id: string;
@@ -175,6 +176,24 @@ export default function Financial() {
         </div>
 
         <div className="flex gap-2">
+          <ExportButton 
+            data={filteredReceipts}
+            filename="dados_financeiros"
+            title="Exportação de Dados Financeiros"
+            pageName="Financeiro"
+            columns={[
+              { key: 'receiptNumber', label: 'Nº Recibo', formatter: (v) => v || '' },
+              { key: 'clientName', label: 'Cliente', formatter: (v) => v || '' },
+              { key: 'clientEmail', label: 'Email', formatter: (v) => v || '' },
+              { key: 'planName', label: 'Plano', formatter: (v) => v || 'N/A' },
+              { key: 'paymentAmount', label: 'Valor', formatter: (v) => formatCurrency(v) },
+              { key: 'paymentMethod', label: 'Método de Pagamento', formatter: (v) => paymentMethodLabels[v] || v },
+              { key: 'paymentDate', label: 'Data do Pagamento', formatter: (v) => format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) },
+              { key: 'status', label: 'Status', formatter: (v) => statusLabels[v] || v }
+            ]}
+            disabled={isLoading || filteredReceipts.length === 0}
+          />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 

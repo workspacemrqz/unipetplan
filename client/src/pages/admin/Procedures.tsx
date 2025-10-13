@@ -41,6 +41,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { z } from "zod";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 // Definir tipos locais
 type Procedure = {
@@ -1431,6 +1432,23 @@ export default function Procedures() {
               </Button>
             </DialogTrigger>
           </Dialog>
+          
+          <ExportButton 
+            data={filteredProcedures}
+            filename="procedimentos"
+            title="Exportação de Procedimentos"
+            pageName="Procedimentos"
+            columns={[
+              { key: 'name', label: 'Nome', formatter: (v) => v || '' },
+              { key: 'description', label: 'Descrição', formatter: (v) => v || 'Sem descrição' },
+              { key: 'category', label: 'Categoria', formatter: (v) => v || 'Sem categoria' },
+              { key: 'isActive', label: 'Status', formatter: (v) => v ? 'Ativo' : 'Inativo' },
+              { key: 'displayOrder', label: 'Ordem de Exibição', formatter: (v) => v?.toString() || '0' },
+              { key: 'createdAt', label: 'Data de Criação', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
+              { key: 'updatedAt', label: 'Última Atualização', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
+            ]}
+            disabled={isLoading || filteredProcedures.length === 0}
+          />
           
           {/* Controle de Colunas */}
           <DropdownMenu>

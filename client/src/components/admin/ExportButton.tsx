@@ -1,0 +1,120 @@
+import { useState } from "react";
+import { Button } from "@/components/admin/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/admin/ui/dropdown-menu";
+import { Download, FileSpreadsheet, FileText, Loader2 } from "lucide-react";
+import { exportToPDF, exportToExcel } from "@/lib/export-utils";
+import { useToast } from "@/hooks/use-toast";
+
+interface ExportButtonProps {
+  data: any[];
+  filename: string;
+  columns?: {
+    key: string;
+    label: string;
+    formatter?: (value: any) => string;
+  }[];
+  title?: string;
+  pageName?: string;
+  disabled?: boolean;
+}
+
+export function ExportButton({
+  data,
+  filename,
+  columns,
+  title,
+  pageName,
+  disabled = false,
+}: ExportButtonProps) {
+  const [isExporting, setIsExporting] = useState(false);
+  const { toast } = useToast();
+
+  const handleExportPDF = async () => {
+    try {
+      setIsExporting(true);
+      await exportToPDF({
+        data,
+        columns: columns || [],
+        filename: `${filename}.pdf`,
+        title: title || filename,
+      });
+      toast({
+        title: "Exportação concluída",
+        description: "PDF exportado com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao exportar PDF:", error);
+      toast({
+        title: "Erro na exportação",
+        description: "Não foi possível exportar o PDF. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      setIsExporting(true);
+      await exportToExcel({
+        data,
+        columns: columns || [],
+        filename: `${filename}.xlsx`,
+        sheetName: pageName || filename,
+      });
+      toast({
+        title: "Exportação concluída",
+        description: "Excel exportado com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      toast({
+        title: "Erro na exportação",
+        description: "Não foi possível exportar o Excel. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={disabled || isExporting || !data || data.length === 0}
+        >
+          {isExporting ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Exportando...
+            </>
+          ) : (
+            <>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={handleExportPDF}>
+          <FileText className="h-4 w-4 mr-2" />
+          Exportar como PDF
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleExportExcel}>
+          <FileSpreadsheet className="h-4 w-4 mr-2" />
+          Exportar como Excel
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

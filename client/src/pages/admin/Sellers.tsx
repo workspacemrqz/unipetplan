@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMasks } from "@/hooks/admin/use-masks";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 interface Seller {
   id: string;
@@ -281,6 +282,30 @@ export default function Sellers() {
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
+          
+          <ExportButton 
+            data={filteredSellers}
+            filename="vendedores"
+            title="Exportação de Vendedores"
+            pageName="Vendedores"
+            columns={[
+              { key: 'fullName', label: 'Nome Completo', formatter: (v) => v || '' },
+              { key: 'cpf', label: 'CPF', formatter: (v) => cpfMask(v || '') },
+              { key: 'email', label: 'Email', formatter: (v) => v || '' },
+              { key: 'phone', label: 'Telefone', formatter: (v) => phoneMask(v || '') },
+              { key: 'city', label: 'Cidade', formatter: (v) => v || '' },
+              { key: 'state', label: 'Estado', formatter: (v) => v || '' },
+              { key: 'cpaPercentage', label: 'Comissão CPA (%)', formatter: (v) => v ? `${v}%` : '0%' },
+              { key: 'recurringCommissionPercentage', label: 'Comissão Recorrente (%)', formatter: (v) => v ? `${v}%` : '0%' },
+              { key: 'pixKey', label: 'Chave PIX', formatter: (v) => v || '' },
+              { key: 'bank', label: 'Banco', formatter: (v) => v || '' },
+              { key: 'accountNumber', label: 'Conta', formatter: (v) => v || '' },
+              { key: 'agency', label: 'Agência', formatter: (v) => v || '' },
+              { key: 'isActive', label: 'Status', formatter: (v) => v ? 'Ativo' : 'Inativo' },
+              { key: 'createdAt', label: 'Data de Cadastro', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
+            ]}
+            disabled={isLoading || filteredSellers.length === 0}
+          />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

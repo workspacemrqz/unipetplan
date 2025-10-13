@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 // Interfaces
 interface Pet {
@@ -328,6 +329,25 @@ export default function Clients() {
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
+          
+          <ExportButton 
+            data={filteredClients}
+            filename="clientes"
+            title="Exportação de Clientes"
+            pageName="Clientes"
+            columns={[
+              { key: 'fullName', label: 'Nome', formatter: (v) => v || '' },
+              { key: 'email', label: 'Email', formatter: (v) => v || 'Não informado' },
+              { key: 'phone', label: 'Telefone', formatter: (v) => formatBrazilianPhoneForDisplay(v || '') },
+              { key: 'cpf', label: 'CPF', formatter: (v) => v || '' },
+              { key: 'city', label: 'Cidade', formatter: (v) => v || 'Não informado' },
+              { key: 'state', label: 'Estado', formatter: (v) => v || 'Não informado' },
+              { key: 'cep', label: 'CEP', formatter: (v) => v || 'Não informado' },
+              { key: 'address', label: 'Endereço', formatter: (v) => v || 'Não informado' },
+              { key: 'createdAt', label: 'Data de Cadastro', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : '' }
+            ]}
+            disabled={isLoading || searchLoading || filteredClients.length === 0}
+          />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -29,6 +29,7 @@ import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 // Types for atendimentos data
 interface AtendimentoWithNetworkUnit {
@@ -387,6 +388,27 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
+          
+          <ExportButton 
+            data={atendimentosData}
+            filename="atendimentos_unidade"
+            title="Exportação de Atendimentos"
+            pageName="Atendimentos da Unidade"
+            columns={[
+              { key: 'procedure', label: 'Procedimento', formatter: (v) => v || '' },
+              { key: 'procedureName', label: 'Nome do Procedimento', formatter: (v) => v || '' },
+              { key: 'clientName', label: 'Cliente', formatter: (v) => v || 'Não informado' },
+              { key: 'petName', label: 'Pet', formatter: (v) => v || 'Não informado' },
+              { key: 'networkUnit.name', label: 'Unidade', formatter: (v) => v || '' },
+              { key: 'value', label: 'Valor', formatter: (v) => v ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v)) : 'R$ 0,00' },
+              { key: 'status', label: 'Status', formatter: (v) => v === 'open' ? 'Aberta' : v === 'closed' ? 'Concluída' : v === 'cancelled' ? 'Cancelada' : v || '' },
+              { key: 'procedureNotes', label: 'Observações do Procedimento', formatter: (v) => v || '' },
+              { key: 'generalNotes', label: 'Observações Gerais', formatter: (v) => v || '' },
+              { key: 'createdAt', label: 'Data de Criação', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
+              { key: 'updatedAt', label: 'Última Atualização', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
+            ]}
+            disabled={isLoading || atendimentosData.length === 0}
+          />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

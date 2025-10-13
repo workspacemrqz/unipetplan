@@ -18,6 +18,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 // Helper function to get the appropriate token based on context
 const getAuthToken = () => {
@@ -299,7 +300,7 @@ export default function LogsPage() {
         />
 
         {/* User Type Filter */}
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex flex-wrap gap-4 items-center justify-between">
           <Select value={userTypeFilter} onValueChange={(value) => {
             setUserTypeFilter(value);
             setCurrentPage(1);
@@ -325,6 +326,21 @@ export default function LogsPage() {
               </SelectItem>
             </SelectContent>
           </Select>
+          
+          <ExportButton 
+            data={logs}
+            filename="logs_unidade"
+            title="Exportação de Logs da Unidade"
+            pageName="Logs da Unidade"
+            columns={[
+              { key: 'log.createdAt', label: 'Data/Hora', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm") : '' },
+              { key: 'veterinarian.name', label: 'Usuário', formatter: (v, row) => getUserLabel(row as Log) },
+              { key: 'log.userType', label: 'Tipo de Usuário', formatter: (v) => v === 'unit' ? 'Admin' : 'Veterinário' },
+              { key: 'log.actionType', label: 'Ação', formatter: (v) => getActionTypeLabel(v) },
+              { key: 'log.actionData', label: 'Detalhes', formatter: (v, row) => formatActionData((row as Log).log.actionType, v) }
+            ]}
+            disabled={isLoadingLogs || logs.length === 0}
+          />
         </div>
 
         <div className="border rounded-lg overflow-hidden bg-white">

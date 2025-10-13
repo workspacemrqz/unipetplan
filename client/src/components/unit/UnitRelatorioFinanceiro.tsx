@@ -24,6 +24,7 @@ import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 interface FinancialEntry {
   id: string;
@@ -205,6 +206,22 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
         </div>
 
         <div className="flex gap-2">
+          <ExportButton 
+            data={filteredEntries}
+            filename="relatorio_financeiro_unidade"
+            title="Exportação de Relatório Financeiro"
+            pageName="Relatório Financeiro da Unidade"
+            columns={[
+              { key: 'date', label: 'Data', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : '' },
+              { key: 'clientName', label: 'Cliente', formatter: (v) => v || '' },
+              { key: 'petName', label: 'Pet', formatter: (v) => v || 'Não informado' },
+              { key: 'procedure', label: 'Procedimento', formatter: (v) => v || '' },
+              { key: 'coparticipacao', label: 'Coparticipação', formatter: (v) => formatCurrency(v) },
+              { key: 'value', label: 'Valor Pago', formatter: (v) => formatCurrency(v) }
+            ]}
+            disabled={loading || filteredEntries.length === 0}
+          />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 

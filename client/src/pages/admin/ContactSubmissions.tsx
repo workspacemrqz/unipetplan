@@ -24,6 +24,7 @@ import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/use-column-preferences";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 const allColumns = [
   "Nome",
@@ -209,6 +210,26 @@ export default function ContactSubmissions() {
         </div>
 
         <div className="flex gap-2">
+          <ExportButton 
+            data={allFilteredSubmissions}
+            filename="formularios_contato"
+            title="Exportação de Formulários de Contato"
+            pageName="Formulários de Contato"
+            columns={[
+              { key: 'name', label: 'Nome', formatter: (v) => v || '' },
+              { key: 'email', label: 'Email', formatter: (v) => v || '' },
+              { key: 'phone', label: 'Telefone', formatter: (v) => formatBrazilianPhoneForDisplay(v || '') },
+              { key: 'city', label: 'Cidade', formatter: (v) => v || 'Não informado' },
+              { key: 'petName', label: 'Nome do Pet', formatter: (v) => v || '' },
+              { key: 'animalType', label: 'Tipo de Animal', formatter: (v) => v || '' },
+              { key: 'petAge', label: 'Idade do Pet', formatter: (v) => v || '' },
+              { key: 'planInterest', label: 'Plano de Interesse', formatter: (v) => v || '' },
+              { key: 'message', label: 'Mensagem', formatter: (v) => v || '' },
+              { key: 'createdAt', label: 'Data de Envio', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
+            ]}
+            disabled={isLoading || allFilteredSubmissions.length === 0}
+          />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 

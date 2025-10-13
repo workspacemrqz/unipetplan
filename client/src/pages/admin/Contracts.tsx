@@ -29,6 +29,7 @@ import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 interface ContractWithDetails {
   id: string;
@@ -390,6 +391,30 @@ export default function Contracts() {
         </div>
 
         <div className="flex gap-2">
+          <ExportButton 
+            data={filteredContracts}
+            filename="contratos"
+            title="Exportação de Contratos"
+            pageName="Contratos"
+            columns={[
+              { key: 'contractNumber', label: 'Nº Contrato', formatter: (v) => v || '' },
+              { key: 'clientName', label: 'Cliente', formatter: (v) => v || 'N/A' },
+              { key: 'clientEmail', label: 'Email', formatter: (v) => v || 'N/A' },
+              { key: 'clientPhone', label: 'Telefone', formatter: (v) => v || 'N/A' },
+              { key: 'petName', label: 'Pet', formatter: (v) => v || 'N/A' },
+              { key: 'petSpecies', label: 'Espécie', formatter: (v) => v || 'N/A' },
+              { key: 'planName', label: 'Plano', formatter: (v) => v || 'N/A' },
+              { key: 'status', label: 'Status', formatter: (v) => statusLabels[v] || v },
+              { key: 'billingPeriod', label: 'Período', formatter: (v) => billingPeriodLabels[v] || v },
+              { key: 'monthlyAmount', label: 'Valor Mensal', formatter: (v) => formatCurrency(v) },
+              { key: 'paymentMethod', label: 'Método de Pagamento', formatter: (v) => paymentMethodLabels[v] || v },
+              { key: 'hasCoparticipation', label: 'Coparticipação', formatter: (v) => v ? 'Sim' : 'Não' },
+              { key: 'startDate', label: 'Data de Início', formatter: (v) => format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) },
+              { key: 'endDate', label: 'Data de Término', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : 'N/A' }
+            ]}
+            disabled={isLoading || filteredContracts.length === 0}
+          />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 

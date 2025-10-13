@@ -35,6 +35,7 @@ import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import type { NetworkUnit } from "@shared/schema";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
+import { ExportButton } from "@/components/admin/ExportButton";
 
 const allColumns = [
   "Nome",
@@ -283,6 +284,24 @@ export default function Network() {
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
+          
+          <ExportButton 
+            data={filteredUnits}
+            filename="rede_credenciada"
+            title="Exportação de Rede Credenciada"
+            pageName="Rede Credenciada"
+            columns={[
+              { key: 'name', label: 'Nome', formatter: (v) => v || '' },
+              { key: 'address', label: 'Endereço', formatter: (v) => v || 'Não informado' },
+              { key: 'phone', label: 'Telefone', formatter: (v) => formatBrazilianPhoneForDisplay(v || '') },
+              { key: 'whatsapp', label: 'WhatsApp', formatter: (v) => v ? formatBrazilianPhoneForDisplay(v) : 'Não informado' },
+              { key: 'cidade', label: 'Cidade', formatter: (v) => v || 'Não informado' },
+              { key: 'services', label: 'Serviços', formatter: (v) => Array.isArray(v) ? v.join(', ') : 'Não informado' },
+              { key: 'googleMapsUrl', label: 'Google Maps', formatter: (v) => v || 'Não informado' },
+              { key: 'isActive', label: 'Status', formatter: (v) => v ? 'Ativo' : 'Inativo' }
+            ]}
+            disabled={isLoading || filteredUnits.length === 0}
+          />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
