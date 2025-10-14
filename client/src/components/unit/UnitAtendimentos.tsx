@@ -66,7 +66,8 @@ interface AtendimentosResponse {
 
 const allColumns = [
   "Procedimento",
-  "Unidade",
+  "Cliente",
+  "Pet",
   "Valor",
   "Status",
   "Data",
@@ -399,7 +400,6 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
               { key: 'procedureName', label: 'Nome do Procedimento', formatter: (v) => v || '' },
               { key: 'clientName', label: 'Cliente', formatter: (v) => v || 'Não informado' },
               { key: 'petName', label: 'Pet', formatter: (v) => v || 'Não informado' },
-              { key: 'networkUnit.name', label: 'Unidade', formatter: (v) => v || '' },
               { key: 'value', label: 'Valor', formatter: (v) => v ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v)) : 'R$ 0,00' },
               { key: 'status', label: 'Status', formatter: (v) => v === 'open' ? 'Aberta' : v === 'closed' ? 'Concluída' : v === 'cancelled' ? 'Cancelada' : v || '' },
               { key: 'procedureNotes', label: 'Observações do Procedimento', formatter: (v) => v || '' },
@@ -449,7 +449,8 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
           <TableHeader>
             <TableRow className="bg-white border-b border-[#eaeaea]">
               {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
-              {visibleColumns.includes("Unidade") && <TableHead className="w-[180px] bg-white">Unidade</TableHead>}
+              {visibleColumns.includes("Cliente") && <TableHead className="w-[150px] bg-white">Cliente</TableHead>}
+              {visibleColumns.includes("Pet") && <TableHead className="w-[120px] bg-white">Pet</TableHead>}
               {visibleColumns.includes("Valor") && <TableHead className="w-[120px] bg-white">Valor</TableHead>}
               {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
               {visibleColumns.includes("Data") && <TableHead className="w-[120px] bg-white">Data</TableHead>}
@@ -492,9 +493,14 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                         </div>
                       </TableCell>
                     )}
-                    {visibleColumns.includes("Unidade") && (
+                    {visibleColumns.includes("Cliente") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        {atendimento.networkUnit?.name || "Não informada"}
+                        {atendimento.clientName || "Não informado"}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Pet") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {atendimento.petName || "Não informado"}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Valor") && (
