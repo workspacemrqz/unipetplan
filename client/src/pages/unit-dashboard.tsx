@@ -5,6 +5,8 @@ import { FileText, Users, Clipboard } from "lucide-react";
 import LoadingDots from '@/components/ui/LoadingDots';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DashboardStats {
   totalGuides: number;
@@ -33,6 +35,7 @@ export default function UnitDashboard() {
   const { slug } = useParams();
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
+  const [periodFilter, setPeriodFilter] = useState<string>('all');
   const [stats, setStats] = useState<DashboardStats>({
     totalGuides: 0,
     totalClients: 0,
@@ -62,6 +65,13 @@ export default function UnitDashboard() {
     }
     return undefined;
   }, [loading, slug]);
+
+  // Recarregar dados quando o filtro de período mudar
+  useEffect(() => {
+    if (!loading) {
+      fetchChartData();
+    }
+  }, [periodFilter]);
 
   const checkAuthentication = async () => {
     const token = localStorage.getItem('unit-token');
@@ -116,10 +126,11 @@ export default function UnitDashboard() {
 
   const fetchChartData = async () => {
     const token = localStorage.getItem('unit-token');
+    const periodParam = periodFilter !== 'all' ? `?period=${periodFilter}` : '';
     
     // Buscar procedimentos vendidos
     try {
-      const response = await fetch(`/api/units/${slug}/charts/procedures-sold`, {
+      const response = await fetch(`/api/units/${slug}/charts/procedures-sold${periodParam}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -135,7 +146,7 @@ export default function UnitDashboard() {
     
     // Buscar valor por usuário
     try {
-      const response = await fetch(`/api/units/${slug}/charts/value-by-user`, {
+      const response = await fetch(`/api/units/${slug}/charts/value-by-user${periodParam}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -151,7 +162,7 @@ export default function UnitDashboard() {
     
     // Buscar total de vendas
     try {
-      const response = await fetch(`/api/units/${slug}/charts/total-sales`, {
+      const response = await fetch(`/api/units/${slug}/charts/total-sales${periodParam}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -186,6 +197,25 @@ export default function UnitDashboard() {
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Dashboard</h1>
             <p className="text-sm text-muted-foreground">Visão geral da unidade</p>
           </div>
+        </div>
+
+        {/* Period Filter */}
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="period-filter">Filtrar por período:</Label>
+          <Select value={periodFilter} onValueChange={setPeriodFilter}>
+            <SelectTrigger id="period-filter" className="w-48">
+              <SelectValue placeholder="Selecione o período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os períodos</SelectItem>
+              <SelectItem value="today">Hoje</SelectItem>
+              <SelectItem value="week">Últimos 7 dias</SelectItem>
+              <SelectItem value="month">Últimos 30 dias</SelectItem>
+              <SelectItem value="3months">Últimos 3 meses</SelectItem>
+              <SelectItem value="6months">Últimos 6 meses</SelectItem>
+              <SelectItem value="year">Último ano</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Stats Cards */}
