@@ -216,8 +216,8 @@ export default function Dashboard() {
                       R$ {(stats?.totalRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <div className="mt-2 pt-2 border-t border-white/20">
-                      <p className="text-xs text-white/70">Total de pagamentos aprovados</p>
-                      <p className="text-sm sm:text-base font-semibold text-white">
+                      <p className="text-xs text-white/90">Total de pagamentos aprovados</p>
+                      <p className="text-sm sm:text-base font-bold text-white">
                         Histórico completo
                       </p>
                     </div>
