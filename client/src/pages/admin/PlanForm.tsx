@@ -83,6 +83,20 @@ export default function PlanForm() {
       contractText: "",
     },
   });
+  
+  // Observar mudanças no campo name para carregar texto padrão em novos planos
+  const watchedName = form.watch("name");
+  
+  useEffect(() => {
+    // Só atualizar o texto do contrato se for um novo plano e o campo contractText estiver vazio
+    if (!isEdit && watchedName && !form.getValues("contractText")) {
+      const defaultText = getDefaultContractText(watchedName);
+      if (defaultText) {
+        form.setValue("contractText", defaultText);
+        console.log("📄 Carregando texto padrão do contrato para novo plano:", watchedName);
+      }
+    }
+  }, [watchedName, isEdit, form]);
 
 
 
