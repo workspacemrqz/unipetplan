@@ -494,18 +494,23 @@ export default function UnitDashboard() {
             </CardHeader>
             <CardContent className="p-4 flex items-center justify-center">
               {valueByUser && valueByUser.length > 0 ? (
-                <PieChart width={400} height={300}>
+                <PieChart width={450} height={300}>
                   <Pie
                     data={valueByUser as any}
                     dataKey="value"
                     nameKey="name"
-                    cx={200}
+                    cx={225}
                     cy={150}
                     outerRadius={90}
                     innerRadius={50}
                     paddingAngle={4}
                     label={(props: any) => {
-                      const { x, y, name, value } = props;
+                      const RADIAN = Math.PI / 180;
+                      const { cx, cy, midAngle, innerRadius, outerRadius, name, value, index } = props;
+                      const radius = innerRadius + (outerRadius - innerRadius) * 1.5;
+                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                      
                       return (
                         <text 
                           x={x} 
@@ -513,8 +518,9 @@ export default function UnitDashboard() {
                           fill="#303030" 
                           fontSize={12}
                           fontWeight={500}
-                          textAnchor={x > 200 ? 'start' : 'end'}
+                          textAnchor={x > cx ? 'start' : 'end'}
                           dominantBaseline="central"
+                          style={{ userSelect: 'none' }}
                         >
                           {`${name}: R$ ${value.toFixed(2)}`}
                         </text>
@@ -522,7 +528,8 @@ export default function UnitDashboard() {
                     }}
                     labelLine={{ 
                       stroke: '#303030', 
-                      strokeWidth: 2 
+                      strokeWidth: 1.5,
+                      strokeDasharray: '2 2'
                     }}
                   >
                     {valueByUser.map((_, index) => (
