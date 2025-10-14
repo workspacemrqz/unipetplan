@@ -859,19 +859,15 @@ export default function CustomerPets() {
             className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden"
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--border-gray)' }}>
-              <div className="flex items-center space-x-3">
-                <FileText className="w-6 h-6" style={{ color: 'var(--text-teal)' }} />
-                <h3 className="text-xl font-semibold" style={{ color: 'var(--text-dark-primary)' }}>
-                  Atendimentos do Pet
-                </h3>
-              </div>
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="font-semibold text-base md:text-lg text-[#277677]">
+                Histórico de Atendimentos
+              </h3>
               <button
                 onClick={closeAtendimentos}
-                className="p-2 rounded-lg"
-                style={{ color: 'var(--text-dark-secondary)' }}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
 
@@ -881,24 +877,22 @@ export default function CustomerPets() {
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
                     <div className="w-8 h-8 border-4 rounded-full animate-spin mx-auto mb-4" 
-                      style={{borderColor: 'var(--text-teal)', borderTopColor: 'transparent'}}></div>
-                    <p style={{ color: 'var(--text-dark-secondary)' }}>Carregando atendimentos...</p>
+                      style={{borderColor: '#277677', borderTopColor: 'transparent'}}></div>
+                    <p className="text-gray-600">Carregando atendimentos...</p>
                   </div>
                 </div>
               ) : atendimentosError ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-                      style={{ background: 'var(--bg-cream-light)' }}>
-                      <X className="w-6 h-6" style={{ color: 'rgb(var(--destructive))' }} />
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-100">
+                      <X className="w-6 h-6 text-red-600" />
                     </div>
-                    <p className="text-lg font-medium" style={{ color: 'var(--text-dark-primary)' }}>
+                    <p className="text-lg font-medium text-gray-900">
                       Erro ao carregar atendimentos
                     </p>
                     <button
                       onClick={() => fetchPetAtendimentos(showAtendimentos)}
-                      className="mt-4 px-4 py-2 rounded-lg"
-                      style={{ background: 'var(--btn-ver-planos-bg)', color: 'var(--btn-ver-planos-text)' }}
+                      className="mt-4 px-4 py-2 rounded-lg bg-[#277677] text-white hover:bg-[#1f5a5b]"
                     >
                       Tentar Novamente
                     </button>
@@ -906,96 +900,65 @@ export default function CustomerPets() {
                 </div>
               ) : atendimentos.length === 0 ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-center">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                      style={{ background: 'var(--bg-cream-light)' }}>
-                      <FileText className="w-8 h-8" style={{ color: 'var(--text-teal)' }} />
-                    </div>
-                    <p className="text-lg font-medium" style={{ color: 'var(--text-dark-primary)' }}>
-                      Não há atendimentos vinculadas ao pet
-                    </p>
-                  </div>
+                  <p className="text-gray-500 text-sm">
+                    Nenhum atendimento anterior registrado
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {atendimentos.map((atendimento) => (
-                    <div key={atendimento.id} className="border rounded-lg p-4" style={{ borderColor: 'var(--border-gray)' }}>
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex flex-wrap gap-2 mb-2">
-                            {atendimento.procedures && atendimento.procedures.length > 0 ? (
-                              atendimento.procedures.map((proc, index) => (
-                                <span key={index} className="px-3 py-1 rounded-full text-sm font-medium"
-                                  style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
-                                  {proc.procedureName || proc.name}
-                                </span>
-                              ))
-                            ) : atendimento.procedure ? (
-                              atendimento.procedure.split(/[,/]/).map((proc, index) => (
-                                <span key={index} className="px-3 py-1 rounded-full text-sm font-medium"
-                                  style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
-                                  {proc.trim()}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="px-3 py-1 rounded-full text-sm font-medium"
-                                style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
-                                Sem procedimento
-                              </span>
-                            )}
-                          </div>
-                          
-                          <div className="space-y-1 text-sm" style={{ color: 'var(--text-dark-secondary)' }}>
-                            {atendimento.networkUnit && (
-                              <p>
-                                <strong style={{ color: 'var(--text-dark-primary)' }}>Unidade:</strong> {atendimento.networkUnit.name}
+                <div 
+                  className="space-y-3 max-h-[calc(80vh-180px)] overflow-y-auto pr-2"
+                  style={{ 
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#277677 #f0f0f0'
+                  }}
+                >
+                  {atendimentos
+                    .sort((a, b) => {
+                      const dateA = new Date(a.createdAt || '').getTime();
+                      const dateB = new Date(b.createdAt || '').getTime();
+                      return dateB - dateA;
+                    })
+                    .map((atendimento, index, array) => (
+                    <div key={atendimento.id}>
+                      <div className="border-l-2 border-[#277677] pl-3 text-sm pb-3">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 break-words">
+                              {atendimento.procedures && atendimento.procedures.length > 0
+                                ? atendimento.procedures.map(p => p.procedureName || p.name).join(', ')
+                                : atendimento.procedure || 'Procedimento não especificado'}
+                            </p>
+                            <p className="text-gray-600 text-xs break-words">
+                              {atendimento.createdAt 
+                                ? new Date(atendimento.createdAt).toLocaleDateString('pt-BR')
+                                : 'Data não informada'}
+                              {atendimento.networkUnit && ` - ${atendimento.networkUnit.name}`}
+                            </p>
+                            {atendimento.generalNotes && (
+                              <p className="text-gray-700 mt-1 break-all" style={{ wordWrap: 'break-word', overflowWrap: 'anywhere' }}>
+                                Observação: {atendimento.generalNotes}
                               </p>
                             )}
-                            {atendimento.createdAt && (
-                              <p>
-                                <strong style={{ color: 'var(--text-dark-primary)' }}>Data:</strong> {new Date(atendimento.createdAt).toLocaleDateString('pt-BR')}
-                              </p>
-                            )}
-                            {atendimento.value && (
-                              <p>
-                                <strong style={{ color: 'var(--text-dark-primary)' }}>Valor:</strong> R$ {atendimento.value}
+                            {atendimento.procedureNotes && (
+                              <p className="text-gray-700 mt-1 break-all" style={{ wordWrap: 'break-word', overflowWrap: 'anywhere' }}>
+                                Notas: {atendimento.procedureNotes}
                               </p>
                             )}
                           </div>
-                        </div>
-                        <div className="ml-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            atendimento.status === 'closed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : atendimento.status === 'open' 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {atendimento.status === 'closed' ? 'Concluído' : atendimento.status === 'open' ? 'Aberto' : atendimento.status}
+                          <span 
+                            className="flex-shrink-0 px-2 py-1 rounded text-xs" 
+                            style={{ backgroundColor: 'rgba(39, 118, 119, 0.1)', color: '#277677' }}
+                          >
+                            {atendimento.status === 'completed' || atendimento.status === 'closed' ? 'Concluída' :
+                             atendimento.status === 'pending' ? 'Pendente' :
+                             atendimento.status === 'open' ? 'Aberta' :
+                             atendimento.status === 'cancelled' ? 'Cancelada' :
+                             'Em andamento'}
                           </span>
                         </div>
                       </div>
-                      
-                      {atendimento.procedureNotes && (
-                        <div className="mt-3 bg-gray-50 rounded-lg p-3">
-                          <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-dark-primary)' }}>
-                            Notas do Procedimento:
-                          </p>
-                          <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-dark-secondary)' }}>
-                            {atendimento.procedureNotes}
-                          </p>
-                        </div>
-                      )}
-                      
-                      {atendimento.generalNotes && (
-                        <div className="mt-3 bg-gray-50 rounded-lg p-3">
-                          <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-dark-primary)' }}>
-                            Observações Gerais:
-                          </p>
-                          <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-dark-secondary)' }}>
-                            {atendimento.generalNotes}
-                          </p>
-                        </div>
+                      {index < array.length - 1 && (
+                        <hr className="border-gray-200 mb-3" />
                       )}
                     </div>
                   ))}
