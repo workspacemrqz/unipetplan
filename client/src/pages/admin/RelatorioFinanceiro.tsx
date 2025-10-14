@@ -211,6 +211,31 @@ export default function RelatorioFinanceiro() {
             filename="relatorio_financeiro"
             title="Exportação de Relatório Financeiro"
             pageName="Relatório Financeiro"
+            prepareData={async () => {
+              // Buscar TODOS os dados com os filtros aplicados (sem paginação)
+              const queryParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
+              const params = new URLSearchParams(queryParams);
+              const response = await fetch(`/admin/api/financial-report?${params}`);
+              
+              if (!response.ok) {
+                throw new Error('Erro ao buscar dados para exportação');
+              }
+              
+              const allData: FinancialEntry[] = await response.json();
+              
+              // Aplicar filtro de busca se houver
+              return searchQuery 
+                ? allData.filter(entry => {
+                    const searchLower = searchQuery.toLowerCase();
+                    return (
+                      entry.clientName?.toLowerCase().includes(searchLower) ||
+                      entry.petName?.toLowerCase().includes(searchLower) ||
+                      entry.procedure?.toLowerCase().includes(searchLower) ||
+                      entry.networkUnitName?.toLowerCase().includes(searchLower)
+                    );
+                  })
+                : allData;
+            }}
             columns={[
               { key: 'date', label: 'Data', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : '' },
               { key: 'clientName', label: 'Cliente', formatter: (v) => v || '' },

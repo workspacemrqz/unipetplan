@@ -395,6 +395,29 @@ export default function AdminLogsPage() {
           filename={sourceFilter === "admin" ? "logs_administrativos" : "logs_unidades"}
           title={sourceFilter === "admin" ? "Exportação de Logs Administrativos" : "Exportação de Logs de Unidades"}
           pageName="Logs de Ações"
+          prepareData={async () => {
+            // Buscar TODOS os logs com os filtros aplicados (sem paginação)
+            const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
+            const queryParams = {
+              limit: "999999", // Número muito grande para buscar todos os registros
+              ...dateParams
+            };
+            
+            const params = new URLSearchParams(queryParams);
+            const response = await fetch(
+              sourceFilter === "admin" 
+                ? `/admin/api/action-logs?${params}`
+                : `/admin/api/unit-action-logs?${params}`
+            );
+            
+            if (!response.ok) {
+              throw new Error('Erro ao buscar dados para exportação');
+            }
+            
+            const allData = await response.json();
+            const allLogs = sourceFilter === "admin" ? allData : allData.data || [];
+            return allLogs;
+          }}
           columns={sourceFilter === "admin" ? [
             { key: 'createdAt', label: 'Data/Hora', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
             { key: 'adminIdentifier', label: 'Administrador', formatter: (v) => v || 'Sistema' },
