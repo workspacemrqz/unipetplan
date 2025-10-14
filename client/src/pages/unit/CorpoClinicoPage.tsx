@@ -411,14 +411,14 @@ export default function CorpoClinicoPage() {
                     {visibleColumns.includes("Especialidade") && <TableCell className="bg-white">{vet.specialty || "-"}</TableCell>}
                     {visibleColumns.includes("Credenciais") && (
                       <TableCell className="bg-white">
-                        <Badge variant={vet.login ? "default" : "secondary"}>
+                        <Badge className="border border-border rounded-lg bg-background text-foreground">
                           {vet.login ? "Configurado" : "Não configurado"}
                         </Badge>
                       </TableCell>
                     )}
                     {visibleColumns.includes("Acesso Atendimentos") && (
                       <TableCell className="bg-white">
-                        <Badge variant={vet.canAccessAtendimentos ? "default" : "secondary"}>
+                        <Badge className="border border-border rounded-lg bg-background text-foreground">
                           {vet.canAccessAtendimentos ? "Sim" : "Não"}
                         </Badge>
                       </TableCell>
@@ -435,17 +435,17 @@ export default function CorpoClinicoPage() {
                       <TableCell className="text-right bg-white">
                         <div className="flex justify-end gap-2">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             onClick={() => handleEdit(vet)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             onClick={() => handleDelete(vet.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
