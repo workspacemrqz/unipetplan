@@ -39,18 +39,19 @@ import {
 import { UserCheck, Plus, Search, Edit, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, Globe, User, MoreHorizontal, Loader2 } from "lucide-react";
 
 const AVAILABLE_PERMISSIONS = [
-  { id: "clients", label: "Clientes", description: "Acesso à seção de clientes" },
-  { id: "pets", label: "Pets", description: "Acesso à seção de pets" },
-  { id: "contracts", label: "Contratos", description: "Acesso à seção de contratos de planos" },
-  { id: "payments", label: "Financeiro", description: "Acesso à seção de pagamentos e transações" },
-  { id: "procedures", label: "Procedimentos", description: "Acesso à seção de procedimentos médicos" },
-  { id: "guides", label: "Atendimentos", description: "Acesso à seção de Atendimentos" },
-  { id: "plans", label: "Planos", description: "Acesso à seção de planos de saúde" },
-  { id: "network", label: "Rede", description: "Acesso à seção de rede credenciada" },
-  { id: "faq", label: "FAQ", description: "Acesso à seção de perguntas frequentes" },
-  { id: "submissions", label: "Formulários", description: "Acesso à seção de formulários de contato" },
-  { id: "settings", label: "Configurações", description: "Acesso à seção de configurações do sistema" },
-  { id: "administration", label: "Administração", description: "Acesso à seção de administração de usuários" },
+  { id: "dashboard", label: "Dashboard", description: "Acesso ao painel principal (/admin)", path: "/admin" },
+  { id: "clients", label: "Clientes", description: "Acesso à seção de clientes (/admin/clientes)", path: "/admin/clientes" },
+  { id: "contracts", label: "Contratos", description: "Acesso à seção de contratos (/admin/contratos)", path: "/admin/contratos" },
+  { id: "atendimentos", label: "Atendimentos", description: "Acesso à seção de atendimentos (/admin/atendimentos)", path: "/admin/atendimentos" },
+  { id: "financeiro", label: "Financeiro", description: "Acesso à seção financeira (/admin/financeiro)", path: "/admin/financeiro" },
+  { id: "cupom", label: "Cupom", description: "Acesso à seção de cupons (/admin/cupom)", path: "/admin/cupom" },
+  { id: "relatorio-financeiro", label: "Relatório Financeiro", description: "Acesso aos relatórios financeiros (/admin/relatorio-financeiro)", path: "/admin/relatorio-financeiro" },
+  { id: "formularios", label: "Formulários", description: "Acesso aos formulários (/admin/formularios)", path: "/admin/formularios" },
+  { id: "avaliacoes", label: "Avaliações", description: "Acesso às avaliações (/admin/avaliacoes)", path: "/admin/avaliacoes" },
+  { id: "rede", label: "Rede", description: "Acesso à rede credenciada (/admin/rede)", path: "/admin/rede" },
+  { id: "vendedores", label: "Vendedores", description: "Acesso à gestão de vendedores (/admin/vendedores)", path: "/admin/vendedores" },
+  { id: "procedimentos", label: "Procedimentos", description: "Acesso aos procedimentos médicos (/admin/procedimentos)", path: "/admin/procedimentos" },
+  { id: "perguntas-frequentes", label: "Perguntas Frequentes", description: "Acesso ao FAQ (/admin/perguntas-frequentes)", path: "/admin/perguntas-frequentes" },
 ];
 
 const allColumns = [
