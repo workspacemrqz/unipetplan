@@ -217,8 +217,8 @@ export default function Dashboard() {
                     </p>
                     <div className="mt-3 pt-2 border-t border-white/20">
                       <p className="text-xs text-white/80">Total de pagamentos aprovados</p>
-                      <p className="text-xs text-white/60 mt-1">
-                        {hasDateFilter ? 'Período filtrado' : 'Todo o período'}
+                      <p className="text-sm font-medium text-white mt-1">
+                        Histórico completo
                       </p>
                     </div>
                   </>
