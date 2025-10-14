@@ -7,7 +7,7 @@ import { ptBR } from 'date-fns/locale';
 interface ExportColumn {
   key: string;
   label: string;
-  formatter?: (value: any) => string;
+  formatter?: (value: any, row?: any) => string;
 }
 
 interface PDFExportOptions {
@@ -30,12 +30,23 @@ export async function exportToPDF({
   filename,
   title,
 }: PDFExportOptions) {
-  const doc = new jsPDF();
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+    floatPrecision: 16
+  });
+  
+  // Set font to Helvetica which has better support for special characters
+  doc.setFont('helvetica');
   
   // Add title
   if (title) {
     doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
     doc.text(title, 14, 15);
+    doc.setFont('helvetica', 'normal');
   }
   
   // Prepare table data
@@ -46,11 +57,12 @@ export async function exportToPDF({
     tableColumns = columns.map(col => col.label);
     tableRows = data.map(row => 
       columns.map(col => {
-        const value = row[col.key];
+        const value = getNestedValue(row, col.key);
         if (col.formatter) {
-          return col.formatter(value);
+          // Pass both value and row to formatter
+          return String(col.formatter(value, row) || '');
         }
-        return formatValue(value);
+        return String(formatValue(value) || '');
       })
     );
   } else {
@@ -60,26 +72,53 @@ export async function exportToPDF({
         key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')
       );
       tableRows = data.map(row => 
-        Object.values(row).map(value => formatValue(value))
+        Object.values(row).map(value => String(formatValue(value) || ''))
       );
     }
   }
   
-  // Add table
+  // Add table with improved configuration
   autoTable(doc, {
     head: [tableColumns],
     body: tableRows,
     startY: title ? 25 : 10,
+    theme: 'striped',
     styles: {
+      font: 'helvetica',
       fontSize: 9,
-      cellPadding: 2,
+      cellPadding: 3,
+      overflow: 'linebreak',
+      cellWidth: 'auto',
+      halign: 'left',
+      valign: 'middle',
+      lineColor: [200, 200, 200],
+      lineWidth: 0.1,
     },
     headStyles: {
       fillColor: [39, 118, 119], // Teal color
-      textColor: 255,
+      textColor: [255, 255, 255],
+      fontSize: 10,
+      fontStyle: 'bold',
+      halign: 'left',
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245],
+    },
+    columnStyles: {
+      // Ensure text doesn't break incorrectly
+      0: { cellWidth: 'auto' },
+    },
+    margin: { top: 10, right: 10, bottom: 10, left: 10 },
+    tableWidth: 'auto',
+    showHead: 'firstPage',
+    tableLineColor: [200, 200, 200],
+    tableLineWidth: 0.1,
+    // Prevent text from being split incorrectly
+    didParseCell: function(data: any) {
+      // Ensure the text is treated as a single string
+      if (data.cell && data.cell.text) {
+        data.cell.text = Array.isArray(data.cell.text) ? data.cell.text : [data.cell.text];
+      }
     },
   });
   
@@ -88,6 +127,7 @@ export async function exportToPDF({
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
     doc.text(
       `Exportado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`,
       14,
@@ -102,6 +142,22 @@ export async function exportToPDF({
   
   // Save the PDF
   doc.save(filename);
+}
+
+// Helper function to get nested values from objects
+function getNestedValue(obj: any, path: string): any {
+  const keys = path.split('.');
+  let value = obj;
+  
+  for (const key of keys) {
+    if (value && typeof value === 'object' && key in value) {
+      value = value[key];
+    } else {
+      return undefined;
+    }
+  }
+  
+  return value;
 }
 
 export async function exportToExcel({
@@ -123,8 +179,8 @@ export async function exportToExcel({
     worksheetData = data.map(row => {
       const formattedRow: any = {};
       columns.forEach(col => {
-        const value = row[col.key];
-        formattedRow[col.key] = col.formatter ? col.formatter(value) : formatValue(value);
+        const value = getNestedValue(row, col.key);
+        formattedRow[col.key] = col.formatter ? col.formatter(value, row) : formatValue(value);
       });
       return formattedRow;
     });
