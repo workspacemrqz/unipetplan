@@ -181,9 +181,9 @@ export default function CustomerContract() {
   };
 
   const getDefaultContractText = () => {
-    return `CONTRATO DE PRESTAÇÃO DE SERVIÇOS VETERINÁRIOS - PLANO DE SAÚDE PET
+    return `Contrato VETERINÁRIOS - PLANO DE SAÚDE PET
 
-Por este instrumento particular de Contrato de Prestação de Serviços Veterinários, as partes abaixo qualificadas celebram o presente contrato mediante as cláusulas e condições seguintes:
+Por este instrumento particular de Contrato Veterinários, as partes abaixo qualificadas celebram o presente contrato mediante as cláusulas e condições seguintes:
 
 CLÁUSULA PRIMEIRA - DAS PARTES
 
@@ -321,7 +321,7 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
             <div className="hidden sm:flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-bold" style={{ color: 'var(--text-dark-primary)' }}>
-                  Contrato de Prestação de Serviços
+                  Contrato
                 </h1>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-dark-secondary)' }}>
                   Plano de Saúde Pet
@@ -346,7 +346,7 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
             <div className="sm:hidden">
               <div>
                 <h1 className="text-2xl font-bold" style={{ color: 'var(--text-dark-primary)' }}>
-                  Contrato de Prestação de Serviços
+                  Contrato
                 </h1>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-dark-secondary)' }}>
                   Plano de Saúde Pet

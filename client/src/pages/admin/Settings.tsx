@@ -594,7 +594,7 @@ export default function Settings() {
                         name="contractText"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Contrato de Prestação de Serviços</FormLabel>
+                            <FormLabel>Contrato</FormLabel>
                             <FormControl>
                               <Textarea 
                                 {...field} 

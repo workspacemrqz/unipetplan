@@ -172,6 +172,9 @@ export default function UnitDashboard() {
   const [coverageSearch, setCoverageSearch] = useState("");
   const [coverageStatusFilter, setCoverageStatusFilter] = useState("all");
 
+  // Period filter state
+  const [periodFilter, setPeriodFilter] = useState<string>("all");
+
   // CPF search functionality
   const handleCpfSearch = () => {
     if (!cpfSearch.trim()) return;
@@ -637,6 +640,66 @@ export default function UnitDashboard() {
     }).format(parseFloat(value));
   };
 
+  // Helper function to filter data by period
+  const filterByPeriod = <T extends { createdAt: string }>(data: T[]): T[] => {
+    if (periodFilter === "all") return data;
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    return data.filter(item => {
+      const itemDate = new Date(item.createdAt);
+      
+      switch (periodFilter) {
+        case "today":
+          return itemDate >= today;
+        case "week":
+          const weekAgo = new Date(today);
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return itemDate >= weekAgo;
+        case "month":
+          const monthAgo = new Date(today);
+          monthAgo.setDate(monthAgo.getDate() - 30);
+          return itemDate >= monthAgo;
+        case "3months":
+          const threeMonthsAgo = new Date(today);
+          threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+          return itemDate >= threeMonthsAgo;
+        case "6months":
+          const sixMonthsAgo = new Date(today);
+          sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+          return itemDate >= sixMonthsAgo;
+        case "year":
+          const yearAgo = new Date(today);
+          yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+          return itemDate >= yearAgo;
+        default:
+          return true;
+      }
+    });
+  };
+
+  // Period filter component
+  const PeriodFilterComponent = () => (
+    <div className="flex items-center space-x-2 mb-4">
+      <Label htmlFor="period-filter">Filtrar por período:</Label>
+      <Select value={periodFilter} onValueChange={setPeriodFilter}>
+        <SelectTrigger id="period-filter" className="w-48">
+          <SelectValue placeholder="Selecione o período" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Todos os períodos</SelectItem>
+          <SelectItem value="today">Hoje</SelectItem>
+          <SelectItem value="week">Últimos 7 dias</SelectItem>
+          <SelectItem value="month">Últimos 30 dias</SelectItem>
+          <SelectItem value="3months">Últimos 3 meses</SelectItem>
+          <SelectItem value="6months">Últimos 6 meses</SelectItem>
+          <SelectItem value="year">Último ano</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
   // Memoized filtered coverage for performance optimization
   const filteredCoverage = useMemo(() => {
     return coverage.filter(item => {
@@ -784,6 +847,7 @@ export default function UnitDashboard() {
             <div className="space-y-4">
               <div className="mb-4">
                 <h3 className="text-lg font-semibold mb-4">Atendimentos</h3>
+                <PeriodFilterComponent />
                 <Tabs defaultValue="open" className="space-y-4">
                   <TabsList className="grid w-full grid-cols-3 gap-1">
                     <TabsTrigger value="open">Abertas</TabsTrigger>
@@ -794,7 +858,7 @@ export default function UnitDashboard() {
                   {["open", "closed", "cancelled"].map(status => (
                     <TabsContent key={status} value={status}>
                       <div className="grid gap-4">
-                        {atendimentos
+                        {filterByPeriod(atendimentos)
                           .filter(atendimento => atendimento.unitStatus === status)
                           .map(atendimento => (
                             <Card key={atendimento.id} className="">
@@ -860,7 +924,7 @@ export default function UnitDashboard() {
                             </Card>
                           ))}
                         
-                        {atendimentos.filter(atendimento => atendimento.unitStatus === status).length === 0 && (
+                        {filterByPeriod(atendimentos).filter(atendimento => atendimento.unitStatus === status).length === 0 && (
                           <Card>
                             <CardContent className="p-3 sm:p-4 lg:p-6 text-center">
                               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -897,6 +961,8 @@ export default function UnitDashboard() {
                 </Button>
               </div>
               
+              <PeriodFilterComponent />
+              
               <div className="flex items-center space-x-2">
                 <Search className="h-4 w-4 text-gray-400" />
                 <Input
@@ -914,7 +980,7 @@ export default function UnitDashboard() {
                 </div>
               ) : (
                 <div className="grid gap-4">
-                  {clients
+                  {filterByPeriod(clients)
                     .filter(client => 
                       client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                       client.cpf.includes(searchTerm) ||
@@ -951,7 +1017,7 @@ export default function UnitDashboard() {
                       </Card>
                     ))}
                   
-                  {clients.filter(client => 
+                  {filterByPeriod(clients).filter(client => 
                     client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     client.cpf.includes(searchTerm) ||
                     (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -995,6 +1061,8 @@ export default function UnitDashboard() {
                   Inicie um novo atendimento para um cliente
                 </p>
               </div>
+
+              <PeriodFilterComponent />
 
               <SteppedAtendimentoForm
                 mode="admin"
@@ -1082,6 +1150,8 @@ export default function UnitDashboard() {
                   </Button>
                 </div>
               </div>
+
+              <PeriodFilterComponent />
 
               {loadingCards ? (
                 <div className="flex items-center justify-center py-8">
@@ -1189,6 +1259,8 @@ export default function UnitDashboard() {
                   {loadingCoverage ? "Carregando..." : "Atualizar"}
                 </Button>
               </div>
+
+              <PeriodFilterComponent />
 
               {/* Filters */}
               {!loadingCoverage && coverage.length > 0 && (

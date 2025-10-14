@@ -6636,13 +6636,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const docDefinition: any = {
           content: [
           {
-            text: 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS VETERINÁRIOS - PLANO DE SAÚDE PET',
+            text: 'Contrato VETERINÁRIOS - PLANO DE SAÚDE PET',
             style: 'header',
             alignment: 'center'
           },
           { text: '\n\n' },
           {
-            text: 'Por este instrumento particular de Contrato de Prestação de Serviços Veterinários, as partes abaixo qualificadas celebram o presente contrato mediante as cláusulas e condições seguintes:',
+            text: 'Por este instrumento particular de Contrato Veterinários, as partes abaixo qualificadas celebram o presente contrato mediante as cláusulas e condições seguintes:',
             style: 'text'
           },
           { text: '\n' },
