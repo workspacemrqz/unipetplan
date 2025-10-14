@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -89,6 +90,8 @@ export default function CustomerContract() {
   const [, navigate] = useLocation();
   const { client, isLoading: authLoading } = useAuth();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedPet, setSelectedPet] = useState<string>("");
+  const [contracts, setContracts] = useState<any[]>([]);
   const contractContentRef = useRef<HTMLDivElement>(null);
   
   // Fetch site settings to get contract text
@@ -103,6 +106,58 @@ export default function CustomerContract() {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+  
+  // Fetch contracts and pets
+  useEffect(() => {
+    const loadContracts = async () => {
+      if (!client || authLoading) return;
+      
+      try {
+        const response = await fetch('/api/customer/contracts', {
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setContracts(data.contracts || []);
+        }
+      } catch (error) {
+        console.error('Error loading contracts:', error);
+      }
+    };
+    
+    loadContracts();
+  }, [client, authLoading]);
+  
+  // Get unique pets from contracts
+  const uniquePets = useMemo(() => {
+    const petsMap = new Map<string, { id: string, name: string, planName: string }>();
+    
+    contracts.forEach(contract => {
+      if (contract.petId && contract.petName && !petsMap.has(contract.petId)) {
+        petsMap.set(contract.petId, {
+          id: contract.petId,
+          name: contract.petName,
+          planName: contract.planName
+        });
+      }
+    });
+    
+    return Array.from(petsMap.values());
+  }, [contracts]);
+  
+  // Auto-select the first pet when pets are loaded
+  useEffect(() => {
+    if (uniquePets.length > 0 && !selectedPet && uniquePets[0]) {
+      setSelectedPet(uniquePets[0].id);
+    }
+  }, [uniquePets, selectedPet]);
+  
+  // Get selected contract and plan
+  const selectedContract = useMemo(() => {
+    if (!selectedPet) return null;
+    return contracts.find(c => c.petId === selectedPet);
+  }, [contracts, selectedPet]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -311,6 +366,39 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
             <span>Voltar</span>
           </button>
 
+          {/* Pet Selector */}
+          {uniquePets.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-dark-primary)' }}>
+                Selecione o pet para visualizar o contrato:
+              </label>
+              <div className="w-full sm:w-[300px]">
+                <Select value={selectedPet} onValueChange={setSelectedPet}>
+                  <SelectTrigger 
+                    className="w-full p-3 rounded-lg border text-sm [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+                    style={{
+                      borderColor: 'var(--border-gray)',
+                      background: 'white'
+                    }}
+                  >
+                    <SelectValue placeholder="Escolha um pet" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniquePets.map((pet) => (
+                      <SelectItem key={pet.id} value={pet.id}>
+                        {pet.name} - {pet.planName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </motion.div>
+          )}
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -324,7 +412,7 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
                   Contrato
                 </h1>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-dark-secondary)' }}>
-                  Plano de Saúde Pet
+                  {selectedContract ? `${selectedContract.planName} - ${selectedContract.petName}` : 'Plano de Saúde Pet'}
                 </p>
               </div>
               <button
@@ -349,7 +437,7 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
                   Contrato
                 </h1>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-dark-secondary)' }}>
-                  Plano de Saúde Pet
+                  {selectedContract ? `${selectedContract.planName} - ${selectedContract.petName}` : 'Plano de Saúde Pet'}
                 </p>
                 <button
                   onClick={handleDownloadPDF}
