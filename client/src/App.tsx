@@ -50,6 +50,7 @@ import ChatAI from "@/components/chat/chat-ai";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminLayout from "@/components/admin/Layout";
 import AuthGuard from "@/components/admin/AuthGuard";
+import PermissionGuard from "@/components/admin/PermissionGuard";
 import { queryClient as adminQueryClient } from "./lib/admin/queryClient";
 
 // Componente de loading global com fallback robusto
@@ -118,52 +119,151 @@ function AdminRouter() {
           <AdminLayout>
           <Switch>
             {/* Dashboard route */}
-            <Route path="/" component={AdminDashboard} />
+            <Route path="/" component={() => (
+              <PermissionGuard requiredPermission="dashboard">
+                <AdminDashboard />
+              </PermissionGuard>
+            )} />
             
             {/* Client management routes */}
-            <Route path="/clientes" component={AdminClients} />
-            <Route path="/clientes/novo" component={AdminClientForm} />
-            <Route path="/clientes/:id/editar" component={AdminClientForm} />
-            <Route path="/clientes/:clientId/pets/novo" component={AdminPetForm} />
+            <Route path="/clientes" component={() => (
+              <PermissionGuard requiredPermission="clientes">
+                <AdminClients />
+              </PermissionGuard>
+            )} />
+            <Route path="/clientes/novo" component={() => (
+              <PermissionGuard requiredPermission="clientes">
+                <AdminClientForm />
+              </PermissionGuard>
+            )} />
+            <Route path="/clientes/:id/editar" component={() => (
+              <PermissionGuard requiredPermission="clientes">
+                <AdminClientForm />
+              </PermissionGuard>
+            )} />
+            <Route path="/clientes/:clientId/pets/novo" component={() => (
+              <PermissionGuard requiredPermission="clientes">
+                <AdminPetForm />
+              </PermissionGuard>
+            )} />
             
             {/* Pet management routes */}
-            <Route path="/pets/:id/editar" component={AdminPetForm} />
+            <Route path="/pets/:id/editar" component={() => (
+              <PermissionGuard requiredPermission="clientes">
+                <AdminPetForm />
+              </PermissionGuard>
+            )} />
             
             {/* Guide management routes */}
-            <Route path="/atendimentos" component={AdminGuides} />
-            <Route path="/atendimentos/novo" component={AdminGuideForm} />
-            <Route path="/atendimentos/:id/editar" component={AdminGuideForm} />
+            <Route path="/atendimentos" component={() => (
+              <PermissionGuard requiredPermission="atendimentos">
+                <AdminGuides />
+              </PermissionGuard>
+            )} />
+            <Route path="/atendimentos/novo" component={() => (
+              <PermissionGuard requiredPermission="atendimentos">
+                <AdminGuideForm />
+              </PermissionGuard>
+            )} />
+            <Route path="/atendimentos/:id/editar" component={() => (
+              <PermissionGuard requiredPermission="atendimentos">
+                <AdminGuideForm />
+              </PermissionGuard>
+            )} />
             
-            {/* Plan management routes */}
+            {/* Plan management routes - sem verificação de permissão */}
             <Route path="/planos" component={AdminPlans} />
             <Route path="/planos/novo" component={AdminPlanForm} />
             <Route path="/planos/:id/editar" component={AdminPlanForm} />
             
             {/* Network management routes */}
-            <Route path="/rede" component={AdminNetwork} />
-            <Route path="/rede/novo" component={AdminNetworkForm} />
-            <Route path="/rede/:id/editar" component={AdminNetworkForm} />
+            <Route path="/rede" component={() => (
+              <PermissionGuard requiredPermission="rede">
+                <AdminNetwork />
+              </PermissionGuard>
+            )} />
+            <Route path="/rede/novo" component={() => (
+              <PermissionGuard requiredPermission="rede">
+                <AdminNetworkForm />
+              </PermissionGuard>
+            )} />
+            <Route path="/rede/:id/editar" component={() => (
+              <PermissionGuard requiredPermission="rede">
+                <AdminNetworkForm />
+              </PermissionGuard>
+            )} />
             
             {/* Seller management routes */}
-            <Route path="/vendedores" component={AdminSellers} />
-            <Route path="/vendedores/novo" component={AdminSellerForm} />
-            <Route path="/vendedores/:id/editar" component={AdminSellerForm} />
-            <Route path="/vendedores/:id/pagamentos" component={AdminSellerPayments} />
+            <Route path="/vendedores" component={() => (
+              <PermissionGuard requiredPermission="vendedores">
+                <AdminSellers />
+              </PermissionGuard>
+            )} />
+            <Route path="/vendedores/novo" component={() => (
+              <PermissionGuard requiredPermission="vendedores">
+                <AdminSellerForm />
+              </PermissionGuard>
+            )} />
+            <Route path="/vendedores/:id/editar" component={() => (
+              <PermissionGuard requiredPermission="vendedores">
+                <AdminSellerForm />
+              </PermissionGuard>
+            )} />
+            <Route path="/vendedores/:id/pagamentos" component={() => (
+              <PermissionGuard requiredPermission="vendedores">
+                <AdminSellerPayments />
+              </PermissionGuard>
+            )} />
             
             {/* Financial and Contracts routes */}
-            <Route path="/financeiro" component={AdminFinancial} />
-            <Route path="/relatorio-financeiro" component={AdminRelatorioFinanceiro} />
-            <Route path="/cupom" component={AdminCoupons} />
-            <Route path="/contratos" component={AdminContracts} />
+            <Route path="/financeiro" component={() => (
+              <PermissionGuard requiredPermission="financeiro">
+                <AdminFinancial />
+              </PermissionGuard>
+            )} />
+            <Route path="/relatorio-financeiro" component={() => (
+              <PermissionGuard requiredPermission="relatorio_financeiro">
+                <AdminRelatorioFinanceiro />
+              </PermissionGuard>
+            )} />
+            <Route path="/cupom" component={() => (
+              <PermissionGuard requiredPermission="cupom">
+                <AdminCoupons />
+              </PermissionGuard>
+            )} />
+            <Route path="/contratos" component={() => (
+              <PermissionGuard requiredPermission="contratos">
+                <AdminContracts />
+              </PermissionGuard>
+            )} />
             
             {/* Other admin routes */}
-            <Route path="/procedimentos" component={AdminProcedures} />
-            <Route path="/perguntas-frequentes" component={AdminFAQ} />
-            <Route path="/formularios" component={AdminContactSubmissions} />
-            <Route path="/avaliacoes" component={AdminEvaluations} />
+            <Route path="/procedimentos" component={() => (
+              <PermissionGuard requiredPermission="procedimentos">
+                <AdminProcedures />
+              </PermissionGuard>
+            )} />
+            <Route path="/perguntas-frequentes" component={() => (
+              <PermissionGuard requiredPermission="faq">
+                <AdminFAQ />
+              </PermissionGuard>
+            )} />
+            <Route path="/formularios" component={() => (
+              <PermissionGuard requiredPermission="formularios">
+                <AdminContactSubmissions />
+              </PermissionGuard>
+            )} />
+            <Route path="/avaliacoes" component={() => (
+              <PermissionGuard requiredPermission="avaliacoes">
+                <AdminEvaluations />
+              </PermissionGuard>
+            )} />
+            {/* Configurações - sem verificação de permissão */}
             <Route path="/configuracoes" component={AdminSettings} />
             <Route path="/documentacao" component={AdminDocumentation} />
+            {/* Administração - sem verificação de permissão (sempre visível) */}
             <Route path="/administracao" component={AdminAdministration} />
+            {/* Logs - sem verificação de permissão */}
             <Route path="/logs" component={AdminLogsPage} />
             
             {/* Unit Dashboard (special case) */}
