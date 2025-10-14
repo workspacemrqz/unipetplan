@@ -229,16 +229,20 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card style={{ backgroundColor: '#FFFFFF' }}>
+        <Card style={{ 
+          background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+          border: 'none',
+          boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+        }}>
           <CardContent className="p-3 sm:p-4 lg:p-6">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground">Receita por Plano</p>
+                <p className="text-xs sm:text-sm text-white/80">Receita por Plano</p>
                 {revenueLoading ? (
                   <Skeleton className="h-6 sm:h-8 w-full mt-1" />
                 ) : revenueError ? (
-                  <Alert className="mt-2">
-                    <AlertDescription className="text-xs">
+                  <Alert className="mt-2 bg-white/10 border-white/20">
+                    <AlertDescription className="text-xs text-white/70">
                       Erro ao carregar receita por plano
                     </AlertDescription>
                   </Alert>
@@ -246,8 +250,8 @@ export default function Dashboard() {
                   <div className="space-y-2 mt-2">
                     {planRevenue.map(plan => (
                       <div key={plan.planId} className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-foreground truncate">{plan.planName}</span>
-                        <span className="text-sm font-bold text-primary ml-2">
+                        <span className="text-sm font-medium text-white truncate">{plan.planName}</span>
+                        <span className="text-sm font-bold text-white ml-2">
                           R$ {plan.totalRevenue.toLocaleString('pt-BR', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
@@ -258,13 +262,13 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="text-center py-2 mt-2">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-white/70">
                       Nenhuma receita encontrada
                     </p>
                   </div>
                 )}
               </div>
-              <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+              <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-white flex-shrink-0" />
             </div>
           </CardContent>
         </Card>
