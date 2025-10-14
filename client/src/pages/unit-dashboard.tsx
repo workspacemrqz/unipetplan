@@ -461,8 +461,8 @@ export default function UnitDashboard() {
           {/* Gráfico de Valor por Usuário */}
           <Card style={{ backgroundColor: '#FFFFFF' }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-foreground min-w-0">Valor por Usuário</CardTitle>
-              <p className="text-sm text-muted-foreground">Total (R$) por criador dos atendimentos</p>
+              <CardTitle className="min-w-0" style={{ color: '#303030' }}>Valor por Usuário</CardTitle>
+              <p className="text-sm" style={{ color: '#303030' }}>Total (R$) por criador dos atendimentos</p>
             </CardHeader>
             <CardContent className="p-4 flex items-center justify-center">
               {valueByUser && valueByUser.length > 0 ? (
