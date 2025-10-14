@@ -5,8 +5,9 @@ import { FileText, Users, Clipboard } from "lucide-react";
 import LoadingDots from '@/components/ui/LoadingDots';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarDate } from "@internationalized/date";
+import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
+import { format } from "date-fns";
 
 interface DashboardStats {
   totalGuides: number;
@@ -35,7 +36,16 @@ export default function UnitDashboard() {
   const { slug } = useParams();
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
-  const [periodFilter, setPeriodFilter] = useState<string>('all');
+  const [dateFilter, setDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
+  const [debouncedDateFilter, setDebouncedDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
   const [stats, setStats] = useState<DashboardStats>({
     totalGuides: 0,
     totalClients: 0,
@@ -66,12 +76,25 @@ export default function UnitDashboard() {
     return undefined;
   }, [loading, slug]);
 
+  // Debounce date filter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedDateFilter(dateFilter);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [dateFilter]);
+
   // Recarregar dados quando o filtro de período mudar
   useEffect(() => {
     if (!loading) {
       fetchChartData();
     }
-  }, [periodFilter]);
+  }, [debouncedDateFilter]);
+
+  const handleDateRangeChange = (startDate: CalendarDate | null, endDate: CalendarDate | null) => {
+    setDateFilter({ startDate, endDate });
+  };
 
   const checkAuthentication = async () => {
     const token = localStorage.getItem('unit-token');
@@ -126,7 +149,27 @@ export default function UnitDashboard() {
 
   const fetchChartData = async () => {
     const token = localStorage.getItem('unit-token');
-    const periodParam = periodFilter !== 'all' ? `?period=${periodFilter}` : '';
+    
+    // Build query params for date range
+    const params = new URLSearchParams();
+    if (debouncedDateFilter.startDate) {
+      const startDate = new Date(
+        debouncedDateFilter.startDate.year,
+        debouncedDateFilter.startDate.month - 1,
+        debouncedDateFilter.startDate.day
+      );
+      params.append('startDate', format(startDate, 'yyyy-MM-dd'));
+    }
+    if (debouncedDateFilter.endDate) {
+      const endDate = new Date(
+        debouncedDateFilter.endDate.year,
+        debouncedDateFilter.endDate.month - 1,
+        debouncedDateFilter.endDate.day
+      );
+      params.append('endDate', format(endDate, 'yyyy-MM-dd'));
+    }
+    
+    const periodParam = params.toString() ? `?${params.toString()}` : '';
     
     // Buscar procedimentos vendidos
     try {
@@ -200,23 +243,10 @@ export default function UnitDashboard() {
         </div>
 
         {/* Period Filter */}
-        <div className="flex items-center space-x-2">
-          <Label htmlFor="period-filter">Filtrar por período:</Label>
-          <Select value={periodFilter} onValueChange={setPeriodFilter}>
-            <SelectTrigger id="period-filter" className="w-48">
-              <SelectValue placeholder="Selecione o período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os períodos</SelectItem>
-              <SelectItem value="today">Hoje</SelectItem>
-              <SelectItem value="week">Últimos 7 dias</SelectItem>
-              <SelectItem value="month">Últimos 30 dias</SelectItem>
-              <SelectItem value="3months">Últimos 3 meses</SelectItem>
-              <SelectItem value="6months">Últimos 6 meses</SelectItem>
-              <SelectItem value="year">Último ano</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <DateFilterComponent 
+          onDateRangeChange={handleDateRangeChange}
+          className="mb-4"
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
