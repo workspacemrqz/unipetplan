@@ -6670,15 +6670,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.getAtendimentosWithNetworkUnits({});
       const allAtendimentos = result?.atendimentos || [];
       
-      // Filtrar atendimentos por petId (usando snake_case pet_id do banco)
-      const petAtendimentos = allAtendimentos.filter(
-        atendimento => atendimento.pet_id === petId || atendimento.petId === petId
-      );
+      // Debug log temporário
+      console.log("🔍 [DEBUG] Total atendimentos encontrados:", allAtendimentos.length);
+      console.log("🔍 [DEBUG] Buscando atendimentos para petId:", petId);
+      
+      // Filtrar atendimentos por petId (verificando snake_case e camelCase)
+      const petAtendimentos = allAtendimentos.filter(atendimento => {
+        // Log para ver a estrutura do atendimento
+        if (allAtendimentos.length > 0 && allAtendimentos.indexOf(atendimento) === 0) {
+          console.log("📋 [DEBUG] Estrutura do atendimento:", Object.keys(atendimento));
+        }
+        
+        // Verificar diferentes variações do campo
+        const petIdValues = [
+          atendimento.pet_id,
+          atendimento.petId,
+          atendimento.pet_id,
+          atendimento.petid
+        ];
+        
+        const matches = petIdValues.some(id => id === petId);
+        
+        if (matches) {
+          console.log("✅ [DEBUG] Atendimento encontrado:", atendimento.id, "para pet:", petId);
+        }
+        
+        return matches;
+      });
+      
+      console.log("📊 [DEBUG] Atendimentos filtrados para o pet:", petAtendimentos.length);
       
       // Ordenar por data decrescente (mais recente primeiro)
       petAtendimentos.sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const dateA = a.createdAt || a.created_at ? new Date(a.createdAt || a.created_at).getTime() : 0;
+        const dateB = b.createdAt || b.created_at ? new Date(b.createdAt || b.created_at).getTime() : 0;
         return dateB - dateA;
       });
       
