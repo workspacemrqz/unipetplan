@@ -22,10 +22,6 @@ args = "Backend"
 task = "workflow.run"
 args = "Frontend"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Server"
-
 [[workflows.workflow]]
 name = "Backend"
 author = "agent"
@@ -49,18 +45,6 @@ task = "shell.exec"
 args = "cd client && npm run dev"
 waitForPort = 5000
 
-[[workflows.workflow]]
-name = "Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
 [[ports]]
 localPort = 3000
 externalPort = 3000
@@ -76,10 +60,6 @@ externalPort = 3003
 [[ports]]
 localPort = 41663
 externalPort = 3002
-
-[[ports]]
-localPort = 43587
-externalPort = 3001
 
 [deployment]
 deploymentTarget = "gce"
