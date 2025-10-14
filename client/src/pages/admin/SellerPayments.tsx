@@ -67,8 +67,10 @@ export default function SellerPayments() {
     enabled: !!sellerId,
   });
   
-  // Ensure payments is always an array
-  const payments = Array.isArray(paymentsData) ? paymentsData : [];
+  // Ensure payments is always an array and sort by createdAt DESC (copy to avoid mutating cache)
+  const payments = Array.isArray(paymentsData) 
+    ? [...paymentsData].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    : [];
 
   const { data: salesReport, error: salesReportError } = useQuery<SalesReport>({
     queryKey: [`/admin/api/sellers/${sellerId}/sales-report`],

@@ -66,14 +66,15 @@ export default function Evaluations() {
     queryKey: ["/admin/api/satisfaction-surveys"],
   });
 
-  const filteredSurveys = searchQuery
+  const filteredSurveys = (searchQuery
     ? surveys.filter(
         (survey) =>
           survey.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           survey.clientEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (survey.feedback && survey.feedback.toLowerCase().includes(searchQuery.toLowerCase()))
       )
-    : surveys;
+    : surveys)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const totalSurveys = filteredSurveys.length;
   const totalPages = Math.ceil(totalSurveys / pageSize);

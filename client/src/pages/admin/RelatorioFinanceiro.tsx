@@ -114,13 +114,14 @@ export default function RelatorioFinanceiro() {
   };
 
   // Filter entries by search query
-  const filteredEntries = searchQuery
+  const filteredEntries = (searchQuery
     ? entries.filter(entry =>
         entry.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.petName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.procedure.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : entries;
+    : entries)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const handleViewDetails = (entry: FinancialEntry) => {
     setSelectedEntry(entry);

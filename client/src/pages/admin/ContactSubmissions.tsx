@@ -67,12 +67,14 @@ export default function ContactSubmissions() {
     queryKey: ["/admin/api/contact-submissions"],
   });
 
-  const allFilteredSubmissions = Array.isArray(submissions) ? submissions?.filter((submission: any) =>
-    submission.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    submission.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    submission.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    submission.petName?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const allFilteredSubmissions = Array.isArray(submissions) ? submissions
+    ?.filter((submission: any) =>
+      submission.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.petName?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
 
   const totalSubmissions = allFilteredSubmissions.length;
   const totalPages = Math.ceil(totalSubmissions / pageSize);
