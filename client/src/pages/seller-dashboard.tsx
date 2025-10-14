@@ -335,8 +335,7 @@ export default function SellerDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Valor Total a Receber */}
               <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
-                <div className="relative z-10 space-y-2">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-white/90 font-semibold">Total a Receber</p>
                     <div className="w-3 h-3 rounded-full bg-blue-300"></div>
@@ -350,8 +349,7 @@ export default function SellerDashboard() {
 
               {/* Valor Recebido */}
               <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
-                <div className="relative z-10 space-y-2">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-white/90 font-semibold">Valor Recebido</p>
                     <div className="w-3 h-3 rounded-full bg-green-300"></div>
@@ -365,8 +363,7 @@ export default function SellerDashboard() {
 
               {/* Valor Pendente */}
               <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
-                <div className="relative z-10 space-y-2">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-white/90 font-semibold">Valor Pendente</p>
                     <div className="w-3 h-3 rounded-full bg-orange-300"></div>
