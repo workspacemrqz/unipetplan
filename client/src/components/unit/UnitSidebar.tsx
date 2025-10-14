@@ -199,12 +199,11 @@ export default function UnitSidebar() {
                             name={item.iconName} 
                             className={cn(
                               "h-5 w-5 mr-3 transition-all duration-200",
-                              item.iconName === "Plus" 
-                                ? (isActive 
-                                  ? "[filter:brightness(0)_saturate(100%)_invert(1)]" // Branco quando ativo
-                                  : "[filter:brightness(0)_saturate(100%)_invert(40%)_sepia(1%)_saturate(0%)_hue-rotate(0deg)_brightness(98%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(44%)_sepia(59%)_saturate(506%)_hue-rotate(131deg)_brightness(97%)_contrast(94%)]") // Gray-600 padrão, primary no hover
-                                : (isActive ? "invert" : "opacity-60"),
-                              !isActive && item.iconName !== "Plus" && "group-hover:scale-110"
+                              // Aplica filtros baseados no estado do botão para herdar a cor do texto
+                              isActive
+                                ? "brightness-0 invert" // Ícone branco quando ativo (inverte o preto para branco)
+                                : "brightness-0 [filter:invert(40%)_sepia(11%)_saturate(478%)_hue-rotate(176deg)_brightness(98%)_contrast(84%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(44%)_sepia(59%)_saturate(506%)_hue-rotate(131deg)_brightness(97%)_contrast(94%)]", // Gray-600 padrão, primary no hover
+                              !isActive && "group-hover:scale-110"
                             )} 
                           />
                           <span className="font-medium">{item.name}</span>
@@ -220,7 +219,7 @@ export default function UnitSidebar() {
                                   key={subItem.name}
                                   href={subItem.href}
                                   className={cn(
-                                    "flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200",
+                                    "flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 group",
                                     isSubActive
                                       ? "bg-primary/10 text-primary font-medium"
                                       : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
@@ -229,8 +228,11 @@ export default function UnitSidebar() {
                                   <SvgIcon 
                                     name={subItem.iconName} 
                                     className={cn(
-                                      "h-4 w-4 mr-2",
-                                      isSubActive ? "opacity-80" : "opacity-50"
+                                      "h-4 w-4 mr-2 transition-all duration-200",
+                                      // Aplica filtros baseados no estado do subitem para herdar a cor do texto
+                                      isSubActive
+                                        ? "brightness-0 [filter:invert(44%)_sepia(59%)_saturate(506%)_hue-rotate(131deg)_brightness(97%)_contrast(94%)]" // Primary color quando ativo
+                                        : "brightness-0 [filter:invert(50%)_sepia(0%)_saturate(0%)_hue-rotate(0deg)_brightness(95%)_contrast(86%)] group-hover:[filter:invert(45%)_sepia(5%)_saturate(397%)_hue-rotate(177deg)_brightness(92%)_contrast(87%)]" // Gray-500 padrão, gray-700 no hover
                                     )} 
                                   />
                                   {subItem.name}
