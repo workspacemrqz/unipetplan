@@ -297,7 +297,7 @@ export default function UnitDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 hover:scale-105 cursor-default">
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 cursor-default">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <p className="text-sm font-semibold text-white/90 mb-2">Valor Total</p>
@@ -311,7 +311,7 @@ export default function UnitDashboard() {
                   </div>
                 </div>
               </div>
-              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 hover:scale-105 cursor-default">
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 cursor-default">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <p className="text-sm font-semibold text-white/90 mb-2">Valor Médio</p>
@@ -331,49 +331,77 @@ export default function UnitDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card style={{ backgroundColor: '#FFFFFF' }}>
+          <Card style={{ 
+            background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+            border: 'none',
+            boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+          }}>
             <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground">Atendimentos</p>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalGuides}</p>
-                <div className="mt-2 pt-2 border-t border-border">
-                  <p className="text-xs text-muted-foreground">Total de atendimentos gerados</p>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+                <div className="relative z-10">
+                  <p className="text-xs sm:text-sm text-white/90 font-semibold mb-2">Atendimentos</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">{stats.totalGuides}</p>
+                  <div className="mt-3 pt-2 border-t border-white/20">
+                    <p className="text-xs text-white/80">Total de atendimentos gerados</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card style={{ backgroundColor: '#FFFFFF' }}>
+          <Card style={{ 
+            background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+            border: 'none',
+            boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+          }}>
             <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground">Clientes</p>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalClients}</p>
-                <div className="mt-2 pt-2 border-t border-border">
-                  <p className="text-xs text-muted-foreground">Clientes únicos atendidos</p>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+                <div className="relative z-10">
+                  <p className="text-xs sm:text-sm text-white/90 font-semibold mb-2">Clientes</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">{stats.totalClients}</p>
+                  <div className="mt-3 pt-2 border-t border-white/20">
+                    <p className="text-xs text-white/80">Clientes únicos atendidos</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card style={{ backgroundColor: '#FFFFFF' }}>
+          <Card style={{ 
+            background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+            border: 'none',
+            boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+          }}>
             <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground">Pets</p>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalPets}</p>
-                <div className="mt-2 pt-2 border-t border-border">
-                  <p className="text-xs text-muted-foreground">Pets únicos atendidos</p>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+                <div className="relative z-10">
+                  <p className="text-xs sm:text-sm text-white/90 font-semibold mb-2">Pets</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">{stats.totalPets}</p>
+                  <div className="mt-3 pt-2 border-t border-white/20">
+                    <p className="text-xs text-white/80">Pets únicos atendidos</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card style={{ backgroundColor: '#FFFFFF' }}>
+          <Card style={{ 
+            background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+            border: 'none',
+            boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+          }}>
             <CardContent className="p-3 sm:p-4 lg:p-6">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground">Procedimentos</p>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate mt-1">{stats.totalProcedures}</p>
-                <div className="mt-2 pt-2 border-t border-border">
-                  <p className="text-xs text-muted-foreground">Total de procedimentos disponíveis</p>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+                <div className="relative z-10">
+                  <p className="text-xs sm:text-sm text-white/90 font-semibold mb-2">Procedimentos</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">{stats.totalProcedures}</p>
+                  <div className="mt-3 pt-2 border-t border-white/20">
+                    <p className="text-xs text-white/80">Total de procedimentos disponíveis</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
