@@ -113,11 +113,6 @@ const allColumns = [
 ] as const;
 
 // Funções auxiliares para resumir informações dos planos
-const formatPlanSummary = (plans?: ProcedurePlan[]) => {
-  if (!plans || plans.length === 0) return "N/A";
-  return `${plans.length} plano${plans.length > 1 ? 's' : ''}`;
-};
-
 const formatCoparticipacaoSummary = (plans?: ProcedurePlan[]) => {
   if (!plans || plans.length === 0) return "N/A";
   
