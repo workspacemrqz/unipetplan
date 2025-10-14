@@ -3570,6 +3570,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Site Settings (public read access)
+  // Get plan contract text by plan type
+  app.get("/api/plans/:planType/contract", async (req, res) => {
+    try {
+      const { planType } = req.params;
+      
+      // Convert to uppercase to match database names
+      const planName = planType.toUpperCase();
+      
+      // Validate plan type
+      if (!['BASIC', 'COMFORT', 'PLATINUM', 'INFINITY'].includes(planName)) {
+        return res.status(400).json({ error: 'Tipo de plano inválido' });
+      }
+      
+      const plan = await storage.getPlanByName(planName);
+      
+      if (!plan) {
+        // Return empty object if plan not found, frontend will use default text
+        return res.json({});
+      }
+      
+      // Return empty object since contractText field doesn't exist in DB yet
+      // Frontend will use default text when contractText is not provided
+      res.json({});
+    } catch (error) {
+      console.error('❌ Erro ao buscar contrato do plano:', error);
+      res.status(500).json({ error: 'Erro ao buscar contrato do plano' });
+    }
+  });
+
   app.get("/api/site-settings", async (req, res) => {
     try {
       const siteSettings = await storage.getSiteSettings();

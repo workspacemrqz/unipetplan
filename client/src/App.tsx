@@ -21,6 +21,10 @@ import CorpoClinicoPage from "@/pages/unit/CorpoClinicoPage";
 import LogsPage from "@/pages/unit/LogsPage";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfUse from "@/pages/terms-of-use";
+import ContractBasic from "@/pages/contract-basic";
+import ContractComfort from "@/pages/contract-comfort";
+import ContractPlatinum from "@/pages/contract-platinum";
+import ContractInfinity from "@/pages/contract-infinity";
 import CheckoutPage from "@/pages/checkout";
 import CheckoutSuccessPage from "@/pages/checkout-success";
 import CustomerLoginPage from "@/pages/customer-login";
@@ -356,6 +360,63 @@ function Router() {
               <main>
                 <Suspense fallback={<GlobalLoading />}>
                   <TermsOfUse />
+                </Suspense>
+              </main>
+              <Footer />
+            </div>
+          </PageLayout>
+        )} />
+        
+        {/* Contract Pages for Plans */}
+        <Route path="/contrato/basic" component={() => (
+          <PageLayout>
+            <div className="min-h-screen bg-background">
+              <Header />
+              <main>
+                <Suspense fallback={<GlobalLoading />}>
+                  <ContractBasic />
+                </Suspense>
+              </main>
+              <Footer />
+            </div>
+          </PageLayout>
+        )} />
+        
+        <Route path="/contrato/comfort" component={() => (
+          <PageLayout>
+            <div className="min-h-screen bg-background">
+              <Header />
+              <main>
+                <Suspense fallback={<GlobalLoading />}>
+                  <ContractComfort />
+                </Suspense>
+              </main>
+              <Footer />
+            </div>
+          </PageLayout>
+        )} />
+        
+        <Route path="/contrato/platinum" component={() => (
+          <PageLayout>
+            <div className="min-h-screen bg-background">
+              <Header />
+              <main>
+                <Suspense fallback={<GlobalLoading />}>
+                  <ContractPlatinum />
+                </Suspense>
+              </main>
+              <Footer />
+            </div>
+          </PageLayout>
+        )} />
+        
+        <Route path="/contrato/infinity" component={() => (
+          <PageLayout>
+            <div className="min-h-screen bg-background">
+              <Header />
+              <main>
+                <Suspense fallback={<GlobalLoading />}>
+                  <ContractInfinity />
                 </Suspense>
               </main>
               <Footer />

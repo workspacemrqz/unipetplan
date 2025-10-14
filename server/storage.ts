@@ -87,6 +87,7 @@ export interface IStorage {
   getAllPlans(): Promise<Plan[]>;
   getAllActivePlans(): Promise<Plan[]>; // For public API
   getPlan(id: string): Promise<Plan | undefined>;
+  getPlanByName(name: string): Promise<Plan | undefined>;
   createPlan(plan: InsertPlan): Promise<Plan>;
   updatePlan(id: string, plan: Partial<InsertPlan>): Promise<Plan | undefined>;
 
@@ -320,6 +321,7 @@ export class InMemoryStorage implements IStorage {
   async getAllPlans(): Promise<Plan[]> { return []; }
   async getAllActivePlans(): Promise<Plan[]> { return []; }
   async getPlan(id: string): Promise<Plan | undefined> { return undefined; }
+  async getPlanByName(name: string): Promise<Plan | undefined> { return undefined; }
   async createPlan(insertPlan: InsertPlan): Promise<Plan> { return insertPlan as any; }
   async updatePlan(id: string, updateData: Partial<InsertPlan>): Promise<Plan | undefined> { return undefined; }
   async deletePlan(id: string): Promise<boolean> { return true; }
@@ -660,6 +662,41 @@ export class DatabaseStorage implements IStorage {
       return plan || undefined;
     } catch (error) {
       console.error("Error in getPlan:", error);
+      throw error;
+    }
+  }
+
+  async getPlanByName(name: string): Promise<Plan | undefined> {
+    try {
+      const [plan] = await db.select({
+        id: plans.id,
+        name: plans.name,
+        description: plans.description,
+        features: plans.features,
+        image: plans.image,
+        buttonText: plans.buttonText,
+        planType: plans.planType,
+        isActive: plans.isActive,
+        displayOrder: plans.displayOrder,
+        createdAt: plans.createdAt,
+        billingFrequency: plans.billingFrequency,
+        basePrice: plans.basePrice,
+        installmentPrice: plans.installmentPrice,
+        installmentCount: plans.installmentCount,
+        perPetBilling: plans.perPetBilling,
+        petDiscounts: plans.petDiscounts,
+        paymentDescription: plans.paymentDescription,
+        availablePaymentMethods: plans.availablePaymentMethods,
+        availableBillingOptions: plans.availableBillingOptions,
+        annualPrice: plans.annualPrice,
+        annualInstallmentPrice: plans.annualInstallmentPrice,
+        annualInstallmentCount: plans.annualInstallmentCount,
+        // contractText field removed as it doesn't exist in the database yet
+      }).from(plans).where(eq(plans.name, name));
+
+      return plan || undefined;
+    } catch (error) {
+      console.error("Error in getPlanByName:", error);
       throw error;
     }
   }
