@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/admin/utils";
 import {
   Home,
-  Link as LinkIcon,
+  ExternalLink,
   LogOut
 } from "lucide-react";
 
@@ -19,7 +19,7 @@ export default function SellerSidebar() {
     {
       name: "Vendas",
       items: [
-        { name: "Link de Referência", href: `/vendedor/link`, icon: LinkIcon }
+        { name: "Link de Referência", href: `/vendedor/link`, icon: ExternalLink }
       ]
     }
   ];
