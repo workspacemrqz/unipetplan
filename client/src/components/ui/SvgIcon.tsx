@@ -13,6 +13,7 @@ export function SvgIcon({ name, className }: SvgIconProps) {
       src={iconPath} 
       alt={name}
       className={cn("inline-block", className)}
+      style={{ filter: "brightness(0) saturate(100%)" }}
     />
   );
 }
