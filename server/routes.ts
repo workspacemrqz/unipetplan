@@ -774,6 +774,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user with permissions
+  app.get("/admin/api/auth/current-user", async (req, res) => {
+    try {
+      if (!req.session || !req.session.admin || !req.session.admin.authenticated) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      // For superadmin, return all permissions
+      if (req.session.admin.role === 'superadmin') {
+        return res.json({
+          id: 'superadmin',
+          username: req.session.admin.login || 'admin',
+          email: req.session.admin.email || '',
+          role: 'superadmin',
+          permissions: [], // Superadmin has implicit access to all
+          isActive: true
+        });
+      }
+
+      // For regular users, get from database
+      if (req.session.admin.userId) {
+        const user = await storage.getUserById(req.session.admin.userId);
+        if (user) {
+          return res.json({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            permissions: user.permissions || [],
+            isActive: user.isActive
+          });
+        }
+      }
+
+      // Fallback for legacy sessions
+      return res.json({
+        id: req.session.admin.userId || 'unknown',
+        username: req.session.admin.login || 'unknown',
+        email: req.session.admin.email || '',
+        role: req.session.admin.role || 'view',
+        permissions: req.session.admin.permissions || [],
+        isActive: true
+      });
+    } catch (error) {
+      console.error("❌ [ADMIN-CURRENT-USER] Error getting current user:", error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor" 
+      });
+    }
+  });
+
 
 
   // Protect all admin API routes except login and auth status
@@ -782,7 +833,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     // Skip authentication only for login and auth status endpoints
     // Use originalUrl since req.path only contains the part after the wildcard
-    if (req.originalUrl === "/admin/api/login" || req.originalUrl === "/admin/api/auth/status") {
+    if (req.originalUrl === "/admin/api/login" || 
+        req.originalUrl === "/admin/api/auth/status" || 
+        req.originalUrl === "/admin/api/auth/current-user") {
       return next();
     }
     

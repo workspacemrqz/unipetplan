@@ -471,6 +471,7 @@ export class InMemoryStorage implements IStorage {
   async getProcedurePlans(procedureId: string): Promise<any[]> { return []; }
   async updateProcedurePlans(procedureId: string, plans: any[]): Promise<void> { }
   async getAllUsers(): Promise<any[]> { return []; }
+  async getUserById(id: string): Promise<any | undefined> { return undefined; }
   async createUser(user: any): Promise<any> { return user; }
   async updateUser(id: string, user: any): Promise<any | undefined> { return user; }
   async deleteUser(id: string): Promise<boolean> { return true; }
@@ -1968,6 +1969,11 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(): Promise<any[]> {
     return await db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  async getUserById(id: string): Promise<any | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async createUser(userData: any): Promise<any> {
