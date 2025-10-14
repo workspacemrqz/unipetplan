@@ -281,17 +281,11 @@ export default function UnitDashboard() {
             <p className="text-sm text-muted-foreground">Resumo de recebimentos</p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="text-center p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-600">Valor Total</p>
                 <p className="text-2xl font-bold text-gray-900 mt-2">
                   R$ {totalSales.totalValue.toFixed(2)}
-                </p>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-600">Total de Atendimentos</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  {totalSales.totalCount}
                 </p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
