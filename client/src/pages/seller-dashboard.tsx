@@ -336,10 +336,7 @@ export default function SellerDashboard() {
               {/* Valor Total a Receber */}
               <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-white/90 font-semibold">Total a Receber</p>
-                    <div className="w-3 h-3 rounded-full bg-blue-300"></div>
-                  </div>
+                  <p className="text-sm text-white/90 font-semibold">Total a Receber</p>
                   <p className="text-2xl font-bold text-white">
                     {formatCurrency(totalToReceive)}
                   </p>
@@ -350,10 +347,7 @@ export default function SellerDashboard() {
               {/* Valor Recebido */}
               <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-white/90 font-semibold">Valor Recebido</p>
-                    <div className="w-3 h-3 rounded-full bg-green-300"></div>
-                  </div>
+                  <p className="text-sm text-white/90 font-semibold">Valor Recebido</p>
                   <p className="text-2xl font-bold text-white">
                     {formatCurrency(totalPaid)}
                   </p>
@@ -364,10 +358,7 @@ export default function SellerDashboard() {
               {/* Valor Pendente */}
               <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-white/90 font-semibold">Valor Pendente</p>
-                    <div className="w-3 h-3 rounded-full bg-orange-300"></div>
-                  </div>
+                  <p className="text-sm text-white/90 font-semibold">Valor Pendente</p>
                   <p className="text-2xl font-bold text-white">
                     {formatCurrency(valorPendente)}
                   </p>
