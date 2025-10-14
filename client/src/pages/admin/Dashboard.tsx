@@ -215,10 +215,10 @@ export default function Dashboard() {
                     <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate" data-testid="metric-total-revenue">
                       R$ {(stats?.totalRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
-                    <div className="mt-2 pt-2 border-t border-white/20">
-                      <p className="text-xs text-white/90">Total de pagamentos aprovados</p>
-                      <p className="text-sm sm:text-base font-bold text-white">
-                        Histórico completo
+                    <div className="mt-3 pt-2 border-t border-white/20">
+                      <p className="text-xs text-white/80">Total de pagamentos aprovados</p>
+                      <p className="text-xs text-white/60 mt-1">
+                        {hasDateFilter ? 'Período filtrado' : 'Todo o período'}
                       </p>
                     </div>
                   </>
