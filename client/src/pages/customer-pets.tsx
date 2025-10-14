@@ -38,11 +38,27 @@ interface Client {
 
 interface Atendimento {
   id: string;
-  title: string;
-  description: string;
-  content?: string;
-  createdAt: string;
-  updatedAt: string;
+  procedure: string;
+  procedureName?: string;
+  procedures?: Array<{
+    procedureName?: string;
+    name?: string;
+    value?: string;
+    procedureId?: string;
+    coparticipacao?: string;
+  }>;
+  status: string;
+  value?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  networkUnit?: {
+    id: string;
+    name: string;
+  };
+  clientName?: string;
+  petName?: string;
+  procedureNotes?: string;
+  generalNotes?: string;
 }
 
 export default function CustomerPets() {
@@ -905,32 +921,79 @@ export default function CustomerPets() {
                   {atendimentos.map((atendimento) => (
                     <div key={atendimento.id} className="border rounded-lg p-4" style={{ borderColor: 'var(--border-gray)' }}>
                       <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h4 className="font-semibold text-lg" style={{ color: 'var(--text-dark-primary)' }}>
-                            {atendimento.title}
-                          </h4>
-                          <p className="text-sm" style={{ color: 'var(--text-dark-secondary)' }}>
-                            Criada em: {new Date(atendimento.createdAt).toLocaleDateString('pt-BR')}
-                          </p>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {atendimento.procedures && atendimento.procedures.length > 0 ? (
+                              atendimento.procedures.map((proc, index) => (
+                                <span key={index} className="px-3 py-1 rounded-full text-sm font-medium"
+                                  style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
+                                  {proc.procedureName || proc.name}
+                                </span>
+                              ))
+                            ) : atendimento.procedure ? (
+                              atendimento.procedure.split(/[,/]/).map((proc, index) => (
+                                <span key={index} className="px-3 py-1 rounded-full text-sm font-medium"
+                                  style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
+                                  {proc.trim()}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="px-3 py-1 rounded-full text-sm font-medium"
+                                style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
+                                Sem procedimento
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-1 text-sm" style={{ color: 'var(--text-dark-secondary)' }}>
+                            {atendimento.networkUnit && (
+                              <p>
+                                <strong style={{ color: 'var(--text-dark-primary)' }}>Unidade:</strong> {atendimento.networkUnit.name}
+                              </p>
+                            )}
+                            {atendimento.createdAt && (
+                              <p>
+                                <strong style={{ color: 'var(--text-dark-primary)' }}>Data:</strong> {new Date(atendimento.createdAt).toLocaleDateString('pt-BR')}
+                              </p>
+                            )}
+                            {atendimento.value && (
+                              <p>
+                                <strong style={{ color: 'var(--text-dark-primary)' }}>Valor:</strong> R$ {atendimento.value}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium"
-                            style={{ background: 'var(--bg-cream-light)', color: 'var(--text-teal)' }}>
-                            Atendimento
+                        <div className="ml-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            atendimento.status === 'closed' 
+                              ? 'bg-green-100 text-green-800' 
+                              : atendimento.status === 'open' 
+                              ? 'bg-blue-100 text-blue-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {atendimento.status === 'closed' ? 'Concluído' : atendimento.status === 'open' ? 'Aberto' : atendimento.status}
                           </span>
                         </div>
                       </div>
                       
-                      {atendimento.description && (
-                        <p className="mb-3" style={{ color: 'var(--text-dark-secondary)' }}>
-                          {atendimento.description}
-                        </p>
+                      {atendimento.procedureNotes && (
+                        <div className="mt-3 bg-gray-50 rounded-lg p-3">
+                          <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-dark-primary)' }}>
+                            Notas do Procedimento:
+                          </p>
+                          <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-dark-secondary)' }}>
+                            {atendimento.procedureNotes}
+                          </p>
+                        </div>
                       )}
                       
-                      {atendimento.content && (
-                        <div className="bg-gray-50 rounded-lg p-3">
-                          <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-dark-primary)' }}>
-                            {atendimento.content}
+                      {atendimento.generalNotes && (
+                        <div className="mt-3 bg-gray-50 rounded-lg p-3">
+                          <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-dark-primary)' }}>
+                            Observações Gerais:
+                          </p>
+                          <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-dark-secondary)' }}>
+                            {atendimento.generalNotes}
                           </p>
                         </div>
                       )}

@@ -6666,13 +6666,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
-      // Por enquanto, retornar array vazio pois não há atendimentos específicas por pet
-      // Em futuras implementações, isso pode ser expandido para atendimentos personalizadas
-      const atendimentos = [];
+      // Buscar todos os atendimentos e filtrar por petId
+      const result = await storage.getAtendimentosWithNetworkUnits({});
+      const allAtendimentos = result?.atendimentos || [];
+      
+      // Filtrar atendimentos por petId (usando snake_case pet_id do banco)
+      const petAtendimentos = allAtendimentos.filter(
+        atendimento => atendimento.pet_id === petId || atendimento.petId === petId
+      );
+      
+      // Ordenar por data decrescente (mais recente primeiro)
+      petAtendimentos.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
       
       res.json({ 
-        atendimentos: atendimentos,
-        message: atendimentos.length === 0 ? "Nenhuma atendimento encontrada para este pet" : "Atendimentos carregadas com sucesso"
+        atendimentos: petAtendimentos,
+        message: petAtendimentos.length === 0 ? "Nenhum atendimento encontrado para este pet" : "Atendimentos carregados com sucesso"
       });
       
     } catch (error) {
