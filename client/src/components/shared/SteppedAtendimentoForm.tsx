@@ -208,6 +208,8 @@ export default function SteppedAtendimentoForm({
     } else if (sanitizedCpf.length < 11 && selectedClient) {
       setSelectedClient(null);
       setClientPets([]);
+      setSelectedPet(null); // Limpar pet selecionado
+      setPetHistory([]); // Limpar histórico
       setSelectedProcedures([]); // Limpar procedimentos selecionados
       form.setValue("clientId", "");
       form.setValue("petId", "");
@@ -364,11 +366,38 @@ export default function SteppedAtendimentoForm({
       form.setValue("procedure", "");
       form.setValue("generalNotes", "");
       form.setValue("value", "");
+      setSelectedPet(null); // Limpar pet anteriormente selecionado
+      setPetHistory([]); // Limpar histórico anterior
       setSelectedProcedures([]); // Limpar procedimentos selecionados
       
       // Auto-selecionar se houver apenas um pet
       if (pets.length === 1) {
-        form.setValue("petId", pets[0].id);
+        const petToSelect = pets[0];
+        form.setValue("petId", petToSelect.id);
+        setSelectedPet(petToSelect);
+        setEditedWeight(petToSelect.weight?.toString() || "");
+        
+        // Buscar histórico do pet auto-selecionado
+        try {
+          const historyResponse = await fetch(
+            mode === 'admin' 
+              ? `/admin/api/pets/${petToSelect.id}/atendimentos`
+              : `/api/units/${slug}/pets/${petToSelect.id}/atendimentos`,
+            mode === 'unit' ? {
+              headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+            } : undefined
+          );
+          
+          if (historyResponse.ok) {
+            const history = await historyResponse.json();
+            setPetHistory(history);
+          } else {
+            setPetHistory([]);
+          }
+        } catch (error) {
+          console.error('Erro ao buscar histórico:', error);
+          setPetHistory([]);
+        }
       }
       
       toast({
