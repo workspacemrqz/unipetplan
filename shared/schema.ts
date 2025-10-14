@@ -182,6 +182,8 @@ export const siteSettings = pgTable("site_settings", {
   aboutImageUrl: text("about_image_url"),
   // Admin cores field
   cores: json("cores").$type<{[key: string]: string}>().default({}),
+  // Contract text field
+  contractText: text("contract_text"),
 });
 
 // Unified clients table (UNIPET version with all fields, includes compatibility)
