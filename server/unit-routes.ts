@@ -1021,10 +1021,12 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       };
       
       await storage.createActionLog({
-        unitId: unitId,
-        action: 'pet_weight_updated',
-        timestamp: new Date(),
-        metadata: logData
+        networkUnitId: unitId,
+        actionType: 'pet_weight_updated',
+        userType: userType === 'veterinarian' ? 'veterinarian' : 'unit',
+        veterinarianId: veterinarianId || undefined,
+        actionData: logData,
+        createdAt: new Date()
       });
       
       console.log(`✅ [UNIT] Pet weight updated: ${pet.name} - Old: ${oldWeight}kg, New: ${weightNum}kg`);

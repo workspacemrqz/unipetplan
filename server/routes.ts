@@ -1688,7 +1688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       for (const contract of sellerContracts) {
         const plan = plans.find(p => p.id === contract.planId);
-        const contractValue = plan ? plan.price : 0;
+        const contractValue = plan ? parseFloat(plan.basePrice || '0') : 0;
         
         // CPA commission
         const cpaPercentage = parseFloat(seller.cpaPercentage || '0') / 100;
@@ -1750,7 +1750,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let totalValue = 0;
       const contractsWithValue = sellerContracts.map(contract => {
         const plan = plans.find(p => p.id === contract.planId);
-        const contractValue = plan ? plan.price : 0;
+        const contractValue = plan ? parseFloat(plan.basePrice || '0') : 0;
         totalValue += contractValue;
         return contractValue;
       });
