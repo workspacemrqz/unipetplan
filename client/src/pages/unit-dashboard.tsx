@@ -286,24 +286,44 @@ export default function UnitDashboard() {
         />
 
         {/* Card de Total de Vendas */}
-        <Card style={{ backgroundColor: '#FFFFFF' }}>
+        <Card style={{ 
+          background: 'linear-gradient(135deg, #0e7074 0%, #16a34a 100%)',
+          border: 'none',
+          boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+        }}>
           <CardHeader>
-            <CardTitle className="text-foreground min-w-0">Total de Vendas</CardTitle>
-            <p className="text-sm text-muted-foreground">Resumo de recebimentos</p>
+            <CardTitle className="text-white text-xl font-bold">Total de Vendas</CardTitle>
+            <p className="text-white/80 text-sm">Resumo de recebimentos</p>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-600">Valor Total</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  R$ {totalSales.totalValue.toFixed(2)}
-                </p>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 hover:scale-105 cursor-default">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <p className="text-sm font-semibold text-white/90 mb-2">Valor Total</p>
+                  <p className="text-3xl font-bold text-white">
+                    R$ {totalSales.totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                      <div className="h-full w-3/4 bg-white/60 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-600">Valor Médio</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  R$ {totalSales.averageValue.toFixed(2)}
-                </p>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 hover:scale-105 cursor-default">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <p className="text-sm font-semibold text-white/90 mb-2">Valor Médio</p>
+                  <p className="text-3xl font-bold text-white">
+                    R$ {totalSales.averageValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                      <div className="h-full w-1/2 bg-white/60 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
