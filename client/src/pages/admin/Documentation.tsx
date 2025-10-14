@@ -80,7 +80,7 @@ export default function Documentation() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="border rounded-lg p-4">
+                <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-4">
                   <h4 className="font-semibold mb-2 flex items-center gap-2">
                     <Clipboard className="h-4 w-4" />
                     Frontend
@@ -96,7 +96,7 @@ export default function Documentation() {
                   </ul>
                 </div>
 
-                <div className="border rounded-lg p-4">
+                <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-4">
                   <h4 className="font-semibold mb-2 flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Backend
@@ -112,7 +112,7 @@ export default function Documentation() {
                 </div>
               </div>
 
-              <div className="border rounded-lg p-4">
+              <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-4">
                 <h4 className="font-semibold mb-3">Estrutura do Projeto</h4>
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
                   <div>
@@ -341,11 +341,11 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Botões de Navegação</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Menu Lateral</p>
                         <p className="text-sm text-muted-foreground mt-1">Navega entre as diferentes seções do admin: Dashboard, Clientes, Financeiro, Rede Credenciada, etc.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Voltar</p>
                         <p className="text-sm text-muted-foreground mt-1">Retorna para a página anterior usando setLocation do Wouter</p>
                       </div>
@@ -356,19 +356,19 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Botões de Ação (CRUD)</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Adicionar / Novo</p>
                         <p className="text-sm text-muted-foreground mt-1">Abre formulário para criação de novo registro (cliente, pet, plano, etc.). Usa mutation do React Query para POST na API.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Editar</p>
                         <p className="text-sm text-muted-foreground mt-1">Carrega dados do registro e abre formulário em modo de edição. Usa mutation para PUT/PATCH na API.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Excluir</p>
                         <p className="text-sm text-muted-foreground mt-1">Abre diálogo de confirmação com senha. Após confirmação, envia DELETE para API e atualiza a lista.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Visualizar Detalhes</p>
                         <p className="text-sm text-muted-foreground mt-1">Abre modal/dialog com informações detalhadas do registro sem permitir edição.</p>
                       </div>
@@ -379,15 +379,15 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Botões de Formulário</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Salvar / Confirmar</p>
                         <p className="text-sm text-muted-foreground mt-1">Valida formulário com Zod, envia dados via React Hook Form, executa mutation e fecha o formulário.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Cancelar</p>
                         <p className="text-sm text-muted-foreground mt-1">Fecha o formulário/modal sem salvar, descartando alterações.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Próximo / Anterior (Stepper)</p>
                         <p className="text-sm text-muted-foreground mt-1">Navega entre etapas do formulário multi-step, validando cada etapa antes de avançar.</p>
                       </div>
@@ -398,27 +398,27 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Botões de Ação Específica</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Ativar/Desativar</p>
                         <p className="text-sm text-muted-foreground mt-1">Toggle de status usando Switch. Atualiza status via API com atualização otimista no cache.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Buscar CEP</p>
                         <p className="text-sm text-muted-foreground mt-1">Consulta API ViaCEP e preenche automaticamente campos de endereço.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Aplicar Cupom</p>
                         <p className="text-sm text-muted-foreground mt-1">Valida cupom via API, calcula desconto e atualiza valor total do checkout.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Adicionar Pet (Checkout)</p>
                         <p className="text-sm text-muted-foreground mt-1">Adiciona novo card de pet no array do formulário, atualizando cálculo de valores.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Gerar Carteirinha</p>
                         <p className="text-sm text-muted-foreground mt-1">Busca cliente por CPF e gera carteirinha digital do pet para download.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Copiar para Área de Transferência</p>
                         <p className="text-sm text-muted-foreground mt-1">Usa navigator.clipboard.writeText para copiar texto (PIX, links, etc.).</p>
                       </div>
@@ -429,11 +429,11 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Botões de Autenticação</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Login</p>
                         <p className="text-sm text-muted-foreground mt-1">Valida credenciais, cria sessão no servidor, armazena dados no session storage e redireciona.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Logout / Sair</p>
                         <p className="text-sm text-muted-foreground mt-1">Destroi sessão no servidor, limpa dados locais e redireciona para login.</p>
                       </div>
@@ -444,15 +444,15 @@ export default function Documentation() {
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Botões de Pagamento</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Finalizar Compra</p>
                         <p className="text-sm text-muted-foreground mt-1">Processa pagamento via Cielo, cria contrato, gera recibo e redireciona para página de sucesso.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Pagar com PIX</p>
                         <p className="text-sm text-muted-foreground mt-1">Gera QR Code PIX via Cielo e inicia polling para verificar status do pagamento.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Pagar com Cartão</p>
                         <p className="text-sm text-muted-foreground mt-1">Processa pagamento com cartão de crédito/débito via API da Cielo.</p>
                       </div>
@@ -481,19 +481,19 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Hooks Customizados</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">useAuth()</p>
                         <p className="text-sm text-muted-foreground mt-1">Gerencia estado de autenticação, login/logout e redirecionamentos.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">useSiteSettings()</p>
                         <p className="text-sm text-muted-foreground mt-1">Carrega e gerencia configurações globais do site (contato, redes sociais, etc.).</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">useToast()</p>
                         <p className="text-sm text-muted-foreground mt-1">Exibe notificações toast para feedback ao usuário.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">useColumnPreferences()</p>
                         <p className="text-sm text-muted-foreground mt-1">Gerencia visibilidade de colunas em tabelas, salvando preferências no localStorage.</p>
                       </div>
@@ -504,15 +504,15 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Funções de Validação</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">validateCPF(cpf: string)</p>
                         <p className="text-sm text-muted-foreground mt-1">Valida CPF brasileiro usando algoritmo de dígito verificador.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">validateEmail(email: string)</p>
                         <p className="text-sm text-muted-foreground mt-1">Valida formato de email com regex.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">validatePhone(phone: string)</p>
                         <p className="text-sm text-muted-foreground mt-1">Valida telefone brasileiro (celular e fixo).</p>
                       </div>
@@ -523,19 +523,19 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Funções de Formatação</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">formatCurrency(value: number)</p>
                         <p className="text-sm text-muted-foreground mt-1">Formata valores monetários para R$ 0.000,00</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">formatCPF(cpf: string)</p>
                         <p className="text-sm text-muted-foreground mt-1">Formata CPF para 000.000.000-00</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">formatPhone(phone: string)</p>
                         <p className="text-sm text-muted-foreground mt-1">Formata telefone para (00) 00000-0000</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">formatDate(date: Date)</p>
                         <p className="text-sm text-muted-foreground mt-1">Formata datas usando date-fns com locale pt-BR</p>
                       </div>
@@ -546,15 +546,15 @@ export default function Documentation() {
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Funções de API</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">apiRequest(url, options)</p>
                         <p className="text-sm text-muted-foreground mt-1">Cliente HTTP base com tratamento de erros e refresh de token.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">queryClient.prefetch()</p>
                         <p className="text-sm text-muted-foreground mt-1">Pre-carrega dados para melhorar performance de navegação.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">queryClient.invalidate()</p>
                         <p className="text-sm text-muted-foreground mt-1">Invalida cache e força refresh de dados.</p>
                       </div>
@@ -583,21 +583,21 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Autenticação</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/admin/api/login</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Login de administradores. Retorna sessão HTTP-only.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/admin/api/logout</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Logout e destruição de sessão.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">GET</Badge>
                           <code className="text-sm">/admin/api/auth/check</code>
@@ -611,35 +611,35 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Clientes</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">GET</Badge>
                           <code className="text-sm">/admin/api/clients</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Lista todos os clientes.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">GET</Badge>
                           <code className="text-sm">/admin/api/clients/:id</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Busca cliente por ID.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/admin/api/clients</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Cria novo cliente.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">PATCH</Badge>
                           <code className="text-sm">/admin/api/clients/:id</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Atualiza cliente existente.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">DELETE</Badge>
                           <code className="text-sm">/admin/api/clients/:id</code>
@@ -653,21 +653,21 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Pets</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">GET</Badge>
                           <code className="text-sm">/admin/api/clients/:id/pets</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Lista pets de um cliente.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/admin/api/pets</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Cria novo pet.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">PATCH</Badge>
                           <code className="text-sm">/admin/api/pets/:id</code>
@@ -681,21 +681,21 @@ export default function Documentation() {
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">Planos</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">GET</Badge>
                           <code className="text-sm">/admin/api/plans</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Lista todos os planos.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/admin/api/plans</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Cria novo plano.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">PATCH</Badge>
                           <code className="text-sm">/admin/api/plans/:id</code>
@@ -709,21 +709,21 @@ export default function Documentation() {
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Pagamentos</h3>
                     <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/api/payment/cielo</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Processa pagamento via Cielo.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/api/payment/cielo/pix</code>
                         </div>
                         <p className="text-sm text-muted-foreground">Gera QR Code PIX.</p>
                       </div>
-                      <div className="bg-muted p-3 rounded-lg">
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">POST</Badge>
                           <code className="text-sm">/api/webhook/cielo</code>
@@ -754,7 +754,7 @@ export default function Documentation() {
                   {/* Tabela Clients */}
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">clients</h3>
-                    <div className="bg-muted p-3 rounded-lg">
+                    <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                       <p className="text-sm text-muted-foreground mb-2">Armazena dados dos clientes</p>
                       <ul className="text-sm space-y-1 ml-4">
                         <li>• id (UUID, PK)</li>
@@ -771,7 +771,7 @@ export default function Documentation() {
                   {/* Tabela Pets */}
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">pets</h3>
-                    <div className="bg-muted p-3 rounded-lg">
+                    <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                       <p className="text-sm text-muted-foreground mb-2">Armazena dados dos pets</p>
                       <ul className="text-sm space-y-1 ml-4">
                         <li>• id (UUID, PK)</li>
@@ -789,7 +789,7 @@ export default function Documentation() {
                   {/* Tabela Plans */}
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">plans</h3>
-                    <div className="bg-muted p-3 rounded-lg">
+                    <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                       <p className="text-sm text-muted-foreground mb-2">Planos de saúde disponíveis</p>
                       <ul className="text-sm space-y-1 ml-4">
                         <li>• id (UUID, PK)</li>
@@ -805,7 +805,7 @@ export default function Documentation() {
                   {/* Tabela Contracts */}
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">contracts</h3>
-                    <div className="bg-muted p-3 rounded-lg">
+                    <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                       <p className="text-sm text-muted-foreground mb-2">Contratos de clientes</p>
                       <ul className="text-sm space-y-1 ml-4">
                         <li>• id (UUID, PK)</li>
@@ -822,7 +822,7 @@ export default function Documentation() {
                   {/* Tabela Network Units */}
                   <div className="border-b pb-4">
                     <h3 className="font-semibold text-lg mb-3">network_units</h3>
-                    <div className="bg-muted p-3 rounded-lg">
+                    <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                       <p className="text-sm text-muted-foreground mb-2">Unidades credenciadas da rede</p>
                       <ul className="text-sm space-y-1 ml-4">
                         <li>• id (UUID, PK)</li>
@@ -839,7 +839,7 @@ export default function Documentation() {
                   {/* Tabela Atendimentos */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3">atendimentos</h3>
-                    <div className="bg-muted p-3 rounded-lg">
+                    <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                       <p className="text-sm text-muted-foreground mb-2">Registro de atendimentos</p>
                       <ul className="text-sm space-y-1 ml-4">
                         <li>• id (UUID, PK)</li>
