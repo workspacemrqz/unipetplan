@@ -43,6 +43,9 @@ interface Procedure {
 const allColumns = [
   "Procedimento",
   "Categoria",
+  "Coparticipação",
+  "Carência",
+  "Limites Anuais",
   "Ações"
 ] as const;
 
@@ -100,6 +103,73 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
       style: 'currency',
       currency: 'BRL'
     }).format(price / 100); // Convert from cents to reais
+  };
+
+  // Funções auxiliares para resumir informações dos planos
+  const formatCoparticipacaoSummary = (plans?: PlanDetail[]) => {
+    if (!plans || plans.length === 0) return "N/A";
+    
+    const coparticipacoes = plans
+      .filter(p => p.coparticipacao && p.coparticipacao > 0)
+      .map(p => p.coparticipacao || 0);
+    
+    if (coparticipacoes.length === 0) return "Sem coparticipação";
+    
+    const min = Math.min(...coparticipacoes) / 100;
+    const max = Math.max(...coparticipacoes) / 100;
+    
+    if (min === max) {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(min);
+    }
+    
+    return `${new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(min)} - ${new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(max)}`;
+  };
+
+  const formatCarenciaSummary = (plans?: PlanDetail[]) => {
+    if (!plans || plans.length === 0) return "N/A";
+    
+    const carencias = plans
+      .filter(p => p.carencia && p.carencia.trim() !== '')
+      .map(p => p.carencia || '');
+    
+    if (carencias.length === 0) return "Sem carência";
+    
+    // Pegar valores únicos
+    const uniqueCarencias = [...new Set(carencias)];
+    
+    if (uniqueCarencias.length === 1) {
+      return uniqueCarencias[0];
+    }
+    
+    return "Varia por plano";
+  };
+
+  const formatLimitesSummary = (plans?: PlanDetail[]) => {
+    if (!plans || plans.length === 0) return "N/A";
+    
+    const limites = plans
+      .filter(p => p.limitesAnuais && p.limitesAnuais !== '0')
+      .map(p => p.limitesAnuais || '');
+    
+    if (limites.length === 0) return "Sem limites";
+    
+    // Pegar valores únicos
+    const uniqueLimites = [...new Set(limites)];
+    
+    if (uniqueLimites.length === 1) {
+      return uniqueLimites[0];
+    }
+    
+    return "Varia por plano";
   };
 
   const handleCopyToClipboard = async () => {
@@ -222,9 +292,12 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
           <Table className="w-full">
             <TableHeader>
               <TableRow className="bg-white border-b border-[#eaeaea]">
-                {visibleColumns.includes("Procedimento") && <TableHead className="w-[200px] bg-white">Procedimento</TableHead>}
-                {visibleColumns.includes("Categoria") && <TableHead className="w-[140px] bg-white">Categoria</TableHead>}
-                {visibleColumns.includes("Ações") && <TableHead className="w-[80px] bg-white">Ações</TableHead>}
+                {visibleColumns.includes("Procedimento") && <TableHead className="bg-white">Procedimento</TableHead>}
+                {visibleColumns.includes("Categoria") && <TableHead className="bg-white">Categoria</TableHead>}
+                {visibleColumns.includes("Coparticipação") && <TableHead className="bg-white">Coparticipação</TableHead>}
+                {visibleColumns.includes("Carência") && <TableHead className="bg-white">Carência</TableHead>}
+                {visibleColumns.includes("Limites Anuais") && <TableHead className="bg-white">Limites Anuais</TableHead>}
+                {visibleColumns.includes("Ações") && <TableHead className="bg-white">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -247,6 +320,21 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
                     {visibleColumns.includes("Categoria") && (
                       <TableCell className="whitespace-nowrap bg-white">
                         {procedure.category}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Coparticipação") && (
+                      <TableCell className="whitespace-nowrap bg-white text-sm">
+                        {formatCoparticipacaoSummary(procedure.plans)}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Carência") && (
+                      <TableCell className="whitespace-nowrap bg-white text-sm">
+                        {formatCarenciaSummary(procedure.plans)}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Limites Anuais") && (
+                      <TableCell className="whitespace-nowrap bg-white text-sm">
+                        {formatLimitesSummary(procedure.plans)}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Ações") && (
