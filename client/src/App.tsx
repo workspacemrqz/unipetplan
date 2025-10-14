@@ -18,7 +18,6 @@ import NovoAtendimentoPage from "@/pages/unit/NovoAtendimentoPage";
 import ProcedimentosPage from "@/pages/unit/ProcedimentosPage";
 import RelatorioFinanceiroPage from "@/pages/unit/RelatorioFinanceiroPage";
 import CorpoClinicoPage from "@/pages/unit/CorpoClinicoPage";
-import LogsPage from "@/pages/unit/LogsPage";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfUse from "@/pages/terms-of-use";
 import ContractBasic from "@/pages/contract-basic";
@@ -80,7 +79,6 @@ import AdminFAQ from './pages/admin/FAQ';
 import AdminContactSubmissions from './pages/admin/ContactSubmissions';
 import AdminSettings from './pages/admin/Settings';
 import AdminAdministration from './pages/admin/Administration';
-import AdminLogsPage from './pages/admin/AdminLogsPage';
 import AdminUnitDashboard from './pages/admin/UnitDashboard';
 import AdminFinancial from './pages/admin/Financial';
 import AdminContracts from './pages/admin/Contracts';
@@ -263,8 +261,6 @@ function AdminRouter() {
             <Route path="/documentacao" component={AdminDocumentation} />
             {/* Administração - sem verificação de permissão (sempre visível) */}
             <Route path="/administracao" component={AdminAdministration} />
-            {/* Logs - sem verificação de permissão */}
-            <Route path="/logs" component={AdminLogsPage} />
             
             {/* Unit Dashboard (special case) */}
             <Route path="/unidade/:slug" component={AdminUnitDashboard} />
@@ -337,7 +333,6 @@ function Router() {
         <Route path="/unidade/:slug/atendimentos" component={AtendimentosPage} />
         <Route path="/unidade/:slug/procedimentos" component={ProcedimentosPage} />
         <Route path="/unidade/:slug/corpo-clinico" component={CorpoClinicoPage} />
-        <Route path="/unidade/:slug/logs" component={LogsPage} />
         <Route path="/unidade/:slug/relatorio-financeiro" component={RelatorioFinanceiroPage} />
         
         {/* Public Routes with Layout - MUST come before /:slug */}

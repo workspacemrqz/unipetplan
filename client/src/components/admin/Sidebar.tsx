@@ -29,7 +29,6 @@ const routePermissionMap: Record<string, string | null> = {
   // Rotas que não precisam de verificação de permissão (sempre visíveis)
   '/administracao': null, // Administração sempre visível
   '/planos': null, // Planos sempre visível
-  '/logs': null, // Logs sempre visível
   '/configuracoes': null, // Configurações sempre visível
   '/documentacao': null // Documentação sempre visível
 };
@@ -78,7 +77,6 @@ const navigation = [
       { name: "Procedimentos", href: "/procedimentos", iconName: "Procedimento" },
       { name: "FAQ", href: "/perguntas-frequentes", iconName: "FAQ" },
       { name: "Administração", href: "/administracao", iconName: "Admin" },
-      { name: "Logs de Ações", href: "/logs", iconName: "LogsList" },
       { name: "Configurações", href: "/configuracoes", iconName: "Configurações" },
       { name: "Documentação", href: "/documentacao", iconName: "Contrato" }
     ]

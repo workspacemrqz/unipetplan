@@ -86,12 +86,6 @@ export default function UnitSidebar() {
           items: [
             { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, iconName: "Pagamento" }
           ]
-        },
-        {
-          name: "Sistema",
-          items: [
-            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, iconName: "LogsList" }
-          ]
         }
       ];
 
