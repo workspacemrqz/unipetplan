@@ -30,10 +30,12 @@ export async function exportToPDF({
   filename,
   title,
 }: PDFExportOptions) {
+  // Configuração para formato horizontal widescreen (16:9)
+  // Usando dimensões customizadas que mantém proporção 1920x1080
   const doc = new jsPDF({
-    orientation: 'portrait',
+    orientation: 'landscape',
     unit: 'mm',
-    format: 'a4',
+    format: [297, 167], // Proporção 16:9 em tamanho A4 landscape
     putOnlyUsedFonts: true,
     floatPrecision: 16
   });
@@ -43,9 +45,9 @@ export async function exportToPDF({
   
   // Add title
   if (title) {
-    doc.setFontSize(16);
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text(title, 14, 15);
+    doc.text(title, 20, 20);
     doc.setFont('helvetica', 'normal');
   }
   
@@ -89,11 +91,11 @@ export async function exportToPDF({
     }
   }
   
-  // Add table with improved configuration
+  // Add table with improved configuration for landscape orientation
   autoTable(doc, {
     head: [tableColumns],
     body: tableRows,
-    startY: title ? 25 : 10,
+    startY: title ? 30 : 15,
     theme: 'striped',
     styles: {
       font: 'helvetica',
@@ -105,8 +107,8 @@ export async function exportToPDF({
       valign: 'middle',
       lineColor: [200, 200, 200],
       lineWidth: 0.1,
-      minCellHeight: 8,
-      minCellWidth: 10,
+      minCellHeight: 6,
+      minCellWidth: 15,
     },
     headStyles: {
       fillColor: [39, 118, 119], // Teal color
@@ -114,14 +116,14 @@ export async function exportToPDF({
       fontSize: 10,
       fontStyle: 'bold',
       halign: 'left',
-      minCellHeight: 10,
+      minCellHeight: 8,
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245],
     },
     columnStyles: {},
-    margin: { top: 10, right: 10, bottom: 10, left: 10 },
-    tableWidth: 'wrap',
+    margin: { top: 15, right: 20, bottom: 15, left: 20 },
+    tableWidth: 'auto',
     showHead: 'everyPage',
     tableLineColor: [200, 200, 200],
     tableLineWidth: 0.1,
@@ -170,7 +172,7 @@ export async function exportToPDF({
     doc.setFont('helvetica', 'normal');
     doc.text(
       `Exportado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`,
-      14,
+      20,
       doc.internal.pageSize.height - 10
     );
     doc.text(
