@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ChevronLeft, Download } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -302,16 +302,14 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           
           {/* Back Button */}
-          <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+          <button
             onClick={() => navigate('/cliente/painel')}
-            className="flex items-center space-x-2 mb-6 text-sm font-medium"
-            style={{ color: 'var(--text-teal)' }}
+            className="flex items-center space-x-2 px-3 py-2 rounded-lg mb-4"
+            style={{ background: 'var(--bg-beige)', color: 'var(--text-dark-secondary)' }}
           >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Voltar ao Painel</span>
-          </motion.button>
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar</span>
+          </button>
 
           {/* Header */}
           <motion.div
@@ -319,7 +317,8 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-lg p-6 mb-6"
           >
-            <div className="flex items-start justify-between">
+            {/* Desktop Layout */}
+            <div className="hidden sm:flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-bold" style={{ color: 'var(--text-dark-primary)' }}>
                   Contrato de Prestação de Serviços
@@ -341,6 +340,31 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
                 <Download className="w-4 h-4" />
                 <span>{isDownloading ? 'Baixando...' : 'Baixar PDF'}</span>
               </button>
+            </div>
+
+            {/* Mobile Layout */}
+            <div className="sm:hidden">
+              <div>
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--text-dark-primary)' }}>
+                  Contrato de Prestação de Serviços
+                </h1>
+                <p className="text-sm mt-1" style={{ color: 'var(--text-dark-secondary)' }}>
+                  Plano de Saúde Pet
+                </p>
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={isDownloading}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all mt-4"
+                  style={{ 
+                    background: isDownloading ? 'var(--bg-beige)' : 'var(--btn-ver-planos-bg)', 
+                    color: isDownloading ? 'var(--text-dark-secondary)' : 'var(--btn-ver-planos-text)',
+                    opacity: isDownloading ? 0.7 : 1
+                  }}
+                >
+                  <Download className="w-4 h-4" />
+                  <span>{isDownloading ? 'Baixando...' : 'Baixar PDF'}</span>
+                </button>
+              </div>
             </div>
           </motion.div>
 
