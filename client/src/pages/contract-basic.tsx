@@ -203,19 +203,15 @@ export default function ContractBasic() {
           <div className="mb-4">
             <Link 
               href="/" 
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all hover:gap-3"
-              style={{ 
-                color: 'var(--text-dark-primary)',
-                backgroundColor: 'var(--bg-cream)'
-              }}
+              className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium transition-colors bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm font-medium">Voltar ao Início</span>
+              <ArrowLeft className="h-5 w-5" />
+              Voltar ao Início
             </Link>
           </div>
 
-          {/* Content Container with proper padding */}
-          <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
+          {/* Content */}
+          <div className="rounded-lg shadow-sm border p-8" style={{ backgroundColor: 'var(--bg-cream-lighter)', borderColor: 'var(--border-gray)' }}>
             {formatContent(content)}
           </div>
         </div>
