@@ -187,10 +187,12 @@ export default function FAQ() {
     },
   });
 
-  const filteredItems = Array.isArray(faqItems) ? faqItems?.filter((item: any) =>
-    item.question?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.answer?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const filteredItems = Array.isArray(faqItems) ? faqItems
+    ?.filter((item: any) =>
+      item.question?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.answer?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
 
   const totalItems = filteredItems.length;
   const totalPages = Math.ceil(totalItems / pageSize);

@@ -77,14 +77,15 @@ export default function Financial() {
     queryKey: ["/admin/api/payment-receipts"],
   });
 
-  const filteredReceipts = searchQuery
+  const filteredReceipts = (searchQuery
     ? receipts.filter(
         (receipt) =>
           receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
           receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : receipts;
+    : receipts)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const totalReceipts = filteredReceipts.length;
   const totalPages = Math.ceil(totalReceipts / pageSize);

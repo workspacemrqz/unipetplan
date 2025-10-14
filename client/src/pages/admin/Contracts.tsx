@@ -128,43 +128,45 @@ export default function Contracts() {
     queryKey: ["/admin/api/contracts"],
   });
 
-  const filteredContracts = contracts.filter((contract) => {
-    // Text search filter
-    const matchesSearch = !searchQuery || 
-      contract.contractNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      contract.clientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      contract.petName?.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredContracts = contracts
+    .filter((contract) => {
+      // Text search filter
+      const matchesSearch = !searchQuery || 
+        contract.contractNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contract.clientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contract.petName?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    // Status filter
-    const matchesStatus = statusFilter === "all" || contract.status === statusFilter;
+      // Status filter
+      const matchesStatus = statusFilter === "all" || contract.status === statusFilter;
 
-    // Date filter
-    let matchesDate = true;
-    if (debouncedDateFilter.startDate || debouncedDateFilter.endDate) {
-      const contractDate = new Date(contract.startDate);
-      
-      if (debouncedDateFilter.startDate) {
-        const startDate = new Date(
-          debouncedDateFilter.startDate.year,
-          debouncedDateFilter.startDate.month - 1,
-          debouncedDateFilter.startDate.day
-        );
-        if (contractDate < startDate) matchesDate = false;
+      // Date filter
+      let matchesDate = true;
+      if (debouncedDateFilter.startDate || debouncedDateFilter.endDate) {
+        const contractDate = new Date(contract.startDate);
+        
+        if (debouncedDateFilter.startDate) {
+          const startDate = new Date(
+            debouncedDateFilter.startDate.year,
+            debouncedDateFilter.startDate.month - 1,
+            debouncedDateFilter.startDate.day
+          );
+          if (contractDate < startDate) matchesDate = false;
+        }
+        
+        if (debouncedDateFilter.endDate) {
+          const endDate = new Date(
+            debouncedDateFilter.endDate.year,
+            debouncedDateFilter.endDate.month - 1,
+            debouncedDateFilter.endDate.day
+          );
+          endDate.setHours(23, 59, 59, 999);
+          if (contractDate > endDate) matchesDate = false;
+        }
       }
-      
-      if (debouncedDateFilter.endDate) {
-        const endDate = new Date(
-          debouncedDateFilter.endDate.year,
-          debouncedDateFilter.endDate.month - 1,
-          debouncedDateFilter.endDate.day
-        );
-        endDate.setHours(23, 59, 59, 999);
-        if (contractDate > endDate) matchesDate = false;
-      }
-    }
 
-    return matchesSearch && matchesStatus && matchesDate;
-  });
+      return matchesSearch && matchesStatus && matchesDate;
+    })
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const totalContracts = filteredContracts.length;
   const totalPages = Math.ceil(totalContracts / pageSize);

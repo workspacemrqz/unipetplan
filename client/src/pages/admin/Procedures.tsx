@@ -689,10 +689,12 @@ export default function Procedures() {
     },
   });
 
-  const filteredItems = Array.isArray(procedures) ? procedures.filter((item: any) =>
-    (item.name ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (item.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const filteredItems = Array.isArray(procedures) ? procedures
+    .filter((item: any) =>
+      (item.name ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
 
   // Pagination logic
   const totalItems = filteredItems.length;

@@ -286,9 +286,11 @@ export default function Coupons() {
     }
   };
 
-  const allFilteredCoupons = Array.isArray(coupons) ? coupons.filter((coupon: Coupon) =>
-    coupon.code?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const allFilteredCoupons = Array.isArray(coupons) ? coupons
+    .filter((coupon: Coupon) =>
+      coupon.code?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
 
   const totalCoupons = allFilteredCoupons.length;
   const totalPages = Math.ceil(totalCoupons / pageSize);

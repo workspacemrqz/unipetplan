@@ -86,12 +86,14 @@ export default function Sellers() {
     ...getQueryOptions('sellers'),
   });
 
-  const filteredSellers = sellers.filter(seller =>
-    seller.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    seller.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    seller.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    seller.cpf?.includes(searchQuery)
-  );
+  const filteredSellers = sellers
+    .filter(seller =>
+      seller.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      seller.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      seller.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      seller.cpf?.includes(searchQuery)
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // Calculate pagination
   const totalSellers = filteredSellers.length;

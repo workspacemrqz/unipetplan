@@ -100,9 +100,11 @@ export default function Plans() {
     },
   });
 
-  const allFilteredPlans = Array.isArray(plans) ? plans.filter((plan: Plan) =>
-    plan.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const allFilteredPlans = Array.isArray(plans) ? plans
+    .filter((plan: Plan) =>
+      plan.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
 
   const totalPlans = allFilteredPlans.length;
   const totalPages = Math.ceil(totalPlans / pageSize);

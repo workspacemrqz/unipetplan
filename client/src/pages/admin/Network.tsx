@@ -129,10 +129,12 @@ export default function Network() {
     },
   });
 
-  const filteredUnits = Array.isArray(units) ? units.filter((unit: NetworkUnit) =>
-    unit.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    unit.address?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const filteredUnits = Array.isArray(units) ? units
+    .filter((unit: NetworkUnit) =>
+      unit.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      unit.address?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
   
   const totalUnits = filteredUnits.length;
   const totalPages = Math.ceil(totalUnits / pageSize);

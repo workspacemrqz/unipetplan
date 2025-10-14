@@ -307,11 +307,13 @@ export default function CorpoClinicoPage() {
     },
   });
 
-  const filteredVeterinarians = veterinarians.filter((vet) =>
-    vet.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    vet.crmv?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    vet.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredVeterinarians = veterinarians
+    .filter((vet) =>
+      vet.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vet.crmv?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vet.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const permanenteVets = filteredVeterinarians.filter((vet) => vet.type === "permanente");
   const volanteVets = filteredVeterinarians.filter((vet) => vet.type === "volante");

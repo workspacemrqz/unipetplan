@@ -131,7 +131,8 @@ export default function Clients() {
   });
 
   // Calculate filtered and paginated clients first
-  const filteredClients = searchQuery.length >= 2 ? searchResults : clients;
+  const filteredClients = (searchQuery.length >= 2 ? searchResults : clients)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const totalClients = filteredClients.length;
   const totalPages = Math.ceil(totalClients / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
