@@ -6499,14 +6499,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Cliente não autenticado" });
       }
 
+      // Get site settings to retrieve contract text
+      const siteSettings = await storage.getSiteSettings();
+      
       // Import pdfMake
       const pdfMake = (await import('pdfmake/build/pdfmake.js')).default;
       const vfsFonts = await import('pdfmake/build/vfs_fonts.js');
       pdfMake.vfs = (vfsFonts as any).vfs;
 
-      // Define the contract document structure
-      const docDefinition: any = {
-        content: [
+      // Check if there's custom contract text in database
+      if (siteSettings?.contractText && siteSettings.contractText.trim()) {
+        // Use custom contract text from database
+        const contractText = siteSettings.contractText
+          .replace(/\[Nome do Cliente\]/g, clientName)
+          .replace(/\[CPF do Cliente\]/g, clientCPF);
+        
+        // Parse the contract text into PDF format
+        const lines = contractText.split('\n');
+        const content: any[] = [];
+        
+        for (const line of lines) {
+          if (!line.trim()) {
+            content.push({ text: '\n' });
+          } else if (line.startsWith('CONTRATO DE PRESTAÇÃO') && !line.includes('CLÁUSULA')) {
+            content.push({
+              text: line,
+              style: 'header',
+              alignment: 'center'
+            });
+          } else if (line.startsWith('CLÁUSULA')) {
+            content.push({
+              text: line,
+              style: 'subheader'
+            });
+          } else if (line.startsWith('•') || line.startsWith('-')) {
+            // Handle bullet points
+            if (!content.length || !content[content.length - 1].ul) {
+              content.push({ ul: [], style: 'text' });
+            }
+            content[content.length - 1].ul.push(line.substring(1).trim());
+          } else {
+            content.push({
+              text: line,
+              style: 'text'
+            });
+          }
+        }
+        
+        const docDefinition: any = {
+          content: content,
+          styles: {
+            header: {
+              fontSize: 16,
+              bold: true,
+              margin: [0, 0, 0, 10] as [number, number, number, number]
+            },
+            subheader: {
+              fontSize: 14,
+              bold: true,
+              margin: [0, 10, 0, 5] as [number, number, number, number]
+            },
+            text: {
+              fontSize: 11,
+              margin: [0, 2, 0, 2] as [number, number, number, number],
+              alignment: 'justify'
+            }
+          },
+          defaultStyle: {
+            font: 'Roboto'
+          }
+        };
+        
+        // Generate the PDF
+        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+        
+        // Get the PDF as buffer
+        pdfDocGenerator.getBuffer((buffer: Buffer) => {
+          // Set response headers for PDF download
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', `attachment; filename=contrato_plano_saude_pet_${new Date().toISOString().split('T')[0]}.pdf`);
+          res.setHeader('Content-Length', buffer.length.toString());
+          
+          // Send the PDF buffer
+          res.end(buffer);
+        });
+      } else {
+        // Use default contract structure
+        const docDefinition: any = {
+          content: [
           {
             text: 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS VETERINÁRIOS - PLANO DE SAÚDE PET',
             style: 'header',
@@ -6787,19 +6867,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       };
 
-      // Generate the PDF
-      const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-      
-      // Get the PDF as buffer
-      pdfDocGenerator.getBuffer((buffer: Buffer) => {
-        // Set response headers for PDF download
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=contrato_plano_saude_pet_${new Date().toISOString().split('T')[0]}.pdf`);
-        res.setHeader('Content-Length', buffer.length.toString());
+        // Generate the PDF
+        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
         
-        // Send the PDF buffer
-        res.end(buffer);
-      });
+        // Get the PDF as buffer
+        pdfDocGenerator.getBuffer((buffer: Buffer) => {
+          // Set response headers for PDF download
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', `attachment; filename=contrato_plano_saude_pet_${new Date().toISOString().split('T')[0]}.pdf`);
+          res.setHeader('Content-Length', buffer.length.toString());
+          
+          // Send the PDF buffer
+          res.end(buffer);
+        });
+      } // End of else (default contract)
 
     } catch (error) {
       console.error("❌ Error generating contract PDF:", error);
