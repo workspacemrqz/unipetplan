@@ -4,13 +4,13 @@ import { cn } from "@/lib/admin/utils";
 import { useState, useEffect } from "react";
 import {
   Home,
-  FileText,
+  File,
   Clipboard,
   LogOut,
   Plus,
   DollarSign,
   Users,
-  Search,
+  FileSearch,
   ChevronDown,
   ChevronRight
 } from "lucide-react";
@@ -51,7 +51,7 @@ export default function UnitSidebar() {
             { 
               name: "Atendimentos", 
               href: `/unidade/${slug}/atendimentos`, 
-              icon: FileText
+              icon: File
             },
             { 
               name: "Novo Atendimento", 
@@ -75,7 +75,7 @@ export default function UnitSidebar() {
             { 
               name: "Atendimentos", 
               href: `/unidade/${slug}/atendimentos`, 
-              icon: FileText
+              icon: File
             },
             { 
               name: "Novo Atendimento", 
@@ -100,7 +100,7 @@ export default function UnitSidebar() {
         {
           name: "Sistema",
           items: [
-            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: Search }
+            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: FileSearch }
           ]
         }
       ];
