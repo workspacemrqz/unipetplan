@@ -1,13 +1,36 @@
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/admin/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
 import { createCacheManager } from "@/lib/admin/cacheUtils";
 import CustomIcon from "@/components/admin/ui/CustomIcon";
+import { usePermissions } from "@/hooks/use-permissions";
+
+// Mapeamento de rotas para permissões
+const routePermissionMap: Record<string, string | null> = {
+  '/': 'dashboard',
+  '/clientes': 'clientes',
+  '/contratos': 'contratos',
+  '/atendimentos': 'atendimentos',
+  '/financeiro': 'financeiro',
+  '/cupom': 'cupom',
+  '/relatorio-financeiro': 'relatorio_financeiro',
+  '/formularios': 'formularios',
+  '/avaliacoes': 'avaliacoes',
+  '/rede': 'rede',
+  '/vendedores': 'vendedores',
+  '/procedimentos': 'procedimentos',
+  '/perguntas-frequentes': 'faq',
+  // Rotas que não precisam de verificação de permissão (sempre visíveis)
+  '/administracao': null, // Administração sempre visível
+  '/planos': null, // Planos sempre visível
+  '/logs': null, // Logs sempre visível
+  '/configuracoes': null // Configurações sempre visível
+};
 
 const navigation = [
   {
@@ -63,13 +86,31 @@ export default function Sidebar() {
   const [location] = useLocation();
   const queryClient = useQueryClient();
   const cacheManager = createCacheManager(queryClient);
+  const { hasPermission, currentUser } = usePermissions();
   
   // Estado para controlar quais seções estão expandidas
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  
+  // Filtrar navegação baseado em permissões
+  const filteredNavigation = useMemo(() => {
+    return navigation.map(section => {
+      const filteredItems = section.items.filter(item => {
+        const permission = routePermissionMap[item.href];
+        // Se não tem permissão mapeada (null), sempre mostra
+        // Se tem permissão mapeada, verifica se o usuário tem acesso
+        return permission === null || permission === undefined || hasPermission(permission);
+      });
+      
+      return {
+        ...section,
+        items: filteredItems
+      };
+    }).filter(section => section.items.length > 0); // Remove seções sem itens
+  }, [currentUser, hasPermission]);
 
   // Expand section containing current route
   useEffect(() => {
-    for (const section of navigation) {
+    for (const section of filteredNavigation) {
       const hasActiveItem = section.items.some(item => 
         item.href === '/' ? location === item.href : location.startsWith(item.href)
       );
@@ -82,7 +123,7 @@ export default function Sidebar() {
         break;
       }
     }
-  }, [location]);
+  }, [location, filteredNavigation]);
 
   // Função para alternar a expansão de uma seção
   const toggleSection = (sectionName: string) => {
@@ -124,7 +165,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 px-4 pb-6 space-y-4 overflow-y-auto">
-        {navigation.map((section) => {
+        {filteredNavigation.map((section) => {
           const isExpanded = expandedSections.has(section.name);
           
           return (
