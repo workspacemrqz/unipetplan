@@ -469,9 +469,7 @@ export default function AdminLogsPage() {
             { key: 'adminIdentifier', label: 'Administrador', formatter: (v) => v || 'Sistema' },
             { key: 'actionType', label: 'Ação', formatter: (v) => getActionTypeLabel(v) },
             { key: 'entityType', label: 'Entidade', formatter: (v) => getEntityTypeLabel(v) },
-            { key: 'entityId', label: 'ID da Entidade', formatter: (v) => v || '' },
-            { key: 'metadata', label: 'Detalhes', formatter: (v, row) => formatAdminLogDetails(row.actionType, row.entityType, v) },
-            { key: 'ip', label: 'Endereço IP', formatter: (v) => v || 'Não registrado' }
+            { key: 'metadata', label: 'Detalhes', formatter: (v, row) => formatAdminLogDetails(row.actionType, row.entityType, v) }
           ] : [
             { key: 'log.createdAt', label: 'Data/Hora', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
             { key: 'networkUnit.name', label: 'Unidade', formatter: (v) => v || 'N/A' },
