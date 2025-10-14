@@ -85,20 +85,24 @@ const DateRangePicker = React.forwardRef<
   }, [value])
 
   const renderContent = () => (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4" style={{ 
+      background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)'
+    }}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Data inicial">
+        <Field label="Data inicial" className="[&_label]:text-white/90 [&_label]:font-medium">
           <DateField
             value={tempRange.startDate}
             onChange={handleStartDateChange}
             placeholder="dd/mm/aaaa"
+            className="bg-white/20 border-white/30 text-white placeholder:text-white/60 [&_input]:text-white [&_input]:placeholder:text-white/60"
           />
         </Field>
-        <Field label="Data final">
+        <Field label="Data final" className="[&_label]:text-white/90 [&_label]:font-medium">
           <DateField
             value={tempRange.endDate}
             onChange={handleEndDateChange}
             placeholder="dd/mm/aaaa"
+            className="bg-white/20 border-white/30 text-white placeholder:text-white/60 [&_input]:text-white [&_input]:placeholder:text-white/60"
           />
         </Field>
       </div>
@@ -108,16 +112,15 @@ const DateRangePicker = React.forwardRef<
           variant="outline"
           size="sm"
           onClick={handleClear}
-          className="flex-1"
+          className="flex-1 bg-white/20 border-white/30 text-white hover:bg-white/30"
         >
           <X className="mr-2 h-4 w-4" />
           Limpar
         </Button>
         <Button
-          variant="default"
           size="sm"
           onClick={handleApply}
-          className="flex-1"
+          className="flex-1 bg-white/30 border-white/40 text-white hover:bg-white/40 font-semibold"
         >
           Aplicar
         </Button>
@@ -149,7 +152,7 @@ const DateRangePicker = React.forwardRef<
           <DrawerTrigger asChild>
             {triggerButton}
           </DrawerTrigger>
-          <DrawerContent>
+          <DrawerContent className="border-0">
             {renderContent()}
           </DrawerContent>
         </Drawer>
@@ -163,7 +166,7 @@ const DateRangePicker = React.forwardRef<
         <PopoverTrigger asChild>
           {triggerButton}
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 border-0 shadow-lg rounded-lg overflow-hidden" align="start">
           {renderContent()}
         </PopoverContent>
       </Popover>
