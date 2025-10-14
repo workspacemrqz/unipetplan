@@ -707,6 +707,7 @@ export const insertSiteSettingsSchema = z.object({
   networkImageUrl: z.string().optional(),
   aboutImageUrl: z.string().optional(),
   cores: z.record(z.string()).optional(),
+  contractText: z.string().optional(),
 });
 
 export const insertChatSettingsSchema = z.object({
