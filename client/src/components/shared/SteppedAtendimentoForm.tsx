@@ -1136,11 +1136,15 @@ export default function SteppedAtendimentoForm({
                                       />
                                       <div className="flex-1">
                                         <span className="text-sm font-medium">{proc.name}</span>
-                                        {proc.annualLimit && (
+                                        {(proc.annualLimit === -1 || proc.isUnlimited) ? (
+                                          <span className="text-xs text-green-600 ml-2">
+                                            (Ilimitado)
+                                          </span>
+                                        ) : proc.annualLimit && proc.annualLimit > 0 ? (
                                           <span className="text-xs text-muted-foreground ml-2">
                                             (Limite: {proc.remaining}/{proc.annualLimit})
                                           </span>
-                                        )}
+                                        ) : null}
                                         {proc.coparticipation > 0 && (
                                           <div className="text-xs text-gray-500 mt-1">
                                             Coparticipação: R$ {proc.coparticipation.toFixed(2).replace('.', ',')}
