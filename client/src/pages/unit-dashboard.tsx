@@ -384,17 +384,17 @@ export default function UnitDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           {/* Gráfico de Procedimentos Vendidos */}
           <Card style={{ backgroundColor: '#FFFFFF' }}>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle className="text-foreground min-w-0">Procedimentos Vendidos</CardTitle>
               <p className="text-sm text-muted-foreground">Quantidade por procedimento (Top 10)</p>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4 flex items-center justify-center">
               {proceduresSold && proceduresSold.length > 0 ? (
                 <BarChart 
-                  width={600}
-                  height={450}
+                  width={500}
+                  height={300}
                   data={proceduresSold} 
-                  margin={{ top: 20, right: 30, left: 20, bottom: 140 }}
+                  margin={{ top: 10, right: 30, left: 20, bottom: 100 }}
                 >
                   <CartesianGrid 
                     strokeDasharray="3 3" 
@@ -405,10 +405,10 @@ export default function UnitDashboard() {
                     dataKey="name" 
                     angle={-45}
                     textAnchor="end"
-                    height={140}
+                    height={100}
                     interval={0}
                     tick={{ 
-                      fontSize: 11, 
+                      fontSize: 10, 
                       fill: '#000000',
                       fontWeight: 500 
                     }}
@@ -416,7 +416,7 @@ export default function UnitDashboard() {
                   />
                   <YAxis 
                     tick={{ 
-                      fontSize: 12, 
+                      fontSize: 11, 
                       fill: '#000000',
                       fontWeight: 500 
                     }} 
@@ -442,11 +442,11 @@ export default function UnitDashboard() {
                     fill="#0e7074" 
                     name="Quantidade" 
                     radius={[8, 8, 0, 0]}
-                    maxBarSize={50}
+                    maxBarSize={40}
                   />
                 </BarChart>
               ) : (
-                <div style={{ height: '450px' }} className="flex items-center justify-center bg-gray-50 rounded-lg">
+                <div style={{ height: '300px', width: '100%' }} className="flex items-center justify-center bg-gray-50 rounded-lg">
                   <div className="text-center px-4">
                     <p className="text-gray-700 font-semibold text-lg">Nenhum dado disponível</p>
                     <p className="text-sm text-gray-500 mt-2">
@@ -460,21 +460,21 @@ export default function UnitDashboard() {
 
           {/* Gráfico de Valor por Usuário */}
           <Card style={{ backgroundColor: '#FFFFFF' }}>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle className="text-foreground min-w-0">Valor por Usuário</CardTitle>
               <p className="text-sm text-muted-foreground">Total (R$) por criador dos atendimentos</p>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4 flex items-center justify-center">
               {valueByUser && valueByUser.length > 0 ? (
-                <PieChart width={600} height={450}>
+                <PieChart width={400} height={300}>
                   <Pie
                     data={valueByUser as any}
                     dataKey="value"
                     nameKey="name"
-                    cx={300}
-                    cy={225}
-                    outerRadius={120}
-                    innerRadius={70}
+                    cx={200}
+                    cy={150}
+                    outerRadius={90}
+                    innerRadius={50}
                     paddingAngle={4}
                     label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
                     labelLine={{ 
@@ -508,7 +508,7 @@ export default function UnitDashboard() {
                   />
                 </PieChart>
               ) : (
-                <div style={{ height: '450px' }} className="flex items-center justify-center bg-gray-50 rounded-lg">
+                <div style={{ height: '300px', width: '100%' }} className="flex items-center justify-center bg-gray-50 rounded-lg">
                   <div className="text-center px-4">
                     <p className="text-gray-700 font-semibold text-lg">Nenhum dado disponível</p>
                     <p className="text-sm text-gray-500 mt-2">
