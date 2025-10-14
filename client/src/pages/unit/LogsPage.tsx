@@ -262,6 +262,136 @@ export default function LogsPage() {
     }
   };
 
+  // Preparar dados para PDF - apenas campos visíveis
+  const preparePdfData = () => {
+    return logs.map(logEntry => ({
+      'Data/Hora': format(new Date(logEntry.log.createdAt), "dd/MM/yyyy HH:mm"),
+      'Ação': getActionTypeLabel(logEntry.log.actionType),
+      'Usuário': getUserLabel(logEntry),
+      'Detalhes': formatActionData(logEntry.log.actionType, logEntry.log.actionData)
+    }));
+  };
+
+  // Preparar dados para Excel - todos os campos incluindo detalhes completos
+  const prepareExcelData = () => {
+    return logs.map(logEntry => {
+      const excelData: any = {
+        // === INFORMAÇÕES DO LOG ===
+        '📅 Data': format(new Date(logEntry.log.createdAt), "dd/MM/yyyy"),
+        '⏰ Hora': format(new Date(logEntry.log.createdAt), "HH:mm:ss"),
+        '📆 Data/Hora Completa': format(new Date(logEntry.log.createdAt), "dd/MM/yyyy 'às' HH:mm:ss"),
+        
+        // === AÇÃO E TIPO ===
+        '🎯 Ação': getActionTypeLabel(logEntry.log.actionType),
+        '🔤 Código da Ação': logEntry.log.actionType,
+        
+        // === USUÁRIO ===
+        '👤 Usuário': getUserLabel(logEntry),
+        '👥 Tipo de Usuário': logEntry.log.userType === 'unit' ? 'Administrador' : 'Veterinário',
+        '🆔 ID do Veterinário': logEntry.veterinarian?.id || 'N/A',
+        '📛 Nome do Veterinário': logEntry.veterinarian?.name || 'Ação do Sistema',
+        
+        // === UNIDADE ===
+        '🏢 ID da Unidade': logEntry.log.networkUnitId || '',
+        
+        // === DETALHES COMPLETOS ===
+        '📝 Detalhes Formatados': formatActionData(logEntry.log.actionType, logEntry.log.actionData),
+        
+        // === DADOS BRUTOS (para análise técnica) ===
+        '💾 ID do Log': logEntry.log.id,
+        '🗄️ Dados da Ação (JSON)': JSON.stringify(logEntry.log.actionData || {}),
+      };
+      
+      // Adicionar campos específicos baseados no tipo de ação
+      if (logEntry.log.actionData) {
+        const actionData = logEntry.log.actionData;
+        
+        switch (logEntry.log.actionType) {
+          case 'client_selected':
+            if (actionData.clientName) {
+              excelData['👤 Cliente Selecionado'] = actionData.clientName;
+            }
+            break;
+            
+          case 'pet_selected':
+            if (actionData.petName) {
+              excelData['🐾 Pet Selecionado'] = actionData.petName;
+            }
+            if (actionData.species) {
+              excelData['🦴 Espécie do Pet'] = actionData.species;
+            }
+            break;
+            
+          case 'procedure_added':
+            if (actionData.procedureName) {
+              excelData['💉 Procedimento Adicionado'] = actionData.procedureName;
+            }
+            if (actionData.value) {
+              excelData['💰 Valor do Procedimento'] = `R$ ${parseFloat(actionData.value).toFixed(2).replace('.', ',')}`;
+            }
+            break;
+            
+          case 'atendimento_created':
+            if (actionData.atendimentoId) {
+              excelData['📋 ID do Atendimento'] = actionData.atendimentoId;
+            }
+            if (actionData.clientName) {
+              excelData['👤 Cliente do Atendimento'] = actionData.clientName;
+            }
+            if (actionData.totalValue) {
+              excelData['💰 Valor Total'] = `R$ ${parseFloat(actionData.totalValue).toFixed(2).replace('.', ',')}`;
+            }
+            break;
+            
+          case 'veterinarian_created':
+          case 'veterinarian_updated':
+            if (actionData.name) {
+              excelData['👨‍⚕️ Nome do Veterinário'] = actionData.name;
+            }
+            if (actionData.crmv) {
+              excelData['📜 CRMV'] = actionData.crmv;
+            }
+            if (actionData.phone) {
+              excelData['📱 Telefone'] = actionData.phone;
+            }
+            if (actionData.email) {
+              excelData['📧 Email'] = actionData.email;
+            }
+            if (actionData.type) {
+              excelData['🏷️ Tipo'] = actionData.type === 'permanente' ? 'Permanente' : 'Volante';
+            }
+            break;
+        }
+      }
+      
+      return excelData;
+    });
+  };
+
+  // Definir colunas para PDF (apenas campos básicos)
+  const getPdfColumns = () => {
+    return [
+      { key: 'Data/Hora', label: 'Data/Hora' },
+      { key: 'Ação', label: 'Ação' },
+      { key: 'Usuário', label: 'Usuário' },
+      { key: 'Detalhes', label: 'Detalhes' }
+    ];
+  };
+
+  // Definir colunas para Excel (todos os campos)
+  const getExcelColumns = () => {
+    return [
+      { key: '📅 Data', label: '📅 Data' },
+      { key: '⏰ Hora', label: '⏰ Hora' },
+      { key: '🎯 Ação', label: '🎯 Ação' },
+      { key: '👤 Usuário', label: '👤 Usuário' },
+      { key: '👥 Tipo de Usuário', label: '👥 Tipo de Usuário' },
+      { key: '📝 Detalhes Formatados', label: '📝 Detalhes Formatados' },
+      { key: '🏢 ID da Unidade', label: '🏢 ID da Unidade' },
+      { key: '💾 ID do Log', label: '💾 ID do Log' }
+    ];
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg-cream-light)]">
@@ -329,16 +459,13 @@ export default function LogsPage() {
           
           <ExportButton 
             data={logs}
+            preparePdfData={() => preparePdfData()}
+            prepareExcelData={() => prepareExcelData()}
+            pdfColumns={getPdfColumns()}
+            excelColumns={getExcelColumns()}
             filename="logs_unidade"
             title="Exportação de Logs da Unidade"
             pageName="Logs da Unidade"
-            columns={[
-              { key: 'log.createdAt', label: 'Data/Hora', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm") : '' },
-              { key: 'veterinarian.name', label: 'Usuário', formatter: (v, row) => getUserLabel(row as Log) },
-              { key: 'log.userType', label: 'Tipo de Usuário', formatter: (v) => v === 'unit' ? 'Admin' : 'Veterinário' },
-              { key: 'log.actionType', label: 'Ação', formatter: (v) => getActionTypeLabel(v) },
-              { key: 'log.actionData', label: 'Detalhes', formatter: (v, row) => formatActionData((row as Log).log.actionType, v) }
-            ]}
             disabled={isLoadingLogs || logs.length === 0}
           />
         </div>
