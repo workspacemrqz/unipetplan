@@ -3,7 +3,7 @@ import { useParams } from "wouter";
 import { cn } from "@/lib/admin/utils";
 import { useState, useEffect } from "react";
 import { LogOut, ChevronDown, ChevronRight } from "lucide-react";
-import { SvgIcon } from "@/components/ui/SvgIcon";
+import CustomIcon from "@/components/admin/ui/CustomIcon";
 
 interface NavigationItem {
   name: string;
@@ -195,15 +195,12 @@ export default function UnitSidebar() {
                               : "text-gray-600 hover:bg-primary/10 hover:text-primary"
                           )}
                         >
-                          <SvgIcon 
+                          <CustomIcon 
                             name={item.iconName} 
+                            color={isActive ? "white" : "gray"}
                             className={cn(
-                              "h-5 w-5 mr-3 transition-all duration-200",
-                              // Aplica filtros baseados no estado do botão para herdar a cor do texto
-                              isActive
-                                ? "brightness-0 invert" // Ícone branco quando ativo (inverte o preto para branco)
-                                : "brightness-0 [filter:invert(40%)_sepia(11%)_saturate(478%)_hue-rotate(176deg)_brightness(98%)_contrast(84%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(44%)_sepia(59%)_saturate(506%)_hue-rotate(131deg)_brightness(97%)_contrast(94%)]", // Gray-600 padrão, primary no hover
-                              !isActive && "group-hover:scale-110"
+                              "h-5 w-5 mr-3 transition-transform duration-200",
+                              !isActive && "group-hover:scale-110 group-hover:brightness-110"
                             )} 
                           />
                           <span className="font-medium">{item.name}</span>
@@ -225,14 +222,12 @@ export default function UnitSidebar() {
                                       : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                                   )}
                                 >
-                                  <SvgIcon 
+                                  <CustomIcon 
                                     name={subItem.iconName} 
+                                    color={isSubActive ? "primary" : "gray"}
                                     className={cn(
-                                      "h-4 w-4 mr-2 transition-all duration-200",
-                                      // Aplica filtros baseados no estado do subitem para herdar a cor do texto
-                                      isSubActive
-                                        ? "brightness-0 [filter:invert(44%)_sepia(59%)_saturate(506%)_hue-rotate(131deg)_brightness(97%)_contrast(94%)]" // Primary color quando ativo
-                                        : "brightness-0 [filter:invert(50%)_sepia(0%)_saturate(0%)_hue-rotate(0deg)_brightness(95%)_contrast(86%)] group-hover:[filter:invert(45%)_sepia(5%)_saturate(397%)_hue-rotate(177deg)_brightness(92%)_contrast(87%)]" // Gray-500 padrão, gray-700 no hover
+                                      "h-4 w-4 mr-2 transition-transform duration-200",
+                                      !isSubActive && "group-hover:scale-110"
                                     )} 
                                   />
                                   {subItem.name}

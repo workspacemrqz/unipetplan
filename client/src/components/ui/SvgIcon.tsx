@@ -12,12 +12,8 @@ export function SvgIcon({ name, className }: SvgIconProps) {
     <img 
       src={iconPath} 
       alt={name}
-      className={cn(
-        "inline-block",
-        // Por padrão, aplica filtro que transforma a imagem SVG na cor atual do texto
-        "[filter:brightness(0)_saturate(100%)]",
-        className
-      )}
+      className={cn("inline-block", className)}
+      style={{ filter: "brightness(0) saturate(100%)" }}
     />
   );
 }
