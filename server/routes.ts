@@ -2113,6 +2113,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ procedures: [], message: "Pet sem plano" });
       }
       
+      // Get plan details to check if it's INFINITY
+      const plan = await storage.getPlan(pet.planId);
+      const isInfinityPlan = plan && plan.name.toUpperCase().includes('INFINITY');
+      
       // Get procedures for this pet's plan
       const planProcedures = await storage.getPlanProceduresWithDetails(pet.planId);
       
@@ -2126,15 +2130,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Extract numeric limit from limitesAnuais string
         let annualLimit = 0;
+        let isUnlimited = false;
+        
         if (pp.limitesAnuais) {
-          const match = pp.limitesAnuais.match(/(\d+)/);
-          if (match) {
-            annualLimit = parseInt(match[1], 10);
+          // Check for unlimited indicators
+          const unlimitedKeywords = ['ilimitado', 'sem limite', 'unlimited', 'infinity'];
+          const limitString = pp.limitesAnuais.toLowerCase();
+          
+          if (unlimitedKeywords.some(keyword => limitString.includes(keyword))) {
+            isUnlimited = true;
+            annualLimit = -1; // Use -1 to indicate unlimited
+          } else {
+            const match = pp.limitesAnuais.match(/(\d+)/);
+            if (match) {
+              annualLimit = parseInt(match[1], 10);
+            }
           }
         }
         
+        // For INFINITY plan, treat no limit as unlimited
+        if (isInfinityPlan && annualLimit === 0) {
+          isUnlimited = true;
+          annualLimit = -1;
+        }
+        
         const usedCount = usageRecord ? usageRecord.usageCount : 0;
-        const remaining = Math.max(0, annualLimit - usedCount);
+        const remaining = isUnlimited ? -1 : Math.max(0, annualLimit - usedCount);
         
         // Calculate waiting period days remaining
         let waitingDaysRemaining = 0;
@@ -2149,7 +2170,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        const canUse = remaining > 0 && waitingDaysRemaining === 0;
+        // For unlimited procedures, always allow usage (if no waiting period)
+        const canUse = (isUnlimited || remaining > 0) && waitingDaysRemaining === 0;
         
         return {
           id: pp.procedureId,
@@ -2159,9 +2181,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           remaining: remaining,
           canUse: canUse,
           waitingDaysRemaining: waitingDaysRemaining,
-          coparticipation: pp.coparticipacao ? pp.coparticipacao / 100 : 0
+          coparticipation: pp.coparticipacao ? pp.coparticipacao / 100 : 0,
+          isUnlimited: isUnlimited
         };
-      }).filter((p: any) => p.canUse && p.annualLimit > 0); // Only return usable procedures
+      }).filter((p: any) => p.canUse); // Return all usable procedures (including unlimited ones)
       
       res.json({
         procedures: availableProcedures,
