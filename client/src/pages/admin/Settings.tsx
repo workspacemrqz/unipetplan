@@ -72,7 +72,6 @@ export default function Settings() {
       mainImageUrl: "",
       networkImageUrl: "",
       aboutImageUrl: "",
-      contractText: "",
     },
   });
 
@@ -221,7 +220,6 @@ export default function Settings() {
         mainImageUrl: (siteSettings as any).mainImageUrl || "",
         networkImageUrl: (siteSettings as any).networkImageUrl || "",
         aboutImageUrl: (siteSettings as any).aboutImageUrl || "",
-        contractText: (siteSettings as any).contractText || ""
       };
       
       siteForm.reset(mergedSettings);
@@ -583,25 +581,6 @@ export default function Settings() {
                             <FormLabel>Termos de Uso</FormLabel>
                             <FormControl>
                               <Textarea {...field} rows={6} data-testid="textarea-terms-of-use" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={siteForm.control}
-                        name="contractText"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Contrato</FormLabel>
-                            <FormControl>
-                              <Textarea 
-                                {...field} 
-                                rows={10} 
-                                placeholder="Digite aqui o texto do contrato que aparecerá na área do cliente e no PDF..." 
-                                data-testid="textarea-contract-text" 
-                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
