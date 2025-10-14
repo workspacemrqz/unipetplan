@@ -2176,6 +2176,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update pet weight only
+  app.put("/admin/api/pets/:id/weight", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { weight } = req.body;
+      
+      // Validate weight
+      if (weight === undefined || weight === null) {
+        return res.status(400).json({ error: "Peso é obrigatório" });
+      }
+      
+      const weightNum = parseFloat(weight);
+      if (isNaN(weightNum) || weightNum <= 0) {
+        return res.status(400).json({ error: "Peso deve ser um número positivo" });
+      }
+      
+      // Get current pet data to check old weight
+      const pet = await storage.getPet(id);
+      if (!pet) {
+        return res.status(404).json({ error: "Pet não encontrado" });
+      }
+      
+      const oldWeight = pet.weight ? parseFloat(pet.weight.toString()) : 0;
+      
+      // Update pet weight
+      const updatedPet = await storage.updatePet(id, { weight: weightNum.toString() });
+      
+      if (!updatedPet) {
+        return res.status(500).json({ error: "Erro ao atualizar peso do pet" });
+      }
+      
+      // Log the weight update action
+      await logAdminAction(req, 'updated', 'pet_weight', id, { 
+        petName: pet.name, 
+        oldWeight: oldWeight, 
+        newWeight: weightNum 
+      });
+      
+      console.log(`✅ [ADMIN] Pet weight updated: ${pet.name} - Old: ${oldWeight}kg, New: ${weightNum}kg`);
+      
+      res.json({ 
+        success: true,
+        message: "Peso atualizado com sucesso",
+        pet: updatedPet
+      });
+      
+    } catch (error) {
+      console.error("❌ [ADMIN] Error updating pet weight:", error);
+      res.status(500).json({ error: "Erro ao atualizar peso do pet" });
+    }
+  });
+
   // Delete pet
   app.delete("/admin/api/pets/:id", requireAdmin, async (req, res) => {
     try {
