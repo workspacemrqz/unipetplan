@@ -136,16 +136,16 @@ export default function Checkout() {
     setCepError('');
     
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
-      const data = await response.json();
+      const response = await fetch(`/api/cep/${cleanCEP}`);
+      const result = await response.json();
       
-      if (!data.erro) {
+      if (result.success && result.data) {
         setCustomerData(prev => ({
           ...prev,
-          address: data.logradouro || '',
-          district: data.bairro || '',
-          city: data.localidade || '',
-          state: data.uf || '',
+          address: result.data.logradouro || '',
+          district: result.data.bairro || '',
+          city: result.data.localidade || '',
+          state: result.data.uf || '',
           // Mantém os campos que o usuário já preencheu
           number: prev.number,
           complement: prev.complement
