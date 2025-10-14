@@ -1621,6 +1621,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get seller total sales data
+  app.get("/api/seller/total-sales/:sellerId", async (req, res) => {
+    try {
+      const { sellerId } = req.params;
+      
+      // Verify seller exists
+      const seller = await storage.getSellerById(sellerId);
+      if (!seller) {
+        return res.status(404).json({ error: "Vendedor não encontrado" });
+      }
+      
+      // Get all contracts for this seller to calculate total sales values
+      const contracts = await storage.getAllContracts();
+      const sellerContracts = contracts.filter(c => c.sellerId === sellerId && c.status === 'active');
+      
+      // Get plans to calculate actual values
+      const plans = await storage.getAllPlans();
+      
+      // Calculate total sales value
+      let totalValue = 0;
+      const contractsWithValue = sellerContracts.map(contract => {
+        const plan = plans.find(p => p.id === contract.planId);
+        const contractValue = plan ? plan.price : 0;
+        totalValue += contractValue;
+        return contractValue;
+      });
+      
+      const totalCount = sellerContracts.length;
+      const averageValue = totalCount > 0 ? totalValue / totalCount : 0;
+      
+      res.json({
+        totalValue,
+        totalCount,
+        averageValue
+      });
+    } catch (error) {
+      console.error("❌ [TOTAL_SALES] Error fetching seller total sales:", error);
+      res.status(500).json({ error: "Erro ao buscar vendas totais" });
+    }
+  });
+
   // Get seller monthly sales history
   app.get("/api/seller/history/:sellerId", async (req, res) => {
     try {
