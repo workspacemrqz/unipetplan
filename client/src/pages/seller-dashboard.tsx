@@ -191,7 +191,7 @@ export default function SellerDashboard() {
       }
 
       try {
-        const response = await fetch(`/api/seller/payments-total/${seller.id}`, {
+        const response = await fetch(`/api/seller/payments-total/${seller.id}${periodParam}`, {
           credentials: 'include'
         });
         if (response.ok) {
