@@ -373,18 +373,25 @@ export default function UnitDashboard() {
               {proceduresSold && proceduresSold.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={proceduresSold} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                     <XAxis 
                       dataKey="name" 
                       angle={-45}
                       textAnchor="end"
                       height={100}
                       interval={0}
-                      tick={{ fontSize: 10 }}
+                      tick={{ fontSize: 10, fill: '#374151' }}
+                      stroke="#9ca3af"
                     />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#257273" name="Quantidade" />
+                    <YAxis tick={{ fill: '#374151' }} stroke="#9ca3af" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#ffffff', 
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '6px'
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#0e7074" name="Quantidade" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -411,14 +418,28 @@ export default function UnitDashboard() {
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      outerRadius={80}
+                      outerRadius={90}
+                      innerRadius={40}
                       label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
+                      labelLine={{ stroke: '#374151', strokeWidth: 1 }}
                     >
                       {valueByUser.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#257273' : '#3a9b9d'} />
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={index % 2 === 0 ? '#0e7074' : '#16a34a'} 
+                          stroke="#ffffff"
+                          strokeWidth={2}
+                        />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `R$ ${value.toFixed(2)}`} />
+                    <Tooltip 
+                      formatter={(value: number) => `R$ ${value.toFixed(2)}`}
+                      contentStyle={{ 
+                        backgroundColor: '#ffffff', 
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '6px'
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
