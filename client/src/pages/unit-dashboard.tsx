@@ -74,7 +74,7 @@ export default function UnitDashboard() {
       return () => clearInterval(interval);
     }
     return undefined;
-  }, [loading, slug]);
+  }, [loading, slug, debouncedDateFilter]);
 
   // Debounce date filter changes
   useEffect(() => {
@@ -266,6 +266,11 @@ export default function UnitDashboard() {
         {/* Period Filter */}
         <DateFilterComponent 
           onDateRangeChange={handleDateRangeChange}
+          isLoading={
+            dateFilter.startDate !== debouncedDateFilter.startDate ||
+            dateFilter.endDate !== debouncedDateFilter.endDate
+          }
+          initialRange={dateFilter}
           className="mb-4"
         />
 
