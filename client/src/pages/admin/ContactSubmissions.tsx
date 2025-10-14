@@ -252,6 +252,7 @@ export default function ContactSubmissions() {
             title="Exportação de Formulários de Contato"
             pageName="Formulários de Contato"
             prepareData={prepareExportData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || allFilteredSubmissions.length === 0}
           />
           

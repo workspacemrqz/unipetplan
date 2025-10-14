@@ -387,6 +387,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
             filename="relatorio_financeiro_unidade"
             title="Exportação de Relatório Financeiro"
             pageName="Relatório Financeiro da Unidade"
+            visibleColumns={visibleColumns}
             disabled={loading || filteredEntries.length === 0}
           />
           

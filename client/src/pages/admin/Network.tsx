@@ -341,6 +341,7 @@ export default function Network() {
             title="Exportação de Rede Credenciada"
             pageName="Rede Credenciada"
             prepareData={prepareExportData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || filteredUnits.length === 0}
           />
           

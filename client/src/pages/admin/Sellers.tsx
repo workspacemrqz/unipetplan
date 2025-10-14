@@ -338,6 +338,7 @@ export default function Sellers() {
             title="Exportação de Vendedores"
             pageName="Vendedores"
             prepareData={prepareExportData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || filteredSellers.length === 0}
           />
           

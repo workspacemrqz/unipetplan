@@ -246,6 +246,7 @@ export default function RelatorioFinanceiro() {
               { key: 'value', label: 'Valor Pago', formatter: (v) => formatCurrency(v) },
               { key: 'networkUnitName', label: 'Unidade', formatter: (v) => v || 'Não informado' }
             ]}
+            visibleColumns={visibleColumns}
             disabled={loading || filteredEntries.length === 0}
           />
           

@@ -216,6 +216,7 @@ export default function Financial() {
             title="Exportação de Dados Financeiros"
             pageName="Financeiro"
             prepareData={prepareExportData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || filteredReceipts.length === 0}
           />
           

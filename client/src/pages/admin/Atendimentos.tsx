@@ -446,6 +446,7 @@ export default function Atendimentos() {
             title="Exportação de Atendimentos"
             pageName="Atendimentos"
             prepareData={prepareExportData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || atendimentosData.length === 0}
           />
 

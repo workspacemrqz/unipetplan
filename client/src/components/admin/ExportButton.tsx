@@ -37,6 +37,8 @@ interface ExportButtonProps {
   pageName?: string;
   disabled?: boolean;
   prepareData?: () => Promise<any[]>;
+  // Colunas visíveis (do useColumnPreferences)
+  visibleColumns?: string[];
 }
 
 export function ExportButton({
@@ -51,10 +53,20 @@ export function ExportButton({
   pageName,
   disabled = false,
   prepareData,
+  visibleColumns,
 }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [isPreparingData, setIsPreparingData] = useState(false);
   const { toast } = useToast();
+
+  // Função auxiliar para filtrar colunas com base nas colunas visíveis
+  const filterColumnsByVisible = (cols: typeof columns) => {
+    if (!cols || !visibleColumns || visibleColumns.length === 0) {
+      return cols || [];
+    }
+    // Filtra apenas as colunas cujo label está nas colunas visíveis
+    return cols.filter(col => visibleColumns.includes(col.label));
+  };
 
   const handleExportPDF = async () => {
     try {
@@ -75,7 +87,10 @@ export function ExportButton({
       }
       
       // Use pdfColumns se disponível, senão use columns
-      const columnsToUse = pdfColumns || columns || [];
+      let columnsToUse = pdfColumns || columns || [];
+      
+      // Aplica filtro de colunas visíveis
+      columnsToUse = filterColumnsByVisible(columnsToUse);
       
       await exportToPDF({
         data: exportData,
@@ -119,7 +134,10 @@ export function ExportButton({
       }
       
       // Use excelColumns se disponível, senão use columns
-      const columnsToUse = excelColumns || columns || [];
+      let columnsToUse = excelColumns || columns || [];
+      
+      // Aplica filtro de colunas visíveis
+      columnsToUse = filterColumnsByVisible(columnsToUse);
       
       await exportToExcel({
         data: exportData,

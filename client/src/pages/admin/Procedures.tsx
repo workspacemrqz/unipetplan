@@ -1562,6 +1562,7 @@ export default function Procedures() {
             title="Exportação de Procedimentos"
             pageName="Procedimentos"
             prepareData={prepareExportData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || filteredItems.length === 0}
           />
           

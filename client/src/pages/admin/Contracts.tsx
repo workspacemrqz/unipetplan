@@ -449,6 +449,7 @@ export default function Contracts() {
             title="Exportação de Contratos"
             pageName="Contratos"
             prepareData={prepareExportData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || filteredContracts.length === 0}
           />
           

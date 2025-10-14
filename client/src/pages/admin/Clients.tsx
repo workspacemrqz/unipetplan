@@ -493,6 +493,7 @@ export default function Clients() {
             pageName="Clientes"
             preparePdfData={preparePdfData}
             prepareExcelData={prepareExcelData}
+            visibleColumns={visibleColumns}
             disabled={isLoading || searchLoading || filteredClients.length === 0}
           />
           
