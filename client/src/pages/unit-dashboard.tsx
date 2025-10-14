@@ -111,7 +111,6 @@ export default function UnitDashboard() {
 
   const fetchDashboardData = async () => {
     const token = localStorage.getItem('unit-token');
-    const newStats = { ...stats };
     
     // Build query params for date range
     const params = new URLSearchParams();
@@ -134,38 +133,64 @@ export default function UnitDashboard() {
     
     const periodParam = params.toString() ? `?${params.toString()}` : '';
     
-    // Buscar estatísticas agregadas do backend
+    // Buscar TODOS os dados em paralelo
     try {
-      const statsResponse = await fetch(`/api/units/${slug}/dashboard-stats${periodParam}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const [statsResponse, proceduresResponse, proceduresSoldResponse, valueByUserResponse, totalSalesResponse] = await Promise.all([
+        fetch(`/api/units/${slug}/dashboard-stats${periodParam}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/unit/${slug}/procedures`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/units/${slug}/charts/procedures-sold${periodParam}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/units/${slug}/charts/value-by-user${periodParam}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/units/${slug}/charts/total-sales${periodParam}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+
+      // Processar todas as respostas
+      const newStats = { ...stats };
+
       if (statsResponse.ok) {
         const dashboardStats = await statsResponse.json();
         newStats.totalGuides = dashboardStats.totalAtendimentos || 0;
         newStats.totalClients = dashboardStats.uniqueClients || 0;
         newStats.totalPets = dashboardStats.uniquePets || 0;
       }
-    } catch (error) {
-      console.error('Erro ao buscar estatísticas do dashboard:', error);
-    }
-    
-    // Buscar procedimentos (não filtra por data, pois mostra todos os procedimentos disponíveis)
-    try {
-      const proceduresResponse = await fetch(`/api/unit/${slug}/procedures`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+
       if (proceduresResponse.ok) {
         const proceduresData = await proceduresResponse.json();
         newStats.totalProcedures = proceduresData.length || 0;
       }
+
+      if (proceduresSoldResponse.ok) {
+        const data = await proceduresSoldResponse.json();
+        console.log('📊 Procedimentos vendidos recebidos:', data);
+        setProceduresSold(data);
+      }
+
+      if (valueByUserResponse.ok) {
+        const data = await valueByUserResponse.json();
+        console.log('💰 Valor por usuário recebido:', data);
+        setValueByUser(data);
+      }
+
+      if (totalSalesResponse.ok) {
+        const data = await totalSalesResponse.json();
+        console.log('💵 Total de vendas recebido:', data);
+        setTotalSales(data);
+      }
+
+      // Atualizar todos os estados de uma vez
+      setStats(newStats);
     } catch (error) {
-      console.error('Erro ao buscar procedimentos:', error);
+      console.error('Erro ao buscar dados do dashboard:', error);
     }
-    
-    setStats(newStats);
-    
-    // Buscar dados dos gráficos
-    fetchChartData();
   };
 
   const fetchChartData = async () => {
@@ -192,52 +217,39 @@ export default function UnitDashboard() {
     
     const periodParam = params.toString() ? `?${params.toString()}` : '';
     
-    // Buscar procedimentos vendidos
+    // Buscar todos os gráficos em paralelo
     try {
-      const response = await fetch(`/api/units/${slug}/charts/procedures-sold${periodParam}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
+      const [proceduresSoldResponse, valueByUserResponse, totalSalesResponse] = await Promise.all([
+        fetch(`/api/units/${slug}/charts/procedures-sold${periodParam}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/units/${slug}/charts/value-by-user${periodParam}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`/api/units/${slug}/charts/total-sales${periodParam}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+
+      if (proceduresSoldResponse.ok) {
+        const data = await proceduresSoldResponse.json();
         console.log('📊 Procedimentos vendidos recebidos:', data);
         setProceduresSold(data);
-      } else {
-        console.error('Erro na resposta de procedimentos:', response.status);
       }
-    } catch (error) {
-      console.error('Erro ao buscar procedimentos vendidos:', error);
-    }
-    
-    // Buscar valor por usuário
-    try {
-      const response = await fetch(`/api/units/${slug}/charts/value-by-user${periodParam}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
+
+      if (valueByUserResponse.ok) {
+        const data = await valueByUserResponse.json();
         console.log('💰 Valor por usuário recebido:', data);
         setValueByUser(data);
-      } else {
-        console.error('Erro na resposta de valor por usuário:', response.status);
       }
-    } catch (error) {
-      console.error('Erro ao buscar valor por usuário:', error);
-    }
-    
-    // Buscar total de vendas
-    try {
-      const response = await fetch(`/api/units/${slug}/charts/total-sales${periodParam}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
+
+      if (totalSalesResponse.ok) {
+        const data = await totalSalesResponse.json();
         console.log('💵 Total de vendas recebido:', data);
         setTotalSales(data);
-      } else {
-        console.error('Erro na resposta de total de vendas:', response.status);
       }
     } catch (error) {
-      console.error('Erro ao buscar total de vendas:', error);
+      console.error('Erro ao buscar dados dos gráficos:', error);
     }
   };
 
