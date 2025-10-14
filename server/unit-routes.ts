@@ -195,6 +195,10 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           if (atendimento.clientName && atendimento.clientName.toLowerCase().includes(searchLower)) {
             return true;
           }
+          // Search in clientCpf
+          if (atendimento.clientCpf && atendimento.clientCpf.toLowerCase().includes(searchLower)) {
+            return true;
+          }
           // Search in petName
           if (atendimento.petName && atendimento.petName.toLowerCase().includes(searchLower)) {
             return true;

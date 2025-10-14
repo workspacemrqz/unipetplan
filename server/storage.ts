@@ -2174,6 +2174,7 @@ export class DatabaseStorage implements IStorage {
         ...r.atendimento,
         networkUnit: r.networkUnit,
         clientName: r.client?.fullName || null,
+        clientCpf: r.client?.cpf || null,
         petName: r.pet?.name || null,
         veterinarianName: r.veterinarian?.name || null,
       })),
