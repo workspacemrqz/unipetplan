@@ -44,6 +44,7 @@ const actionTypeTranslations: Record<string, string> = {
   "veterinarian_updated": "Veterinário Atualizado",
   "veterinarian_deleted": "Veterinário Removido",
   "veterinarian_status_changed": "Status de Veterinário Alterado",
+  "pet_weight_updated": "Peso do Pet Atualizado",
 };
 
 const getActionTypeLabel = (actionType: string): string => {

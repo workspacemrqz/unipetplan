@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, Edit2, Save, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -116,6 +116,11 @@ export default function SteppedAtendimentoForm({
   const [selectedPet, setSelectedPet] = useState<any>(null);
   const [petHistory, setPetHistory] = useState<any[]>([]);
   const [selectedProcedures, setSelectedProcedures] = useState<any[]>([]);  // Novo estado para múltiplos procedimentos
+  
+  // Estados para edição de peso
+  const [isEditingWeight, setIsEditingWeight] = useState(false);
+  const [editedWeight, setEditedWeight] = useState("");
+  const [isSavingWeight, setIsSavingWeight] = useState(false);
 
   // Função para formatar CPF
   const formatCpf = (value: string) => {
@@ -211,6 +216,84 @@ export default function SteppedAtendimentoForm({
       form.setValue("value", "");
     }
   }, [cpfSearch]);
+
+  // Função para salvar peso do pet
+  const saveWeight = async () => {
+    if (!selectedPet || !editedWeight) return;
+    
+    const weightNum = parseFloat(editedWeight);
+    if (isNaN(weightNum) || weightNum <= 0) {
+      toast({
+        title: "Peso inválido",
+        description: "Digite um peso válido maior que zero.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSavingWeight(true);
+    
+    try {
+      const endpoint = mode === 'admin'
+        ? `/admin/api/pets/${selectedPet.id}/weight`
+        : `/api/units/${slug}/pets/${selectedPet.id}/weight`;
+      
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(mode === 'unit' ? { 'Authorization': `Bearer ${getAuthToken()}` } : {})
+        },
+        body: JSON.stringify({ weight: weightNum })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar peso");
+      }
+      
+      const result = await response.json();
+      
+      // Update local state
+      setSelectedPet({
+        ...selectedPet,
+        weight: weightNum
+      });
+      
+      // Update clientPets array
+      setClientPets(clientPets.map(pet => 
+        pet.id === selectedPet.id 
+          ? { ...pet, weight: weightNum }
+          : pet
+      ));
+      
+      // Log action
+      await logAction(mode, slug, "pet_weight_updated", {
+        petId: selectedPet.id,
+        petName: selectedPet.name,
+        oldWeight: selectedPet.weight || 0,
+        newWeight: weightNum
+      });
+      
+      // Reset editing state
+      setIsEditingWeight(false);
+      setEditedWeight("");
+      
+      toast({
+        title: "Peso atualizado",
+        description: `O peso de ${selectedPet.name} foi atualizado para ${weightNum} kg`,
+      });
+      
+    } catch (error) {
+      console.error("Erro ao salvar peso:", error);
+      toast({
+        title: "Erro ao atualizar peso",
+        description: "Não foi possível atualizar o peso do pet. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingWeight(false);
+    }
+  };
 
   // Buscar cliente por CPF
   const searchClientByCpf = async () => {
@@ -547,6 +630,10 @@ export default function SteppedAtendimentoForm({
                                 const pet = clientPets.find(p => p.id === value);
                                 setSelectedPet(pet);
                                 
+                                // Reset weight editing state when selecting a new pet
+                                setIsEditingWeight(false);
+                                setEditedWeight(pet?.weight?.toString() || "");
+                                
                                 logAction(mode, slug, "pet_selected", {
                                   petId: value,
                                   petName: pet?.name
@@ -685,12 +772,89 @@ export default function SteppedAtendimentoForm({
                                           <span className="ml-2 text-gray-900">{selectedPet.color}</span>
                                         </div>
                                       )}
-                                      {selectedPet.weight && selectedPet.weight !== '0' && selectedPet.weight !== 0 && parseFloat(selectedPet.weight) > 0 && (
-                                        <div>
-                                          <span className="font-medium text-gray-600">Peso:</span>
-                                          <span className="ml-2 text-gray-900">{selectedPet.weight} kg</span>
-                                        </div>
-                                      )}
+                                      <div>
+                                        <span className="font-medium text-gray-600">Peso:</span>
+                                        {!isEditingWeight ? (
+                                          <span className="ml-2">
+                                            {selectedPet.weight && selectedPet.weight !== '0' && selectedPet.weight !== 0 && parseFloat(selectedPet.weight) > 0 ? (
+                                              <>
+                                                <span className="text-gray-900">{selectedPet.weight} kg</span>
+                                                <Button
+                                                  type="button"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="ml-2 h-7 px-2"
+                                                  onClick={() => {
+                                                    setIsEditingWeight(true);
+                                                    setEditedWeight(selectedPet.weight?.toString() || "");
+                                                  }}
+                                                >
+                                                  <Edit2 className="h-3 w-3 mr-1" />
+                                                  Editar
+                                                </Button>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <span className="text-gray-500 italic">Não informado</span>
+                                                <Button
+                                                  type="button"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="ml-2 h-7 px-2"
+                                                  onClick={() => {
+                                                    setIsEditingWeight(true);
+                                                    setEditedWeight("");
+                                                  }}
+                                                >
+                                                  <Edit2 className="h-3 w-3 mr-1" />
+                                                  Adicionar
+                                                </Button>
+                                              </>
+                                            )}
+                                          </span>
+                                        ) : (
+                                          <div className="inline-flex items-center gap-2 ml-2">
+                                            <Input
+                                              type="number"
+                                              step="0.01"
+                                              min="0.01"
+                                              value={editedWeight}
+                                              onChange={(e) => setEditedWeight(e.target.value)}
+                                              placeholder="0.00"
+                                              className="w-24 h-8 text-sm"
+                                              autoFocus
+                                            />
+                                            <span className="text-gray-900">kg</span>
+                                            <Button
+                                              type="button"
+                                              variant="default"
+                                              size="sm"
+                                              className="h-8 px-2"
+                                              onClick={saveWeight}
+                                              disabled={isSavingWeight || !editedWeight}
+                                            >
+                                              {isSavingWeight ? (
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                              ) : (
+                                                <Save className="h-3 w-3" />
+                                              )}
+                                            </Button>
+                                            <Button
+                                              type="button"
+                                              variant="ghost"
+                                              size="sm"
+                                              className="h-8 px-2"
+                                              onClick={() => {
+                                                setIsEditingWeight(false);
+                                                setEditedWeight(selectedPet.weight?.toString() || "");
+                                              }}
+                                              disabled={isSavingWeight}
+                                            >
+                                              <X className="h-3 w-3" />
+                                            </Button>
+                                          </div>
+                                        )}
+                                      </div>
                                       {selectedPet.microchip && (
                                         <div>
                                           <span className="font-medium text-gray-600">Microchip:</span>

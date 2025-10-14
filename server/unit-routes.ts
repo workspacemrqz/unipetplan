@@ -971,6 +971,76 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
 
+  // Update pet weight (authenticated)
+  app.put("/api/units/:slug/pets/:petId/weight", requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const { petId } = req.params;
+      const { weight } = req.body;
+      const unitId = req.unit?.unitId;
+      const veterinarianId = req.unit?.veterinarianId;
+      const userType = req.unit?.type || 'unit';
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Validate weight
+      if (weight === undefined || weight === null) {
+        return res.status(400).json({ error: "Peso é obrigatório" });
+      }
+      
+      const weightNum = parseFloat(weight);
+      if (isNaN(weightNum) || weightNum <= 0) {
+        return res.status(400).json({ error: "Peso deve ser um número positivo" });
+      }
+      
+      // Get current pet data to check old weight
+      const pet = await storage.getPet(petId);
+      if (!pet) {
+        return res.status(404).json({ error: "Pet não encontrado" });
+      }
+      
+      const oldWeight = pet.weight ? parseFloat(pet.weight.toString()) : 0;
+      
+      // Update pet weight
+      const updatedPet = await storage.updatePet(petId, { weight: weightNum.toString() });
+      
+      if (!updatedPet) {
+        return res.status(500).json({ error: "Erro ao atualizar peso do pet" });
+      }
+      
+      // Log the weight update action
+      const logData = {
+        petId: petId,
+        petName: pet.name,
+        oldWeight: oldWeight,
+        newWeight: weightNum,
+        changedBy: userType === 'veterinarian' ? 'veterinarian' : 'unit_admin',
+        veterinarianId: veterinarianId || null,
+        unitId: unitId
+      };
+      
+      await storage.createActionLog({
+        unitId: unitId,
+        action: 'pet_weight_updated',
+        timestamp: new Date(),
+        metadata: logData
+      });
+      
+      console.log(`✅ [UNIT] Pet weight updated: ${pet.name} - Old: ${oldWeight}kg, New: ${weightNum}kg`);
+      
+      res.json({ 
+        success: true,
+        message: "Peso atualizado com sucesso",
+        pet: updatedPet
+      });
+      
+    } catch (error) {
+      console.error("❌ [UNIT] Error updating pet weight:", error);
+      res.status(500).json({ error: "Erro ao atualizar peso do pet" });
+    }
+  });
+
   // ===== VETERINARIANS MANAGEMENT =====
   
   // Veterinarian login
