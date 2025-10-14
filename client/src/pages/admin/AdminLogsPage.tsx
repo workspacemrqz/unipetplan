@@ -397,26 +397,72 @@ export default function AdminLogsPage() {
           pageName="Logs de Ações"
           prepareData={async () => {
             // Buscar TODOS os logs com os filtros aplicados (sem paginação)
-            const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
+            // Função auxiliar para obter parâmetros de data
+            const getDateParams = (startDate: CalendarDate | null, endDate: CalendarDate | null) => {
+              const params: { startDate?: string; endDate?: string } = {};
+              
+              if (startDate) {
+                const start = new Date(startDate.year, startDate.month - 1, startDate.day);
+                params.startDate = start.toISOString();
+              }
+              
+              if (endDate) {
+                const end = new Date(endDate.year, endDate.month - 1, endDate.day);
+                end.setHours(23, 59, 59, 999);
+                params.endDate = end.toISOString();
+              }
+              
+              return params;
+            };
+
+            const dateParams = getDateParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
             const queryParams = {
+              page: "1",
               limit: "999999", // Número muito grande para buscar todos os registros
+              source: sourceFilter,
+              ...(sourceFilter === "admin" && actionTypeFilter !== "all" && { actionType: actionTypeFilter }),
+              ...(sourceFilter === "admin" && entityTypeFilter !== "all" && { entityType: entityTypeFilter }),
+              ...(sourceFilter === "units" && userTypeFilter !== "all" && { userType: userTypeFilter }),
               ...dateParams
             };
             
             const params = new URLSearchParams(queryParams);
-            const response = await fetch(
-              sourceFilter === "admin" 
-                ? `/admin/api/action-logs?${params}`
-                : `/admin/api/unit-action-logs?${params}`
-            );
+            const response = await fetch(`/admin/api/logs?${params}`);
             
             if (!response.ok) {
               throw new Error('Erro ao buscar dados para exportação');
             }
             
-            const allData = await response.json();
-            const allLogs = sourceFilter === "admin" ? allData : allData.data || [];
-            return allLogs;
+            const logsData = await response.json();
+            
+            // Processar os dados conforme o formato esperado
+            if (logsData.data && Array.isArray(logsData.data)) {
+              return logsData.data.map((log: any) => {
+                if (sourceFilter === "units" && log.log) {
+                  // Unit log structure
+                  return {
+                    log: log.log,
+                    veterinarian: log.veterinarian || null,
+                    networkUnit: log.networkUnit || null
+                  };
+                } else {
+                  // Admin log structure
+                  return {
+                    id: log.id,
+                    adminUserId: log.adminUserId || null,
+                    adminIdentifier: log.adminIdentifier || 'Sistema',
+                    actionType: log.actionType,
+                    entityType: log.entityType,
+                    entityId: log.entityId || '',
+                    metadata: log.metadata || null,
+                    ip: log.ip || null,
+                    createdAt: log.createdAt
+                  };
+                }
+              });
+            }
+            
+            return [];
           }}
           columns={sourceFilter === "admin" ? [
             { key: 'createdAt', label: 'Data/Hora', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
