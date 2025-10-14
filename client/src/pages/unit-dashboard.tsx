@@ -274,6 +274,36 @@ export default function UnitDashboard() {
           className="mb-4"
         />
 
+        {/* Card de Total de Vendas */}
+        <Card style={{ backgroundColor: '#FFFFFF' }}>
+          <CardHeader>
+            <CardTitle className="text-foreground min-w-0">Total de Vendas</CardTitle>
+            <p className="text-sm text-muted-foreground">Resumo de recebimentos</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-600">Valor Total</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  R$ {totalSales.totalValue.toFixed(2)}
+                </p>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-600">Total de Atendimentos</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  {totalSales.totalCount}
+                </p>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-600">Valor Médio</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">
+                  R$ {totalSales.averageValue.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card style={{ backgroundColor: '#FFFFFF' }}>
@@ -405,36 +435,6 @@ export default function UnitDashboard() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Card de Total de Vendas */}
-        <Card className="mt-6" style={{ backgroundColor: '#FFFFFF' }}>
-          <CardHeader>
-            <CardTitle className="text-foreground min-w-0">Total de Vendas</CardTitle>
-            <p className="text-sm text-muted-foreground">Resumo de recebimentos</p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-600">Valor Total</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  R$ {totalSales.totalValue.toFixed(2)}
-                </p>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-600">Total de Atendimentos</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  {totalSales.totalCount}
-                </p>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-600">Valor Médio</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
-                  R$ {totalSales.averageValue.toFixed(2)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </UnitLayout>
   );
