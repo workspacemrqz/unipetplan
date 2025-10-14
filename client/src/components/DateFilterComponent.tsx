@@ -1,12 +1,12 @@
 import * as React from "react"
 import { CalendarDate } from "@internationalized/date"
-import { Calendar as CalendarIcon, X, Filter } from "lucide-react"
+import { X, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useDateFilter, type DateRange } from "@/hooks/use-date-filter"
-import { formatDateRangeForDisplay, jsDateToCalendarDate } from "@/lib/date-utils"
+import { jsDateToCalendarDate } from "@/lib/date-utils"
 import { cn } from "@/lib/utils"
 
 export interface DateFilterComponentProps {
@@ -76,7 +76,6 @@ const DateFilterComponent = React.memo(function DateFilterComponent({
     setDateRange,
     clearFilter,
     isFiltering,
-    isValidRange,
     errorMessage
   } = useDateFilter(defaultRange)
 
