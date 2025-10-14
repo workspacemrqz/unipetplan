@@ -2,27 +2,17 @@ import { Link, useLocation } from "wouter";
 import { useParams } from "wouter";
 import { cn } from "@/lib/admin/utils";
 import { useState, useEffect } from "react";
-import {
-  Home,
-  File,
-  Clipboard,
-  LogOut,
-  Plus,
-  DollarSign,
-  Users,
-  FileSearch,
-  ChevronDown,
-  ChevronRight
-} from "lucide-react";
+import { LogOut, ChevronDown, ChevronRight } from "lucide-react";
+import { SvgIcon } from "@/components/ui/SvgIcon";
 
 interface NavigationItem {
   name: string;
   href: string;
-  icon: any;
+  iconName: string;
   subItems?: Array<{
     name: string;
     href: string;
-    icon: any;
+    iconName: string;
   }>;
 }
 
@@ -51,12 +41,12 @@ export default function UnitSidebar() {
             { 
               name: "Atendimentos", 
               href: `/unidade/${slug}/atendimentos`, 
-              icon: File
+              iconName: "Atendimento"
             },
             { 
               name: "Novo Atendimento", 
               href: `/unidade/${slug}/atendimentos/novo`, 
-              icon: Plus 
+              iconName: "Atendimento" 
             }
           ]
         }
@@ -66,7 +56,7 @@ export default function UnitSidebar() {
         {
           name: "Principal",
           items: [
-            { name: "Dashboard", href: `/unidade/${slug}/painel`, icon: Home }
+            { name: "Dashboard", href: `/unidade/${slug}/painel`, iconName: "Dashboard" }
           ]
         },
         {
@@ -75,32 +65,32 @@ export default function UnitSidebar() {
             { 
               name: "Atendimentos", 
               href: `/unidade/${slug}/atendimentos`, 
-              icon: File
+              iconName: "Atendimento"
             },
             { 
               name: "Novo Atendimento", 
               href: `/unidade/${slug}/atendimentos/novo`, 
-              icon: Plus 
+              iconName: "Atendimento" 
             }
           ]
         },
         {
           name: "Gestão",
           items: [
-            { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, icon: Clipboard },
-            { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, icon: Users }
+            { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, iconName: "Procedimento" },
+            { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, iconName: "Cliente e Pet" }
           ]
         },
         {
           name: "Financeiro",
           items: [
-            { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, icon: DollarSign }
+            { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, iconName: "Pagamento" }
           ]
         },
         {
           name: "Sistema",
           items: [
-            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, icon: FileSearch }
+            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, iconName: "Configurações" }
           ]
         }
       ];
@@ -205,10 +195,14 @@ export default function UnitSidebar() {
                               : "text-gray-600 hover:bg-primary/10 hover:text-primary"
                           )}
                         >
-                          <item.icon className={cn(
-                            "h-5 w-5 mr-3 transition-transform duration-200",
-                            !isActive && "group-hover:scale-110"
-                          )} />
+                          <SvgIcon 
+                            name={item.iconName} 
+                            className={cn(
+                              "h-5 w-5 mr-3 transition-transform duration-200",
+                              isActive ? "invert" : "opacity-60",
+                              !isActive && "group-hover:scale-110"
+                            )} 
+                          />
                           <span className="font-medium">{item.name}</span>
                         </Link>
                         
@@ -228,7 +222,13 @@ export default function UnitSidebar() {
                                       : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                                   )}
                                 >
-                                  <subItem.icon className="h-4 w-4 mr-2" />
+                                  <SvgIcon 
+                                    name={subItem.iconName} 
+                                    className={cn(
+                                      "h-4 w-4 mr-2",
+                                      isSubActive ? "opacity-80" : "opacity-50"
+                                    )} 
+                                  />
                                   {subItem.name}
                                 </Link>
                               );
