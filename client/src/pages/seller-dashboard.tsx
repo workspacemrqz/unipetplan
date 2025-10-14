@@ -40,15 +40,20 @@ const KPICard = ({
   subtitle
 }: any) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
+    <div style={{ 
+      background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+      border: 'none',
+      boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+    }} className="rounded-xl p-6">
+      <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+        <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
-            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <p className="text-sm font-semibold text-white/90">{title}</p>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-3xl font-bold text-white">{value}</p>
           {subtitle && (
-            <p className="text-xs text-gray-500 mt-2">{subtitle}</p>
+            <p className="text-xs text-white/80 mt-2">{subtitle}</p>
           )}
         </div>
       </div>
@@ -317,81 +322,106 @@ export default function SellerDashboard() {
         />
 
         {/* Dashboard de Pagamentos */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo Financeiro</h3>
+        <div style={{ 
+          background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+          border: 'none',
+          boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+        }} className="rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Resumo Financeiro</h3>
           
           {/* Valores principais */}
           <div className="space-y-6">
             {/* Grid de valores */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Valor Total a Receber */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">Total a Receber</p>
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+                <div className="relative z-10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-white/90 font-semibold">Total a Receber</p>
+                    <div className="w-3 h-3 rounded-full bg-blue-300"></div>
+                  </div>
+                  <p className="text-2xl font-bold text-white">
+                    {formatCurrency(totalToReceive)}
+                  </p>
+                  <p className="text-xs text-white/80">{commissions.contractsCount} vendas realizadas</p>
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(totalToReceive)}
-                </p>
-                <p className="text-xs text-gray-500">{commissions.contractsCount} vendas realizadas</p>
               </div>
 
               {/* Valor Recebido */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">Valor Recebido</p>
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+                <div className="relative z-10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-white/90 font-semibold">Valor Recebido</p>
+                    <div className="w-3 h-3 rounded-full bg-green-300"></div>
+                  </div>
+                  <p className="text-2xl font-bold text-white">
+                    {formatCurrency(totalPaid)}
+                  </p>
+                  <p className="text-xs text-white/80">Pagamentos processados</p>
                 </div>
-                <p className="text-2xl font-bold text-green-600">
-                  {formatCurrency(totalPaid)}
-                </p>
-                <p className="text-xs text-gray-500">Pagamentos processados</p>
               </div>
 
               {/* Valor Pendente */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">Valor Pendente</p>
-                  <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+              <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+                <div className="relative z-10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-white/90 font-semibold">Valor Pendente</p>
+                    <div className="w-3 h-3 rounded-full bg-orange-300"></div>
+                  </div>
+                  <p className="text-2xl font-bold text-white">
+                    {formatCurrency(valorPendente)}
+                  </p>
+                  <p className="text-xs text-white/80">Aguardando pagamento</p>
                 </div>
-                <p className="text-2xl font-bold text-orange-600">
-                  {formatCurrency(valorPendente)}
-                </p>
-                <p className="text-xs text-gray-500">Aguardando pagamento</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Card de Total de Vendas */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Total de Vendas</h3>
-          <p className="text-sm text-gray-600 mb-4">Resumo de vendas realizadas</p>
+        <div style={{ 
+          background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+          border: 'none',
+          boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+        }} className="rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-2">Total de Vendas</h3>
+          <p className="text-sm text-white/80 mb-4">Resumo de vendas realizadas</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Valor Total */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600">Valor Total</p>
-                <p className="text-3xl font-bold text-gray-900">
+            <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 cursor-default">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+              <div className="relative z-10 space-y-2">
+                <p className="text-sm font-semibold text-white/90">Valor Total</p>
+                <p className="text-3xl font-bold text-white">
                   {formatCurrency(totalSalesData.totalValue)}
                 </p>
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">Total de {totalSalesData.totalCount} vendas</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full w-3/4 bg-white/60 rounded-full"></div>
+                  </div>
                 </div>
+                <p className="text-xs text-white/80 mt-2">Total de {totalSalesData.totalCount} vendas</p>
               </div>
             </div>
 
             {/* Valor Médio */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600">Valor Médio</p>
-                <p className="text-3xl font-bold text-gray-900">
+            <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 transition-all hover:bg-white/15 cursor-default">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+              <div className="relative z-10 space-y-2">
+                <p className="text-sm font-semibold text-white/90">Valor Médio</p>
+                <p className="text-3xl font-bold text-white">
                   {formatCurrency(totalSalesData.averageValue)}
                 </p>
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">Por venda realizada</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full w-1/2 bg-white/60 rounded-full"></div>
+                  </div>
                 </div>
+                <p className="text-xs text-white/80 mt-2">Por venda realizada</p>
               </div>
             </div>
           </div>
@@ -414,36 +444,46 @@ export default function SellerDashboard() {
 
         {/* Resumo de Comissões */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+          <div style={{ 
+            background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+            border: 'none',
+            boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+          }} className="rounded-xl p-6">
+            <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+              <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
-                  <p className="text-sm font-medium text-gray-600">Comissão CPA</p>
-                  <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                  <p className="text-sm font-semibold text-white/90">Comissão CPA</p>
+                  <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-white/20 text-white">
                     {stats.cpaPercentage}%
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-white">
                   {formatCurrency(parseFloat(commissions.totalCPA) || 0)}
                 </p>
-                <p className="text-xs text-gray-500 mt-2">Por nova venda realizada</p>
+                <p className="text-xs text-white/80 mt-2">Por nova venda realizada</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+          <div style={{ 
+            background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+            border: 'none',
+            boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+          }} className="rounded-xl p-6">
+            <div className="relative overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 p-4 transition-all hover:bg-white/15 cursor-default">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
+              <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
-                  <p className="text-sm font-medium text-gray-600">Comissão Recorrente</p>
-                  <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                  <p className="text-sm font-semibold text-white/90">Comissão Recorrente</p>
+                  <div className="px-2 py-0.5 rounded-full text-xs font-bold bg-white/20 text-white">
                     {stats.recurringPercentage}%
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-white">
                   {formatCurrency(parseFloat(commissions.totalRecurring) || 0)}
                 </p>
-                <p className="text-xs text-gray-500 mt-2">Das mensalidades dos clientes</p>
+                <p className="text-xs text-white/80 mt-2">Das mensalidades dos clientes</p>
               </div>
             </div>
           </div>
