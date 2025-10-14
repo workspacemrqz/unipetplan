@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
-import { Label } from "@/components/admin/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
 import {
   Table,
   TableBody,
@@ -56,7 +54,6 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
   const [selectedProcedure, setSelectedProcedure] = useState<Procedure | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
-  const [periodFilter, setPeriodFilter] = useState<string>('all');
   const { visibleColumns, toggleColumn } = useColumnPreferences('unit.procedures.columns', allColumns);
   const { toast } = useToast();
   const pageSize = 10;
@@ -104,27 +101,6 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
       currency: 'BRL'
     }).format(price / 100); // Convert from cents to reais
   };
-
-  // Period Filter Component
-  const PeriodFilterComponent = () => (
-    <div className="flex items-center space-x-2">
-      <Label htmlFor="period-filter">Filtrar por período:</Label>
-      <Select value={periodFilter} onValueChange={setPeriodFilter}>
-        <SelectTrigger id="period-filter" className="w-48">
-          <SelectValue placeholder="Selecione o período" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todos os períodos</SelectItem>
-          <SelectItem value="today">Hoje</SelectItem>
-          <SelectItem value="week">Últimos 7 dias</SelectItem>
-          <SelectItem value="month">Últimos 30 dias</SelectItem>
-          <SelectItem value="3months">Últimos 3 meses</SelectItem>
-          <SelectItem value="6months">Últimos 6 meses</SelectItem>
-          <SelectItem value="year">Último ano</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  );
 
   const handleCopyToClipboard = async () => {
     if (!selectedProcedure || copyState !== 'idle') return;
@@ -189,8 +165,6 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
           <p className="text-sm text-muted-foreground">Visualize todos os procedimentos disponíveis</p>
         </div>
       </div>
-
-      <PeriodFilterComponent />
 
       {/* Filters and Column Controls */}
       <div className="flex flex-wrap gap-4 items-center justify-between">
