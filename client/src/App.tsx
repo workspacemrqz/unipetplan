@@ -127,29 +127,29 @@ function AdminRouter() {
             
             {/* Client management routes */}
             <Route path="/clientes" component={() => (
-              <PermissionGuard permission="clientes">
+              <PermissionGuard permission="clients">
                 <AdminClients />
               </PermissionGuard>
             )} />
             <Route path="/clientes/novo" component={() => (
-              <PermissionGuard permission="clientes">
+              <PermissionGuard permission="clients">
                 <AdminClientForm />
               </PermissionGuard>
             )} />
             <Route path="/clientes/:id/editar" component={() => (
-              <PermissionGuard permission="clientes">
+              <PermissionGuard permission="clients">
                 <AdminClientForm />
               </PermissionGuard>
             )} />
             <Route path="/clientes/:clientId/pets/novo" component={() => (
-              <PermissionGuard permission="clientes">
+              <PermissionGuard permission="clients">
                 <AdminPetForm />
               </PermissionGuard>
             )} />
             
             {/* Pet management routes */}
             <Route path="/pets/:id/editar" component={() => (
-              <PermissionGuard permission="clientes">
+              <PermissionGuard permission="clients">
                 <AdminPetForm />
               </PermissionGuard>
             )} />
@@ -222,7 +222,7 @@ function AdminRouter() {
               </PermissionGuard>
             )} />
             <Route path="/relatorio-financeiro" component={() => (
-              <PermissionGuard permission="relatorio_financeiro">
+              <PermissionGuard permission="relatorio-financeiro">
                 <AdminRelatorioFinanceiro />
               </PermissionGuard>
             )} />
@@ -232,7 +232,7 @@ function AdminRouter() {
               </PermissionGuard>
             )} />
             <Route path="/contratos" component={() => (
-              <PermissionGuard permission="contratos">
+              <PermissionGuard permission="contracts">
                 <AdminContracts />
               </PermissionGuard>
             )} />
@@ -244,7 +244,7 @@ function AdminRouter() {
               </PermissionGuard>
             )} />
             <Route path="/perguntas-frequentes" component={() => (
-              <PermissionGuard permission="faq">
+              <PermissionGuard permission="perguntas-frequentes">
                 <AdminFAQ />
               </PermissionGuard>
             )} />

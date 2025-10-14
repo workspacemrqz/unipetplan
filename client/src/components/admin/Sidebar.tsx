@@ -13,18 +13,18 @@ import { usePermissions } from "@/hooks/use-permissions";
 // Mapeamento de rotas para permissões
 const routePermissionMap: Record<string, string | null> = {
   '/': 'dashboard',
-  '/clientes': 'clientes',
-  '/contratos': 'contratos',
+  '/clientes': 'clients',
+  '/contratos': 'contracts',
   '/atendimentos': 'atendimentos',
   '/financeiro': 'financeiro',
   '/cupom': 'cupom',
-  '/relatorio-financeiro': 'relatorio_financeiro',
+  '/relatorio-financeiro': 'relatorio-financeiro',
   '/formularios': 'formularios',
   '/avaliacoes': 'avaliacoes',
   '/rede': 'rede',
   '/vendedores': 'vendedores',
   '/procedimentos': 'procedimentos',
-  '/perguntas-frequentes': 'faq',
+  '/perguntas-frequentes': 'perguntas-frequentes',
   // Rotas que não precisam de verificação de permissão (sempre visíveis)
   '/administracao': null, // Administração sempre visível
   '/planos': null, // Planos sempre visível
