@@ -7,7 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
 import { useMobileViewport } from "@/hooks/use-mobile"
 import { DateField } from "@/components/ui/datefield"
-import { Field } from "@/components/ui/field"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -89,22 +88,24 @@ const DateRangePicker = React.forwardRef<
       background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)'
     }}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Data inicial" className="[&_label]:text-white/90 [&_label]:font-medium">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-white/90">Data inicial</label>
           <DateField
             value={tempRange.startDate}
             onChange={handleStartDateChange}
             placeholder="dd/mm/aaaa"
-            className="bg-white/20 border-white/30 text-white placeholder:text-white/60 [&_input]:text-white [&_input]:placeholder:text-white/60"
+            className="bg-white/20 border border-white/30 rounded-md px-3 py-2 [&_span]:!text-white [&_span[data-placeholder]]:!text-white/60"
           />
-        </Field>
-        <Field label="Data final" className="[&_label]:text-white/90 [&_label]:font-medium">
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-white/90">Data final</label>
           <DateField
             value={tempRange.endDate}
             onChange={handleEndDateChange}
             placeholder="dd/mm/aaaa"
-            className="bg-white/20 border-white/30 text-white placeholder:text-white/60 [&_input]:text-white [&_input]:placeholder:text-white/60"
+            className="bg-white/20 border border-white/30 rounded-md px-3 py-2 [&_span]:!text-white [&_span[data-placeholder]]:!text-white/60"
           />
-        </Field>
+        </div>
       </div>
       
       <div className="flex justify-between gap-2">
