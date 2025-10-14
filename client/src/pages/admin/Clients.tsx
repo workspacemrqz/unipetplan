@@ -286,9 +286,24 @@ export default function Clients() {
     }
   };
 
-  // Preparação de dados para PDF - apenas campos visíveis na tabela
+  // Preparação de dados para PDF - busca todos os dados com filtros aplicados
   const preparePdfData = async () => {
-    return filteredClients.map(client => {
+    // Buscar TODOS os dados considerando o filtro de busca
+    let allData: Client[] = [];
+    
+    if (searchQuery.length >= 2) {
+      // Se há busca, buscar todos os resultados da pesquisa
+      const response = await fetch(`/admin/api/clients/search/${encodeURIComponent(searchQuery)}`);
+      if (response.ok) {
+        allData = await response.json();
+      }
+    } else {
+      // Sem busca, usar todos os clientes já carregados
+      allData = clients;
+    }
+    
+    // Mapear todos os dados para o formato PDF
+    return allData.map(client => {
       const pdfData: any = {};
       
       // Adiciona apenas os campos que estão visíveis na tabela
@@ -316,11 +331,25 @@ export default function Clients() {
     });
   };
 
-  // Preparação de dados para Excel - todos os campos incluindo pets
+  // Preparação de dados para Excel - busca todos os dados incluindo pets
   const prepareExcelData = async () => {
+    // Buscar TODOS os dados considerando o filtro de busca
+    let allData: Client[] = [];
+    
+    if (searchQuery.length >= 2) {
+      // Se há busca, buscar todos os resultados da pesquisa
+      const response = await fetch(`/admin/api/clients/search/${encodeURIComponent(searchQuery)}`);
+      if (response.ok) {
+        allData = await response.json();
+      }
+    } else {
+      // Sem busca, usar todos os clientes já carregados
+      allData = clients;
+    }
+    
     const enrichedData = [];
     
-    for (const client of filteredClients) {
+    for (const client of allData) {
       try {
         const response = await fetch(`/admin/api/clients/${client.id}/pets`);
         const pets: Pet[] = response.ok ? await response.json() : [];
