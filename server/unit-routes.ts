@@ -248,6 +248,23 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         console.log(`✅ [UNIT] Filtering dashboard stats for veterinarian ${req.unit.veterinarianId}`);
       }
       
+      // Add date range filters if provided
+      const { startDate, endDate } = req.query;
+      
+      if (startDate && typeof startDate === 'string') {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        conditions.push(sql`${atendimentos.createdAt} >= ${start.toISOString()}`);
+        console.log(`✅ [UNIT] Filtering dashboard stats from date: ${start.toISOString()}`);
+      }
+      
+      if (endDate && typeof endDate === 'string') {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        conditions.push(sql`${atendimentos.createdAt} <= ${end.toISOString()}`);
+        console.log(`✅ [UNIT] Filtering dashboard stats to date: ${end.toISOString()}`);
+      }
+      
       // Count DISTINCT clients using SQL aggregation
       const uniqueClientsResult = await db
         .select({ count: sql<number>`count(distinct ${atendimentos.clientId})` })
@@ -270,7 +287,8 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       const uniquePets = uniquePetsResult[0]?.count || 0;
       const totalAtendimentos = totalAtendimentosResult[0]?.count || 0;
       
-      console.log(`✅ [UNIT] Dashboard stats for unit ${unitId}: ${totalAtendimentos} atendimentos, ${uniqueClients} unique clients, ${uniquePets} unique pets`);
+      const dateInfo = startDate || endDate ? ` (filtered: ${startDate || 'any'} to ${endDate || 'any'})` : '';
+      console.log(`✅ [UNIT] Dashboard stats for unit ${unitId}${dateInfo}: ${totalAtendimentos} atendimentos, ${uniqueClients} unique clients, ${uniquePets} unique pets`);
       
       res.json({
         uniqueClients: Number(uniqueClients),

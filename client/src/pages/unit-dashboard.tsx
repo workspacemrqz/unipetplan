@@ -85,10 +85,10 @@ export default function UnitDashboard() {
     return () => clearTimeout(timer);
   }, [dateFilter]);
 
-  // Recarregar dados quando o filtro de período mudar
+  // Recarregar todos os dados quando o filtro de período mudar
   useEffect(() => {
     if (!loading) {
-      fetchChartData();
+      fetchDashboardData();
     }
   }, [debouncedDateFilter]);
 
@@ -113,9 +113,30 @@ export default function UnitDashboard() {
     const token = localStorage.getItem('unit-token');
     const newStats = { ...stats };
     
+    // Build query params for date range
+    const params = new URLSearchParams();
+    if (debouncedDateFilter.startDate) {
+      const startDate = new Date(
+        debouncedDateFilter.startDate.year,
+        debouncedDateFilter.startDate.month - 1,
+        debouncedDateFilter.startDate.day
+      );
+      params.append('startDate', format(startDate, 'yyyy-MM-dd'));
+    }
+    if (debouncedDateFilter.endDate) {
+      const endDate = new Date(
+        debouncedDateFilter.endDate.year,
+        debouncedDateFilter.endDate.month - 1,
+        debouncedDateFilter.endDate.day
+      );
+      params.append('endDate', format(endDate, 'yyyy-MM-dd'));
+    }
+    
+    const periodParam = params.toString() ? `?${params.toString()}` : '';
+    
     // Buscar estatísticas agregadas do backend
     try {
-      const statsResponse = await fetch(`/api/units/${slug}/dashboard-stats`, {
+      const statsResponse = await fetch(`/api/units/${slug}/dashboard-stats${periodParam}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (statsResponse.ok) {
@@ -128,7 +149,7 @@ export default function UnitDashboard() {
       console.error('Erro ao buscar estatísticas do dashboard:', error);
     }
     
-    // Buscar procedimentos
+    // Buscar procedimentos (não filtra por data, pois mostra todos os procedimentos disponíveis)
     try {
       const proceduresResponse = await fetch(`/api/unit/${slug}/procedures`, {
         headers: { 'Authorization': `Bearer ${token}` }
