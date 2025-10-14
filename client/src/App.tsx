@@ -95,6 +95,7 @@ import SellerLogin from './pages/seller-login';
 import SellerDashboard from './pages/seller-dashboard';
 import SellerLink from './pages/seller-link';
 import SellerReferral from './pages/seller-referral';
+import SellerMenuDemo from './pages/SellerMenuDemo';
 
 // Import veterinarian pages
 import VeterinarianLoginPage from './pages/veterinarian-login';
@@ -208,6 +209,7 @@ function Router() {
         <Route path="/vendedor/login" component={SellerLogin} />
         <Route path="/vendedor/dashboard" component={SellerDashboard} />
         <Route path="/vendedor/link" component={SellerLink} />
+        <Route path="/vendedor/demo" component={SellerMenuDemo} />
         <Route path="/vendedor/:slug" component={SellerReferral} />
         
         {/* Veterinarian Area Routes */}

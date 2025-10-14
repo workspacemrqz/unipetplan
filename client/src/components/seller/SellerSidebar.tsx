@@ -55,17 +55,19 @@ export default function SellerSidebar() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+                      "flex items-center px-3 py-2 text-sm rounded-lg transition-colors group",
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "text-gray-600 hover:text-gray-900"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     )}
                   >
                     <SvgIcon 
                       name={item.iconName} 
                       className={cn(
-                        "h-5 w-5 mr-3",
-                        isActive ? "invert" : "opacity-60"
+                        "h-5 w-5 mr-3 transition-all",
+                        isActive 
+                          ? "[filter:brightness(0)_saturate(100%)_invert(1)]" // Branco quando ativo
+                          : "[filter:brightness(0)_saturate(100%)_invert(40%)_sepia(1%)_saturate(0%)_hue-rotate(0deg)_brightness(98%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(15%)_sepia(0%)_saturate(0%)_hue-rotate(0deg)_brightness(95%)_contrast(100%)]" // Gray-600 padrão, gray-900 no hover
                       )} 
                     />
                     {item.name}
