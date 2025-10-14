@@ -8,6 +8,7 @@ import { Button } from "@/components/admin/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { InputMasked } from "@/components/ui/input-masked";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
@@ -36,6 +37,7 @@ const planFormSchema = z.object({
   buttonText: z.string().optional(),
   displayOrder: z.number().optional(),
   isActive: z.boolean(),
+  contractText: z.string().optional(),
 });
 
 export default function PlanForm() {
@@ -77,6 +79,7 @@ export default function PlanForm() {
       buttonText: "Contratar Plano",
       displayOrder: 0,
       isActive: true,
+      contractText: "",
     },
   });
 
@@ -113,6 +116,7 @@ export default function PlanForm() {
         buttonText: planData.buttonText || "Contratar Plano",
         displayOrder: planData.displayOrder || 0,
         isActive: planData.isActive ?? true,
+        contractText: planData.contractText || "",
       });
 
       // Log the view action when plan is loaded for editing
@@ -345,6 +349,36 @@ export default function PlanForm() {
                   )}
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Campo de Contrato */}
+          <Card style={{ backgroundColor: '#FFFFFF' }}>
+            <CardHeader>
+              <CardTitle className="text-foreground">Contrato do Plano</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="contractText"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Texto do Contrato</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        rows={15} 
+                        placeholder="Digite aqui o texto específico do contrato para este plano. Este texto será exibido na página de contrato do cliente e no checkout."
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Defina um contrato específico para este plano. Cada plano pode ter seu próprio texto de contrato personalizado.
+                    </p>
+                  </FormItem>
+                )}
+              />
             </CardContent>
           </Card>
 

@@ -105,6 +105,7 @@ export const plans = pgTable("plans", {
   annualPrice: decimal("annual_price", { precision: 10, scale: 2 }),
   annualInstallmentPrice: decimal("annual_installment_price", { precision: 10, scale: 2 }),
   annualInstallmentCount: integer("annual_installment_count").default(12),
+  contractText: text("contract_text"),
 });
 
 // Unified network units table (includes Admin fields)
