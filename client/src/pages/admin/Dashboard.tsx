@@ -196,11 +196,15 @@ export default function Dashboard() {
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        <Card style={{ backgroundColor: '#FFFFFF' }}>
+        <Card style={{ 
+          background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
+          border: 'none',
+          boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
+        }}>
           <CardContent className="p-3 sm:p-4 lg:p-6">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground">Receita do Período Selecionado</p>
+                <p className="text-xs sm:text-sm text-white/80">Receita do Período Selecionado</p>
                 {statsLoading ? (
                   <div className="space-y-2">
                     <Skeleton className="h-6 sm:h-8 w-16 sm:w-20 mt-1" />
@@ -208,19 +212,19 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <>
-                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground truncate" data-testid="metric-total-revenue">
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate" data-testid="metric-total-revenue">
                       R$ {(stats?.totalRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
-                    <div className="mt-2 pt-2 border-t border-border">
-                      <p className="text-xs text-muted-foreground">Total de pagamentos aprovados</p>
-                      <p className="text-sm sm:text-base font-semibold text-foreground">
+                    <div className="mt-2 pt-2 border-t border-white/20">
+                      <p className="text-xs text-white/70">Total de pagamentos aprovados</p>
+                      <p className="text-sm sm:text-base font-semibold text-white">
                         Histórico completo
                       </p>
                     </div>
                   </>
                 )}
               </div>
-              <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+              <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-white flex-shrink-0" />
             </div>
           </CardContent>
         </Card>
