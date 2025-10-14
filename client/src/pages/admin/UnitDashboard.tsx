@@ -5,10 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { FileText, User, Heart, MapPin, Clock, DollarSign, CheckCircle, XCircle, Eye, Users, CreditCard, Plus, Settings, Search, AlertCircle, Info, Loader2 } from "lucide-react";
+import { FileText, User, Heart, MapPin, Clock, DollarSign, CheckCircle, XCircle, Eye, Users, CreditCard, Plus, Settings, Search } from "lucide-react";
+import { CalendarDate } from "@internationalized/date";
+import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import DigitalCard from "@/components/DigitalCard";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import LoadingDots from "@/components/ui/LoadingDots";
@@ -172,8 +173,29 @@ export default function UnitDashboard() {
   const [coverageSearch, setCoverageSearch] = useState("");
   const [coverageStatusFilter, setCoverageStatusFilter] = useState("all");
 
-  // Period filter state
-  const [periodFilter, setPeriodFilter] = useState<string>("all");
+  // Date filter state (similar to UnitAtendimentos)
+  const [dateFilter, setDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
+  const [debouncedDateFilter, setDebouncedDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+
+  // Debounce date filter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedDateFilter(dateFilter);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [dateFilter]);
+
+  const handleDateRangeChange = (startDate: CalendarDate | null, endDate: CalendarDate | null) => {
+    setDateFilter({ startDate, endDate });
+  };
 
   // CPF search functionality
   const handleCpfSearch = () => {
@@ -640,65 +662,46 @@ export default function UnitDashboard() {
     }).format(parseFloat(value));
   };
 
-  // Helper function to filter data by period
-  const filterByPeriod = <T extends { createdAt: string }>(data: T[]): T[] => {
-    if (periodFilter === "all") return data;
-    
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  // Helper function to filter data by date range
+  const filterByDateRange = <T extends { createdAt: string }>(data: T[]): T[] => {
+    if (!debouncedDateFilter.startDate && !debouncedDateFilter.endDate) {
+      return data; // No filter applied, return all data
+    }
     
     return data.filter(item => {
       const itemDate = new Date(item.createdAt);
       
-      switch (periodFilter) {
-        case "today":
-          return itemDate >= today;
-        case "week":
-          const weekAgo = new Date(today);
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          return itemDate >= weekAgo;
-        case "month":
-          const monthAgo = new Date(today);
-          monthAgo.setDate(monthAgo.getDate() - 30);
-          return itemDate >= monthAgo;
-        case "3months":
-          const threeMonthsAgo = new Date(today);
-          threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-          return itemDate >= threeMonthsAgo;
-        case "6months":
-          const sixMonthsAgo = new Date(today);
-          sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-          return itemDate >= sixMonthsAgo;
-        case "year":
-          const yearAgo = new Date(today);
-          yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-          return itemDate >= yearAgo;
-        default:
-          return true;
+      // Convert CalendarDate to JavaScript Date for comparison
+      const startDate = debouncedDateFilter.startDate 
+        ? new Date(
+            debouncedDateFilter.startDate.year, 
+            debouncedDateFilter.startDate.month - 1, 
+            debouncedDateFilter.startDate.day,
+            0, 0, 0, 0
+          )
+        : null;
+      
+      const endDate = debouncedDateFilter.endDate 
+        ? new Date(
+            debouncedDateFilter.endDate.year, 
+            debouncedDateFilter.endDate.month - 1, 
+            debouncedDateFilter.endDate.day,
+            23, 59, 59, 999
+          )
+        : null;
+      
+      if (startDate && endDate) {
+        return itemDate >= startDate && itemDate <= endDate;
+      } else if (startDate) {
+        return itemDate >= startDate;
+      } else if (endDate) {
+        return itemDate <= endDate;
       }
+      
+      return true;
     });
   };
 
-  // Period filter component
-  const PeriodFilterComponent = () => (
-    <div className="flex items-center space-x-2 mb-4">
-      <Label htmlFor="period-filter">Filtrar por período:</Label>
-      <Select value={periodFilter} onValueChange={setPeriodFilter}>
-        <SelectTrigger id="period-filter" className="w-48">
-          <SelectValue placeholder="Selecione o período" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todos os períodos</SelectItem>
-          <SelectItem value="today">Hoje</SelectItem>
-          <SelectItem value="week">Últimos 7 dias</SelectItem>
-          <SelectItem value="month">Últimos 30 dias</SelectItem>
-          <SelectItem value="3months">Últimos 3 meses</SelectItem>
-          <SelectItem value="6months">Últimos 6 meses</SelectItem>
-          <SelectItem value="year">Último ano</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  );
 
   // Memoized filtered coverage for performance optimization
   const filteredCoverage = useMemo(() => {
@@ -847,7 +850,10 @@ export default function UnitDashboard() {
             <div className="space-y-4">
               <div className="mb-4">
                 <h3 className="text-lg font-semibold mb-4">Atendimentos</h3>
-                <PeriodFilterComponent />
+                <DateFilterComponent 
+                  onDateRangeChange={handleDateRangeChange}
+                  className="mb-4"
+                />
                 <Tabs defaultValue="open" className="space-y-4">
                   <TabsList className="grid w-full grid-cols-3 gap-1">
                     <TabsTrigger value="open">Abertas</TabsTrigger>
@@ -858,7 +864,7 @@ export default function UnitDashboard() {
                   {["open", "closed", "cancelled"].map(status => (
                     <TabsContent key={status} value={status}>
                       <div className="grid gap-4">
-                        {filterByPeriod(atendimentos)
+                        {filterByDateRange(atendimentos)
                           .filter(atendimento => atendimento.unitStatus === status)
                           .map(atendimento => (
                             <Card key={atendimento.id} className="">
@@ -924,7 +930,7 @@ export default function UnitDashboard() {
                             </Card>
                           ))}
                         
-                        {filterByPeriod(atendimentos).filter(atendimento => atendimento.unitStatus === status).length === 0 && (
+                        {filterByDateRange(atendimentos).filter(atendimento => atendimento.unitStatus === status).length === 0 && (
                           <Card>
                             <CardContent className="p-3 sm:p-4 lg:p-6 text-center">
                               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -961,7 +967,10 @@ export default function UnitDashboard() {
                 </Button>
               </div>
               
-              <PeriodFilterComponent />
+              <DateFilterComponent 
+                onDateRangeChange={handleDateRangeChange}
+                className="mb-4"
+              />
               
               <div className="flex items-center space-x-2">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -980,7 +989,7 @@ export default function UnitDashboard() {
                 </div>
               ) : (
                 <div className="grid gap-4">
-                  {filterByPeriod(clients)
+                  {filterByDateRange(clients)
                     .filter(client => 
                       client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                       client.cpf.includes(searchTerm) ||
@@ -1017,7 +1026,7 @@ export default function UnitDashboard() {
                       </Card>
                     ))}
                   
-                  {filterByPeriod(clients).filter(client => 
+                  {filterByDateRange(clients).filter(client => 
                     client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     client.cpf.includes(searchTerm) ||
                     (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -1062,7 +1071,10 @@ export default function UnitDashboard() {
                 </p>
               </div>
 
-              <PeriodFilterComponent />
+              <DateFilterComponent 
+                onDateRangeChange={handleDateRangeChange}
+                className="mb-4"
+              />
 
               <SteppedAtendimentoForm
                 mode="admin"
@@ -1151,7 +1163,10 @@ export default function UnitDashboard() {
                 </div>
               </div>
 
-              <PeriodFilterComponent />
+              <DateFilterComponent 
+                onDateRangeChange={handleDateRangeChange}
+                className="mb-4"
+              />
 
               {loadingCards ? (
                 <div className="flex items-center justify-center py-8">
@@ -1260,7 +1275,10 @@ export default function UnitDashboard() {
                 </Button>
               </div>
 
-              <PeriodFilterComponent />
+              <DateFilterComponent 
+                onDateRangeChange={handleDateRangeChange}
+                className="mb-4"
+              />
 
               {/* Filters */}
               {!loadingCoverage && coverage.length > 0 && (
