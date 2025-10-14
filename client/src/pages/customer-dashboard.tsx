@@ -220,6 +220,30 @@ export default function CustomerDashboard() {
                 Ver Perfil
               </button>
             </div>
+
+            {/* Contract Card */}
+            <div className="bg-white rounded-xl shadow-lg p-6 shadow-xl transition-shadow duration-300">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: 'var(--bg-cream-light)' }}>
+                  <FileText className="w-6 h-6" style={{ color: 'var(--text-teal)' }} />
+                </div>
+                <div>
+                  <h3 className="font-semibold" style={{ color: 'var(--text-dark-primary)' }}>
+                    Contrato
+                  </h3>
+                  <p className="text-sm" style={{ color: 'var(--text-dark-secondary)' }}>
+                    Termos de serviço
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => navigate('/cliente/contrato')}
+                className="w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                style={{ background: 'var(--btn-ver-planos-bg)', color: 'var(--btn-ver-planos-text)' }}>
+                Ver Contrato
+              </button>
+            </div>
           </motion.div>
 
           {/* Quick Actions */}

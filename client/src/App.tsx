@@ -30,6 +30,7 @@ import CustomerProfile from "@/pages/customer-profile";
 import CustomerSurveys from "@/pages/customer-surveys";
 import CustomerFinancial from "@/pages/customer-financial";
 import CustomerProcedures from "@/pages/customer-procedures";
+import CustomerContract from "@/pages/customer-contract";
 import RenewalCheckout from "@/pages/renewal-checkout";
 import InstallmentPayment from "@/pages/installment-payment";
 import TelemedicinePage from "@/pages/telemedicine";
@@ -198,6 +199,7 @@ function Router() {
         <Route path="/cliente/pesquisas" component={() => (<><CustomerSurveys /><ChatAI /></>)} />
         <Route path="/cliente/financeiro" component={() => (<><CustomerFinancial /><ChatAI /></>)} />
         <Route path="/cliente/procedimentos" component={() => (<><CustomerProcedures /><ChatAI /></>)} />
+        <Route path="/cliente/contrato" component={() => (<><CustomerContract /><ChatAI /></>)} />
         <Route path="/cliente/renovacao" component={() => (<><RenewalCheckout /><ChatAI /></>)} />
         <Route path="/cliente/pagamento" component={() => (<><InstallmentPayment /><ChatAI /></>)} />
         <Route path="/cliente/telemedicina" component={() => (<><TelemedicinePage /><ChatAI /></>)} />

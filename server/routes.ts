@@ -6488,6 +6488,325 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download contract PDF
+  app.get("/api/clients/contract/download", requireClient, async (req, res) => {
+    try {
+      const clientId = req.session.client?.id;
+      const clientName = req.session.client?.full_name || "Cliente";
+      const clientCPF = req.session.client?.cpf || "XXX.XXX.XXX-XX";
+      
+      if (!clientId) {
+        return res.status(401).json({ error: "Cliente não autenticado" });
+      }
+
+      // Import pdfMake
+      const pdfMake = (await import('pdfmake/build/pdfmake.js')).default;
+      const vfsFonts = await import('pdfmake/build/vfs_fonts.js');
+      pdfMake.vfs = (vfsFonts as any).vfs;
+
+      // Define the contract document structure
+      const docDefinition: any = {
+        content: [
+          {
+            text: 'CONTRATO DE PRESTAÇÃO DE SERVIÇOS VETERINÁRIOS - PLANO DE SAÚDE PET',
+            style: 'header',
+            alignment: 'center'
+          },
+          { text: '\n\n' },
+          {
+            text: 'Por este instrumento particular de Contrato de Prestação de Serviços Veterinários, as partes abaixo qualificadas celebram o presente contrato mediante as cláusulas e condições seguintes:',
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA PRIMEIRA - DAS PARTES',
+            style: 'subheader'
+          },
+          {
+            text: [
+              { text: 'CONTRATADA: ', bold: true },
+              'CLÍNICA VETERINÁRIA PET SAÚDE, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº XX.XXX.XXX/0001-XX, com sede na Rua Example, nº 123, Bairro Centro, Cidade/Estado, CEP 00000-000, neste ato representada na forma de seu contrato social.'
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: [
+              { text: 'CONTRATANTE: ', bold: true },
+              `${clientName}, inscrito(a) no CPF sob o nº ${clientCPF}, residente e domiciliado(a) no endereço cadastrado em nosso sistema.`
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA SEGUNDA - DO OBJETO',
+            style: 'subheader'
+          },
+          {
+            text: 'O presente contrato tem por objeto a prestação de serviços veterinários através do plano de saúde pet contratado, que oferece cobertura para consultas, exames, procedimentos e tratamentos veterinários, conforme as condições e coberturas específicas do plano escolhido pelo CONTRATANTE.',
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA TERCEIRA - DOS PLANOS DISPONÍVEIS',
+            style: 'subheader'
+          },
+          {
+            text: 'A CONTRATADA oferece os seguintes planos de saúde pet:',
+            style: 'text'
+          },
+          {
+            ul: [
+              { text: 'Plano Basic: Cobertura básica incluindo consultas, exames laboratoriais simples, vacinas essenciais e procedimentos ambulatoriais básicos.', style: 'text' },
+              { text: 'Plano Confort: Inclui todas as coberturas do plano Basic, além de exames especializados, procedimentos cirúrgicos simples e descontos em medicamentos.', style: 'text' },
+              { text: 'Plano Platinum: Cobertura ampliada com exames complexos, cirurgias de médio porte, internação e tratamentos especializados.', style: 'text' },
+              { text: 'Plano Infinity: Cobertura completa incluindo todas as especialidades, cirurgias complexas, tratamentos oncológicos e atendimento 24 horas.', style: 'text' }
+            ]
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA QUARTA - DAS COBERTURAS',
+            style: 'subheader'
+          },
+          {
+            text: 'As coberturas específicas de cada plano estão detalhadas no Anexo I deste contrato e incluem:',
+            style: 'text'
+          },
+          {
+            ul: [
+              'Consultas veterinárias conforme limite do plano',
+              'Exames laboratoriais e de imagem conforme cobertura',
+              'Procedimentos ambulatoriais',
+              'Vacinas inclusas no plano',
+              'Cirurgias conforme porte e cobertura do plano',
+              'Medicamentos com desconto ou cobertura conforme plano'
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA QUINTA - DAS CARÊNCIAS',
+            style: 'subheader'
+          },
+          {
+            text: 'Ficam estabelecidos os seguintes prazos de carência a partir da data de contratação:',
+            style: 'text'
+          },
+          {
+            ul: [
+              'Consultas e emergências: 24 horas',
+              'Exames simples: 30 dias',
+              'Procedimentos ambulatoriais: 30 dias',
+              'Cirurgias eletivas: 60 dias',
+              'Exames complexos: 90 dias',
+              'Doenças preexistentes: 180 dias'
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA SEXTA - DO PAGAMENTO',
+            style: 'subheader'
+          },
+          {
+            text: 'O CONTRATANTE pagará à CONTRATADA o valor mensal correspondente ao plano escolhido, conforme valores vigentes na data da contratação:',
+            style: 'text'
+          },
+          {
+            ul: [
+              'Plano Basic: R$ 49,90/mês',
+              'Plano Confort: R$ 79,90/mês (cobrança anual)',
+              'Plano Platinum: R$ 129,90/mês (cobrança anual)',
+              'Plano Infinity: R$ 69,90/mês'
+            ],
+            style: 'text'
+          },
+          {
+            text: 'O pagamento deverá ser realizado até o dia de vencimento escolhido pelo CONTRATANTE, através dos meios de pagamento disponibilizados pela CONTRATADA (cartão de crédito ou PIX).',
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA SÉTIMA - DO PRAZO',
+            style: 'subheader'
+          },
+          {
+            text: 'O presente contrato é celebrado por prazo indeterminado, iniciando-se na data de sua assinatura eletrônica através da aceitação dos termos no momento da contratação online.',
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA OITAVA - DO CANCELAMENTO',
+            style: 'subheader'
+          },
+          {
+            text: 'O CONTRATANTE poderá solicitar o cancelamento do plano a qualquer momento, mediante comunicação prévia de 30 dias. O cancelamento não dará direito à devolução de valores já pagos referentes a períodos já utilizados ou em curso.',
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA NONA - DAS EXCLUSÕES',
+            style: 'subheader'
+          },
+          {
+            text: 'Não estão cobertos pelo plano:',
+            style: 'text'
+          },
+          {
+            ul: [
+              'Tratamentos estéticos',
+              'Produtos de higiene e beleza',
+              'Rações e suplementos não prescritos',
+              'Despesas com transporte',
+              'Procedimentos experimentais',
+              'Danos causados por maus-tratos ou negligência'
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA DÉCIMA - DAS OBRIGAÇÕES DO CONTRATANTE',
+            style: 'subheader'
+          },
+          {
+            text: 'São obrigações do CONTRATANTE:',
+            style: 'text'
+          },
+          {
+            ul: [
+              'Manter os pagamentos em dia',
+              'Fornecer informações verdadeiras sobre o pet',
+              'Seguir as orientações veterinárias',
+              'Comunicar alterações cadastrais',
+              'Utilizar os serviços de forma consciente'
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA DÉCIMA PRIMEIRA - DAS OBRIGAÇÕES DA CONTRATADA',
+            style: 'subheader'
+          },
+          {
+            text: 'São obrigações da CONTRATADA:',
+            style: 'text'
+          },
+          {
+            ul: [
+              'Prestar os serviços conforme cobertura do plano',
+              'Manter equipe veterinária qualificada',
+              'Disponibilizar estrutura adequada',
+              'Respeitar os prazos de atendimento',
+              'Manter sigilo sobre informações do pet e do tutor'
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA DÉCIMA SEGUNDA - DA RESCISÃO',
+            style: 'subheader'
+          },
+          {
+            text: 'O presente contrato poderá ser rescindido:',
+            style: 'text'
+          },
+          {
+            ul: [
+              'Por acordo entre as partes',
+              'Por inadimplência superior a 60 dias',
+              'Por descumprimento de cláusulas contratuais',
+              'Por fraude ou má-fé comprovada'
+            ],
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA DÉCIMA TERCEIRA - DAS DISPOSIÇÕES GERAIS',
+            style: 'subheader'
+          },
+          {
+            text: '1. Os casos omissos serão resolvidos de comum acordo entre as partes.\n2. Este contrato poderá ser alterado mediante termo aditivo assinado por ambas as partes.\n3. A tolerância de uma parte quanto ao descumprimento da outra não implicará renúncia de direitos.\n4. Este contrato obriga as partes e seus sucessores.',
+            style: 'text'
+          },
+          { text: '\n' },
+          {
+            text: 'CLÁUSULA DÉCIMA QUARTA - DO FORO',
+            style: 'subheader'
+          },
+          {
+            text: 'Fica eleito o foro da comarca da sede da CONTRATADA para dirimir quaisquer dúvidas ou litígios decorrentes deste contrato, renunciando as partes a qualquer outro, por mais privilegiado que seja.',
+            style: 'text'
+          },
+          { text: '\n\n' },
+          {
+            text: 'E por estarem assim justas e contratadas, as partes aceitam o presente contrato em todos os seus termos.',
+            style: 'text',
+            alignment: 'center'
+          },
+          { text: '\n\n' },
+          {
+            text: `Data de aceite: ${new Date().toLocaleDateString('pt-BR')}`,
+            style: 'text',
+            alignment: 'center'
+          },
+          {
+            text: 'Contrato aceito eletronicamente através da plataforma online',
+            style: 'text',
+            alignment: 'center',
+            fontSize: 10,
+            italics: true
+          },
+          { text: '\n' },
+          {
+            text: 'Este documento é uma cópia do contrato aceito pelo cliente durante o processo de checkout.',
+            style: 'text',
+            alignment: 'center',
+            fontSize: 10,
+            italics: true
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 16,
+            bold: true,
+            margin: [0, 0, 0, 10] as [number, number, number, number]
+          },
+          subheader: {
+            fontSize: 14,
+            bold: true,
+            margin: [0, 10, 0, 5] as [number, number, number, number]
+          },
+          text: {
+            fontSize: 11,
+            margin: [0, 2, 0, 2] as [number, number, number, number],
+            alignment: 'justify'
+          }
+        },
+        defaultStyle: {
+          font: 'Roboto'
+        }
+      };
+
+      // Generate the PDF
+      const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+      
+      // Get the PDF as buffer
+      pdfDocGenerator.getBuffer((buffer: Buffer) => {
+        // Set response headers for PDF download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=contrato_plano_saude_pet_${new Date().toISOString().split('T')[0]}.pdf`);
+        res.setHeader('Content-Length', buffer.length.toString());
+        
+        // Send the PDF buffer
+        res.end(buffer);
+      });
+
+    } catch (error) {
+      console.error("❌ Error generating contract PDF:", error);
+      res.status(500).json({ error: "Erro ao gerar PDF do contrato" });
+    }
+  });
+
   // Get contract renewal data for authenticated client
   app.get("/api/contracts/:contractId/renewal", requireClient, async (req, res) => {
     try {
