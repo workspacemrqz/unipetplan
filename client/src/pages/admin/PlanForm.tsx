@@ -26,6 +26,7 @@ import { apiRequest } from "@/lib/admin/queryClient";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { PLAN_TYPES } from "@/lib/constants";
 import { z } from "zod";
+import { getDefaultContractText } from "@/lib/default-contract-texts";
 
 // Schema de validação do formulário
 const planFormSchema = z.object({
@@ -110,6 +111,13 @@ export default function PlanForm() {
         parseFloat(planData.basePrice).toFixed(2).replace('.', ',') : 
         "0,00";
       
+      // Usar texto padrão do contrato se o campo estiver vazio
+      let contractTextToUse = planData.contractText || "";
+      if (!contractTextToUse && planData.name) {
+        contractTextToUse = getDefaultContractText(planData.name);
+        console.log("📄 Carregando texto padrão do contrato para plano:", planData.name);
+      }
+      
       form.reset({
         name: planData.name || "",
         price: formattedPrice,
@@ -119,7 +127,7 @@ export default function PlanForm() {
         buttonText: planData.buttonText || "Contratar Plano",
         displayOrder: planData.displayOrder || 0,
         isActive: planData.isActive ?? true,
-        contractText: planData.contractText || "",
+        contractText: contractTextToUse,
       });
       
       setHasResetForm(true);
