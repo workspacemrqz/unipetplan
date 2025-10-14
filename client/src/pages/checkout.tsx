@@ -836,6 +836,19 @@ export default function Checkout() {
     return planType === "with_waiting_period" ? "Sem coparticipação" : "Com coparticipação";
   };
 
+  // Função para obter o link do contrato baseado no plano
+  const getContractLink = (): string => {
+    if (!selectedPlan) return "/contrato/basic"; // fallback
+    
+    const planName = selectedPlan.name.toUpperCase();
+    if (planName.includes('BASIC')) return "/contrato/basic";
+    if (planName.includes('COMFORT')) return "/contrato/comfort";
+    if (planName.includes('PLATINUM')) return "/contrato/platinum";
+    if (planName.includes('INFINITY')) return "/contrato/infinity";
+    
+    return "/contrato/basic"; // fallback
+  };
+
   // Calcular valor total com descontos por pet usando basePrice correto
   const calculateTotal = () => {
     if (!selectedPlan) return 0;
@@ -1928,6 +1941,10 @@ export default function Checkout() {
                         Li e aceito os{' '}
                         <a href="/termos-e-condicoes" target="_blank" className="underline text-teal-600 hover:text-teal-700">
                           Termos e Condições
+                        </a>
+                        {' '}e o{' '}
+                        <a href={getContractLink()} target="_blank" className="underline text-teal-600 hover:text-teal-700">
+                          Contrato do {selectedPlan ? `Plano ${selectedPlan.name}` : 'Plano'}
                         </a>
                       </span>
                     </label>
