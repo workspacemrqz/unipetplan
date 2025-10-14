@@ -1,10 +1,12 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/admin/utils";
-import { LogOut } from "lucide-react";
-import { SvgIcon } from "@/components/ui/SvgIcon";
+import { useState, useEffect } from "react";
+import { LogOut, ChevronDown, ChevronRight } from "lucide-react";
+import CustomIcon from "@/components/admin/ui/CustomIcon";
 
 export default function SellerSidebar() {
   const [location] = useLocation();
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   
   const navigation = [
     {
@@ -20,6 +22,34 @@ export default function SellerSidebar() {
       ]
     }
   ];
+
+  // Expand section containing current route
+  useEffect(() => {
+    for (const section of navigation) {
+      const hasActiveItem = section.items.some(item => location === item.href);
+      if (hasActiveItem) {
+        setExpandedSections(prev => {
+          const newSet = new Set(prev);
+          newSet.add(section.name);
+          return newSet;
+        });
+        break;
+      }
+    }
+  }, [location]);
+
+  // Função para alternar a expansão de uma seção
+  const toggleSection = (sectionName: string) => {
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionName)) {
+        newSet.delete(sectionName);
+      } else {
+        newSet.add(sectionName);
+      }
+      return newSet;
+    });
+  };
 
   const handleLogout = () => {
     // Usar a mesma lógica do seller dashboard
@@ -38,45 +68,58 @@ export default function SellerSidebar() {
         <img src="/unipet-logo.png" alt="Unipet Plan" className="h-8 w-auto" />
       </div>
 
-      {/* Navigation - Exact same style as unit */}
-      <nav className="flex-1 px-6 pb-6 space-y-6 overflow-y-auto">
-        {navigation.map((section) => (
-          <div key={section.name}>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-              {section.name}
-            </h3>
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                // Check if current location matches the item's href
-                const isActive = location === item.href;
-                
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center px-3 py-2 text-sm rounded-lg transition-colors group",
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                    )}
-                  >
-                    <SvgIcon 
-                      name={item.iconName} 
-                      className={cn(
-                        "h-5 w-5 mr-3 transition-all",
-                        isActive 
-                          ? "[filter:brightness(0)_saturate(100%)_invert(1)]" // Branco quando ativo
-                          : "[filter:brightness(0)_saturate(100%)_invert(40%)_sepia(1%)_saturate(0%)_hue-rotate(0deg)_brightness(98%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(15%)_sepia(0%)_saturate(0%)_hue-rotate(0deg)_brightness(95%)_contrast(100%)]" // Gray-600 padrão, gray-900 no hover
-                      )} 
-                    />
-                    {item.name}
-                  </Link>
-                );
-              })}
+      {/* Navigation - Same style as admin */}
+      <nav className="flex-1 px-4 pb-6 space-y-4 overflow-y-auto">
+        {navigation.map((section) => {
+          const isExpanded = expandedSections.has(section.name);
+          
+          return (
+            <div key={section.name}>
+              <button
+                onClick={() => toggleSection(section.name)}
+                className="w-full flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-3 py-1 hover:text-gray-600 transition-colors rounded-lg"
+              >
+                <span>{section.name}</span>
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+              
+              {isExpanded && (
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const isActive = location === item.href;
+                    
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group",
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-md"
+                            : "text-gray-600 hover:bg-primary/10 hover:text-primary"
+                        )}
+                      >
+                        <CustomIcon 
+                          name={item.iconName} 
+                          color={isActive ? "white" : "gray"}
+                          className={cn(
+                            "h-5 w-5 mr-3 transition-transform duration-200",
+                            !isActive && "group-hover:scale-110 group-hover:brightness-110"
+                          )} 
+                        />
+                        <span className="font-medium">{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Logout Button */}
