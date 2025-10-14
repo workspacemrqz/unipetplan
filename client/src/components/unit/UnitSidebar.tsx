@@ -78,7 +78,7 @@ export default function UnitSidebar() {
           name: "Gestão",
           items: [
             { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, iconName: "Procedimento" },
-            { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, iconName: "Cliente e Pet" }
+            { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, iconName: "Admin" }
           ]
         },
         {
