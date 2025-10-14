@@ -98,6 +98,7 @@ import SellerReferral from './pages/seller-referral';
 import SellerMenuDemo from './pages/SellerMenuDemo';
 import MenuLogsDemo from './pages/MenuLogsDemo';
 import UnitMenuDemo from './pages/UnitMenuDemo';
+import NovoAtendimentoIconDemo from './pages/NovoAtendimentoIconDemo';
 
 // Import veterinarian pages
 import VeterinarianLoginPage from './pages/veterinarian-login';
@@ -220,6 +221,7 @@ function Router() {
         {/* Demo Routes */}
         <Route path="/demo/menu-logs" component={MenuLogsDemo} />
         <Route path="/demo/unit-menu" component={UnitMenuDemo} />
+        <Route path="/demo/novo-atendimento-icon" component={NovoAtendimentoIconDemo} />
         
         {/* Unit Routes - specific paths first */}
         <Route path="/unidade/:slug/painel" component={UnitDashboard} />

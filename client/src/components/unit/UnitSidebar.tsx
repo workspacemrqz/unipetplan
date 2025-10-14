@@ -46,7 +46,7 @@ export default function UnitSidebar() {
             { 
               name: "Novo Atendimento", 
               href: `/unidade/${slug}/atendimentos/novo`, 
-              iconName: "Atendimento" 
+              iconName: "Plus" 
             }
           ]
         }
@@ -70,7 +70,7 @@ export default function UnitSidebar() {
             { 
               name: "Novo Atendimento", 
               href: `/unidade/${slug}/atendimentos/novo`, 
-              iconName: "Atendimento" 
+              iconName: "Plus" 
             }
           ]
         },
