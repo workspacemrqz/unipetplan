@@ -783,10 +783,10 @@ export default function SteppedAtendimentoForm({
                                           <span className="ml-2 text-gray-900">{selectedPet.color}</span>
                                         </div>
                                       )}
-                                      <div>
+                                      <div className="flex items-center">
                                         <span className="font-medium text-gray-600">Peso:</span>
                                         {!isEditingWeight ? (
-                                          <span className="ml-2">
+                                          <span className="ml-2 flex items-center">
                                             {selectedPet.weight && selectedPet.weight !== '0' && selectedPet.weight !== 0 && parseFloat(selectedPet.weight) > 0 ? (
                                               <>
                                                 <span className="text-gray-900">{selectedPet.weight} kg</span>
