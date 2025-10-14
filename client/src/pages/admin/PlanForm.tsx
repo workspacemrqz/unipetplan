@@ -9,8 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { InputMasked } from "@/components/ui/input-masked";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -24,7 +22,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { PLAN_TYPES } from "@/lib/constants";
 import { z } from "zod";
 import { getDefaultContractText } from "@/lib/default-contract-texts";
 
@@ -97,19 +94,6 @@ export default function PlanForm() {
       }
     }
   }, [watchedName, isEdit, form]);
-
-
-
-
-  const getPlanTypeLabel = (type: string) => {
-    switch (type) {
-      case "with_waiting_period": return "Com Coparticipação";
-      case "without_waiting_period": return "Sem Coparticipação";
-      default: return type;
-    }
-  };
-
-
 
 
   // Track if we've already reset the form to avoid multiple resets
@@ -316,39 +300,6 @@ export default function PlanForm() {
                           data-testid="input-price" 
                         />
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="planType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo do Plano *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} disabled={isEdit}>
-                        <FormControl>
-                          <SelectTrigger 
-                            data-testid="select-plan-type"
-                            className="[&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
-                            style={{
-                              borderColor: 'var(--border-gray)',
-                              background: 'white'
-                            }}
-                          >
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {PLAN_TYPES.flatMap((type, index) => [
-                            <SelectItem key={type} value={type} className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground">
-                              {getPlanTypeLabel(type)}
-                            </SelectItem>,
-                            ...(index < PLAN_TYPES.length - 1 ? [<Separator key={`separator-${type}`} />] : [])
-                          ])}
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
