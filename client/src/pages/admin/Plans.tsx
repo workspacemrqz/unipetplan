@@ -117,8 +117,8 @@ export default function Plans() {
 
   const getPlanTypeLabel = (type: string) => {
     switch (type) {
-      case "with_waiting_period": return "Com Coparticipação";
-      case "without_waiting_period": return "Sem Coparticipação";
+      case "with_waiting_period": return "Sem Coparticipação";
+      case "without_waiting_period": return "Com Coparticipação";
       default: return type;
     }
   };
