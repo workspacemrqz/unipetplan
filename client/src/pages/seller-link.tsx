@@ -49,7 +49,7 @@ export default function SellerLink() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-cream-light)]">
+      <div className="min-h-screen flex items-center justify-center bg-[#faf9f7]">
         <div className="text-center">
           <LoadingDots size="lg" color="#0e7074" className="mb-4" />
           <p className="text-gray-600">Carregando...</p>
