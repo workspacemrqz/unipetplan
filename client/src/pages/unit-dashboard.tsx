@@ -369,65 +369,67 @@ export default function UnitDashboard() {
               <CardTitle className="text-foreground min-w-0">Procedimentos Vendidos</CardTitle>
               <p className="text-sm text-muted-foreground">Quantidade por procedimento (Top 10)</p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {proceduresSold && proceduresSold.length > 0 ? (
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart 
-                    data={proceduresSold} 
-                    margin={{ top: 20, right: 30, left: 20, bottom: 120 }}
-                  >
-                    <CartesianGrid 
-                      strokeDasharray="3 3" 
-                      stroke="#d1d5db" 
-                      vertical={false} 
-                    />
-                    <XAxis 
-                      dataKey="name" 
-                      angle={-45}
-                      textAnchor="end"
-                      height={120}
-                      interval={0}
-                      tick={{ 
-                        fontSize: 11, 
-                        fill: '#111827',
-                        fontWeight: 500 
-                      }}
-                      stroke="#6b7280"
-                    />
-                    <YAxis 
-                      tick={{ 
-                        fontSize: 12, 
-                        fill: '#111827',
-                        fontWeight: 500 
-                      }} 
-                      stroke="#6b7280"
-                    />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#ffffff', 
-                        border: '2px solid #0e7074',
-                        borderRadius: '8px',
-                        padding: '12px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
-                      }}
-                      labelStyle={{ 
-                        color: '#111827', 
-                        fontWeight: 600,
-                        marginBottom: '4px'
-                      }}
-                      cursor={{ fill: 'rgba(14, 112, 116, 0.1)' }}
-                    />
-                    <Bar 
-                      dataKey="count" 
-                      fill="#0e7074" 
-                      name="Quantidade" 
-                      radius={[8, 8, 0, 0]}
-                      maxBarSize={50}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="w-full" style={{ height: '450px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart 
+                      data={proceduresSold} 
+                      margin={{ top: 20, right: 30, left: 20, bottom: 140 }}
+                    >
+                      <CartesianGrid 
+                        strokeDasharray="3 3" 
+                        stroke="#d1d5db" 
+                        vertical={false} 
+                      />
+                      <XAxis 
+                        dataKey="name" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={140}
+                        interval={0}
+                        tick={{ 
+                          fontSize: 11, 
+                          fill: '#000000',
+                          fontWeight: 500 
+                        }}
+                        stroke="#6b7280"
+                      />
+                      <YAxis 
+                        tick={{ 
+                          fontSize: 12, 
+                          fill: '#000000',
+                          fontWeight: 500 
+                        }} 
+                        stroke="#6b7280"
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#ffffff', 
+                          border: '2px solid #0e7074',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
+                        }}
+                        labelStyle={{ 
+                          color: '#000000', 
+                          fontWeight: 600,
+                          marginBottom: '4px'
+                        }}
+                        cursor={{ fill: 'rgba(14, 112, 116, 0.1)' }}
+                      />
+                      <Bar 
+                        dataKey="count" 
+                        fill="#0e7074" 
+                        name="Quantidade" 
+                        radius={[8, 8, 0, 0]}
+                        maxBarSize={50}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <div className="h-[400px] flex items-center justify-center bg-gray-50 rounded-lg">
+                <div style={{ height: '450px' }} className="flex items-center justify-center bg-gray-50 rounded-lg">
                   <div className="text-center px-4">
                     <p className="text-gray-700 font-semibold text-lg">Nenhum dado disponível</p>
                     <p className="text-sm text-gray-500 mt-2">
@@ -445,53 +447,55 @@ export default function UnitDashboard() {
               <CardTitle className="text-foreground min-w-0">Valor por Usuário</CardTitle>
               <p className="text-sm text-muted-foreground">Total (R$) por criador dos atendimentos</p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {valueByUser && valueByUser.length > 0 ? (
-                <ResponsiveContainer width="100%" height={400}>
-                  <PieChart>
-                    <Pie
-                      data={valueByUser as any}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={110}
-                      innerRadius={60}
-                      paddingAngle={4}
-                      label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
-                      labelLine={{ 
-                        stroke: '#374151', 
-                        strokeWidth: 2 
-                      }}
-                    >
-                      {valueByUser.map((_, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={index % 2 === 0 ? '#0e7074' : '#16a34a'} 
-                          stroke="#ffffff"
-                          strokeWidth={3}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Valor Total']}
-                      contentStyle={{ 
-                        backgroundColor: '#ffffff', 
-                        border: '2px solid #0e7074',
-                        borderRadius: '8px',
-                        padding: '12px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
-                      }}
-                      labelStyle={{ 
-                        color: '#111827', 
-                        fontWeight: 600,
-                        marginBottom: '4px'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="w-full" style={{ height: '450px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={valueByUser as any}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={120}
+                        innerRadius={70}
+                        paddingAngle={4}
+                        label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
+                        labelLine={{ 
+                          stroke: '#374151', 
+                          strokeWidth: 2 
+                        }}
+                      >
+                        {valueByUser.map((_, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={index % 2 === 0 ? '#0e7074' : '#16a34a'} 
+                            stroke="#ffffff"
+                            strokeWidth={3}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Valor Total']}
+                        contentStyle={{ 
+                          backgroundColor: '#ffffff', 
+                          border: '2px solid #0e7074',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
+                        }}
+                        labelStyle={{ 
+                          color: '#000000', 
+                          fontWeight: 600,
+                          marginBottom: '4px'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <div className="h-[400px] flex items-center justify-center bg-gray-50 rounded-lg">
+                <div style={{ height: '450px' }} className="flex items-center justify-center bg-gray-50 rounded-lg">
                   <div className="text-center px-4">
                     <p className="text-gray-700 font-semibold text-lg">Nenhum dado disponível</p>
                     <p className="text-sm text-gray-500 mt-2">
