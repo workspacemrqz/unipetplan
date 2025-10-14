@@ -157,6 +157,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       const status = req.query.status as string;
       const startDate = req.query.startDate as string;
       const endDate = req.query.endDate as string;
+      const search = req.query.search as string;
       
       // Build filters based on user type
       const filters: any = {
@@ -185,6 +186,41 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           };
         })
       );
+      
+      // Apply search filter if present
+      if (search) {
+        const searchLower = search.toLowerCase();
+        allAtendimentos = allAtendimentos.filter((atendimento: any) => {
+          // Search in clientName
+          if (atendimento.clientName && atendimento.clientName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in petName
+          if (atendimento.petName && atendimento.petName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in procedure names
+          if (atendimento.procedure && atendimento.procedure.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in procedures array
+          if (atendimento.procedures && atendimento.procedures.length > 0) {
+            const hasMatchingProcedure = atendimento.procedures.some((proc: any) => {
+              const procName = proc.procedureName || proc.name || '';
+              return procName.toLowerCase().includes(searchLower);
+            });
+            if (hasMatchingProcedure) return true;
+          }
+          // Search in notes
+          if (atendimento.procedureNotes && atendimento.procedureNotes.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          if (atendimento.generalNotes && atendimento.generalNotes.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          return false;
+        });
+      }
       
       // Apply date filter if present
       if (startDate || endDate) {
