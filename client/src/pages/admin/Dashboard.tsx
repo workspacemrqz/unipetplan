@@ -7,7 +7,6 @@ import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import type { Client, Atendimento, ContactSubmission } from "../../../../shared/schema";
 import {
   User,
-  DollarSign,
   Users
 } from "lucide-react";
 import { CalendarDate } from "@internationalized/date";
@@ -104,6 +103,7 @@ export default function Dashboard() {
   const stats = (dashboardData as any)?.stats || {} as {
     monthlyRevenue?: number;
     totalRevenue?: number;
+    totalRevenueAllTime?: number;
     activeClients?: number;
     registeredPets?: number;
   };
@@ -217,14 +217,16 @@ export default function Dashboard() {
                     </p>
                     <div className="mt-3 pt-2 border-t border-white/20">
                       <p className="text-xs text-white/80">Total de pagamentos aprovados</p>
-                      <p className="text-sm font-medium text-white mt-1">
-                        Histórico completo
-                      </p>
+                      <div className="flex items-center justify-between mt-1">
+                        <p className="text-xs text-white/60">Histórico completo</p>
+                        <p className="text-sm font-bold text-white">
+                          R$ {(stats?.totalRevenueAllTime || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
                     </div>
                   </>
                 )}
               </div>
-              <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-white flex-shrink-0" />
             </div>
           </CardContent>
         </Card>
@@ -268,7 +270,6 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-              <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-white flex-shrink-0" />
             </div>
           </CardContent>
         </Card>

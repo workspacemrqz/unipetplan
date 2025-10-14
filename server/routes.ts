@@ -997,7 +997,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activeNetwork: networkUnits.filter(u => u.isActive).length,
         totalProcedures: 0, // TODO: Add if getAllProcedures method exists
         monthlyRevenue: filteredPets.length * 0, // Will be calculated after planRevenue
-        totalRevenue: filteredPets.length * 0 // Will be calculated after planRevenue
+        totalRevenue: filteredPets.length * 0, // Will be calculated after planRevenue
+        totalRevenueAllTime: 0 // Will be calculated from all approved payments
       };
 
       // Calculate plan distribution using filtered pets
@@ -1017,6 +1018,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const approvedPaymentReceipts = filteredPaymentReceipts.filter(receipt => 
         receipt.returnCode && ['00', '0'].includes(receipt.returnCode)
       );
+      
+      // Calculate total revenue from ALL approved payments (no date filter) for "Histórico completo"
+      const allApprovedPaymentReceipts = allPaymentReceipts.filter(receipt => 
+        receipt.returnCode && ['00', '0'].includes(receipt.returnCode)
+      );
+      
+      const totalRevenueAllTime = allApprovedPaymentReceipts.reduce((sum, receipt) => {
+        const amount = parseFloat(receipt.paymentAmount || '0');
+        return sum + amount;
+      }, 0);
 
       // Calculate plan revenue from actual approved payments (using filtered and approved receipts)
       const planRevenue = plans.map(plan => {
@@ -1054,12 +1065,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         afterDateFilter: filteredPaymentReceipts.length,
         approved: approvedPaymentReceipts.length,
         totalRevenue: totalApprovedPayments,
+        totalRevenueAllTime: totalRevenueAllTime,
         period: hasDateFilter ? `${startDate} to ${endDate}` : 'all time'
       });
       
       // Update stats with calculated revenue
       stats.monthlyRevenue = totalMonthlyRevenue;
       stats.totalRevenue = totalApprovedPayments; // Total from filtered approved payments only
+      stats.totalRevenueAllTime = totalRevenueAllTime; // Total from ALL approved payments (no filter)
 
       const dashboardData = {
         stats,
