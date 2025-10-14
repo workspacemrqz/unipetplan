@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/admin/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/admin/ui/tabs";
+import { ScrollArea } from "@/components/admin/ui/scroll-area";
+import { Badge } from "@/components/admin/ui/badge";
 import { 
   FileText, 
   Database, 
@@ -14,15 +14,13 @@ import {
 
 export default function Documentation() {
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <FileText className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Documentação Técnica</h1>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Documentação Técnica</h1>
+          <p className="text-sm text-muted-foreground">Documentação completa do sistema UNIPET PLAN - Plataforma de Gerenciamento de Planos de Saúde Pet</p>
         </div>
-        <p className="text-muted-foreground">
-          Documentação completa do sistema UNIPET PLAN - Plataforma de Gerenciamento de Planos de Saúde Pet
-        </p>
       </div>
 
       <Tabs defaultValue="resumo" className="space-y-6">
@@ -430,7 +428,7 @@ export default function Documentation() {
                       </div>
                       <div className="bg-muted p-3 rounded-lg">
                         <p className="font-medium">Pagar com Cartão</p>
-                        <p className="text-sm text-muted-foreground mt-1">Envia dados do cartão para Cielo, processa pagamento e atualiza status do contrato.</p>
+                        <p className="text-sm text-muted-foreground mt-1">Processa pagamento com cartão de crédito/débito via API da Cielo.</p>
                       </div>
                     </div>
                   </div>
@@ -440,7 +438,7 @@ export default function Documentation() {
           </Card>
         </TabsContent>
 
-        {/* Funções Principais */}
+        {/* Funções */}
         <TabsContent value="funcoes" className="space-y-6">
           <Card>
             <CardHeader>
@@ -448,136 +446,91 @@ export default function Documentation() {
                 <Clipboard className="h-5 w-5" />
                 Principais Funções Implementadas
               </CardTitle>
-              <CardDescription>Descrição das funções mais importantes do sistema</CardDescription>
+              <CardDescription>Detalhamento das principais funções e hooks do sistema</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[600px] pr-4">
                 <div className="space-y-6">
-                  {/* Funções de Autenticação */}
+                  {/* Hooks Customizados */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Autenticação e Autorização</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">requireAdmin()</p>
-                        <p className="text-muted-foreground">Middleware que verifica sessão admin antes de permitir acesso a rotas protegidas.</p>
+                    <h3 className="font-semibold text-lg mb-3">Hooks Customizados</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">useAuth()</p>
+                        <p className="text-sm text-muted-foreground mt-1">Gerencia estado de autenticação, login/logout e redirecionamentos.</p>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">requireAuth()</p>
-                        <p className="text-muted-foreground">Middleware para proteger rotas de cliente, verificando sessão ativa.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">useSiteSettings()</p>
+                        <p className="text-sm text-muted-foreground mt-1">Carrega e gerencia configurações globais do site (contato, redes sociais, etc.).</p>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">requireUnitAuth()</p>
-                        <p className="text-muted-foreground">Middleware para autenticação de unidades da rede credenciada.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">useToast()</p>
+                        <p className="text-sm text-muted-foreground mt-1">Exibe notificações toast para feedback ao usuário.</p>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Funções de Pagamento */}
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Sistema de Pagamentos</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">CieloService.createCreditCardPayment()</p>
-                        <p className="text-muted-foreground">Processa pagamento com cartão de crédito via API Cielo, incluindo retry logic e validação.</p>
-                      </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">CieloService.createPixPayment()</p>
-                        <p className="text-muted-foreground">Gera QR Code PIX e processa pagamento instantâneo via Cielo.</p>
-                      </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">PaymentReceiptService.generateReceipt()</p>
-                        <p className="text-muted-foreground">Gera recibo em PDF usando pdfMake e armazena no Supabase Storage.</p>
-                      </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">CieloWebhookService.processNotification()</p>
-                        <p className="text-muted-foreground">Processa webhooks da Cielo para atualizar status de pagamentos automaticamente.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Funções de Renovação */}
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Renovação Automática</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">AutomaticRenewalService.processAutomaticRenewals()</p>
-                        <p className="text-muted-foreground">Processa renovações automáticas de contratos vencidos via cron job.</p>
-                      </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">calculateNextRenewalDate()</p>
-                        <p className="text-muted-foreground">Calcula próxima data de renovação baseado no período de cobrança (mensal/anual).</p>
-                      </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">NotificationService.sendPaymentReminder()</p>
-                        <p className="text-muted-foreground">Envia lembretes de pagamento por email antes do vencimento.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">useColumnPreferences()</p>
+                        <p className="text-sm text-muted-foreground mt-1">Gerencia visibilidade de colunas em tabelas, salvando preferências no localStorage.</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Funções de Validação */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Validação e Sanitização</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">sanitizeText()</p>
-                        <p className="text-muted-foreground">Remove tags HTML perigosas e sanitiza texto para prevenir XSS.</p>
+                    <h3 className="font-semibold text-lg mb-3">Funções de Validação</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">validateCPF(cpf: string)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Valida CPF brasileiro usando algoritmo de dígito verificador.</p>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">validateImageContent()</p>
-                        <p className="text-muted-foreground">Valida tipo MIME, extensão, magic numbers e conteúdo de imagens uploadadas.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">validateEmail(email: string)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Valida formato de email com regex.</p>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">zodResolver()</p>
-                        <p className="text-muted-foreground">Integra schemas Zod com React Hook Form para validação de formulários.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Funções de Storage */}
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Armazenamento de Arquivos</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">SupabaseStorageService.uploadImage()</p>
-                        <p className="text-muted-foreground">Upload de imagens para Supabase com processamento via Sharp (resize, otimização).</p>
-                      </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">SupabaseStorageService.uploadPDF()</p>
-                        <p className="text-muted-foreground">Upload de PDFs (recibos) para bucket privado com controle de acesso.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">validatePhone(phone: string)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Valida telefone brasileiro (celular e fixo).</p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Funções de Cálculo */}
+                  {/* Funções de Formatação */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Cálculos e Regras de Negócio</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">calculateCoparticipation()</p>
-                        <p className="text-muted-foreground">Calcula valor de coparticipação baseado em regras do procedimento e plano.</p>
+                    <h3 className="font-semibold text-lg mb-3">Funções de Formatação</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">formatCurrency(value: number)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Formata valores monetários para R$ 0.000,00</p>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">checkWaitingPeriod()</p>
-                        <p className="text-muted-foreground">Verifica se período de carência do procedimento já foi cumprido.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">formatCPF(cpf: string)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Formata CPF para 000.000.000-00</p>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">checkAnnualLimit()</p>
-                        <p className="text-muted-foreground">Verifica se limite anual de uso do procedimento foi atingido.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">formatPhone(phone: string)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Formata telefone para (00) 00000-0000</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">formatDate(date: Date)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Formata datas usando date-fns com locale pt-BR</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Funções de API */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3">Integrações Externas</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">CepService.lookup()</p>
-                        <p className="text-muted-foreground">Busca endereço completo via API ViaCEP com timeout e tratamento de erros.</p>
+                    <h3 className="font-semibold text-lg mb-3">Funções de API</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">apiRequest(url, options)</p>
+                        <p className="text-sm text-muted-foreground mt-1">Cliente HTTP base com tratamento de erros e refresh de token.</p>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded font-mono">
-                        <p className="font-semibold text-foreground mb-1">apiRequest()</p>
-                        <p className="text-muted-foreground">Função helper para requisições HTTP com tratamento de erros e retry automático.</p>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">queryClient.prefetch()</p>
+                        <p className="text-sm text-muted-foreground mt-1">Pre-carrega dados para melhorar performance de navegação.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <p className="font-medium">queryClient.invalidate()</p>
+                        <p className="text-sm text-muted-foreground mt-1">Invalida cache e força refresh de dados.</p>
                       </div>
                     </div>
                   </div>
@@ -593,143 +546,164 @@ export default function Documentation() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Integrações com APIs Externas
+                Endpoints da API
               </CardTitle>
-              <CardDescription>Detalhamento de todas as integrações e serviços externos</CardDescription>
+              <CardDescription>Documentação completa dos endpoints REST disponíveis</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[600px] pr-4">
                 <div className="space-y-6">
-                  {/* Cielo */}
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Badge variant="default">Gateway de Pagamento</Badge>
-                      <h3 className="font-semibold text-lg">Cielo E-commerce API</h3>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p><span className="font-medium text-foreground">Propósito:</span> Processamento de pagamentos (cartão de crédito e PIX)</p>
-                      <p><span className="font-medium text-foreground">Endpoints utilizados:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• POST /sales - Criação de transação com cartão</li>
-                        <li>• POST /sales/&#123;id&#125;/capture - Captura de pagamento autorizado</li>
-                        <li>• GET /sales/&#123;id&#125; - Consulta status de pagamento</li>
-                        <li>• POST /pix/qrcode - Geração de QR Code PIX</li>
-                      </ul>
-                      <p><span className="font-medium text-foreground">Funcionalidades:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• Tokenização de cartões para renovação automática</li>
-                        <li>• Parcelamento em até 12x</li>
-                        <li>• Webhooks para notificação de mudança de status</li>
-                        <li>• Rate limiting (30 req/min) e retry automático</li>
-                        <li>• Validação e sanitização de dados sensíveis</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* ViaCEP */}
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Badge variant="secondary">Consulta de CEP</Badge>
-                      <h3 className="font-semibold text-lg">ViaCEP API</h3>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p><span className="font-medium text-foreground">Propósito:</span> Busca automática de endereço por CEP</p>
-                      <p><span className="font-medium text-foreground">Endpoint:</span> GET https://viacep.com.br/ws/&#123;cep&#125;/json/</p>
-                      <p><span className="font-medium text-foreground">Funcionalidades:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• Preenchimento automático de endereço em formulários</li>
-                        <li>• Validação de CEP (8 dígitos)</li>
-                        <li>• Timeout de 5 segundos para resiliência</li>
-                        <li>• Rate limiting para evitar abuso</li>
-                      </ul>
+                  {/* Autenticação */}
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-lg mb-3">Autenticação</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/admin/api/login</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Login de administradores. Retorna sessão HTTP-only.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/admin/api/logout</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Logout e destruição de sessão.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/admin/api/auth/check</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Verifica autenticação atual.</p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Supabase */}
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Badge variant="secondary">Cloud Storage</Badge>
-                      <h3 className="font-semibold text-lg">Supabase Storage</h3>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p><span className="font-medium text-foreground">Propósito:</span> Armazenamento de imagens e PDFs</p>
-                      <p><span className="font-medium text-foreground">Buckets utilizados:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• pet-images (público) - Fotos de pets e ícones do chat</li>
-                        <li>• receipts-private (privado) - Recibos de pagamento em PDF</li>
-                      </ul>
-                      <p><span className="font-medium text-foreground">Funcionalidades:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• Upload com processamento de imagem via Sharp (resize, otimização)</li>
-                        <li>• Validação de tipo MIME e conteúdo</li>
-                        <li>• Geração de URLs públicas/assinadas</li>
-                        <li>• Controle de acesso por bucket</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Nodemailer */}
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Badge variant="secondary">Email</Badge>
-                      <h3 className="font-semibold text-lg">Nodemailer (SMTP)</h3>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p><span className="font-medium text-foreground">Propósito:</span> Envio de notificações por email</p>
-                      <p><span className="font-medium text-foreground">Configuração:</span> Variáveis SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS</p>
-                      <p><span className="font-medium text-foreground">Tipos de email enviados:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• Confirmação de pagamento</li>
-                        <li>• Lembretes de vencimento (7 e 3 dias antes)</li>
-                        <li>• Notificações de pagamento em atraso</li>
-                        <li>• Boas-vindas após primeiro contrato</li>
-                        <li>• Recibos de pagamento anexados</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Chat AI */}
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Badge variant="secondary">IA</Badge>
-                      <h3 className="font-semibold text-lg">Chat AI (Webhook Configurável)</h3>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p><span className="font-medium text-foreground">Propósito:</span> Assistente virtual para atendimento ao cliente</p>
-                      <p><span className="font-medium text-foreground">Configuração:</span> URL de webhook configurável via admin</p>
-                      <p><span className="font-medium text-foreground">Funcionalidades:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• Rate limiting (20 mensagens/minuto)</li>
-                        <li>• Sanitização de mensagens com sanitize-html</li>
-                        <li>• Customização de ícones e cores via admin</li>
-                        <li>• Posicionamento configurável (esquerda/direita)</li>
-                      </ul>
+                  {/* Clientes */}
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-lg mb-3">Clientes</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/admin/api/clients</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Lista todos os clientes.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/admin/api/clients/:id</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Busca cliente por ID.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/admin/api/clients</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Cria novo cliente.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">PATCH</Badge>
+                          <code className="text-sm">/admin/api/clients/:id</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Atualiza cliente existente.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">DELETE</Badge>
+                          <code className="text-sm">/admin/api/clients/:id</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Remove cliente.</p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* React Query */}
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-3 mb-3">
-                      <Badge variant="outline">Internal API</Badge>
-                      <h3 className="font-semibold text-lg">API Interna (Express)</h3>
+                  {/* Pets */}
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-lg mb-3">Pets</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/admin/api/clients/:id/pets</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Lista pets de um cliente.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/admin/api/pets</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Cria novo pet.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">PATCH</Badge>
+                          <code className="text-sm">/admin/api/pets/:id</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Atualiza pet existente.</p>
+                      </div>
                     </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p><span className="font-medium text-foreground">Gerenciamento de Estado:</span> TanStack React Query</p>
-                      <p><span className="font-medium text-foreground">Principais endpoints:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• /admin/api/* - Rotas administrativas (protegidas)</li>
-                        <li>• /api/clients/* - Área do cliente</li>
-                        <li>• /api/unit/* - Portal de unidades</li>
-                        <li>• /api/sellers/* - Sistema de vendedores</li>
-                        <li>• /api/webhooks/* - Webhooks externos</li>
-                      </ul>
-                      <p><span className="font-medium text-foreground">Otimizações:</span></p>
-                      <ul className="ml-6 space-y-1">
-                        <li>• Cache inteligente com invalidação seletiva</li>
-                        <li>• Optimistic updates para melhor UX</li>
-                        <li>• Retry automático em caso de falha</li>
-                        <li>• Stale time configurado por tipo de dado</li>
-                      </ul>
+                  </div>
+
+                  {/* Planos */}
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-lg mb-3">Planos</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">GET</Badge>
+                          <code className="text-sm">/admin/api/plans</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Lista todos os planos.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/admin/api/plans</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Cria novo plano.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">PATCH</Badge>
+                          <code className="text-sm">/admin/api/plans/:id</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Atualiza plano existente.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pagamentos */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3">Pagamentos</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/payment/cielo</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Processa pagamento via Cielo.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/payment/cielo/pix</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Gera QR Code PIX.</p>
+                      </div>
+                      <div className="bg-muted p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">POST</Badge>
+                          <code className="text-sm">/api/webhook/cielo</code>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Webhook de notificações Cielo.</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -746,223 +720,110 @@ export default function Documentation() {
                 <Database className="h-5 w-5" />
                 Estrutura do Banco de Dados
               </CardTitle>
-              <CardDescription>Organização das tabelas e relacionamentos no PostgreSQL</CardDescription>
+              <CardDescription>Schema e relacionamentos das tabelas PostgreSQL</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[600px] pr-4">
                 <div className="space-y-6">
-                  {/* Info geral */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="font-semibold mb-2">Tecnologias</h3>
-                    <ul className="text-sm space-y-1 text-muted-foreground">
-                      <li>• <span className="font-medium text-foreground">SGBD:</span> PostgreSQL (via Neon)</li>
-                      <li>• <span className="font-medium text-foreground">ORM:</span> Drizzle ORM</li>
-                      <li>• <span className="font-medium text-foreground">Migrações:</span> npm run db:push (sem SQL manual)</li>
-                      <li>• <span className="font-medium text-foreground">Pool de Conexões:</span> Max 20, Min 5 conexões</li>
-                    </ul>
-                  </div>
-
-                  {/* Tabelas Principais */}
+                  {/* Tabela Clients */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Tabelas Core</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">users</p>
-                        <p className="text-sm text-muted-foreground mb-2">Usuários administrativos do sistema</p>
-                        <p className="text-xs font-mono">id, username, password (bcrypt), email, role, permissions[], isActive, createdAt</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">clients</p>
-                        <p className="text-sm text-muted-foreground mb-2">Clientes (tutores) que contratam planos</p>
-                        <p className="text-xs font-mono">id, fullName, email, phone, cpf, address, login, cpfHash, imageUrl, createdAt</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">pets</p>
-                        <p className="text-sm text-muted-foreground mb-2">Animais de estimação vinculados aos clientes</p>
-                        <p className="text-xs font-mono">id, clientId (FK), name, species, breed, birthDate, sex, weight, microchip, medicalHistory, vaccines, planId (FK), imageUrl</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">plans</p>
-                        <p className="text-sm text-muted-foreground mb-2">Planos de saúde disponíveis</p>
-                        <p className="text-xs font-mono">id, name, description, features[], pricing, type, billingFrequency, isActive, imageUrl</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">contracts</p>
-                        <p className="text-sm text-muted-foreground mb-2">Contratos ativos entre clientes e planos</p>
-                        <p className="text-xs font-mono">id, clientId (FK), planId (FK), petId (FK), contractNumber, status, startDate, endDate, billingPeriod, paymentMethod, cieloPaymentId</p>
-                      </div>
+                    <h3 className="font-semibold text-lg mb-3">clients</h3>
+                    <div className="bg-muted p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">Armazena dados dos clientes</p>
+                      <ul className="text-sm space-y-1 ml-4">
+                        <li>• id (UUID, PK)</li>
+                        <li>• full_name (VARCHAR)</li>
+                        <li>• cpf (VARCHAR, UNIQUE)</li>
+                        <li>• email (VARCHAR)</li>
+                        <li>• phone (VARCHAR)</li>
+                        <li>• address, city, state, cep (VARCHAR)</li>
+                        <li>• created_at, updated_at (TIMESTAMP)</li>
+                      </ul>
                     </div>
                   </div>
 
-                  {/* Procedimentos */}
+                  {/* Tabela Pets */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Sistema de Procedimentos</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">procedureCategories</p>
-                        <p className="text-sm text-muted-foreground mb-2">Categorias de procedimentos (Consultas, Exames, Cirurgias, etc.)</p>
-                        <p className="text-xs font-mono">id, name, displayOrder, isActive</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">procedures</p>
-                        <p className="text-sm text-muted-foreground mb-2">Procedimentos médicos disponíveis</p>
-                        <p className="text-xs font-mono">id, name, description, categoryId (FK), displayOrder, isActive</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">planProcedures</p>
-                        <p className="text-sm text-muted-foreground mb-2">Relação planos x procedimentos com regras</p>
-                        <p className="text-xs font-mono">id, planId (FK), procedureId (FK), isIncluded, price, coparticipacao (%), carencia (dias), limitesAnuais, payValue</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">procedureUsage</p>
-                        <p className="text-sm text-muted-foreground mb-2">Controle de uso anual de procedimentos por pet</p>
-                        <p className="text-xs font-mono">id, petId (FK), procedureId (FK), planId (FK), year, usageCount</p>
-                      </div>
+                    <h3 className="font-semibold text-lg mb-3">pets</h3>
+                    <div className="bg-muted p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">Armazena dados dos pets</p>
+                      <ul className="text-sm space-y-1 ml-4">
+                        <li>• id (UUID, PK)</li>
+                        <li>• client_id (UUID, FK → clients)</li>
+                        <li>• name, species, breed (VARCHAR)</li>
+                        <li>• age, sex, color, weight (VARCHAR/DECIMAL)</li>
+                        <li>• castrated (BOOLEAN)</li>
+                        <li>• vaccine_data (JSONB)</li>
+                        <li>• medical info (TEXT)</li>
+                        <li>• created_at, updated_at (TIMESTAMP)</li>
+                      </ul>
                     </div>
                   </div>
 
-                  {/* Rede Credenciada */}
+                  {/* Tabela Plans */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Rede Credenciada</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">networkUnits</p>
-                        <p className="text-sm text-muted-foreground mb-2">Clínicas e hospitais veterinários credenciados</p>
-                        <p className="text-xs font-mono">id, name, address, phone, services[], login, senhaHash, urlSlug, isActive, imageUrl</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">veterinarians</p>
-                        <p className="text-sm text-muted-foreground mb-2">Veterinários vinculados às unidades</p>
-                        <p className="text-xs font-mono">id, networkUnitId (FK), name, crmv, specialty, type (permanente/volante), login, passwordHash, permissions[], isActive</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">atendimentos</p>
-                        <p className="text-sm text-muted-foreground mb-2">Registros de atendimentos realizados</p>
-                        <p className="text-xs font-mono">id, clientId (FK), petId (FK), networkUnitId (FK), veterinarianId (FK), status, value, notes, createdAt</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">atendimentoProcedures</p>
-                        <p className="text-sm text-muted-foreground mb-2">Procedimentos realizados em cada atendimento</p>
-                        <p className="text-xs font-mono">id, atendimentoId (FK), procedureId (FK), procedureName, value, coparticipacao, notes</p>
-                      </div>
+                    <h3 className="font-semibold text-lg mb-3">plans</h3>
+                    <div className="bg-muted p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">Planos de saúde disponíveis</p>
+                      <ul className="text-sm space-y-1 ml-4">
+                        <li>• id (UUID, PK)</li>
+                        <li>• name (VARCHAR)</li>
+                        <li>• description (TEXT)</li>
+                        <li>• pricing (JSONB)</li>
+                        <li>• is_active (BOOLEAN)</li>
+                        <li>• created_at, updated_at (TIMESTAMP)</li>
+                      </ul>
                     </div>
                   </div>
 
-                  {/* Financeiro */}
+                  {/* Tabela Contracts */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Sistema Financeiro</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">contractInstallments</p>
-                        <p className="text-sm text-muted-foreground mb-2">Parcelas de pagamento dos contratos</p>
-                        <p className="text-xs font-mono">id, contractId (FK), installmentNumber, dueDate, amount, status, cieloPaymentId, paidAt</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">paymentReceipts</p>
-                        <p className="text-sm text-muted-foreground mb-2">Recibos de pagamento gerados</p>
-                        <p className="text-xs font-mono">id, contractId (FK), cieloPaymentId, receiptNumber, amount, paymentDate, method, pdfUrl, status</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">coupons</p>
-                        <p className="text-sm text-muted-foreground mb-2">Cupons de desconto</p>
-                        <p className="text-xs font-mono">id, code, type (percentage/fixed_value), value, usageLimit, usageCount, validFrom, validUntil, isActive</p>
-                      </div>
+                    <h3 className="font-semibold text-lg mb-3">contracts</h3>
+                    <div className="bg-muted p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">Contratos de clientes</p>
+                      <ul className="text-sm space-y-1 ml-4">
+                        <li>• id (UUID, PK)</li>
+                        <li>• client_id (UUID, FK → clients)</li>
+                        <li>• plan_id (UUID, FK → plans)</li>
+                        <li>• status (VARCHAR)</li>
+                        <li>• start_date, end_date (DATE)</li>
+                        <li>• payment info (JSONB)</li>
+                        <li>• created_at, updated_at (TIMESTAMP)</li>
+                      </ul>
                     </div>
                   </div>
 
-                  {/* Vendedores */}
+                  {/* Tabela Network Units */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Sistema de Vendedores</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">sellers</p>
-                        <p className="text-sm text-muted-foreground mb-2">Vendedores/parceiros cadastrados</p>
-                        <p className="text-xs font-mono">id, name, cpf, email, phone, commission (%), whitelabelUrl, pixKey, isActive</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">sellerAnalytics</p>
-                        <p className="text-sm text-muted-foreground mb-2">Métricas de performance dos vendedores</p>
-                        <p className="text-xs font-mono">id, sellerId (FK), date, clicks, conversions, revenue</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">sellerPayments</p>
-                        <p className="text-sm text-muted-foreground mb-2">Pagamentos realizados a vendedores</p>
-                        <p className="text-xs font-mono">id, sellerId (FK), amount, paymentDate, description, createdBy (FK)</p>
-                      </div>
+                    <h3 className="font-semibold text-lg mb-3">network_units</h3>
+                    <div className="bg-muted p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">Unidades credenciadas da rede</p>
+                      <ul className="text-sm space-y-1 ml-4">
+                        <li>• id (UUID, PK)</li>
+                        <li>• name (VARCHAR)</li>
+                        <li>• slug (VARCHAR, UNIQUE)</li>
+                        <li>• address, city, state (VARCHAR)</li>
+                        <li>• phone, email (VARCHAR)</li>
+                        <li>• is_active (BOOLEAN)</li>
+                        <li>• created_at, updated_at (TIMESTAMP)</li>
+                      </ul>
                     </div>
                   </div>
 
-                  {/* Comunicação */}
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3">Comunicação e Suporte</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">protocols</p>
-                        <p className="text-sm text-muted-foreground mb-2">Protocolos de atendimento ao cliente</p>
-                        <p className="text-xs font-mono">id, clientId (FK), contractId (FK), protocolNumber, type, status, subject, description, resolution</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">satisfactionSurveys</p>
-                        <p className="text-sm text-muted-foreground mb-2">Pesquisas de satisfação</p>
-                        <p className="text-xs font-mono">id, clientId (FK), contractId (FK), rating, feedback, wouldRecommend, respondedAt</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">contactSubmissions</p>
-                        <p className="text-sm text-muted-foreground mb-2">Formulários de contato do site</p>
-                        <p className="text-xs font-mono">id, name, email, phone, city, petType, message, createdAt</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">chatSettings</p>
-                        <p className="text-sm text-muted-foreground mb-2">Configurações do chat AI</p>
-                        <p className="text-xs font-mono">id, welcomeMessage, webhookUrl, botIconUrl, userIconUrl, position, isActive</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Configurações */}
+                  {/* Tabela Atendimentos */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3">Configurações</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">siteSettings</p>
-                        <p className="text-sm text-muted-foreground mb-2">Configurações globais do site</p>
-                        <p className="text-xs font-mono">id, contactEmail, phone, whatsapp, socialLinks, cnpj, businessHours, story, privacyPolicy, termsOfUse, images (bytea)</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">faqItems</p>
-                        <p className="text-sm text-muted-foreground mb-2">Perguntas frequentes</p>
-                        <p className="text-xs font-mono">id, question, answer, displayOrder, isActive</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">adminActionLogs</p>
-                        <p className="text-sm text-muted-foreground mb-2">Logs de auditoria de ações administrativas</p>
-                        <p className="text-xs font-mono">id, adminUserId (FK), adminIdentifier, actionType, entityType, entityId, metadata, ip, userAgent, createdAt</p>
-                      </div>
-
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="font-semibold mb-1">express_sessions</p>
-                        <p className="text-sm text-muted-foreground mb-2">Sessões de autenticação (gerada automaticamente)</p>
-                        <p className="text-xs font-mono">sid (PK), sess (jsonb), expire</p>
-                      </div>
+                    <h3 className="font-semibold text-lg mb-3">atendimentos</h3>
+                    <div className="bg-muted p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">Registro de atendimentos</p>
+                      <ul className="text-sm space-y-1 ml-4">
+                        <li>• id (UUID, PK)</li>
+                        <li>• pet_id (UUID, FK → pets)</li>
+                        <li>• network_unit_id (UUID, FK → network_units)</li>
+                        <li>• procedure_data (JSONB)</li>
+                        <li>• total_value (DECIMAL)</li>
+                        <li>• status (VARCHAR)</li>
+                        <li>• created_at, updated_at (TIMESTAMP)</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -977,122 +838,82 @@ export default function Documentation() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Medidas de Segurança
+                Segurança e Proteções
               </CardTitle>
-              <CardDescription>Práticas de segurança implementadas no sistema</CardDescription>
+              <CardDescription>Medidas de segurança implementadas no sistema</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[600px] pr-4">
                 <div className="space-y-6">
                   {/* Autenticação */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      Autenticação e Autorização
-                    </h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-7">
-                      <li>• <span className="font-medium text-foreground">Sessões Seguras:</span> express-session com PostgreSQL store, SameSite=Lax, HttpOnly cookies</li>
-                      <li>• <span className="font-medium text-foreground">Prevenção de Session Fixation:</span> Regeneração de sessão após login</li>
-                      <li>• <span className="font-medium text-foreground">Hashing de Senhas:</span> bcryptjs com salt automático para senhas de admin e CPF de clientes</li>
-                      <li>• <span className="font-medium text-foreground">JWT para Unidades:</span> Tokens com expiração de 8 horas</li>
-                      <li>• <span className="font-medium text-foreground">Middleware de Proteção:</span> requireAdmin, requireAuth, requireUnitAuth em todas as rotas sensíveis</li>
-                      <li>• <span className="font-medium text-foreground">RBAC:</span> Sistema de roles e permissões granulares para usuários admin</li>
-                      <li>• <span className="font-medium text-foreground">Verificação Server-Side:</span> AuthGuard com retry e verificação contínua</li>
+                    <h3 className="font-semibold text-lg mb-3">Autenticação e Sessão</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li>• Sessões HTTP-only com express-session</li>
+                      <li>• Passwords hash com bcrypt (salt rounds: 10)</li>
+                      <li>• JWT tokens para clientes (refresh + access)</li>
+                      <li>• Timeout de sessão configurável</li>
+                      <li>• CSRF protection com tokens</li>
                     </ul>
                   </div>
 
-                  {/* Proteção de Dados */}
+                  {/* Proteções HTTP */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      Proteção de Dados
-                    </h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-7">
-                      <li>• <span className="font-medium text-foreground">Sanitização de Inputs:</span> sanitize-html para prevenir XSS em mensagens de chat e textos</li>
-                      <li>• <span className="font-medium text-foreground">Validação com Zod:</span> Schemas rigorosos em todas as entradas de dados</li>
-                      <li>• <span className="font-medium text-foreground">SQL Injection:</span> Prevenção via Drizzle ORM com queries parametrizadas</li>
-                      <li>• <span className="font-medium text-foreground">Mass Assignment:</span> Proteção via schemas explícitos e validação de campos</li>
-                      <li>• <span className="font-medium text-foreground">Dados Sensíveis em Logs:</span> log-sanitizer mascara CPF, cartões, senhas e emails</li>
-                      <li>• <span className="font-medium text-foreground">Schema Seguro:</span> secure-schema.ts evita armazenamento direto de dados pessoais</li>
-                      <li>• <span className="font-medium text-foreground">Exclusão de Campos:</span> Passwords e hashes nunca retornam em respostas de API</li>
+                    <h3 className="font-semibold text-lg mb-3">Proteções HTTP</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li>• Helmet.js para headers de segurança</li>
+                      <li>• CORS configurado com whitelist</li>
+                      <li>• Rate limiting (100 req/15min por IP)</li>
+                      <li>• Content Security Policy (CSP)</li>
+                      <li>• XSS Protection habilitado</li>
                     </ul>
                   </div>
 
-                  {/* Ataques Web */}
+                  {/* Validação de Dados */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      Prevenção de Ataques Web
-                    </h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-7">
-                      <li>• <span className="font-medium text-foreground">CSRF Protection:</span> csurf middleware com tokens em todas as requisições POST/PUT/DELETE</li>
-                      <li>• <span className="font-medium text-foreground">XSS Prevention:</span> Sanitização HTML, CSP headers via Helmet</li>
-                      <li>• <span className="font-medium text-foreground">CORS Restritivo:</span> Validação por parsing de URL, whitelist de domínios confiáveis</li>
-                      <li>• <span className="font-medium text-foreground">Rate Limiting:</span> Limites por endpoint (login: 5/15min, chat: 20/min, uploads, CEP, etc.)</li>
-                      <li>• <span className="font-medium text-foreground">IDOR Prevention:</span> Verificação de ownership e associação em todas as operações</li>
-                      <li>• <span className="font-medium text-foreground">Helmet Security Headers:</span> HSTS, noSniff, XSS Filter, Referrer Policy</li>
+                    <h3 className="font-semibold text-lg mb-3">Validação de Dados</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li>• Validação com Zod em frontend e backend</li>
+                      <li>• Sanitização de inputs com DOMPurify</li>
+                      <li>• Prevenção de SQL Injection com Drizzle ORM</li>
+                      <li>• Proteção contra mass assignment</li>
+                      <li>• Validação de tipos TypeScript</li>
                     </ul>
                   </div>
 
-                  {/* Upload e Arquivos */}
+                  {/* Upload de Arquivos */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      Segurança de Uploads
-                    </h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-7">
-                      <li>• <span className="font-medium text-foreground">Validação Multi-Camadas:</span> MIME type, extensão, magic numbers via file-type</li>
-                      <li>• <span className="font-medium text-foreground">Processamento com Sharp:</span> Re-encoding de imagens para remover metadados maliciosos</li>
-                      <li>• <span className="font-medium text-foreground">Limites de Tamanho:</span> Multer configurado com limits (10MB max)</li>
-                      <li>• <span className="font-medium text-foreground">Validação de Conteúdo:</span> Verificação de padrões suspeitos em arquivos</li>
-                      <li>• <span className="font-medium text-foreground">Isolamento de Buckets:</span> Separação de arquivos públicos e privados no Supabase</li>
+                    <h3 className="font-semibold text-lg mb-3">Upload de Arquivos</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li>• Validação de tipo MIME com file-type</li>
+                      <li>• Limite de tamanho: 5MB por arquivo</li>
+                      <li>• Processamento com Sharp (resize, optimize)</li>
+                      <li>• Armazenamento seguro no Supabase Storage</li>
+                      <li>• URLs assinadas com expiração</li>
                     </ul>
                   </div>
 
-                  {/* APIs Externas */}
+                  {/* Logs e Auditoria */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      Segurança em Integrações
-                    </h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-7">
-                      <li>• <span className="font-medium text-foreground">HTTPS Enforcement:</span> Todas as chamadas externas via HTTPS</li>
-                      <li>• <span className="font-medium text-foreground">Timeout Configurado:</span> 5-10s para evitar hang indefinido</li>
-                      <li>• <span className="font-medium text-foreground">Retry com Exponential Backoff:</span> CieloService com até 3 tentativas</li>
-                      <li>• <span className="font-medium text-foreground">Rate Limiting Interno:</span> Controle de requisições para APIs externas (30 req/min)</li>
-                      <li>• <span className="font-medium text-foreground">Validação de Webhooks:</span> Verificação de estrutura e origem em webhooks Cielo</li>
-                      <li>• <span className="font-medium text-foreground">Audit Logs:</span> Log de todas as requisições webhook com IP e timestamp</li>
+                    <h3 className="font-semibold text-lg mb-3">Logs e Auditoria</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li>• Registro de todas ações administrativas</li>
+                      <li>• Tracking de IP e User-Agent</li>
+                      <li>• Metadata detalhado de operações</li>
+                      <li>• Logs separados por fonte (admin/units)</li>
+                      <li>• Retenção configurável de logs</li>
                     </ul>
                   </div>
 
-                  {/* Infraestrutura */}
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      Infraestrutura e Deploy
-                    </h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-7">
-                      <li>• <span className="font-medium text-foreground">Variáveis de Ambiente:</span> Secrets nunca commitados, uso de .env e Replit Secrets</li>
-                      <li>• <span className="font-medium text-foreground">Trust Proxy:</span> Configurado para ambientes de produção (Replit, EasyPanel)</li>
-                      <li>• <span className="font-medium text-foreground">Database Pool:</span> Configuração otimizada com limites e timeouts</li>
-                      <li>• <span className="font-medium text-foreground">Graceful Shutdown:</span> Fechamento correto de conexões ao encerrar servidor</li>
-                      <li>• <span className="font-medium text-foreground">Health Checks:</span> Monitoramento contínuo do estado do banco de dados</li>
-                    </ul>
-                  </div>
-
-                  {/* Práticas de Código */}
+                  {/* Permissões */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      Práticas de Código Seguro
-                    </h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-7">
-                      <li>• <span className="font-medium text-foreground">TypeScript Strict:</span> Type safety em todo o código</li>
-                      <li>• <span className="font-medium text-foreground">Princípio do Menor Privilégio:</span> Permissões mínimas necessárias por role</li>
-                      <li>• <span className="font-medium text-foreground">Separação de Contextos:</span> Schemas e rotas separadas para admin, cliente, unidade</li>
-                      <li>• <span className="font-medium text-foreground">Error Handling:</span> Mensagens genéricas ao cliente, detalhes em logs server-side</li>
-                      <li>• <span className="font-medium text-foreground">Auditoria:</span> Registro de todas as ações administrativas em adminActionLogs</li>
-                      <li>• <span className="font-medium text-foreground">Cache Seguro:</span> In-memory cache apenas para hints de UX, nunca para controle de acesso</li>
+                    <h3 className="font-semibold text-lg mb-3">Controle de Permissões</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li>• Sistema de roles (admin, editor, view)</li>
+                      <li>• Permissões granulares por recurso</li>
+                      <li>• Middleware de verificação em rotas</li>
+                      <li>• IDOR prevention com ownership check</li>
+                      <li>• Isolamento de dados por unidade de rede</li>
                     </ul>
                   </div>
                 </div>
