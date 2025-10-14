@@ -111,7 +111,7 @@ const DateFilterComponent = React.memo(function DateFilterComponent({
   // No default range on component mount - starts with no filter
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn("w-full", className)} style={{ backgroundColor: '#FFFFFF' }}>
       <CardContent className="p-3 sm:p-4">
         <div className="space-y-3 sm:space-y-4">
           {/* Header */}
@@ -124,13 +124,12 @@ const DateFilterComponent = React.memo(function DateFilterComponent({
             </div>
             {isFiltering && (
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={handleClearFilter}
-                className="h-8 px-2 text-xs w-full xs:w-auto"
                 disabled={isLoading}
               >
-                <X className="h-3 w-3 mr-1" />
+                <X className="h-4 w-4 mr-2" />
                 Limpar
               </Button>
             )}
@@ -157,7 +156,6 @@ const DateFilterComponent = React.memo(function DateFilterComponent({
                   size="sm"
                   onClick={handleCurrentMonth}
                   disabled={isLoading}
-                  className="h-10 px-3 text-xs bg-input text-accent-foreground bg-input/80"
                   aria-label="Filtrar por mês atual"
                 >
                   Mês atual
@@ -167,7 +165,6 @@ const DateFilterComponent = React.memo(function DateFilterComponent({
                   size="sm"
                   onClick={handleCurrentWeek}
                   disabled={isLoading}
-                  className="h-10 px-3 text-xs bg-input text-accent-foreground bg-input/80"
                   aria-label="Filtrar por semana atual"
                 >
                   Semana atual
@@ -177,7 +174,6 @@ const DateFilterComponent = React.memo(function DateFilterComponent({
                   size="sm"
                   onClick={handleToday}
                   disabled={isLoading}
-                  className="h-10 px-3 text-xs bg-input text-accent-foreground bg-input/80"
                   aria-label="Filtrar por hoje"
                 >
                   Hoje
