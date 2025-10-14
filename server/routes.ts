@@ -3705,9 +3705,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({});
       }
       
-      // Return empty object since contractText field doesn't exist in DB yet
-      // Frontend will use default text when contractText is not provided
-      res.json({});
+      // Return the contract text from the database
+      res.json({ contractText: plan.contractText || null });
     } catch (error) {
       console.error('❌ Erro ao buscar contrato do plano:', error);
       res.status(500).json({ error: 'Erro ao buscar contrato do plano' });
