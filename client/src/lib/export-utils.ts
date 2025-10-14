@@ -60,19 +60,31 @@ export async function exportToPDF({
         const value = getNestedValue(row, col.key);
         if (col.formatter) {
           // Pass both value and row to formatter
-          return String(col.formatter(value, row) || '');
+          const formatted = col.formatter(value, row);
+          return formatted != null ? String(formatted) : '';
         }
-        return String(formatValue(value) || '');
+        const formatted = formatValue(value);
+        return formatted != null ? String(formatted) : '';
       })
     );
   } else {
     // Auto-generate columns from data keys
     if (data.length > 0) {
-      tableColumns = Object.keys(data[0]).map(key => 
-        key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')
-      );
+      // Handle simple object with string keys
+      const sampleRow = data[0];
+      const keys = Object.keys(sampleRow);
+      
+      tableColumns = keys.map(key => {
+        // Format column names
+        return String(key).charAt(0).toUpperCase() + String(key).slice(1).replace(/([A-Z])/g, ' $1');
+      });
+      
       tableRows = data.map(row => 
-        Object.values(row).map(value => String(formatValue(value) || ''))
+        keys.map(key => {
+          const value = row[key];
+          const formatted = formatValue(value);
+          return formatted != null ? String(formatted) : '';
+        })
       );
     }
   }
@@ -88,11 +100,13 @@ export async function exportToPDF({
       fontSize: 9,
       cellPadding: 3,
       overflow: 'linebreak',
-      cellWidth: 'auto',
+      cellWidth: 'wrap',
       halign: 'left',
       valign: 'middle',
       lineColor: [200, 200, 200],
       lineWidth: 0.1,
+      minCellHeight: 8,
+      minCellWidth: 10,
     },
     headStyles: {
       fillColor: [39, 118, 119], // Teal color
@@ -100,24 +114,50 @@ export async function exportToPDF({
       fontSize: 10,
       fontStyle: 'bold',
       halign: 'left',
+      minCellHeight: 10,
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245],
     },
-    columnStyles: {
-      // Ensure text doesn't break incorrectly
-      0: { cellWidth: 'auto' },
-    },
+    columnStyles: {},
     margin: { top: 10, right: 10, bottom: 10, left: 10 },
-    tableWidth: 'auto',
-    showHead: 'firstPage',
+    tableWidth: 'wrap',
+    showHead: 'everyPage',
     tableLineColor: [200, 200, 200],
     tableLineWidth: 0.1,
-    // Prevent text from being split incorrectly
+    willDrawCell: function(data: any) {
+      // Ensure text is properly formatted before drawing
+      if (data.cell && data.cell.raw) {
+        // Convert to string if not already
+        const text = String(data.cell.raw || '');
+        // Remove any null or undefined values
+        if (text === 'null' || text === 'undefined') {
+          data.cell.text = [''];
+        } else {
+          // Ensure text is properly formatted
+          data.cell.text = [text];
+        }
+      }
+    },
     didParseCell: function(data: any) {
-      // Ensure the text is treated as a single string
-      if (data.cell && data.cell.text) {
-        data.cell.text = Array.isArray(data.cell.text) ? data.cell.text : [data.cell.text];
+      // Clean and format the cell text
+      if (data.cell) {
+        const rawText = data.cell.raw || data.cell.text || '';
+        const cleanText = String(rawText).trim();
+        
+        // Ensure text is an array with a single string element
+        if (cleanText) {
+          data.cell.text = [cleanText];
+        } else {
+          data.cell.text = [''];
+        }
+        
+        // Ensure proper text wrapping for long content
+        if (cleanText.length > 50) {
+          data.cell.styles = data.cell.styles || {};
+          data.cell.styles.cellWidth = 'wrap';
+          data.cell.styles.overflow = 'linebreak';
+        }
       }
     },
   });

@@ -306,21 +306,50 @@ export default function Atendimentos() {
     const allData: AtendimentosResponse = await response.json();
     const allAtendimentos = allData.data || [];
     
-    return allAtendimentos.map(atendimento => ({
-      'Procedimentos': atendimento.procedures && atendimento.procedures.length > 0 
-        ? atendimento.procedures.map((p: any) => p.procedureName || p.name).join(', ') 
-        : 'Não informado',
-      'Unidade': atendimento.networkUnit?.name || 'Não informada',
-      'Cliente': atendimento.clientName || 'Não informado',
-      'Pet': atendimento.petName || 'Não informado',
-      'Valor': `R$ ${parseFloat(atendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      'Status': getStatusLabel(atendimento.status),
-      'Veterinário': atendimento.veterinarianName || 'Unidade',
-      'Notas do Procedimento': atendimento.procedureNotes || '',
-      'Notas Gerais': atendimento.generalNotes || '',
-      'Data de Criação': atendimento.createdAt ? format(new Date(atendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
-      'Última Atualização': atendimento.updatedAt ? format(new Date(atendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : ''
-    }));
+    // Format data ensuring all values are strings
+    return allAtendimentos.map(atendimento => {
+      // Process procedures safely
+      let proceduresText = 'Não informado';
+      if (atendimento.procedures && Array.isArray(atendimento.procedures) && atendimento.procedures.length > 0) {
+        proceduresText = atendimento.procedures
+          .map((p: any) => String(p.procedureName || p.name || 'Procedimento'))
+          .filter(name => name && name !== 'undefined' && name !== 'null')
+          .join(', ');
+      }
+      
+      // Format value safely
+      let valueText = 'R$ 0,00';
+      if (atendimento.value != null) {
+        const numValue = parseFloat(String(atendimento.value)) || 0;
+        valueText = `R$ ${numValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      
+      // Format dates safely
+      const formatDate = (dateStr: any) => {
+        if (!dateStr) return '';
+        try {
+          const date = new Date(dateStr);
+          if (isNaN(date.getTime())) return '';
+          return format(date, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+        } catch {
+          return '';
+        }
+      };
+      
+      return {
+        'Procedimentos': proceduresText,
+        'Unidade': String(atendimento.networkUnit?.name || 'Não informada'),
+        'Cliente': String(atendimento.clientName || 'Não informado'),
+        'Pet': String(atendimento.petName || 'Não informado'),
+        'Valor': valueText,
+        'Status': String(getStatusLabel(atendimento.status) || 'Pendente'),
+        'Veterinário': String(atendimento.veterinarianName || 'Unidade'),
+        'Notas Procedimento': String(atendimento.procedureNotes || ''),
+        'Notas Gerais': String(atendimento.generalNotes || ''),
+        'Data Criação': formatDate(atendimento.createdAt),
+        'Atualização': formatDate(atendimento.updatedAt)
+      };
+    });
   };
 
   const getStatusColor = () => {
