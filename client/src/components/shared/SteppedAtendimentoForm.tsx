@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Check, Loader2, Edit2, Save, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, Edit, Save, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -219,7 +219,10 @@ export default function SteppedAtendimentoForm({
 
   // Função para salvar peso do pet
   const saveWeight = async () => {
-    if (!selectedPet || !editedWeight) return;
+    if (!selectedPet || !editedWeight) {
+      console.log("Dados insuficientes:", { selectedPet, editedWeight });
+      return;
+    }
     
     const weightNum = parseFloat(editedWeight);
     if (isNaN(weightNum) || weightNum <= 0) {
@@ -232,11 +235,15 @@ export default function SteppedAtendimentoForm({
     }
     
     setIsSavingWeight(true);
+    console.log("Iniciando atualização de peso:", { petId: selectedPet.id, weight: weightNum });
     
     try {
       const endpoint = mode === 'admin'
         ? `/admin/api/pets/${selectedPet.id}/weight`
         : `/api/units/${slug}/pets/${selectedPet.id}/weight`;
+      
+      console.log("Endpoint:", endpoint);
+      console.log("Token:", getAuthToken() ? "Present" : "Missing");
       
       const response = await fetch(endpoint, {
         method: 'PUT',
@@ -244,14 +251,18 @@ export default function SteppedAtendimentoForm({
           'Content-Type': 'application/json',
           ...(mode === 'unit' ? { 'Authorization': `Bearer ${getAuthToken()}` } : {})
         },
+        credentials: 'include',
         body: JSON.stringify({ weight: weightNum })
       });
       
       if (!response.ok) {
-        throw new Error("Erro ao atualizar peso");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Erro na resposta da API:", { status: response.status, error: errorData });
+        throw new Error(errorData.error || `Erro ao atualizar peso (status: ${response.status})`);
       }
       
       const result = await response.json();
+      console.log("Peso atualizado com sucesso:", result);
       
       // Update local state
       setSelectedPet({
@@ -789,7 +800,7 @@ export default function SteppedAtendimentoForm({
                                                     setEditedWeight(selectedPet.weight?.toString() || "");
                                                   }}
                                                 >
-                                                  <Edit2 className="h-3 w-3 mr-1" />
+                                                  <Edit className="h-3 w-3 mr-1" />
                                                   Editar
                                                 </Button>
                                               </>
@@ -806,7 +817,7 @@ export default function SteppedAtendimentoForm({
                                                     setEditedWeight("");
                                                   }}
                                                 >
-                                                  <Edit2 className="h-3 w-3 mr-1" />
+                                                  <Edit className="h-3 w-3 mr-1" />
                                                   Adicionar
                                                 </Button>
                                               </>
