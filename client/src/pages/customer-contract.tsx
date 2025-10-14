@@ -7,6 +7,84 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Component to format and display contract content
+function ContractContent({ text }: { text: string }) {
+  const formatContractText = (content: string) => {
+    const lines = content.split('\n');
+    const elements: JSX.Element[] = [];
+    let currentList: string[] = [];
+    let listKey = 0;
+
+    const flushList = () => {
+      if (currentList.length > 0) {
+        elements.push(
+          <ul key={`list-${listKey++}`} className="list-disc list-inside mb-4 space-y-1">
+            {currentList.map((item, idx) => (
+              <li key={idx} className="text-sm" style={{ color: 'var(--text-dark-secondary)' }}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        );
+        currentList = [];
+      }
+    };
+
+    lines.forEach((line, index) => {
+      const trimmed = line.trim();
+      
+      if (!trimmed) {
+        flushList();
+        elements.push(<div key={`space-${index}`} className="h-4" />);
+      } else if (trimmed.startsWith('CONTRATO DE PRESTAÇÃO') && !trimmed.includes('CLÁUSULA')) {
+        flushList();
+        elements.push(
+          <h1 key={`title-${index}`} className="text-2xl font-bold text-center mb-6" style={{ color: 'var(--text-dark-primary)' }}>
+            {trimmed}
+          </h1>
+        );
+      } else if (trimmed.startsWith('CLÁUSULA')) {
+        flushList();
+        elements.push(
+          <h2 key={`clause-${index}`} className="text-lg font-semibold mb-3 mt-6" style={{ color: 'var(--text-dark-primary)' }}>
+            {trimmed}
+          </h2>
+        );
+      } else if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+        currentList.push(trimmed.substring(1).trim());
+      } else if (trimmed.match(/^\d+\./)) {
+        flushList();
+        elements.push(
+          <p key={`numbered-${index}`} className="text-sm mb-2" style={{ color: 'var(--text-dark-secondary)' }}>
+            {trimmed}
+          </p>
+        );
+      } else {
+        flushList();
+        // Handle bold text within paragraphs
+        const parts = trimmed.split(/(\*\*[^*]+\*\*)/g);
+        const formattedParts = parts.map((part, idx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={idx}>{part.slice(2, -2)}</strong>;
+          }
+          return part;
+        });
+        
+        elements.push(
+          <p key={`para-${index}`} className="text-sm mb-3 text-justify" style={{ color: 'var(--text-dark-secondary)' }}>
+            {formattedParts}
+          </p>
+        );
+      }
+    });
+
+    flushList();
+    return elements;
+  };
+
+  return <div className="max-w-none">{formatContractText(text)}</div>;
+}
+
 export default function CustomerContract() {
   const [, navigate] = useLocation();
   const { client, isLoading: authLoading } = useAuth();
@@ -17,7 +95,7 @@ export default function CustomerContract() {
   const { data: siteSettings, isLoading: settingsLoading } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
-      const response = await fetch('/api/settings/site');
+      const response = await fetch('/api/site-settings');
       if (!response.ok) {
         throw new Error('Erro ao carregar configurações');
       }
@@ -274,9 +352,7 @@ Este documento é uma cópia do contrato aceito pelo cliente durante o processo 
             className="bg-white rounded-xl shadow-lg p-8"
             ref={contractContentRef}
           >
-            <div className="prose max-w-none whitespace-pre-wrap" style={{ color: 'var(--text-dark-primary)' }}>
-              {getContractText()}
-            </div>
+            <ContractContent text={getContractText()} />
           </motion.div>
         </div>
       </div>
