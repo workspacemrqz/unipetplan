@@ -232,7 +232,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Procedimentos</h1>
-          <p className="text-sm text-muted-foreground">Visualize todos os procedimentos disponíveis</p>
+          <p className="text-sm text-muted-foreground">Gerencie os procedimentos médicos disponíveis</p>
         </div>
       </div>
 
