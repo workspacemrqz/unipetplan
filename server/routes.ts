@@ -529,10 +529,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (isValidPassword && user.isActive) {
           // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
+          // Salvar dados existentes da sessão antes da regeneração
+          const existingSessionData = {
+            client: req.session.client,
+          };
+          
           req.session.regenerate((err) => {
             if (err) {
               console.error("❌ [ADMIN-LOGIN] Erro ao regenerar sessão:", err);
               return res.status(500).json({ error: "Erro ao criar sessão segura" });
+            }
+            
+            // RESTAURAR dados existentes da sessão
+            if (existingSessionData.client) {
+              req.session.client = existingSessionData.client;
             }
             
             // Set admin session with user info
@@ -602,10 +612,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (isValidLogin && isValidPassword) {
         // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
+        // Salvar dados existentes da sessão antes da regeneração
+        const existingSessionData = {
+          client: req.session.client,
+        };
+        
         req.session.regenerate((err) => {
           if (err) {
             console.error("❌ [ADMIN-LOGIN] Erro ao regenerar sessão:", err);
             return res.status(500).json({ error: "Erro ao criar sessão segura" });
+          }
+          
+          // RESTAURAR dados existentes da sessão
+          if (existingSessionData.client) {
+            req.session.client = existingSessionData.client;
           }
           
           // Set admin session for environment variable admin
@@ -5960,11 +5980,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
+      // Salvar dados existentes da sessão antes da regeneração
+      const existingSessionData = {
+        admin: req.session.admin,
+      };
+      
       const sessionStart = performance.now();
       req.session.regenerate((err) => {
         if (err) {
           console.error("❌ [CLIENT-LOGIN] Erro ao regenerar sessão:", err);
           return res.status(500).json({ error: "Erro ao criar sessão segura" });
+        }
+        
+        // RESTAURAR dados existentes da sessão
+        if (existingSessionData.admin) {
+          req.session.admin = existingSessionData.admin;
         }
         
         // Store client in session
@@ -7422,10 +7452,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Regenerate session to prevent session fixation attacks
+      // Salvar dados existentes da sessão antes da regeneração
+      const existingSessionData = {
+        admin: req.session.admin,
+        client: req.session.client,
+      };
+      
       req.session.regenerate((err) => {
         if (err) {
           console.error("❌ [SELLER-LOGIN] Erro ao regenerar sessão:", err);
           return res.status(500).json({ error: "Erro ao criar sessão segura" });
+        }
+        
+        // RESTAURAR dados existentes da sessão
+        if (existingSessionData.admin) {
+          req.session.admin = existingSessionData.admin;
+        }
+        if (existingSessionData.client) {
+          req.session.client = existingSessionData.client;
         }
         
         // Store seller in session
