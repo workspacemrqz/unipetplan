@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/admin/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/admin/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
+import { Separator } from "@/components/admin/ui/separator";
 import { ScrollArea } from "@/components/admin/ui/scroll-area";
 import { Badge } from "@/components/admin/ui/badge";
 import { 
@@ -13,6 +15,18 @@ import {
 } from "lucide-react";
 
 export default function Documentation() {
+  const [selectedSection, setSelectedSection] = useState("resumo");
+
+  const sections = [
+    { value: "resumo", label: "Resumo" },
+    { value: "funcionalidades", label: "Funcionalidades" },
+    { value: "botoes", label: "Botões" },
+    { value: "funcoes", label: "Funções" },
+    { value: "apis", label: "APIs" },
+    { value: "database", label: "Database" },
+    { value: "seguranca", label: "Segurança" }
+  ];
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -23,19 +37,31 @@ export default function Documentation() {
         </div>
       </div>
 
-      <Tabs defaultValue="resumo" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
-          <TabsTrigger value="resumo">Resumo</TabsTrigger>
-          <TabsTrigger value="funcionalidades">Funcionalidades</TabsTrigger>
-          <TabsTrigger value="botoes">Botões</TabsTrigger>
-          <TabsTrigger value="funcoes">Funções</TabsTrigger>
-          <TabsTrigger value="apis">APIs</TabsTrigger>
-          <TabsTrigger value="database">Database</TabsTrigger>
-          <TabsTrigger value="seguranca">Segurança</TabsTrigger>
-        </TabsList>
+      {/* Section Selector */}
+      <div className="flex items-center gap-4">
+        <Select value={selectedSection} onValueChange={setSelectedSection}>
+          <SelectTrigger className="w-[280px]">
+            <SelectValue placeholder="Selecione uma seção" />
+          </SelectTrigger>
+          <SelectContent>
+            {sections.flatMap((section, index, array) => [
+              <SelectItem 
+                key={section.value} 
+                value={section.value} 
+                className="py-3 pl-10 pr-4 data-[state=selected]:bg-primary data-[state=selected]:text-primary-foreground"
+              >
+                {section.label}
+              </SelectItem>,
+              ...(index < array.length - 1 ? [<Separator key={`separator-${section.value}`} />] : [])
+            ])}
+          </SelectContent>
+        </Select>
+      </div>
 
+      {/* Content based on selection */}
+      <div className="mt-6">
         {/* Resumo Técnico */}
-        <TabsContent value="resumo" className="space-y-6">
+        {selectedSection === "resumo" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -119,10 +145,10 @@ export default function Documentation() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
         {/* Funcionalidades */}
-        <TabsContent value="funcionalidades" className="space-y-6">
+        {selectedSection === "funcionalidades" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -296,10 +322,10 @@ export default function Documentation() {
               </ScrollArea>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
         {/* Botões */}
-        <TabsContent value="botoes" className="space-y-6">
+        {selectedSection === "botoes" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -436,10 +462,10 @@ export default function Documentation() {
               </ScrollArea>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
         {/* Funções */}
-        <TabsContent value="funcoes" className="space-y-6">
+        {selectedSection === "funcoes" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -538,10 +564,10 @@ export default function Documentation() {
               </ScrollArea>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
         {/* APIs */}
-        <TabsContent value="apis" className="space-y-6">
+        {selectedSection === "apis" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -710,10 +736,10 @@ export default function Documentation() {
               </ScrollArea>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
         {/* Database */}
-        <TabsContent value="database" className="space-y-6">
+        {selectedSection === "database" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -830,10 +856,10 @@ export default function Documentation() {
               </ScrollArea>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
         {/* Segurança */}
-        <TabsContent value="seguranca" className="space-y-6">
+        {selectedSection === "seguranca" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -920,8 +946,8 @@ export default function Documentation() {
               </ScrollArea>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        )}
+      </div>
     </div>
   );
 }

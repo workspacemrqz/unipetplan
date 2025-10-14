@@ -1,0 +1,160 @@
+2025-10-14 06:39:35.93
+3e282818
+User
+correlationId: '3xagv',
+2025-10-14 06:39:35.93
+3e282818
+User
+paymentId: '9e12738b-3971-4222-bc4d-1aa681b905b3',
+2025-10-14 06:39:35.93
+3e282818
+User
+userId: undefined
+2025-10-14 06:39:35.93
+3e282818
+User
+}
+2025-10-14 06:39:35.93
+3e282818
+User
+🔍 [Cielo] Consultando pagamento {
+2025-10-14 06:39:35.93
+3e282818
+User
+correlationId: 'bf36a52a-0a5e-4d44-b6e8-d873863ab3dd',
+2025-10-14 06:39:35.93
+3e282818
+User
+paymentId: '9e12738b-3971-4222-bc4d-1aa681b905b3'
+2025-10-14 06:39:35.93
+3e282818
+User
+}
+2025-10-14 06:39:35.93
+3e282818
+User
+🔗 [Cielo] URL de consulta: https://apiquery.cieloecommerce.cielo.com.br/1/sales/9e12738b-3971-4222-bc4d-1aa681b905b3
+2025-10-14 06:39:36.25
+3e282818
+User
+✅ [Cielo] Status interpretado corretamente: {
+2025-10-14 06:39:36.25
+3e282818
+User
+correlationId: 'bf36a52a-0a5e-4d44-b6e8-d873863ab3dd',
+2025-10-14 06:39:36.25
+3e282818
+User
+paymentId: '9e12738b-3971-4222-bc4d-1aa681b905b3',
+2025-10-14 06:39:36.25
+3e282818
+User
+cieloStatus: 12,
+2025-10-14 06:39:36.25
+3e282818
+User
+mappedStatus: 'pending',
+2025-10-14 06:39:36.25
+3e282818
+User
+capturedAmount: undefined,
+2025-10-14 06:39:36.25
+3e282818
+User
+capturedDate: undefined,
+2025-10-14 06:39:36.25
+3e282818
+User
+isApproved: false
+2025-10-14 06:39:36.25
+3e282818
+User
+}
+2025-10-14 06:39:36.57
+3e282818
+User
+GET /api/payments/query/9e12738b-3971-4222-bc4d-1aa681b905b3 200 in 636ms
+2025-10-14 06:39:39.20
+3e282818
+User
+✅ [CORS] Same-origin request allowed
+2025-10-14 06:39:39.20
+3e282818
+User
+🔍 [PAYMENT-QUERY] Consultando status de pagamento {
+2025-10-14 06:39:39.20
+3e282818
+User
+correlationId: 'edbpaj',
+2025-10-14 06:39:39.20
+3e282818
+User
+paymentId: '9e12738b-3971-4222-bc4d-1aa681b905b3',
+2025-10-14 06:39:39.20
+3e282818
+User
+userId: undefined
+2025-10-14 06:39:39.20
+3e282818
+User
+}
+2025-10-14 06:39:39.20
+3e282818
+User
+🔍 [Cielo] Consultando pagamento {
+2025-10-14 06:39:39.20
+3e282818
+User
+correlationId: '5453f1a5-bca7-4005-b841-a0195690fd9a',
+2025-10-14 06:39:39.20
+3e282818
+User
+paymentId: '9e12738b-3971-4222-bc4d-1aa681b905b3'
+2025-10-14 06:39:39.20
+3e282818
+User
+}
+2025-10-14 06:39:39.20
+3e282818
+User
+🔗 [Cielo] URL de consulta: https://apiquery.cieloecommerce.cielo.com.br/1/sales/9e12738b-3971-4222-bc4d-1aa681b905b3
+2025-10-14 06:39:39.52
+3e282818
+User
+✅ [Cielo] Status interpretado corretamente: {
+2025-10-14 06:39:39.52
+3e282818
+User
+correlationId: '5453f1a5-bca7-4005-b841-a0195690fd9a',
+2025-10-14 06:39:39.52
+3e282818
+User
+paymentId: '9e12738b-3971-4222-bc4d-1aa681b905b3',
+2025-10-14 06:39:39.52
+3e282818
+User
+cieloStatus: 12,
+2025-10-14 06:39:39.52
+3e282818
+User
+mappedStatus: 'pending',
+2025-10-14 06:39:39.52
+3e282818
+User
+capturedAmount: undefined,
+2025-10-14 06:39:39.52
+3e282818
+User
+capturedDate: undefined,
+2025-10-14 06:39:39.52
+3e282818
+User
+isApproved: false
+2025-10-14 06:39:39.52
+3e282818
+User
+}
+2025-10-14 06:39:39.84
+3e282818
+User
+GET /api/payments/query/9e12738b-3971-4222-bc4d-1aa681b905b3 200 in 637ms
