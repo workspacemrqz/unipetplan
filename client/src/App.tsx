@@ -100,6 +100,7 @@ import MenuLogsDemo from './pages/MenuLogsDemo';
 import UnitMenuDemo from './pages/UnitMenuDemo';
 import NovoAtendimentoIconDemo from './pages/NovoAtendimentoIconDemo';
 import LogsIconFixDemo from './pages/LogsIconFixDemo';
+import PlusIconColorDemo from './pages/PlusIconColorDemo';
 
 // Import veterinarian pages
 import VeterinarianLoginPage from './pages/veterinarian-login';
@@ -224,6 +225,7 @@ function Router() {
         <Route path="/demo/unit-menu" component={UnitMenuDemo} />
         <Route path="/demo/novo-atendimento-icon" component={NovoAtendimentoIconDemo} />
         <Route path="/demo/logs-icon-fix" component={LogsIconFixDemo} />
+        <Route path="/demo/plus-icon-color" component={PlusIconColorDemo} />
         
         {/* Unit Routes - specific paths first */}
         <Route path="/unidade/:slug/painel" component={UnitDashboard} />

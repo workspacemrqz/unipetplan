@@ -198,9 +198,13 @@ export default function UnitSidebar() {
                           <SvgIcon 
                             name={item.iconName} 
                             className={cn(
-                              "h-5 w-5 mr-3 transition-transform duration-200",
-                              isActive ? "invert" : "opacity-60",
-                              !isActive && "group-hover:scale-110"
+                              "h-5 w-5 mr-3 transition-all duration-200",
+                              item.iconName === "Plus" 
+                                ? (isActive 
+                                  ? "[filter:brightness(0)_saturate(100%)_invert(1)]" // Branco quando ativo
+                                  : "[filter:brightness(0)_saturate(100%)_invert(40%)_sepia(1%)_saturate(0%)_hue-rotate(0deg)_brightness(98%)_contrast(102%)] group-hover:[filter:brightness(0)_saturate(100%)_invert(44%)_sepia(59%)_saturate(506%)_hue-rotate(131deg)_brightness(97%)_contrast(94%)]") // Gray-600 padrão, primary no hover
+                                : (isActive ? "invert" : "opacity-60"),
+                              !isActive && item.iconName !== "Plus" && "group-hover:scale-110"
                             )} 
                           />
                           <span className="font-medium">{item.name}</span>
