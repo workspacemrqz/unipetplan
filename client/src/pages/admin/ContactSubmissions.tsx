@@ -160,7 +160,27 @@ export default function ContactSubmissions() {
   };
 
   const prepareExportData = async () => {
-    return allFilteredSubmissions.map(submission => ({
+    // Buscar TODOS os dados sem paginação
+    const response = await fetch(`/admin/api/contact-submissions?limit=999999`);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao buscar dados para exportação');
+    }
+    
+    const allSubmissions = await response.json();
+    
+    // Aplicar filtros de busca se houver
+    const filtered = searchQuery
+      ? allSubmissions.filter((submission: any) =>
+          submission.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          submission.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          submission.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          submission.petName?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : allSubmissions;
+    
+    // Retornar dados formatados para exportação
+    return filtered.map((submission: any) => ({
       'Nome': submission.name || '',
       'Email': submission.email || '',
       'Telefone': formatBrazilianPhoneForDisplay(submission.phone),

@@ -149,7 +149,26 @@ export default function Financial() {
   };
 
   const prepareExportData = async () => {
-    return filteredReceipts.map(receipt => ({
+    // Buscar TODOS os dados sem paginação
+    const response = await fetch(`/admin/api/payment-receipts?limit=999999`);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao buscar dados para exportação');
+    }
+    
+    const allReceipts = await response.json();
+    
+    // Aplicar filtros de busca se houver
+    const filtered = searchQuery
+      ? allReceipts.filter((receipt: PaymentReceipt) =>
+          receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : allReceipts;
+    
+    // Retornar dados formatados para exportação
+    return filtered.map((receipt: PaymentReceipt) => ({
       'Nº Recibo': receipt.receiptNumber || '',
       'Cliente': receipt.clientName || '',
       'Email do Cliente': receipt.clientEmail || '',

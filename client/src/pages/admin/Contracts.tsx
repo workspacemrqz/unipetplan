@@ -251,7 +251,25 @@ export default function Contracts() {
   };
 
   const prepareExportData = async () => {
-    return filteredContracts.map(contract => ({
+    // Buscar TODOS os dados sem paginação
+    const queryParams = new URLSearchParams({
+      limit: '999999',
+      ...(searchQuery && { search: searchQuery }),
+      ...(statusFilter !== 'all' && { status: statusFilter }),
+      ...(dateFilter?.startDate && { startDate: dateFilter.startDate.toString() }),
+      ...(dateFilter?.endDate && { endDate: dateFilter.endDate.toString() })
+    });
+    
+    const response = await fetch(`/admin/api/contracts?${queryParams}`);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao buscar dados para exportação');
+    }
+    
+    const allContracts = await response.json();
+    
+    // Retornar dados formatados para exportação
+    return allContracts.map((contract: ContractWithDetails) => ({
       'Nº Contrato': contract.contractNumber || '',
       'Cliente': contract.clientName || 'N/A',
       'Email do Cliente': contract.clientEmail || 'N/A',

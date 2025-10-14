@@ -858,6 +858,37 @@ export default function Procedures() {
     toggleMutation.mutate({ id, isActive: !currentStatus });
   };
 
+  // Função para preparar dados de exportação - busca TODOS os registros
+  const prepareExportData = async () => {
+    // Buscar TODOS os procedimentos sem paginação
+    const response = await fetch(`/admin/api/procedures?limit=999999`);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao buscar dados para exportação');
+    }
+    
+    const allProcedures = await response.json();
+    
+    // Aplicar filtros de busca se houver
+    const filtered = searchQuery 
+      ? allProcedures.filter((procedure: Procedure) =>
+          procedure.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          procedure.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          procedure.category?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : allProcedures;
+    
+    // Retornar dados formatados para exportação
+    return filtered.map((procedure: Procedure) => ({
+      'Nome': procedure.name || '',
+      'Descrição': procedure.description || 'Sem descrição',
+      'Categoria': procedure.category || 'Sem categoria',
+      'Status': procedure.isActive ? 'Ativo' : 'Inativo',
+      'Ordem de Exibição': procedure.displayOrder?.toString() || '0',
+      'Data de Criação': procedure.createdAt ? format(new Date(procedure.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '',
+      'Última Atualização': procedure.updatedAt ? format(new Date(procedure.updatedAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : ''
+    }));
+  };
 
   const onSubmit = (data: any) => {
     // Validar planos antes de submeter
@@ -1438,15 +1469,7 @@ export default function Procedures() {
             filename="procedimentos"
             title="Exportação de Procedimentos"
             pageName="Procedimentos"
-            columns={[
-              { key: 'name', label: 'Nome', formatter: (v) => v || '' },
-              { key: 'description', label: 'Descrição', formatter: (v) => v || 'Sem descrição' },
-              { key: 'category', label: 'Categoria', formatter: (v) => v || 'Sem categoria' },
-              { key: 'isActive', label: 'Status', formatter: (v) => v ? 'Ativo' : 'Inativo' },
-              { key: 'displayOrder', label: 'Ordem de Exibição', formatter: (v) => v?.toString() || '0' },
-              { key: 'createdAt', label: 'Data de Criação', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
-              { key: 'updatedAt', label: 'Última Atualização', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
-            ]}
+            prepareData={prepareExportData}
             disabled={isLoading || filteredItems.length === 0}
           />
           

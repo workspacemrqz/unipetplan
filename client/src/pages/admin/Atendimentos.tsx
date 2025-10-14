@@ -288,7 +288,25 @@ export default function Atendimentos() {
   };
 
   const prepareExportData = async () => {
-    return atendimentosData.map(atendimento => ({
+    // Buscar TODOS os dados com os filtros aplicados (sem paginação)
+    const queryParamsForExport = {
+      limit: "999999", // Número muito grande para buscar todos os registros
+      ...(searchQuery && { search: searchQuery }),
+      ...(statusFilter !== "all" && { status: statusFilter }),
+      ...dateParams
+    };
+    
+    const params = new URLSearchParams(queryParamsForExport);
+    const response = await fetch(`/admin/api/atendimentos/with-network-units?${params}`);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao buscar dados para exportação');
+    }
+    
+    const allData: AtendimentosResponse = await response.json();
+    const allAtendimentos = allData.data || [];
+    
+    return allAtendimentos.map(atendimento => ({
       'Procedimentos': atendimento.procedures && atendimento.procedures.length > 0 
         ? atendimento.procedures.map((p: any) => p.procedureName || p.name).join(', ') 
         : 'Não informado',

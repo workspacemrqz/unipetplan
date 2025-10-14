@@ -264,7 +264,22 @@ export default function Network() {
   };
 
   const prepareExportData = async () => {
-    return filteredUnits.map(unit => ({
+    // Buscar TODOS os dados considerando apenas o filtro de busca (sem paginação)
+    // Como não há API com paginação em Network, usar todos os dados já carregados
+    const allData = searchQuery 
+      ? units.filter((unit: NetworkUnit) => {
+          const searchLower = searchQuery.toLowerCase();
+          return (
+            unit.name?.toLowerCase().includes(searchLower) ||
+            unit.address?.toLowerCase().includes(searchLower) ||
+            unit.phone?.includes(searchQuery) ||
+            unit.whatsapp?.includes(searchQuery) ||
+            unit.cidade?.toLowerCase().includes(searchLower)
+          );
+        })
+      : units;
+    
+    return allData.map((unit: NetworkUnit) => ({
       'Nome': unit.name || '',
       'Endereço': unit.address || '',
       'Cidade': unit.cidade || '',

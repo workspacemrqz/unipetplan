@@ -250,7 +250,27 @@ export default function Sellers() {
   };
 
   const prepareExportData = async () => {
-    return filteredSellers.map(seller => ({
+    // Buscar TODOS os dados sem paginação
+    const response = await fetch(`/admin/api/sellers?limit=999999`);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao buscar dados para exportação');
+    }
+    
+    const allSellers = await response.json();
+    
+    // Aplicar filtros de busca se houver
+    const filtered = searchQuery
+      ? allSellers.filter((seller: Seller) =>
+          seller.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          seller.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          seller.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          seller.cpf?.includes(searchQuery)
+        )
+      : allSellers;
+    
+    // Retornar dados formatados para exportação
+    return filtered.map((seller: Seller) => ({
       'Nome Completo': seller.fullName || '',
       'CPF': cpfMask(seller.cpf),
       'Email': seller.email || '',
