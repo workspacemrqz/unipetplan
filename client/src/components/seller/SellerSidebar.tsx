@@ -1,10 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/admin/utils";
-import {
-  Home,
-  ExternalLink,
-  LogOut
-} from "lucide-react";
+import { LogOut } from "lucide-react";
+import { SvgIcon } from "@/components/ui/SvgIcon";
 
 export default function SellerSidebar() {
   const [location] = useLocation();
@@ -13,13 +10,13 @@ export default function SellerSidebar() {
     {
       name: "Principal",
       items: [
-        { name: "Dashboard", href: `/vendedor/dashboard`, icon: Home }
+        { name: "Dashboard", href: `/vendedor/dashboard`, iconName: "Dashboard" }
       ]
     },
     {
       name: "Vendas",
       items: [
-        { name: "Link de Referência", href: `/vendedor/link`, icon: ExternalLink }
+        { name: "Link de Referência", href: `/vendedor/link`, iconName: "Vendedor" }
       ]
     }
   ];
@@ -64,7 +61,13 @@ export default function SellerSidebar() {
                         : "text-gray-600 hover:text-gray-900"
                     )}
                   >
-                    <item.icon className="h-5 w-5 mr-3" />
+                    <SvgIcon 
+                      name={item.iconName} 
+                      className={cn(
+                        "h-5 w-5 mr-3",
+                        isActive ? "invert" : "opacity-60"
+                      )} 
+                    />
                     {item.name}
                   </Link>
                 );
