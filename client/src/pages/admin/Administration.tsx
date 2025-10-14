@@ -8,7 +8,7 @@ import { Input } from "@/components/admin/ui/input";
 import { InputMasked } from "@/components/admin/ui/input-masked";
 import { Badge } from "@/components/admin/ui/badge";
 import { Switch } from "@/components/admin/ui/switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/admin/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/admin/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/admin/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/admin/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
@@ -388,8 +388,8 @@ export default function Administration() {
           form.reset();
         }
       }}>
-        <DialogContent hideCloseButton maxHeightMobile="max-h-[80vh]">
-            <DialogHeader>
+        <DialogContent hideCloseButton>
+            <DialogHeader className="flex flex-row items-center justify-between pr-2">
               <DialogTitle className="flex items-center space-x-2">
                 {editingUser ? (
                   <>
@@ -403,12 +403,59 @@ export default function Administration() {
                   </>
                 )}
               </DialogTitle>
-              <DialogDescription>
-                {editingUser 
-                  ? "Atualize as informações e permissões do usuário." 
-                  : "Crie um novo usuário e configure suas permissões de acesso."
-                }
-              </DialogDescription>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  variant="outline"
+                  disabled={createMutation.isPending}
+                  onClick={form.handleSubmit(onSubmit)}
+                  className={`gap-2 h-8 transition-all duration-300 ${
+                    createMutation.isPending ? 'bg-[#e6f4f4] border-[#277677] text-[#277677]' : ''
+                  }`}
+                  data-testid="button-save"
+                >
+                  {createMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {editingUser ? "Salvando..." : "Salvando..."}
+                    </>
+                  ) : (
+                    <>
+                      {editingUser ? (
+                        <>
+                          <Edit className="h-4 w-4" />
+                          Salvar
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="h-4 w-4" />
+                          Criar
+                        </>
+                      )}
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setDialogOpen(false);
+                    setEditingUser(null);
+                    form.reset({
+                      username: "",
+                      email: "",
+                      password: "",
+                      role: "view",
+                      permissions: [],
+                      isActive: true,
+                    });
+                  }}
+                  className="h-8"
+                  data-testid="button-cancel"
+                >
+                  Fechar
+                </Button>
+              </div>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar">
@@ -578,58 +625,6 @@ export default function Administration() {
                     ))}
                   </div>
                   </div>
-                </div>
-
-                <div className="flex justify-end space-x-4 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setDialogOpen(false);
-                      setEditingUser(null);
-                      form.reset({
-                        username: "",
-                        email: "",
-                        password: "",
-                        role: "view",
-                        permissions: [],
-                        isActive: true,
-                      });
-                    }}
-                    data-testid="button-cancel"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="admin-action"
-                    size="sm"
-                    disabled={createMutation.isPending}
-                    data-testid="button-save"
-                    className="min-w-[100px]"
-                  >
-                    {createMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {editingUser ? "Atualizando..." : "Criando..."}
-                      </>
-                    ) : (
-                      <>
-                        {editingUser ? (
-                          <>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Atualizar
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Criar Usuário
-                          </>
-                        )}
-                      </>
-                    )}
-                  </Button>
                 </div>
               </form>
             </Form>
