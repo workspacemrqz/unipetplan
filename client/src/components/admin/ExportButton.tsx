@@ -16,8 +16,23 @@ interface ExportButtonProps {
   columns?: {
     key: string;
     label: string;
-    formatter?: (value: any) => string;
+    formatter?: (value: any, row?: any) => string;
   }[];
+  // Configurações separadas para PDF
+  pdfColumns?: {
+    key: string;
+    label: string;
+    formatter?: (value: any, row?: any) => string;
+  }[];
+  preparePdfData?: () => Promise<any[]>;
+  // Configurações separadas para Excel
+  excelColumns?: {
+    key: string;
+    label: string;
+    formatter?: (value: any, row?: any) => string;
+  }[];
+  prepareExcelData?: () => Promise<any[]>;
+  // Configurações gerais
   title?: string;
   pageName?: string;
   disabled?: boolean;
@@ -28,6 +43,10 @@ export function ExportButton({
   data,
   filename,
   columns,
+  pdfColumns,
+  preparePdfData,
+  excelColumns,
+  prepareExcelData,
   title,
   pageName,
   disabled = false,
@@ -41,20 +60,26 @@ export function ExportButton({
     try {
       setIsExporting(true);
       
+      // Use preparePdfData se disponível, senão use prepareData, senão use data direto
       let exportData = data;
-      if (prepareData) {
+      const prepareFn = preparePdfData || prepareData;
+      
+      if (prepareFn) {
         setIsPreparingData(true);
         toast({
           title: "Preparando dados...",
-          description: "Buscando informações completas para exportação.",
+          description: "Buscando informações para exportação PDF.",
         });
-        exportData = await prepareData();
+        exportData = await prepareFn();
         setIsPreparingData(false);
       }
       
+      // Use pdfColumns se disponível, senão use columns
+      const columnsToUse = pdfColumns || columns || [];
+      
       await exportToPDF({
         data: exportData,
-        columns: columns || [],
+        columns: columnsToUse,
         filename: `${filename}.pdf`,
         title: title || filename,
       });
@@ -79,20 +104,26 @@ export function ExportButton({
     try {
       setIsExporting(true);
       
+      // Use prepareExcelData se disponível, senão use prepareData, senão use data direto
       let exportData = data;
-      if (prepareData) {
+      const prepareFn = prepareExcelData || prepareData;
+      
+      if (prepareFn) {
         setIsPreparingData(true);
         toast({
           title: "Preparando dados...",
-          description: "Buscando informações completas para exportação.",
+          description: "Buscando informações completas para exportação Excel.",
         });
-        exportData = await prepareData();
+        exportData = await prepareFn();
         setIsPreparingData(false);
       }
       
+      // Use excelColumns se disponível, senão use columns
+      const columnsToUse = excelColumns || columns || [];
+      
       await exportToExcel({
         data: exportData,
-        columns: columns || [],
+        columns: columnsToUse,
         filename: `${filename}.xlsx`,
         sheetName: pageName || filename,
       });

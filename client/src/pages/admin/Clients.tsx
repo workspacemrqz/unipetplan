@@ -286,7 +286,38 @@ export default function Clients() {
     }
   };
 
-  const prepareExportData = async () => {
+  // Preparação de dados para PDF - apenas campos visíveis na tabela
+  const preparePdfData = async () => {
+    return filteredClients.map(client => {
+      const pdfData: any = {};
+      
+      // Adiciona apenas os campos que estão visíveis na tabela
+      if (visibleColumns.includes("Nome")) {
+        pdfData['Nome'] = client.fullName || client.full_name || '';
+      }
+      if (visibleColumns.includes("Email")) {
+        pdfData['Email'] = client.email || 'Não informado';
+      }
+      if (visibleColumns.includes("Telefone")) {
+        pdfData['Telefone'] = formatBrazilianPhoneForDisplay(client.phone || '');
+      }
+      if (visibleColumns.includes("CPF")) {
+        pdfData['CPF'] = client.cpf || '';
+      }
+      if (visibleColumns.includes("Cidade")) {
+        pdfData['Cidade'] = client.city || 'Não informado';
+      }
+      if (visibleColumns.includes("Data")) {
+        pdfData['Data de Cadastro'] = client.createdAt ? 
+          format(new Date(client.createdAt), "dd/MM/yyyy", { locale: ptBR }) : '';
+      }
+      
+      return pdfData;
+    });
+  };
+
+  // Preparação de dados para Excel - todos os campos incluindo pets
+  const prepareExcelData = async () => {
     const enrichedData = [];
     
     for (const client of filteredClients) {
@@ -406,7 +437,8 @@ export default function Clients() {
             filename="clientes"
             title="Exportação de Clientes"
             pageName="Clientes"
-            prepareData={prepareExportData}
+            preparePdfData={preparePdfData}
+            prepareExcelData={prepareExcelData}
             disabled={isLoading || searchLoading || filteredClients.length === 0}
           />
           
