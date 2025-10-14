@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -97,8 +97,11 @@ export default function PlanForm() {
 
 
 
+  // Track if we've already reset the form to avoid multiple resets
+  const [hasResetForm, setHasResetForm] = useState(false);
+  
   useEffect(() => {
-    if (plan && typeof plan === 'object') {
+    if (plan && typeof plan === 'object' && !hasResetForm) {
       console.log("🔍 Resetting form with plan data:", plan);
       
       // Converter basePrice (string decimal) para valor do formulário
@@ -118,8 +121,10 @@ export default function PlanForm() {
         isActive: planData.isActive ?? true,
         contractText: planData.contractText || "",
       });
+      
+      setHasResetForm(true);
 
-      // Log the view action when plan is loaded for editing
+      // Log the view action only once when plan is initially loaded
       if (planId) {
         logAction({
           actionType: "viewed",
@@ -132,7 +137,7 @@ export default function PlanForm() {
         });
       }
     }
-  }, [plan, form, planId, logAction]);
+  }, [plan, hasResetForm]);
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {

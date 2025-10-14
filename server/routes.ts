@@ -2802,6 +2802,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         displayOrder: updateData.displayOrder,
         isActive: updateData.isActive,
         basePrice: updateData.basePrice,
+        contractText: updateData.contractText,
         // Adicionar outros campos conforme necessário
       };
       

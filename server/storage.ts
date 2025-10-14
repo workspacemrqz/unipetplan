@@ -581,6 +581,7 @@ export class DatabaseStorage implements IStorage {
         annualPrice: plans.annualPrice,
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
+        contractText: plans.contractText,
       }).from(plans).where(eq(plans.isActive, true)).orderBy(asc(plans.displayOrder));
 
       return result;
@@ -617,6 +618,7 @@ export class DatabaseStorage implements IStorage {
         annualPrice: plans.annualPrice,
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
+        contractText: plans.contractText,
       }).from(plans).orderBy(asc(plans.displayOrder));
 
       return result;
@@ -657,6 +659,7 @@ export class DatabaseStorage implements IStorage {
         annualPrice: plans.annualPrice,
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
+        contractText: plans.contractText,
       }).from(plans).where(eq(plans.id, id));
 
       return plan || undefined;
@@ -691,7 +694,7 @@ export class DatabaseStorage implements IStorage {
         annualPrice: plans.annualPrice,
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
-        // contractText field removed as it doesn't exist in the database yet
+        contractText: plans.contractText,
       }).from(plans).where(eq(plans.name, name));
 
       return plan || undefined;
