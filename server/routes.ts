@@ -3269,6 +3269,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all procedures with their plan details
+  app.get("/admin/api/procedures-with-plans", requireAdmin, async (req, res) => {
+    
+    try {
+      const procedures = await storage.getAllProcedures();
+      
+      // For each procedure, fetch its plans
+      const proceduresWithPlans = await Promise.all(
+        procedures.map(async (procedure) => {
+          const plans = await storage.getProcedurePlans(procedure.id);
+          return {
+            ...procedure,
+            plans
+          };
+        })
+      );
+      
+      res.json(proceduresWithPlans);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching procedures with plans:", error);
+      res.status(500).json({ error: "Erro ao buscar procedimentos com planos" });
+    }
+  });
+
   // Get procedure categories
   app.get("/admin/api/procedure-categories", requireAdmin, async (req, res) => {
     try {

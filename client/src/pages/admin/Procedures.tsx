@@ -53,6 +53,7 @@ type Procedure = {
   displayOrder: number;
   createdAt: string;
   updatedAt: string;
+  plans?: ProcedurePlan[];
 };
 
 type Plan = {
@@ -104,9 +105,84 @@ const insertProcedureSchema = z.object({
 
 const allColumns = [
   "Nome",
-  "Status", 
+  "Status",
+  "Coparticipação",
+  "Carência",
+  "Limites Anuais",
   "Ações",
 ] as const;
+
+// Funções auxiliares para resumir informações dos planos
+const formatPlanSummary = (plans?: ProcedurePlan[]) => {
+  if (!plans || plans.length === 0) return "N/A";
+  return `${plans.length} plano${plans.length > 1 ? 's' : ''}`;
+};
+
+const formatCoparticipacaoSummary = (plans?: ProcedurePlan[]) => {
+  if (!plans || plans.length === 0) return "N/A";
+  
+  const coparticipacoes = plans
+    .filter(p => p.coparticipacao && p.coparticipacao > 0)
+    .map(p => p.coparticipacao || 0);
+  
+  if (coparticipacoes.length === 0) return "Sem coparticipação";
+  
+  const min = Math.min(...coparticipacoes) / 100;
+  const max = Math.max(...coparticipacoes) / 100;
+  
+  if (min === max) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(min);
+  }
+  
+  return `${new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(min)} - ${new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(max)}`;
+};
+
+const formatCarenciaSummary = (plans?: ProcedurePlan[]) => {
+  if (!plans || plans.length === 0) return "N/A";
+  
+  const carencias = plans
+    .filter(p => p.carencia && p.carencia.trim() !== '')
+    .map(p => p.carencia || '');
+  
+  if (carencias.length === 0) return "Sem carência";
+  
+  // Pegar valores únicos
+  const uniqueCarencias = [...new Set(carencias)];
+  
+  if (uniqueCarencias.length === 1) {
+    return uniqueCarencias[0];
+  }
+  
+  return "Varia por plano";
+};
+
+const formatLimitesSummary = (plans?: ProcedurePlan[]) => {
+  if (!plans || plans.length === 0) return "N/A";
+  
+  const limites = plans
+    .filter(p => p.limitesAnuais && p.limitesAnuais !== '0')
+    .map(p => p.limitesAnuais || '');
+  
+  if (limites.length === 0) return "Sem limites";
+  
+  // Pegar valores únicos
+  const uniqueLimites = [...new Set(limites)];
+  
+  if (uniqueLimites.length === 1) {
+    return uniqueLimites[0];
+  }
+  
+  return "Varia por plano";
+};
 
 export default function Procedures() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -142,7 +218,7 @@ export default function Procedures() {
   const { logAction } = useAdminLogger();
 
   const { data: procedures, isLoading } = useQuery<Procedure[]>({
-    queryKey: ["/admin/api/procedures"],
+    queryKey: ["/admin/api/procedures-with-plans"],
   });
 
   const { data: plans } = useQuery<Plan[]>({
@@ -601,6 +677,7 @@ export default function Procedures() {
       const procedureId = isEdit ? editingItem!.id : procedureResponse.id;
       
       queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] });
+      queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures-with-plans"] });
       queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures", editingItem?.id, "plans"] });
       // Invalidar cache dos planos também para atualizar a página de edição de planos
       queryClient.invalidateQueries({ queryKey: ["/admin/api/plans"] });
@@ -639,6 +716,7 @@ export default function Procedures() {
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] });
+      queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures-with-plans"] });
       
       if (procedureToDelete) {
         await logAction({
@@ -675,6 +753,7 @@ export default function Procedures() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] });
+      queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures-with-plans"] });
       toast({
         title: "Status atualizado",
         description: "Status do procedimento foi atualizado.",
@@ -1533,6 +1612,15 @@ export default function Procedures() {
                 {visibleColumns.includes("Status") && (
                   <TableHead className="bg-white">Status</TableHead>
                 )}
+                {visibleColumns.includes("Coparticipação") && (
+                  <TableHead className="bg-white">Coparticipação</TableHead>
+                )}
+                {visibleColumns.includes("Carência") && (
+                  <TableHead className="bg-white">Carência</TableHead>
+                )}
+                {visibleColumns.includes("Limites Anuais") && (
+                  <TableHead className="bg-white">Limites Anuais</TableHead>
+                )}
                 {visibleColumns.includes("Ações") && (
                   <TableHead className="bg-white">Ações</TableHead>
                 )}
@@ -1559,6 +1647,21 @@ export default function Procedures() {
                         checked={item.isActive}
                         onCheckedChange={() => handleToggleStatus(item.id, item.isActive)}
                       />
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes("Coparticipação") && (
+                    <TableCell className="whitespace-nowrap bg-white text-sm">
+                      {formatCoparticipacaoSummary(item.plans)}
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes("Carência") && (
+                    <TableCell className="whitespace-nowrap bg-white text-sm">
+                      {formatCarenciaSummary(item.plans)}
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes("Limites Anuais") && (
+                    <TableCell className="whitespace-nowrap bg-white text-sm">
+                      {formatLimitesSummary(item.plans)}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Ações") && (
