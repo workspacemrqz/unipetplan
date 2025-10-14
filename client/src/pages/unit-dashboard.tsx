@@ -370,39 +370,50 @@ export default function UnitDashboard() {
               <p className="text-sm text-muted-foreground">Quantidade por procedimento (Top 10)</p>
             </CardHeader>
             <CardContent>
-              <div className="mb-2 text-xs text-gray-600">
-                Debug: {proceduresSold ? `${proceduresSold.length} itens` : 'Null/Undefined'}
-              </div>
               {proceduresSold && proceduresSold.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={proceduresSold} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
-                    <XAxis 
-                      dataKey="name" 
-                      angle={-45}
-                      textAnchor="end"
-                      height={100}
-                      interval={0}
-                      tick={{ fontSize: 10, fill: '#1f2937' }}
-                      stroke="#6b7280"
-                    />
-                    <YAxis tick={{ fill: '#1f2937' }} stroke="#6b7280" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#ffffff', 
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px'
-                      }}
-                    />
-                    <Bar dataKey="count" fill="#0e7074" name="Quantidade" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div style={{ width: '100%', height: '350px' }}>
+                  <ResponsiveContainer>
+                    <BarChart data={proceduresSold} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                      <XAxis 
+                        dataKey="name" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={100}
+                        interval={0}
+                        tick={{ fontSize: 11, fill: '#374151', fontWeight: 500 }}
+                        stroke="#9ca3af"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: '#374151', fontWeight: 500 }} 
+                        stroke="#9ca3af"
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#ffffff', 
+                          border: '2px solid #0e7074',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                        }}
+                        labelStyle={{ color: '#1f2937', fontWeight: 600 }}
+                      />
+                      <Bar 
+                        dataKey="count" 
+                        fill="#0e7074" 
+                        name="Quantidade" 
+                        radius={[6, 6, 0, 0]}
+                        maxBarSize={60}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <div className="h-[300px] flex items-center justify-center">
+                <div className="h-[350px] flex items-center justify-center">
                   <div className="text-center">
-                    <p className="text-gray-700 font-medium">Sem dados disponíveis</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {proceduresSold === null ? 'Carregando...' : 'Nenhum procedimento encontrado'}
+                    <p className="text-gray-700 font-medium text-lg">Sem dados disponíveis</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {proceduresSold === null ? 'Carregando dados...' : 'Nenhum procedimento encontrado no período'}
                     </p>
                   </div>
                 </div>
@@ -417,48 +428,51 @@ export default function UnitDashboard() {
               <p className="text-sm text-muted-foreground">Total (R$) por criador dos atendimentos</p>
             </CardHeader>
             <CardContent>
-              <div className="mb-2 text-xs text-gray-600">
-                Debug: {valueByUser ? `${valueByUser.length} itens` : 'Null/Undefined'}
-              </div>
               {valueByUser && valueByUser.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={valueByUser as any}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={90}
-                      innerRadius={40}
-                      label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
-                      labelLine={{ stroke: '#1f2937', strokeWidth: 1 }}
-                    >
-                      {valueByUser.map((_, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={index % 2 === 0 ? '#0e7074' : '#16a34a'} 
-                          stroke="#ffffff"
-                          strokeWidth={2}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      formatter={(value: number) => `R$ ${value.toFixed(2)}`}
-                      contentStyle={{ 
-                        backgroundColor: '#ffffff', 
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div style={{ width: '100%', height: '350px' }}>
+                  <ResponsiveContainer>
+                    <PieChart>
+                      <Pie
+                        data={valueByUser as any}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        innerRadius={50}
+                        paddingAngle={3}
+                        label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
+                        labelLine={{ stroke: '#374151', strokeWidth: 2 }}
+                      >
+                        {valueByUser.map((_, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={index % 2 === 0 ? '#0e7074' : '#16a34a'} 
+                            stroke="#ffffff"
+                            strokeWidth={3}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Valor Total']}
+                        contentStyle={{ 
+                          backgroundColor: '#ffffff', 
+                          border: '2px solid #0e7074',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                        }}
+                        labelStyle={{ color: '#1f2937', fontWeight: 600 }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <div className="h-[300px] flex items-center justify-center">
+                <div className="h-[350px] flex items-center justify-center">
                   <div className="text-center">
-                    <p className="text-gray-700 font-medium">Sem dados disponíveis</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {valueByUser === null ? 'Carregando...' : 'Nenhum usuário encontrado'}
+                    <p className="text-gray-700 font-medium text-lg">Sem dados disponíveis</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {valueByUser === null ? 'Carregando dados...' : 'Nenhum usuário encontrado no período'}
                     </p>
                   </div>
                 </div>
