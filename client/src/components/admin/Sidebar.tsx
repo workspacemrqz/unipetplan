@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import {
   ChevronDown,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
 import { createCacheManager } from "@/lib/admin/cacheUtils";
 import CustomIcon from "@/components/admin/ui/CustomIcon";
@@ -158,6 +159,15 @@ export default function Sidebar() {
     }
   };
 
+  const handleLogout = () => {
+    // Limpar sessão
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Redirecionar para a página de login
+    window.location.href = '/admin/login';
+  };
+
   return (
     <div className="flex flex-col h-full bg-white border-r border-[#eaeaea]">
       <div className="p-6">
@@ -220,6 +230,17 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Logout Button */}
+      <div className="p-4 border-t border-[#eaeaea]">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Sair
+        </button>
+      </div>
     </div>
   );
 }
