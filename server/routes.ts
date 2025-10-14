@@ -83,6 +83,36 @@ declare module 'express' {
   }
 }
 
+/**
+ * Helper para preservar dados da sessão durante regeneração
+ * Preserva TODOS os dados customizados da sessão dinamicamente
+ * Exclui apenas metadados internos do express-session
+ */
+function preserveSessionData(session: any): any {
+  const preserved: any = {};
+  
+  // Lista de chaves internas do express-session que NÃO devem ser preservadas
+  const internalKeys = ['cookie', 'id', 'regenerate', 'destroy', 'reload', 'save', 'touch'];
+  
+  // Copiar TODOS os dados customizados da sessão
+  for (const key in session) {
+    if (!internalKeys.includes(key) && session.hasOwnProperty(key)) {
+      preserved[key] = session[key];
+    }
+  }
+  
+  return preserved;
+}
+
+/**
+ * Helper para restaurar dados preservados da sessão
+ */
+function restoreSessionData(session: any, preserved: any): void {
+  for (const [key, value] of Object.entries(preserved)) {
+    session[key] = value;
+  }
+}
+
 // Rate limiter for file uploads - balanced for user experience
 const uploadRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -529,10 +559,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (isValidPassword && user.isActive) {
           // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
-          // Salvar dados existentes da sessão antes da regeneração
-          const existingSessionData = {
-            client: req.session.client,
-          };
+          // Preservar dados existentes da sessão antes da regeneração
+          const preservedData = preserveSessionData(req.session);
           
           req.session.regenerate((err) => {
             if (err) {
@@ -540,10 +568,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return res.status(500).json({ error: "Erro ao criar sessão segura" });
             }
             
-            // RESTAURAR dados existentes da sessão
-            if (existingSessionData.client) {
-              req.session.client = existingSessionData.client;
-            }
+            // Restaurar dados preservados
+            restoreSessionData(req.session, preservedData);
             
             // Set admin session with user info
             req.session.admin = { 
@@ -612,10 +638,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (isValidLogin && isValidPassword) {
         // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
-        // Salvar dados existentes da sessão antes da regeneração
-        const existingSessionData = {
-          client: req.session.client,
-        };
+        // Preservar dados existentes da sessão antes da regeneração
+        const preservedData = preserveSessionData(req.session);
         
         req.session.regenerate((err) => {
           if (err) {
@@ -623,10 +647,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(500).json({ error: "Erro ao criar sessão segura" });
           }
           
-          // RESTAURAR dados existentes da sessão
-          if (existingSessionData.client) {
-            req.session.client = existingSessionData.client;
-          }
+          // Restaurar dados preservados
+          restoreSessionData(req.session, preservedData);
           
           // Set admin session for environment variable admin
           req.session.admin = { 
@@ -5980,10 +6002,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // ✅ SECURITY FIX: Regenerate session to prevent session fixation attacks
-      // Salvar dados existentes da sessão antes da regeneração
-      const existingSessionData = {
-        admin: req.session.admin,
-      };
+      // Preservar dados existentes da sessão antes da regeneração
+      const preservedData = preserveSessionData(req.session);
       
       const sessionStart = performance.now();
       req.session.regenerate((err) => {
@@ -5992,10 +6012,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ error: "Erro ao criar sessão segura" });
         }
         
-        // RESTAURAR dados existentes da sessão
-        if (existingSessionData.admin) {
-          req.session.admin = existingSessionData.admin;
-        }
+        // Restaurar dados preservados
+        restoreSessionData(req.session, preservedData);
         
         // Store client in session
         req.session.client = {
@@ -7452,11 +7470,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Regenerate session to prevent session fixation attacks
-      // Salvar dados existentes da sessão antes da regeneração
-      const existingSessionData = {
-        admin: req.session.admin,
-        client: req.session.client,
-      };
+      // Preservar dados existentes da sessão antes da regeneração
+      const preservedData = preserveSessionData(req.session);
       
       req.session.regenerate((err) => {
         if (err) {
@@ -7464,13 +7479,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ error: "Erro ao criar sessão segura" });
         }
         
-        // RESTAURAR dados existentes da sessão
-        if (existingSessionData.admin) {
-          req.session.admin = existingSessionData.admin;
-        }
-        if (existingSessionData.client) {
-          req.session.client = existingSessionData.client;
-        }
+        // Restaurar dados preservados
+        restoreSessionData(req.session, preservedData);
         
         // Store seller in session
         (req.session as any).seller = {
