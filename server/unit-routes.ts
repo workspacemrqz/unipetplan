@@ -1314,6 +1314,21 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
       }
 
+      // Add date range filters if provided
+      const { startDate, endDate } = req.query;
+      
+      if (startDate && typeof startDate === 'string') {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        conditions.push(sql`${atendimentos.createdAt} >= ${start.toISOString()}`);
+      }
+      
+      if (endDate && typeof endDate === 'string') {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        conditions.push(sql`${atendimentos.createdAt} <= ${end.toISOString()}`);
+      }
+
       // Get all atendimentos for this unit
       const unitAtendimentos = await db
         .select({ id: atendimentos.id })
@@ -1361,6 +1376,21 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // If it's a veterinarian, filter by their ID
       if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+      }
+
+      // Add date range filters if provided
+      const { startDate, endDate } = req.query;
+      
+      if (startDate && typeof startDate === 'string') {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        conditions.push(sql`${atendimentos.createdAt} >= ${start.toISOString()}`);
+      }
+      
+      if (endDate && typeof endDate === 'string') {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        conditions.push(sql`${atendimentos.createdAt} <= ${end.toISOString()}`);
       }
 
       // Get value grouped by veterinarian from atendimento_procedures
@@ -1416,6 +1446,21 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // If it's a veterinarian, filter by their ID
       if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+      }
+
+      // Add date range filters if provided
+      const { startDate, endDate } = req.query;
+      
+      if (startDate && typeof startDate === 'string') {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        conditions.push(sql`${atendimentos.createdAt} >= ${start.toISOString()}`);
+      }
+      
+      if (endDate && typeof endDate === 'string') {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        conditions.push(sql`${atendimentos.createdAt} <= ${end.toISOString()}`);
       }
 
       // Get total sales value from atendimento_procedures
