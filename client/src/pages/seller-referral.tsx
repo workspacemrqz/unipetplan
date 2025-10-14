@@ -55,7 +55,7 @@ export default function SellerReferral() {
   }, [params, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-[#faf9f7]">
       <div className="text-center space-y-4">
         {error ? (
           <>

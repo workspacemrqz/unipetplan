@@ -93,7 +93,7 @@ export default function UnitLoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-muted flex items-center justify-center">
+      <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
         <div className="text-center">
           <LoadingDots size="lg" color="#0e7074" className="mb-4" />
           <p className="text-muted-foreground">Carregando...</p>
@@ -103,7 +103,7 @@ export default function UnitLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted">
+    <div className="min-h-screen bg-[#faf9f7]">
       <div className="flex items-center justify-center min-h-screen px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
