@@ -3273,7 +3273,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/admin/api/procedures-with-plans", requireAdmin, async (req, res) => {
     
     try {
+      console.log("📋 [ADMIN] Fetching procedures with plans...");
       const procedures = await storage.getAllProcedures();
+      console.log(`📋 [ADMIN] Found ${procedures.length} procedures`);
       
       // For each procedure, fetch its plans
       const proceduresWithPlans = await Promise.all(
@@ -3286,10 +3288,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
       
+      console.log(`✅ [ADMIN] Returning ${proceduresWithPlans.length} procedures with plans`);
       res.json(proceduresWithPlans);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching procedures with plans:", error);
       res.status(500).json({ error: "Erro ao buscar procedimentos com planos" });
+    }
+  });
+
+  // Get all plan procedures for efficient client-side join
+  app.get("/admin/api/plan-procedures/all", requireAdmin, async (req, res) => {
+    try {
+      const planProcedures = await storage.getAllPlanProcedures();
+      res.json(planProcedures);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching all plan procedures:", error);
+      res.status(500).json({ error: "Erro ao buscar procedimentos dos planos" });
     }
   });
 

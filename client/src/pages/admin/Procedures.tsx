@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -213,16 +213,32 @@ export default function Procedures() {
   const { logAction } = useAdminLogger();
 
   const { data: procedures, isLoading } = useQuery<Procedure[]>({
-    queryKey: ["/admin/api/procedures-with-plans"],
+    queryKey: ["/admin/api/procedures"],
   });
 
   const { data: plans } = useQuery<Plan[]>({
     queryKey: ["/admin/api/plans/active"],
   });
 
+  // Buscar todos os plan_procedures para fazer o join
+  const { data: allPlanProcedures } = useQuery({
+    queryKey: ["/admin/api/plan-procedures/all"],
+    enabled: !!procedures && procedures.length > 0,
+  });
+
   const { data: categories } = useQuery({
     queryKey: ["/admin/api/procedure-categories"],
   });
+
+  // Fazer o join dos procedimentos com seus planos
+  const proceduresWithPlans = useMemo(() => {
+    if (!procedures || !allPlanProcedures) return procedures || [];
+    
+    return procedures.map(procedure => ({
+      ...procedure,
+      plans: Array.isArray(allPlanProcedures) ? allPlanProcedures.filter((pp: any) => pp.procedureId === procedure.id) : []
+    }));
+  }, [procedures, allPlanProcedures]);
 
   // Buscar configurações de regras para cálculo automático de porcentagem
   const { data: rulesSettings } = useQuery({
@@ -763,7 +779,7 @@ export default function Procedures() {
     },
   });
 
-  const filteredItems = Array.isArray(procedures) ? procedures
+  const filteredItems = Array.isArray(proceduresWithPlans) ? proceduresWithPlans
     .filter((item: any) =>
       (item.name ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())

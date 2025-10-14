@@ -244,6 +244,7 @@ export interface IStorage {
   getRulesSettings(): Promise<any | undefined>;
   updateRulesSettings(settings: any): Promise<any | undefined>;
   getProcedurePlans(procedureId: string): Promise<any[]>;
+  getAllPlanProcedures(): Promise<any[]>;
   updateProcedurePlans(procedureId: string, plans: any[]): Promise<void>;
   getAllUsers(): Promise<any[]>;
   createUser(user: any): Promise<any>;
