@@ -370,24 +370,27 @@ export default function UnitDashboard() {
               <p className="text-sm text-muted-foreground">Quantidade por procedimento (Top 10)</p>
             </CardHeader>
             <CardContent>
+              <div className="mb-2 text-xs text-gray-600">
+                Debug: {proceduresSold ? `${proceduresSold.length} itens` : 'Null/Undefined'}
+              </div>
               {proceduresSold && proceduresSold.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={proceduresSold} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
                     <XAxis 
                       dataKey="name" 
                       angle={-45}
                       textAnchor="end"
                       height={100}
                       interval={0}
-                      tick={{ fontSize: 10, fill: '#374151' }}
-                      stroke="#9ca3af"
+                      tick={{ fontSize: 10, fill: '#1f2937' }}
+                      stroke="#6b7280"
                     />
-                    <YAxis tick={{ fill: '#374151' }} stroke="#9ca3af" />
+                    <YAxis tick={{ fill: '#1f2937' }} stroke="#6b7280" />
                     <Tooltip 
                       contentStyle={{ 
                         backgroundColor: '#ffffff', 
-                        border: '1px solid #e5e7eb',
+                        border: '1px solid #d1d5db',
                         borderRadius: '6px'
                       }}
                     />
@@ -395,8 +398,13 @@ export default function UnitDashboard() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-gray-500">
-                  <p>Carregando gráfico...</p>
+                <div className="h-[300px] flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-gray-700 font-medium">Sem dados disponíveis</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {proceduresSold === null ? 'Carregando...' : 'Nenhum procedimento encontrado'}
+                    </p>
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -409,6 +417,9 @@ export default function UnitDashboard() {
               <p className="text-sm text-muted-foreground">Total (R$) por criador dos atendimentos</p>
             </CardHeader>
             <CardContent>
+              <div className="mb-2 text-xs text-gray-600">
+                Debug: {valueByUser ? `${valueByUser.length} itens` : 'Null/Undefined'}
+              </div>
               {valueByUser && valueByUser.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
@@ -421,7 +432,7 @@ export default function UnitDashboard() {
                       outerRadius={90}
                       innerRadius={40}
                       label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
-                      labelLine={{ stroke: '#374151', strokeWidth: 1 }}
+                      labelLine={{ stroke: '#1f2937', strokeWidth: 1 }}
                     >
                       {valueByUser.map((_, index) => (
                         <Cell 
@@ -436,15 +447,20 @@ export default function UnitDashboard() {
                       formatter={(value: number) => `R$ ${value.toFixed(2)}`}
                       contentStyle={{ 
                         backgroundColor: '#ffffff', 
-                        border: '1px solid #e5e7eb',
+                        border: '1px solid #d1d5db',
                         borderRadius: '6px'
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-gray-500">
-                  <p>Carregando gráfico...</p>
+                <div className="h-[300px] flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-gray-700 font-medium">Sem dados disponíveis</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {valueByUser === null ? 'Carregando...' : 'Nenhum usuário encontrado'}
+                    </p>
+                  </div>
                 </div>
               )}
             </CardContent>
