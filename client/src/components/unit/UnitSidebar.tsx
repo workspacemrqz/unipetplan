@@ -90,7 +90,7 @@ export default function UnitSidebar() {
         {
           name: "Sistema",
           items: [
-            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, iconName: "Configurações" }
+            { name: "Logs de Ações", href: `/unidade/${slug}/logs`, iconName: "LogsList" }
           ]
         }
       ];

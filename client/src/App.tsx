@@ -96,6 +96,7 @@ import SellerDashboard from './pages/seller-dashboard';
 import SellerLink from './pages/seller-link';
 import SellerReferral from './pages/seller-referral';
 import SellerMenuDemo from './pages/SellerMenuDemo';
+import MenuLogsDemo from './pages/MenuLogsDemo';
 
 // Import veterinarian pages
 import VeterinarianLoginPage from './pages/veterinarian-login';
@@ -214,6 +215,9 @@ function Router() {
         
         {/* Veterinarian Area Routes */}
         <Route path="/veterinario/login" component={VeterinarianLoginPage} />
+        
+        {/* Demo Routes */}
+        <Route path="/demo/menu-logs" component={MenuLogsDemo} />
         
         {/* Unit Routes - specific paths first */}
         <Route path="/unidade/:slug/painel" component={UnitDashboard} />
