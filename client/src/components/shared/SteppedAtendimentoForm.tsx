@@ -697,7 +697,7 @@ export default function SteppedAtendimentoForm({
                                     className="py-3"
                                   >
                                     <span className="font-semibold">{pet.name}</span>
-                                    <span className="text-sm text-muted-foreground ml-2">
+                                    <span className="text-sm ml-2">
                                       ({pet.species}{pet.breed && ` - ${pet.breed}`})
                                     </span>
                                   </SelectItem>
