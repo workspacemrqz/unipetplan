@@ -3,6 +3,9 @@ import { useLocation } from "wouter";
 import SellerLayout from "@/components/seller/SellerLayout";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { useSellerAuth } from "@/contexts/SellerAuthContext";
+import { CalendarDate } from "@internationalized/date";
+import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
+import { format } from "date-fns";
 
 interface DashboardStats {
   totalClients: number;
@@ -57,6 +60,16 @@ export default function SellerDashboard() {
   const [, setLocation] = useLocation();
   const { seller, isLoading: authLoading } = useSellerAuth();
   const [loading, setLoading] = useState(true);
+  const [dateFilter, setDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+  
+  const [debouncedDateFilter, setDebouncedDateFilter] = useState<{
+    startDate: CalendarDate | null;
+    endDate: CalendarDate | null;
+  }>({ startDate: null, endDate: null });
+  
   const [stats, setStats] = useState<DashboardStats>({
     totalClients: 0,
     totalSales: 0,
@@ -84,6 +97,26 @@ export default function SellerDashboard() {
     checkAuthentication();
   }, []);
 
+  // Debounce date filter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedDateFilter(dateFilter);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [dateFilter]);
+
+  // Reload data when debounced date filter changes
+  useEffect(() => {
+    if (!loading && seller) {
+      fetchDashboardData();
+    }
+  }, [debouncedDateFilter]);
+
+  const handleDateRangeChange = (startDate: CalendarDate | null, endDate: CalendarDate | null) => {
+    setDateFilter({ startDate, endDate });
+  };
+
   const checkAuthentication = async () => {
     if (!authLoading && !seller) {
       setLocation("/vendedor/login");
@@ -98,9 +131,30 @@ export default function SellerDashboard() {
 
   const fetchDashboardData = async () => {
     if (seller) {
+      // Build query params for date range
+      const params = new URLSearchParams();
+      if (debouncedDateFilter.startDate) {
+        const startDate = new Date(
+          debouncedDateFilter.startDate.year,
+          debouncedDateFilter.startDate.month - 1,
+          debouncedDateFilter.startDate.day
+        );
+        params.append('startDate', format(startDate, 'yyyy-MM-dd'));
+      }
+      if (debouncedDateFilter.endDate) {
+        const endDate = new Date(
+          debouncedDateFilter.endDate.year,
+          debouncedDateFilter.endDate.month - 1,
+          debouncedDateFilter.endDate.day
+        );
+        params.append('endDate', format(endDate, 'yyyy-MM-dd'));
+      }
+      
+      const periodParam = params.toString() ? `?${params.toString()}` : '';
+      
       let analytics = { clicks: 0, conversions: 0, conversionRate: 0 };
       try {
-        const response = await fetch(`/api/seller/analytics/${seller.id}`);
+        const response = await fetch(`/api/seller/analytics/${seller.id}${periodParam}`);
         if (response.ok) {
           analytics = await response.json();
         }
@@ -119,7 +173,7 @@ export default function SellerDashboard() {
       };
       
       try {
-        const response = await fetch(`/api/seller/commissions/${seller.id}`);
+        const response = await fetch(`/api/seller/commissions/${seller.id}${periodParam}`);
         if (response.ok) {
           const data = await response.json();
           commissionsData = {
@@ -152,7 +206,7 @@ export default function SellerDashboard() {
       
       // Buscar dados de vendas totais
       try {
-        const response = await fetch(`/api/seller/total-sales/${seller.id}`, {
+        const response = await fetch(`/api/seller/total-sales/${seller.id}${periodParam}`, {
           credentials: 'include'
         });
         if (response.ok) {
@@ -250,6 +304,17 @@ export default function SellerDashboard() {
             </p>
           </div>
         </div>
+
+        {/* Filtro por Período */}
+        <DateFilterComponent 
+          onDateRangeChange={handleDateRangeChange}
+          isLoading={
+            dateFilter.startDate !== debouncedDateFilter.startDate ||
+            dateFilter.endDate !== debouncedDateFilter.endDate
+          }
+          initialRange={dateFilter}
+          className="mb-4"
+        />
 
         {/* Dashboard de Pagamentos */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">

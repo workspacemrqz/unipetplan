@@ -1576,6 +1576,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/seller/analytics/:sellerId", async (req, res) => {
     try {
       const { sellerId } = req.params;
+      const { startDate, endDate } = req.query;
       
       // Verify seller exists
       const seller = await storage.getSellerById(sellerId);
@@ -1583,8 +1584,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Vendedor não encontrado" });
       }
       
-      // Get analytics
+      // Get analytics - for now, date filtering on analytics isn't implemented
+      // because analytics are aggregated totals in the database
+      // Future implementation could store individual analytics events with timestamps
       const analytics = await storage.getSellerAnalytics(sellerId);
+      
+      // Note: To properly implement date filtering for analytics,
+      // we would need to store individual click and conversion events with timestamps
+      // For now, analytics always return total aggregated values
       
       res.json(analytics);
     } catch (error) {
@@ -1597,6 +1604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/seller/commissions/:sellerId", async (req, res) => {
     try {
       const { sellerId } = req.params;
+      const { startDate, endDate } = req.query;
       
       // Verify seller exists
       const seller = await storage.getSellerById(sellerId);
@@ -1604,14 +1612,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Vendedor não encontrado" });
       }
       
-      // Use the same logic as the admin page for consistency
-      const salesReport = await storage.getSellerSalesReport(sellerId);
+      // Get all contracts for this seller
+      let contracts = await storage.getAllContracts();
+      let sellerContracts = contracts.filter(c => c.sellerId === sellerId && c.status === 'active');
+      
+      // Apply date filter if provided
+      if (startDate || endDate) {
+        const start = startDate ? new Date(startDate as string) : new Date('1970-01-01');
+        const end = endDate ? new Date(endDate as string) : new Date();
+        end.setHours(23, 59, 59, 999); // Include the entire end date
+        
+        sellerContracts = sellerContracts.filter(contract => {
+          const contractDate = new Date(contract.createdAt || contract.startDate || '');
+          return contractDate >= start && contractDate <= end;
+        });
+      }
+      
+      // Calculate commissions
+      const plans = await storage.getAllPlans();
+      let totalCPA = 0;
+      let totalRecurring = 0;
+      
+      for (const contract of sellerContracts) {
+        const plan = plans.find(p => p.id === contract.planId);
+        const contractValue = plan ? plan.price : 0;
+        
+        // CPA commission
+        const cpaPercentage = parseFloat(seller.cpaPercentage || '0') / 100;
+        totalCPA += contractValue * cpaPercentage;
+        
+        // Recurring commission 
+        const recurringPercentage = parseFloat(seller.recurringCommissionPercentage || '0') / 100;
+        totalRecurring += contractValue * recurringPercentage;
+      }
+      
+      const totalCommission = totalCPA + totalRecurring;
       
       res.json({
-        totalToReceive: salesReport.totalCommission.toFixed(2),
-        totalCPA: salesReport.totalCpaCommission.toFixed(2),
-        totalRecurring: salesReport.totalRecurringCommission.toFixed(2),
-        contractsCount: salesReport.totalSales,
+        totalToReceive: totalCommission.toFixed(2),
+        totalCPA: totalCPA.toFixed(2),
+        totalRecurring: totalRecurring.toFixed(2),
+        contractsCount: sellerContracts.length,
         cpaPercentage: seller.cpaPercentage,
         recurringPercentage: seller.recurringCommissionPercentage
       });
@@ -1625,6 +1666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/seller/total-sales/:sellerId", async (req, res) => {
     try {
       const { sellerId } = req.params;
+      const { startDate, endDate } = req.query;
       
       // Verify seller exists
       const seller = await storage.getSellerById(sellerId);
@@ -1634,7 +1676,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get all contracts for this seller to calculate total sales values
       const contracts = await storage.getAllContracts();
-      const sellerContracts = contracts.filter(c => c.sellerId === sellerId && c.status === 'active');
+      let sellerContracts = contracts.filter(c => c.sellerId === sellerId && c.status === 'active');
+      
+      // Apply date filter if provided
+      if (startDate || endDate) {
+        const start = startDate ? new Date(startDate as string) : new Date('1970-01-01');
+        const end = endDate ? new Date(endDate as string) : new Date();
+        end.setHours(23, 59, 59, 999); // Include the entire end date
+        
+        sellerContracts = sellerContracts.filter(contract => {
+          const contractDate = new Date(contract.createdAt || contract.startDate || '');
+          return contractDate >= start && contractDate <= end;
+        });
+      }
       
       // Get plans to calculate actual values
       const plans = await storage.getAllPlans();
