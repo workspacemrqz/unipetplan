@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ChevronLeft, Download, FileText } from "lucide-react";
+import { ChevronLeft, Download } from "lucide-react";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -100,19 +100,13 @@ export default function CustomerContract() {
             className="bg-white rounded-xl shadow-lg p-6 mb-6"
           >
             <div className="flex items-start justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center"
-                  style={{ background: 'var(--bg-cream-light)' }}>
-                  <FileText className="w-6 h-6" style={{ color: 'var(--text-teal)' }} />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold" style={{ color: 'var(--text-dark-primary)' }}>
-                    Contrato de Prestação de Serviços
-                  </h1>
-                  <p className="text-sm mt-1" style={{ color: 'var(--text-dark-secondary)' }}>
-                    Plano de Saúde Pet
-                  </p>
-                </div>
+              <div>
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--text-dark-primary)' }}>
+                  Contrato de Prestação de Serviços
+                </h1>
+                <p className="text-sm mt-1" style={{ color: 'var(--text-dark-secondary)' }}>
+                  Plano de Saúde Pet
+                </p>
               </div>
               <button
                 onClick={handleDownloadPDF}
