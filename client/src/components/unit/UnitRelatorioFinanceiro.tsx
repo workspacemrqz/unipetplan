@@ -172,6 +172,134 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
     }
   };
 
+  // Preparar dados para PDF - apenas campos visíveis
+  const preparePdfData = () => {
+    return filteredEntries.map((entry, index) => {
+      const pdfData: any = {};
+      
+      if (visibleColumns.includes("Nº")) {
+        pdfData['Nº'] = (index + 1).toString();
+      }
+      if (visibleColumns.includes("Data")) {
+        pdfData['Data'] = entry.date ? format(new Date(entry.date), "dd/MM/yyyy", { locale: ptBR }) : '';
+      }
+      if (visibleColumns.includes("Cliente")) {
+        pdfData['Cliente'] = entry.clientName || '';
+      }
+      if (visibleColumns.includes("Procedimento")) {
+        pdfData['Procedimento'] = entry.procedure || '';
+      }
+      if (visibleColumns.includes("Coparticipação")) {
+        pdfData['Coparticipação'] = formatCurrency(entry.coparticipacao);
+      }
+      if (visibleColumns.includes("Pago")) {
+        pdfData['Pago'] = formatCurrency(entry.value);
+      }
+      
+      return pdfData;
+    });
+  };
+
+  // Preparar dados para Excel - todos os campos incluindo detalhes completos
+  const prepareExcelData = () => {
+    let totalCoparticipacao = 0;
+    let totalPago = 0;
+    
+    const data = filteredEntries.map((entry, index) => {
+      const copValue = parseFloat(entry.coparticipacao || '0');
+      const paidValue = parseFloat(entry.value || '0');
+      
+      totalCoparticipacao += copValue;
+      totalPago += paidValue;
+      
+      return {
+        // === IDENTIFICAÇÃO ===
+        '📋 Número': (index + 1).toString(),
+        '🆔 ID': entry.id || '',
+        
+        // === DATA ===
+        '📅 Data': entry.date ? format(new Date(entry.date), "dd/MM/yyyy", { locale: ptBR }) : '',
+        '📆 Data Completa': entry.date ? format(new Date(entry.date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+        
+        // === CLIENTE E PET ===
+        '👤 Cliente': entry.clientName || '',
+        '🐾 Pet': entry.petName || 'Não informado',
+        
+        // === PROCEDIMENTO ===
+        '💉 Procedimento': entry.procedure || '',
+        
+        // === VALORES FINANCEIROS ===
+        '💳 Coparticipação': formatCurrency(entry.coparticipacao),
+        '💰 Valor Pago': formatCurrency(entry.value),
+        '📊 Diferença': formatCurrency(String(paidValue - copValue)),
+        
+        // === STATUS ===
+        '✅ Status Pagamento': paidValue > 0 ? 'Pago' : 'Pendente',
+      };
+    });
+    
+    // Adicionar linha de totais ao final
+    if (data.length > 0) {
+      data.push({
+        '📋 Número': '',
+        '🆔 ID': '',
+        '📅 Data': '',
+        '📆 Data Completa': '',
+        '👤 Cliente': 'TOTAIS',
+        '🐾 Pet': '',
+        '💉 Procedimento': '',
+        '💳 Coparticipação': formatCurrency(String(totalCoparticipacao)),
+        '💰 Valor Pago': formatCurrency(String(totalPago)),
+        '📊 Diferença': formatCurrency(String(totalPago - totalCoparticipacao)),
+        '✅ Status Pagamento': '',
+      });
+    }
+    
+    return data;
+  };
+
+  // Definir colunas para PDF (apenas visíveis)
+  const getPdfColumns = () => {
+    const columns = [];
+    
+    if (visibleColumns.includes("Nº")) {
+      columns.push({ key: 'Nº', label: 'Nº' });
+    }
+    if (visibleColumns.includes("Data")) {
+      columns.push({ key: 'Data', label: 'Data' });
+    }
+    if (visibleColumns.includes("Cliente")) {
+      columns.push({ key: 'Cliente', label: 'Cliente' });
+    }
+    if (visibleColumns.includes("Procedimento")) {
+      columns.push({ key: 'Procedimento', label: 'Procedimento' });
+    }
+    if (visibleColumns.includes("Coparticipação")) {
+      columns.push({ key: 'Coparticipação', label: 'Coparticipação' });
+    }
+    if (visibleColumns.includes("Pago")) {
+      columns.push({ key: 'Pago', label: 'Pago' });
+    }
+    
+    return columns;
+  };
+
+  // Definir colunas para Excel (todos os campos)
+  const getExcelColumns = () => {
+    return [
+      { key: '📋 Número', label: '📋 Número' },
+      { key: '🆔 ID', label: '🆔 ID' },
+      { key: '📅 Data', label: '📅 Data' },
+      { key: '👤 Cliente', label: '👤 Cliente' },
+      { key: '🐾 Pet', label: '🐾 Pet' },
+      { key: '💉 Procedimento', label: '💉 Procedimento' },
+      { key: '💳 Coparticipação', label: '💳 Coparticipação' },
+      { key: '💰 Valor Pago', label: '💰 Valor Pago' },
+      { key: '📊 Diferença', label: '📊 Diferença' },
+      { key: '✅ Status Pagamento', label: '✅ Status Pagamento' }
+    ];
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -208,17 +336,13 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
         <div className="flex gap-2">
           <ExportButton 
             data={filteredEntries}
+            preparePdfData={() => preparePdfData()}
+            prepareExcelData={() => prepareExcelData()}
+            pdfColumns={getPdfColumns()}
+            excelColumns={getExcelColumns()}
             filename="relatorio_financeiro_unidade"
             title="Exportação de Relatório Financeiro"
             pageName="Relatório Financeiro da Unidade"
-            columns={[
-              { key: 'date', label: 'Data', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : '' },
-              { key: 'clientName', label: 'Cliente', formatter: (v) => v || '' },
-              { key: 'petName', label: 'Pet', formatter: (v) => v || 'Não informado' },
-              { key: 'procedure', label: 'Procedimento', formatter: (v) => v || '' },
-              { key: 'coparticipacao', label: 'Coparticipação', formatter: (v) => formatCurrency(v) },
-              { key: 'value', label: 'Valor Pago', formatter: (v) => formatCurrency(v) }
-            ]}
             disabled={loading || filteredEntries.length === 0}
           />
           
