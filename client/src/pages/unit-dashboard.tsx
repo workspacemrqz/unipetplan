@@ -476,9 +476,24 @@ export default function UnitDashboard() {
                     outerRadius={90}
                     innerRadius={50}
                     paddingAngle={4}
-                    label={(entry: any) => `${entry.name}: R$ ${entry.value.toFixed(2)}`}
+                    label={(props: any) => {
+                      const { x, y, name, value } = props;
+                      return (
+                        <text 
+                          x={x} 
+                          y={y} 
+                          fill="#303030" 
+                          fontSize={12}
+                          fontWeight={500}
+                          textAnchor={x > 200 ? 'start' : 'end'}
+                          dominantBaseline="central"
+                        >
+                          {`${name}: R$ ${value.toFixed(2)}`}
+                        </text>
+                      );
+                    }}
                     labelLine={{ 
-                      stroke: '#374151', 
+                      stroke: '#303030', 
                       strokeWidth: 2 
                     }}
                   >
