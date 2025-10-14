@@ -69,6 +69,9 @@ const allColumns = [
   "Cliente",
   "Pet",
   "Valor",
+  "Coparticipação",
+  "Carência",
+  "Limites Anuais",
   "Status",
   "Data",
   "Ações",
@@ -625,6 +628,9 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
               {visibleColumns.includes("Cliente") && <TableHead className="w-[150px] bg-white">Cliente</TableHead>}
               {visibleColumns.includes("Pet") && <TableHead className="w-[120px] bg-white">Pet</TableHead>}
               {visibleColumns.includes("Valor") && <TableHead className="w-[120px] bg-white">Valor</TableHead>}
+              {visibleColumns.includes("Coparticipação") && <TableHead className="w-[120px] bg-white">Coparticipação</TableHead>}
+              {visibleColumns.includes("Carência") && <TableHead className="w-[100px] bg-white">Carência</TableHead>}
+              {visibleColumns.includes("Limites Anuais") && <TableHead className="w-[120px] bg-white">Limites Anuais</TableHead>}
               {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
               {visibleColumns.includes("Data") && <TableHead className="w-[120px] bg-white">Data</TableHead>}
               {visibleColumns.includes("Ações") && <TableHead className="w-[150px] bg-white">Ações</TableHead>}
@@ -679,6 +685,57 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                     {visibleColumns.includes("Valor") && (
                       <TableCell className="whitespace-nowrap bg-white">
                         R$ {parseFloat(atendimento.value || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Coparticipação") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {atendimento.procedures && atendimento.procedures.length > 0 ? (
+                          <div className="space-y-1">
+                            {atendimento.procedures.map((proc: any, index: number) => (
+                              <div key={index} className="text-xs">
+                                {proc.copayment ? `${proc.copayment}%` : '0%'}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Carência") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {atendimento.procedures && atendimento.procedures.length > 0 ? (
+                          <div className="space-y-1">
+                            {atendimento.procedures.map((proc: any, index: number) => (
+                              <div key={index} className="text-xs">
+                                {proc.waitingDays ? `${proc.waitingDays} dias` : 'Sem carência'}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Limites Anuais") && (
+                      <TableCell className="whitespace-nowrap bg-white">
+                        {atendimento.procedures && atendimento.procedures.length > 0 ? (
+                          <div className="space-y-1">
+                            {atendimento.procedures.map((proc: any, index: number) => (
+                              <div key={index} className="text-xs">
+                                {proc.annualLimit === -1 ? (
+                                  <span className="text-emerald-600 font-medium">Ilimitado</span>
+                                ) : proc.annualLimit > 0 ? (
+                                  `${proc.usageCount || 0}/${proc.annualLimit}`
+                                ) : (
+                                  '-'
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Status") && (
