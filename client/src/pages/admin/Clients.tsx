@@ -325,62 +325,86 @@ export default function Clients() {
         const response = await fetch(`/admin/api/clients/${client.id}/pets`);
         const pets: Pet[] = response.ok ? await response.json() : [];
         
+        // Dados organizados do cliente - Seção Principal
         const exportData: any = {
-          'Nome Completo': client.fullName || client.full_name || '',
-          'Email': client.email || 'Não informado',
-          'Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
-          'CPF': client.cpf || '',
-          'CEP': client.cep || 'Não informado',
-          'Endereço': client.address || 'Não informado',
-          'Cidade': client.city || 'Não informado',
-          'Estado': client.state || 'Não informado',
-          'Data de Cadastro': client.createdAt ? format(new Date(client.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
-          'Última Atualização': client.updatedAt ? format(new Date(client.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+          // === INFORMAÇÕES DO CLIENTE ===
+          '👤 Nome Completo': client.fullName || client.full_name || '',
+          '📧 Email': client.email || 'Não informado',
+          '📱 Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
+          '📄 CPF': client.cpf || '',
+          
+          // === ENDEREÇO ===
+          '📍 CEP': client.cep || 'Não informado',
+          '🏠 Endereço': client.address || 'Não informado',
+          '🌆 Cidade': client.city || 'Não informado',
+          '🗺️ Estado': client.state || 'Não informado',
+          
+          // === DATAS ===
+          '📅 Data de Cadastro': client.createdAt ? format(new Date(client.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+          '🔄 Última Atualização': client.updatedAt ? format(new Date(client.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : '',
+          
+          // === CONTAGEM DE PETS ===
+          '🐾 Total de Pets': pets ? pets.length.toString() : '0',
         };
         
         if (pets && pets.length > 0) {
+          // Adicionar informações de cada pet de forma mais organizada
           pets.forEach((pet, index) => {
-            const petPrefix = `Pet ${index + 1}`;
-            exportData[`${petPrefix} - Nome`] = pet.name || '';
-            exportData[`${petPrefix} - Espécie`] = pet.species || '';
-            exportData[`${petPrefix} - Raça`] = pet.breed || 'Não informado';
-            exportData[`${petPrefix} - Idade`] = pet.age || 'Não informado';
-            exportData[`${petPrefix} - Sexo`] = pet.sex || 'Não informado';
-            exportData[`${petPrefix} - Cor`] = pet.color || 'Não informado';
-            exportData[`${petPrefix} - Peso (kg)`] = pet.weight ? String(pet.weight) : 'Não informado';
-            exportData[`${petPrefix} - Data de Nascimento`] = pet.birthDate ? format(new Date(pet.birthDate), "dd/MM/yyyy", { locale: ptBR }) : 'Não informado';
-            exportData[`${petPrefix} - Castrado`] = pet.castrated !== null ? (pet.castrated ? 'Sim' : 'Não') : 'Não informado';
-            exportData[`${petPrefix} - Microchip`] = pet.microchip || 'Não informado';
-            exportData[`${petPrefix} - Último Check-up`] = pet.lastCheckup ? format(new Date(pet.lastCheckup), "dd/MM/yyyy", { locale: ptBR }) : 'Não informado';
-            exportData[`${petPrefix} - Doenças Anteriores`] = pet.previousDiseases || 'Nenhuma';
-            exportData[`${petPrefix} - Cirurgias`] = pet.surgeries || 'Nenhuma';
-            exportData[`${petPrefix} - Alergias`] = pet.allergies || 'Nenhuma';
-            exportData[`${petPrefix} - Medicações Atuais`] = pet.currentMedications || 'Nenhuma';
-            exportData[`${petPrefix} - Condições Hereditárias`] = pet.hereditaryConditions || 'Nenhuma';
-            exportData[`${petPrefix} - Tratamentos Antiparasitários`] = pet.parasiteTreatments || 'Nenhum';
+            const petNum = index + 1;
             
+            // === DADOS BÁSICOS DO PET ===
+            exportData[`[PET ${petNum}] Nome`] = pet.name || '';
+            exportData[`[PET ${petNum}] Espécie`] = pet.species || '';
+            exportData[`[PET ${petNum}] Raça`] = pet.breed || 'Não informado';
+            exportData[`[PET ${petNum}] Sexo`] = pet.sex || pet.gender || 'Não informado';
+            exportData[`[PET ${petNum}] Idade`] = pet.age || 'Não informado';
+            exportData[`[PET ${petNum}] Cor`] = pet.color || 'Não informado';
+            exportData[`[PET ${petNum}] Peso (kg)`] = pet.weight ? `${pet.weight} kg` : 'Não informado';
+            exportData[`[PET ${petNum}] Data Nascimento`] = pet.birthDate ? format(new Date(pet.birthDate), "dd/MM/yyyy", { locale: ptBR }) : 'Não informado';
+            exportData[`[PET ${petNum}] Castrado`] = pet.castrated !== undefined && pet.castrated !== null ? (pet.castrated ? 'Sim' : 'Não') : 'Não informado';
+            
+            // === IDENTIFICAÇÃO DO PET ===
+            exportData[`[PET ${petNum}] Microchip`] = pet.microchip || 'Não possui';
+            
+            // === HISTÓRICO MÉDICO DO PET ===
+            exportData[`[PET ${petNum}] Último Check-up`] = pet.lastCheckup ? format(new Date(pet.lastCheckup), "dd/MM/yyyy", { locale: ptBR }) : 'Não realizado';
+            exportData[`[PET ${petNum}] Doenças Anteriores`] = pet.previousDiseases || 'Nenhuma registrada';
+            exportData[`[PET ${petNum}] Cirurgias Realizadas`] = pet.surgeries || 'Nenhuma registrada';
+            exportData[`[PET ${petNum}] Alergias`] = pet.allergies || 'Nenhuma registrada';
+            exportData[`[PET ${petNum}] Medicações Atuais`] = pet.currentMedications || pet.medications || 'Nenhuma';
+            exportData[`[PET ${petNum}] Condições Crônicas`] = pet.chronicConditions || 'Nenhuma';
+            exportData[`[PET ${petNum}] Condições Hereditárias`] = pet.hereditaryConditions || 'Nenhuma conhecida';
+            exportData[`[PET ${petNum}] Tratamentos Antiparasitários`] = pet.parasiteTreatments || 'Nenhum registrado';
+            exportData[`[PET ${petNum}] Observações`] = pet.observations || 'Sem observações';
+            
+            // === VACINAÇÃO DO PET ===
             if (pet.vaccineData && Array.isArray(pet.vaccineData) && pet.vaccineData.length > 0) {
-              const vaccines = pet.vaccineData.map((v: any) => 
-                `${v.vaccine}: ${format(new Date(v.date), "dd/MM/yyyy", { locale: ptBR })}`
-              ).join('; ');
-              exportData[`${petPrefix} - Vacinas`] = vaccines;
+              const vaccines = pet.vaccineData
+                .map((v: any) => `${v.vaccine || 'Vacina'}: ${v.date ? format(new Date(v.date), "dd/MM/yyyy", { locale: ptBR }) : 'Data não registrada'}`)
+                .join(' | ');
+              exportData[`[PET ${petNum}] Vacinas Aplicadas`] = vaccines;
             } else {
-              exportData[`${petPrefix} - Vacinas`] = 'Nenhuma vacina registrada';
+              exportData[`[PET ${petNum}] Vacinas Aplicadas`] = 'Nenhuma vacina registrada';
             }
+            
+            // === STATUS DO PET ===
+            exportData[`[PET ${petNum}] Cadastrado em`] = pet.createdAt ? format(new Date(pet.createdAt), "dd/MM/yyyy", { locale: ptBR }) : 'Data não registrada';
           });
         } else {
-          exportData['Pets'] = 'Nenhum pet cadastrado';
+          // Caso não tenha pets
+          exportData['🐾 Informação de Pets'] = 'Nenhum pet cadastrado para este cliente';
         }
         
         enrichedData.push(exportData);
       } catch (error) {
         console.error(`Erro ao buscar pets para cliente ${client.id}:`, error);
+        // Em caso de erro, ainda exporta os dados básicos do cliente
         enrichedData.push({
-          'Nome Completo': client.fullName || client.full_name || '',
-          'Email': client.email || 'Não informado',
-          'Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
-          'CPF': client.cpf || '',
-          'Erro': 'Erro ao carregar dados completos'
+          '👤 Nome Completo': client.fullName || client.full_name || '',
+          '📧 Email': client.email || 'Não informado',
+          '📱 Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
+          '📄 CPF': client.cpf || '',
+          '⚠️ Status': 'Erro ao carregar dados completos dos pets'
         });
       }
     }

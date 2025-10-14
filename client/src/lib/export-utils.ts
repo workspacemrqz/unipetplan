@@ -167,52 +167,140 @@ export async function exportToExcel({
   sheetName = 'Dados',
 }: ExcelExportOptions) {
   let worksheetData: any[] = [];
+  let headers: string[] = [];
   
   if (columns && columns.length > 0) {
-    // Create header row
-    const headers = columns.reduce((acc, col) => {
-      acc[col.key] = col.label;
-      return acc;
-    }, {} as any);
+    // Create header row with labels
+    headers = columns.map(col => col.label);
     
     // Format data rows
-    worksheetData = data.map(row => {
-      const formattedRow: any = {};
+    const dataRows = data.map(row => {
+      const values: any[] = [];
       columns.forEach(col => {
         const value = getNestedValue(row, col.key);
-        formattedRow[col.key] = col.formatter ? col.formatter(value, row) : formatValue(value);
+        const formattedValue = col.formatter ? col.formatter(value, row) : formatValue(value);
+        values.push(formattedValue);
       });
-      return formattedRow;
+      return values;
     });
     
-    // Add headers as first row
-    worksheetData.unshift(headers);
+    // Combine headers and data
+    worksheetData = [headers, ...dataRows];
   } else {
-    // Use data as-is with formatted values
-    worksheetData = data.map(row => {
-      const formattedRow: any = {};
-      Object.keys(row).forEach(key => {
-        formattedRow[key] = formatValue(row[key]);
+    // Create a more organized structure for raw data
+    if (data.length > 0) {
+      // Get all unique keys from all data objects
+      const allKeys = new Set<string>();
+      data.forEach(row => {
+        Object.keys(row).forEach(key => allKeys.add(key));
       });
-      return formattedRow;
-    });
+      
+      // Convert keys to array and sort them for consistency
+      const sortedKeys = Array.from(allKeys).sort((a, b) => {
+        // Priority order for common fields
+        const priorityOrder = [
+          'Nome Completo', 'Email', 'Telefone', 'CPF', 
+          'CEP', 'Endereço', 'Cidade', 'Estado',
+          'Data de Cadastro', 'Última Atualização'
+        ];
+        
+        const aIndex = priorityOrder.indexOf(a);
+        const bIndex = priorityOrder.indexOf(b);
+        
+        if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+        if (aIndex !== -1) return -1;
+        if (bIndex !== -1) return 1;
+        
+        // Put Pet fields after client fields
+        if (a.startsWith('Pet ') && !b.startsWith('Pet ')) return 1;
+        if (!a.startsWith('Pet ') && b.startsWith('Pet ')) return -1;
+        
+        return a.localeCompare(b);
+      });
+      
+      // Create headers
+      headers = sortedKeys;
+      
+      // Create data rows
+      const dataRows = data.map(row => {
+        return sortedKeys.map(key => formatValue(row[key]));
+      });
+      
+      worksheetData = [headers, ...dataRows];
+    }
   }
   
   // Create workbook and worksheet
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.json_to_sheet(worksheetData, { skipHeader: columns ? true : false });
   
-  // Auto-size columns
-  const columnWidths = Object.keys(worksheetData[0] || {}).map(key => ({
-    wch: Math.max(
-      key.length,
-      ...worksheetData.map(row => String(row[key] || '').length)
-    ) + 2
-  }));
-  ws['!cols'] = columnWidths;
+  // Create worksheet from array of arrays
+  const ws = XLSX.utils.aoa_to_sheet(worksheetData);
   
-  // Add worksheet to workbook
+  // Apply styles to header row
+  if (headers.length > 0) {
+    const headerRange = XLSX.utils.decode_range(ws['!ref'] || 'A1:A1');
+    
+    // Style header cells
+    for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+      if (!ws[cellAddress]) continue;
+      
+      // Add bold style to headers (note: basic XLSX doesn't support full styling, 
+      // but we can at least ensure proper formatting)
+      ws[cellAddress].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "277677" } },
+        alignment: { horizontal: "center", vertical: "center" }
+      };
+    }
+  }
+  
+  // Calculate optimal column widths
+  const columnWidths: { wch: number }[] = [];
+  
+  if (worksheetData.length > 0) {
+    const numCols = worksheetData[0].length;
+    
+    for (let col = 0; col < numCols; col++) {
+      let maxWidth = 10; // minimum width
+      
+      // Check all rows for this column
+      worksheetData.forEach(row => {
+        if (row[col]) {
+          const cellLength = String(row[col]).length;
+          maxWidth = Math.max(maxWidth, cellLength);
+        }
+      });
+      
+      // Cap maximum width and add some padding
+      columnWidths.push({ wch: Math.min(maxWidth + 2, 50) });
+    }
+    
+    ws['!cols'] = columnWidths;
+  }
+  
+  // Set print settings for better output
+  ws['!pageSetup'] = {
+    orientation: 'landscape',
+    fitToWidth: 1,
+    fitToHeight: 0
+  };
+  
+  // Add autofilter to the data range
+  if (worksheetData.length > 1) {
+    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1:A1');
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
+  }
+  
+  // Add worksheet to workbook with a clean name
   XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  
+  // Add workbook properties
+  wb.Props = {
+    Title: sheetName,
+    Author: "UnipetPlan",
+    CreatedDate: new Date()
+  };
   
   // Save the file
   XLSX.writeFile(wb, filename);
