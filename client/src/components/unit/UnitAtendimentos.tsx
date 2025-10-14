@@ -322,6 +322,142 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
     }
   };
 
+  // Preparar dados para PDF - apenas campos visíveis
+  const preparePdfData = () => {
+    return atendimentosData.map(atendimento => {
+      const pdfData: any = {};
+      
+      // Procedimentos
+      if (atendimento.procedures && atendimento.procedures.length > 0) {
+        pdfData['Procedimento'] = atendimento.procedures
+          .map((proc: any) => proc.procedureName || proc.name || '')
+          .join(', ');
+      } else {
+        pdfData['Procedimento'] = atendimento.procedure || 'Não informado';
+      }
+      
+      // Dados básicos
+      pdfData['Cliente'] = atendimento.clientName || 'Não informado';
+      pdfData['Pet'] = atendimento.petName || 'Não informado';
+      pdfData['Valor'] = atendimento.value 
+        ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(atendimento.value))
+        : 'R$ 0,00';
+      pdfData['Status'] = getStatusLabel(atendimento.status);
+      pdfData['Data'] = atendimento.createdAt 
+        ? format(new Date(atendimento.createdAt), "dd/MM/yyyy", { locale: ptBR })
+        : '';
+      
+      return pdfData;
+    });
+  };
+
+  // Preparar dados para Excel - todos os campos incluindo detalhes
+  const prepareExcelData = () => {
+    return atendimentosData.map(atendimento => {
+      const excelData: any = {
+        // === INFORMAÇÕES DO ATENDIMENTO ===
+        '🏥 ID Atendimento': atendimento.id || '',
+        '📋 Procedimento(s)': '',
+        '💰 Valor Total': atendimento.value 
+          ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(atendimento.value))
+          : 'R$ 0,00',
+        '✅ Status': getStatusLabel(atendimento.status),
+        
+        // === CLIENTE E PET ===
+        '👤 Cliente': atendimento.clientName || 'Não informado',
+        '🐾 Pet': atendimento.petName || 'Não informado',
+        
+        // === UNIDADE ===
+        '🏢 Unidade': atendimento.networkUnit?.name || 'Não especificada',
+        
+        // === OBSERVAÇÕES ===
+        '📝 Obs. Procedimento': atendimento.procedureNotes || 'Sem observações',
+        '💬 Obs. Gerais': atendimento.generalNotes || 'Sem observações',
+        
+        // === DATAS ===
+        '📅 Data de Criação': atendimento.createdAt 
+          ? format(new Date(atendimento.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
+          : 'Não informado',
+        '🔄 Última Atualização': atendimento.updatedAt 
+          ? format(new Date(atendimento.updatedAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
+          : 'Não atualizado',
+      };
+      
+      // Processar procedimentos com detalhes
+      if (atendimento.procedures && atendimento.procedures.length > 0) {
+        const procedureDetails = atendimento.procedures.map((proc: any, index: number) => {
+          const procedureInfo = [
+            proc.procedureName || proc.name || 'Procedimento',
+            proc.value ? `R$ ${parseFloat(proc.value).toFixed(2).replace('.', ',')}` : '',
+            proc.coparticipacao ? `Copart: ${proc.coparticipacao}` : ''
+          ].filter(Boolean).join(' | ');
+          
+          excelData[`[PROC ${index + 1}] Detalhes`] = procedureInfo;
+        });
+        
+        // Resumo de todos os procedimentos
+        excelData['📋 Procedimento(s)'] = atendimento.procedures
+          .map((proc: any) => proc.procedureName || proc.name || '')
+          .filter(Boolean)
+          .join('; ') || 'Não especificado';
+          
+        excelData['📊 Total de Procedimentos'] = atendimento.procedures.length.toString();
+      } else if (atendimento.procedure) {
+        excelData['📋 Procedimento(s)'] = atendimento.procedure;
+        excelData['📊 Total de Procedimentos'] = '1';
+      } else {
+        excelData['📋 Procedimento(s)'] = 'Não informado';
+        excelData['📊 Total de Procedimentos'] = '0';
+      }
+      
+      return excelData;
+    });
+  };
+
+  // Definir colunas para PDF (apenas visíveis)
+  const getPdfColumns = () => {
+    const columns = [];
+    
+    if (visibleColumns.includes("Procedimento")) {
+      columns.push({ key: 'Procedimento', label: 'Procedimento' });
+    }
+    if (visibleColumns.includes("Cliente")) {
+      columns.push({ key: 'Cliente', label: 'Cliente' });
+    }
+    if (visibleColumns.includes("Pet")) {
+      columns.push({ key: 'Pet', label: 'Pet' });
+    }
+    if (visibleColumns.includes("Valor")) {
+      columns.push({ key: 'Valor', label: 'Valor' });
+    }
+    if (visibleColumns.includes("Status")) {
+      columns.push({ key: 'Status', label: 'Status' });
+    }
+    if (visibleColumns.includes("Data")) {
+      columns.push({ key: 'Data', label: 'Data' });
+    }
+    
+    return columns;
+  };
+
+  // Definir colunas para Excel (todos os campos)
+  const getExcelColumns = () => {
+    return [
+      { key: '🏥 ID Atendimento', label: '🏥 ID Atendimento' },
+      { key: '📋 Procedimento(s)', label: '📋 Procedimento(s)' },
+      { key: '💰 Valor Total', label: '💰 Valor Total' },
+      { key: '✅ Status', label: '✅ Status' },
+      { key: '👤 Cliente', label: '👤 Cliente' },
+      { key: '🐾 Pet', label: '🐾 Pet' },
+      { key: '🏢 Unidade', label: '🏢 Unidade' },
+      { key: '📝 Obs. Procedimento', label: '📝 Obs. Procedimento' },
+      { key: '💬 Obs. Gerais', label: '💬 Obs. Gerais' },
+      { key: '📅 Data de Criação', label: '📅 Data de Criação' },
+      { key: '🔄 Última Atualização', label: '🔄 Última Atualização' },
+      { key: '📊 Total de Procedimentos', label: '📊 Total de Procedimentos' }
+    ];
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -392,21 +528,13 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
           
           <ExportButton 
             data={atendimentosData}
+            preparePdfData={() => preparePdfData()}
+            prepareExcelData={() => prepareExcelData()}
+            pdfColumns={getPdfColumns()}
+            excelColumns={getExcelColumns()}
             filename="atendimentos_unidade"
             title="Exportação de Atendimentos"
             pageName="Atendimentos da Unidade"
-            columns={[
-              { key: 'procedure', label: 'Procedimento', formatter: (v) => v || '' },
-              { key: 'procedureName', label: 'Nome do Procedimento', formatter: (v) => v || '' },
-              { key: 'clientName', label: 'Cliente', formatter: (v) => v || 'Não informado' },
-              { key: 'petName', label: 'Pet', formatter: (v) => v || 'Não informado' },
-              { key: 'value', label: 'Valor', formatter: (v) => v ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v)) : 'R$ 0,00' },
-              { key: 'status', label: 'Status', formatter: (v) => v === 'open' ? 'Aberta' : v === 'closed' ? 'Concluída' : v === 'cancelled' ? 'Cancelada' : v || '' },
-              { key: 'procedureNotes', label: 'Observações do Procedimento', formatter: (v) => v || '' },
-              { key: 'generalNotes', label: 'Observações Gerais', formatter: (v) => v || '' },
-              { key: 'createdAt', label: 'Data de Criação', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' },
-              { key: 'updatedAt', label: 'Última Atualização', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '' }
-            ]}
             disabled={isLoading || atendimentosData.length === 0}
           />
           
