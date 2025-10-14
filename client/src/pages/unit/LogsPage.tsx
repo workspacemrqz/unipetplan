@@ -263,9 +263,47 @@ export default function LogsPage() {
     }
   };
 
+  // Função auxiliar para buscar todos os logs sem paginação
+  const fetchAllLogs = async (): Promise<Log[]> => {
+    try {
+      const token = getAuthToken();
+      
+      if (!token) {
+        throw new Error("Token não encontrado");
+      }
+
+      // Construir parâmetros mantendo todos os filtros existentes
+      const allDataParams = {
+        limit: "999999", // Fetch all records
+        ...(userTypeFilter !== "all" && { userType: userTypeFilter }),
+        ...dateParams
+      };
+
+      const params = new URLSearchParams(allDataParams);
+      const response = await fetch(`/api/units/${slug}/logs?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar todos os logs');
+      }
+
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Erro ao buscar todos os logs:', error);
+      return [];
+    }
+  };
+
   // Preparar dados para PDF - apenas campos visíveis
-  const preparePdfData = () => {
-    return logs.map(logEntry => ({
+  const preparePdfData = async () => {
+    // Fetch all data for export
+    const allLogs = await fetchAllLogs();
+    
+    return allLogs.map(logEntry => ({
       'Data/Hora': format(new Date(logEntry.log.createdAt), "dd/MM/yyyy HH:mm"),
       'Ação': getActionTypeLabel(logEntry.log.actionType),
       'Usuário': getUserLabel(logEntry),
@@ -274,8 +312,11 @@ export default function LogsPage() {
   };
 
   // Preparar dados para Excel - todos os campos incluindo detalhes completos
-  const prepareExcelData = () => {
-    return logs.map(logEntry => {
+  const prepareExcelData = async () => {
+    // Fetch all data for export
+    const allLogs = await fetchAllLogs();
+    
+    return allLogs.map(logEntry => {
       const excelData: any = {
         // === INFORMAÇÕES DO LOG ===
         '📅 Data': format(new Date(logEntry.log.createdAt), "dd/MM/yyyy"),

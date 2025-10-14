@@ -172,9 +172,49 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
     }
   };
 
+  // Função auxiliar para buscar todos os dados do relatório financeiro
+  const fetchAllFinancialData = async (): Promise<FinancialEntry[]> => {
+    try {
+      const token = localStorage.getItem('unit-token');
+      const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
+      // Adicionar limit para garantir que busca todos os registros
+      const allDataParams = {
+        ...dateParams,
+        limit: "999999" // Fetch all records
+      };
+      const queryParams = new URLSearchParams(allDataParams as any);
+      
+      const response = await fetch(`/api/units/${unitSlug}/relatorio-financeiro?${queryParams}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Apply search filter if needed
+        if (searchQuery) {
+          return data.filter((entry: FinancialEntry) =>
+            entry.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            entry.petName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            entry.procedure.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        return data;
+      }
+      return [];
+    } catch (error) {
+      console.error('Erro ao buscar todos os dados financeiros:', error);
+      return [];
+    }
+  };
+
   // Preparar dados para PDF - apenas campos visíveis
-  const preparePdfData = () => {
-    return filteredEntries.map((entry, index) => {
+  const preparePdfData = async () => {
+    // Fetch all data for export
+    const allData = await fetchAllFinancialData();
+    
+    return allData.map((entry, index) => {
       const pdfData: any = {};
       
       if (visibleColumns.includes("Nº")) {
@@ -201,11 +241,14 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
   };
 
   // Preparar dados para Excel - todos os campos incluindo detalhes completos
-  const prepareExcelData = () => {
+  const prepareExcelData = async () => {
+    // Fetch all data for export
+    const allData = await fetchAllFinancialData();
+    
     let totalCoparticipacao = 0;
     let totalPago = 0;
     
-    const data = filteredEntries.map((entry, index) => {
+    const data = allData.map((entry, index) => {
       const copValue = parseFloat(entry.coparticipacao || '0');
       const paidValue = parseFloat(entry.value || '0');
       

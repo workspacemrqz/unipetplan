@@ -323,8 +323,11 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
   };
 
   // Preparar dados para PDF - apenas campos visíveis
-  const preparePdfData = () => {
-    return atendimentosData.map(atendimento => {
+  const preparePdfData = async () => {
+    // Fetch all data for export
+    const allData = await fetchAllAtendimentos();
+    
+    return allData.map(atendimento => {
       const pdfData: any = {};
       
       // Procedimentos
@@ -351,9 +354,51 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
     });
   };
 
+  // Função auxiliar para buscar todos os atendimentos sem paginação
+  const fetchAllAtendimentos = async (): Promise<AtendimentoWithNetworkUnit[]> => {
+    try {
+      // Verificar primeiro veterinarian-token, depois unit-token
+      const veterinarianToken = localStorage.getItem('veterinarian-token');
+      const unitToken = localStorage.getItem('unit-token');
+      const token = veterinarianToken || unitToken;
+      
+      if (!token) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      // Construir parâmetros mantendo todos os filtros existentes
+      const allDataParams = {
+        limit: "999999", // Fetch all records
+        ...(searchQuery && { search: searchQuery }),
+        ...(statusFilter !== "all" && { status: statusFilter }),
+        ...dateParams
+      };
+
+      const queryString = new URLSearchParams(allDataParams).toString();
+      const response = await fetch(`/api/units/${unitSlug}/atendimentos?${queryString}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar atendimentos: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Erro ao buscar todos os atendimentos:', error);
+      return [];
+    }
+  };
+
   // Preparar dados para Excel - todos os campos incluindo detalhes
-  const prepareExcelData = () => {
-    return atendimentosData.map(atendimento => {
+  const prepareExcelData = async () => {
+    // Fetch all data for export
+    const allData = await fetchAllAtendimentos();
+    
+    return allData.map(atendimento => {
       const excelData: any = {
         // === INFORMAÇÕES DO ATENDIMENTO ===
         '🏥 ID Atendimento': atendimento.id || '',
