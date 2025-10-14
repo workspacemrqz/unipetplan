@@ -1809,32 +1809,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Vendedor não encontrado" });
       }
       
-      // Get seller payments and filter by date if provided
-      let payments = await storage.getSellerPayments?.(sellerId) || [];
-      
-      // Apply date filter if provided
-      if (startDate || endDate) {
-        const start = startDate ? new Date(startDate as string) : new Date('1970-01-01');
-        const end = endDate ? new Date(endDate as string) : new Date();
-        end.setHours(23, 59, 59, 999); // Include the entire end date
-        
-        payments = payments.filter(payment => {
-          const paymentDate = new Date(payment.createdAt || payment.date || '');
-          return paymentDate >= start && paymentDate <= end;
-        });
-      }
-      
-      // Calculate total paid from filtered payments
-      const totalPaid = payments.reduce((sum, payment) => {
-        return sum + (parseFloat(payment.amount) || 0);
-      }, 0);
-      
-      // Get the full report to calculate balance
+      // Get the full report for total commission
       const report = await storage.getSellerSalesReport(sellerId);
       
+      // For now, date filtering on payments is not implemented
+      // We return the total paid from the sales report
+      // Future implementation could query seller_payments table with date filters
+      
       res.json({
-        totalPaid: totalPaid,
-        balance: report.totalCommission - totalPaid, // Balance is total commission minus paid
+        totalPaid: report.totalPaid,
+        balance: report.balance,
         totalCommission: report.totalCommission
       });
     } catch (error) {
