@@ -30,6 +30,7 @@ interface Procedure {
   name: string;
   type: string;
   annualLimit: number;
+  isUnlimited?: boolean;
   used: number;
   remaining: number;
   canUse: boolean;
@@ -202,11 +203,25 @@ export function ProceduresTab() {
                               {procedure.type}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-center">{procedure.annualLimit}</TableCell>
                           <TableCell className="text-center">
-                            <Badge variant="neutral" className="text-xs">
-                              {procedure.remaining}
-                            </Badge>
+                            {procedure.isUnlimited ? (
+                              <Badge variant="neutral" className="text-xs">
+                                Ilimitado
+                              </Badge>
+                            ) : (
+                              procedure.annualLimit
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {procedure.isUnlimited ? (
+                              <Badge variant="neutral" className="text-xs">
+                                Ilimitado
+                              </Badge>
+                            ) : (
+                              <Badge variant="neutral" className="text-xs">
+                                {procedure.remaining}
+                              </Badge>
+                            )}
                           </TableCell>
                           <TableCell className="text-center">
                             {procedure.waitingDaysRemaining && procedure.waitingDaysRemaining > 0 ? (
@@ -232,6 +247,10 @@ export function ProceduresTab() {
                             {procedure.waitingDaysRemaining && procedure.waitingDaysRemaining > 0 ? (
                               <Badge variant="neutral" className="text-xs">
                                 Em carência
+                              </Badge>
+                            ) : procedure.isUnlimited ? (
+                              <Badge variant="neutral" className="text-xs">
+                                Disponível
                               </Badge>
                             ) : procedure.remaining > 0 ? (
                               <Badge variant="neutral" className="text-xs">

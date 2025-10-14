@@ -48,15 +48,32 @@ export function setupProcedureUsageRoutes(app: Express, storage: IStorage) {
               
               // Extract numeric limit from limitesAnuais string
               let annualLimit = 0;
+              let isUnlimited = false;
+              
               if (pp.limitesAnuais) {
-                const match = pp.limitesAnuais.match(/(\d+)/);
-                if (match) {
-                  annualLimit = parseInt(match[1], 10);
+                // Check for unlimited indicators
+                const unlimitedKeywords = ['ilimitado', 'sem limite', 'unlimited', 'infinity'];
+                const limitString = pp.limitesAnuais.toLowerCase();
+                
+                if (unlimitedKeywords.some(keyword => limitString.includes(keyword))) {
+                  isUnlimited = true;
+                  annualLimit = -1; // Use -1 to indicate unlimited
+                } else {
+                  const match = pp.limitesAnuais.match(/(\d+)/);
+                  if (match) {
+                    annualLimit = parseInt(match[1], 10);
+                  }
                 }
               }
               
+              // For INFINITY plan, treat no limit as unlimited
+              if (plan.name.toUpperCase().includes('INFINITY') && annualLimit === 0) {
+                isUnlimited = true;
+                annualLimit = -1;
+              }
+              
               const usedCount = usageRecord ? usageRecord.usageCount : 0;
-              const remaining = Math.max(0, annualLimit - usedCount);
+              const remaining = isUnlimited ? -1 : Math.max(0, annualLimit - usedCount);
               
               // Calculate waiting period days remaining
               let waitingDaysRemaining = 0;
@@ -80,16 +97,18 @@ export function setupProcedureUsageRoutes(app: Express, storage: IStorage) {
               return {
                 id: pp.procedureId,
                 name: pp.procedureName,
+                type: pp.procedureType || 'Geral',
                 annualLimit: annualLimit,
+                isUnlimited: isUnlimited,
                 used: usedCount,
                 remaining: remaining,
-                canUse: remaining > 0 && waitingDaysRemaining === 0,
+                canUse: isUnlimited || (remaining > 0 && waitingDaysRemaining === 0),
                 waitingDaysRemaining: waitingDaysRemaining,
                 waitingDaysTotal: waitingDaysTotal,
                 coparticipation: coparticipation,
                 petCreatedAt: pet.createdAt
               };
-            }).filter((p: any) => p.annualLimit > 0); // Only show procedures with limits
+            }); // Show all procedures (including unlimited ones)
           }
           
           return {
