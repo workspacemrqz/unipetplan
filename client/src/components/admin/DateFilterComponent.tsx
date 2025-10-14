@@ -152,7 +152,7 @@ const DateFilterComponent = React.memo(function DateFilterComponent({
                   placeholder="Selecionar período personalizado"
                   disabled={isLoading}
                   isLoading={isLoading}
-                  className="w-full bg-white/20 text-white border-white/30 [&_input]:text-white [&_input]:placeholder-white/60"
+                  className="w-full [&_button]:bg-white/20 [&_button]:backdrop-blur-sm [&_button]:border-white/30 [&_button]:text-white [&_button]:hover:bg-white/30 [&_button]:hover:border-white/40 [&_button_.lucide]:text-white/80 [&_button]:font-normal"
                 />
               </div>
               
