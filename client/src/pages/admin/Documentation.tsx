@@ -4,15 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/admin/ui/separator";
 import { ScrollArea } from "@/components/admin/ui/scroll-area";
 import { Badge } from "@/components/admin/ui/badge";
-import { 
-  FileText, 
-  Database, 
-  Shield, 
-  Globe, 
-  Settings,
-  CheckCircle,
-  Clipboard
-} from "lucide-react";
 
 export default function Documentation() {
   const [selectedSection, setSelectedSection] = useState("resumo");
@@ -64,8 +55,7 @@ export default function Documentation() {
         {selectedSection === "resumo" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
+              <CardTitle>
                 Resumo Técnico do Projeto
               </CardTitle>
               <CardDescription>Visão geral da arquitetura e tecnologias utilizadas</CardDescription>
@@ -81,8 +71,7 @@ export default function Documentation() {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-4">
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Clipboard className="h-4 w-4" />
+                  <h4 className="font-semibold mb-2">
                     Frontend
                   </h4>
                   <ul className="space-y-1 text-sm text-muted-foreground">
@@ -97,8 +86,7 @@ export default function Documentation() {
                 </div>
 
                 <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-4">
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
+                  <h4 className="font-semibold mb-2">
                     Backend
                   </h4>
                   <ul className="space-y-1 text-sm text-muted-foreground">
@@ -151,8 +139,7 @@ export default function Documentation() {
         {selectedSection === "funcionalidades" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
+              <CardTitle>
                 Funcionalidades Implementadas
               </CardTitle>
               <CardDescription>Descrição detalhada de todas as funcionalidades do sistema</CardDescription>
@@ -162,8 +149,7 @@ export default function Documentation() {
                 <div className="space-y-6">
                   {/* Gestão de Clientes */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
                       1. Gestão de Clientes e Pets
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -178,8 +164,8 @@ export default function Documentation() {
 
                   {/* Planos de Saúde */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       2. Planos de Saúde
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -193,8 +179,8 @@ export default function Documentation() {
 
                   {/* Contratos */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       3. Gestão de Contratos
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -209,8 +195,8 @@ export default function Documentation() {
 
                   {/* Pagamentos */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       4. Sistema de Pagamentos
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -226,8 +212,8 @@ export default function Documentation() {
 
                   {/* Rede Credenciada */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       5. Rede Credenciada
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -242,8 +228,8 @@ export default function Documentation() {
 
                   {/* Atendimentos */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       6. Atendimentos
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -257,8 +243,8 @@ export default function Documentation() {
 
                   {/* Área do Cliente */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       7. Área do Cliente
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -274,8 +260,8 @@ export default function Documentation() {
 
                   {/* Vendedores */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       8. Sistema de Vendedores
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -290,8 +276,8 @@ export default function Documentation() {
 
                   {/* Comunicação */}
                   <div className="border-b pb-4">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       9. Comunicação
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -305,8 +291,8 @@ export default function Documentation() {
 
                   {/* Administração */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    <h3 className="font-semibold text-lg mb-3">
+                      
                       10. Administração
                     </h3>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-7">
@@ -328,8 +314,8 @@ export default function Documentation() {
         {selectedSection === "botoes" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
+                <CardTitle>
+                
                 Funcionalidade dos Botões
               </CardTitle>
               <CardDescription>Descrição das ações executadas ao clicar nos botões do sistema</CardDescription>
@@ -468,8 +454,8 @@ export default function Documentation() {
         {selectedSection === "funcoes" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clipboard className="h-5 w-5" />
+                <CardTitle>
+                
                 Principais Funções Implementadas
               </CardTitle>
               <CardDescription>Detalhamento das principais funções e hooks do sistema</CardDescription>
@@ -570,8 +556,8 @@ export default function Documentation() {
         {selectedSection === "apis" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
+                <CardTitle>
+                
                 Endpoints da API
               </CardTitle>
               <CardDescription>Documentação completa dos endpoints REST disponíveis</CardDescription>
@@ -742,8 +728,8 @@ export default function Documentation() {
         {selectedSection === "database" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
+                <CardTitle>
+                
                 Estrutura do Banco de Dados
               </CardTitle>
               <CardDescription>Schema e relacionamentos das tabelas PostgreSQL</CardDescription>
@@ -862,8 +848,8 @@ export default function Documentation() {
         {selectedSection === "seguranca" && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
+                <CardTitle>
+                
                 Segurança e Proteções
               </CardTitle>
               <CardDescription>Medidas de segurança implementadas no sistema</CardDescription>
