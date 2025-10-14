@@ -287,7 +287,7 @@ export default function UnitDashboard() {
 
         {/* Card de Total de Vendas */}
         <Card style={{ 
-          background: 'linear-gradient(135deg, #0e7074 0%, #16a34a 100%)',
+          background: 'linear-gradient(135deg, #0e7074 0%, #277677 100%)',
           border: 'none',
           boxShadow: '0 10px 40px rgba(14, 112, 116, 0.2)'
         }}>
