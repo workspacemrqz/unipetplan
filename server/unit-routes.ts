@@ -347,6 +347,33 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
+      // ✅ VALIDAR STATUS DO CONTRATO DO PET
+      if (atendimentoData.petId) {
+        const petContracts = await storage.getContractsByPetId(atendimentoData.petId);
+        
+        // Verificar se há contrato suspenso
+        const suspendedContract = petContracts.find((contract: any) => contract.status === 'suspended');
+        if (suspendedContract) {
+          return res.status(403).json({ 
+            error: "Plano suspenso",
+            message: "Não é possível criar atendimento. O plano deste pet está suspenso. Por favor, regularize o contrato antes de continuar.",
+            contractStatus: 'suspended',
+            contractId: suspendedContract.id
+          });
+        }
+        
+        // Verificar se há contrato cancelado
+        const cancelledContract = petContracts.find((contract: any) => contract.status === 'cancelled');
+        if (cancelledContract) {
+          return res.status(403).json({ 
+            error: "Plano cancelado",
+            message: "Não é possível criar atendimento. O plano deste pet foi cancelado.",
+            contractStatus: 'cancelled',
+            contractId: cancelledContract.id
+          });
+        }
+      }
+      
       // Processar múltiplos procedimentos
       const processedData = {
         ...atendimentoData,
@@ -963,6 +990,18 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     } catch (error) {
       console.error("❌ [UNIT] Error fetching available procedures:", error);
       res.status(500).json({ error: "Erro ao buscar procedimentos disponíveis" });
+    }
+  });
+
+  // ✅ Get contracts for a specific pet (authenticated)
+  app.get(["/api/unit/:slug/pets/:petId/contracts", "/api/units/:slug/pets/:petId/contracts"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const petId = req.params.petId;
+      const contracts = await storage.getContractsByPetId(petId);
+      res.json(contracts);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching pet contracts:", error);
+      res.status(500).json({ error: "Erro ao buscar contratos do pet" });
     }
   });
 

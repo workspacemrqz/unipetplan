@@ -121,6 +121,9 @@ export default function SteppedAtendimentoForm({
   const [isEditingWeight, setIsEditingWeight] = useState(false);
   const [editedWeight, setEditedWeight] = useState("");
   const [isSavingWeight, setIsSavingWeight] = useState(false);
+  
+  // ✅ Estado para controlar status do contrato do pet
+  const [contractStatus, setContractStatus] = useState<{ status: string; contractId?: string } | null>(null);
 
   // Função para formatar CPF
   const formatCpf = (value: string) => {
@@ -218,6 +221,45 @@ export default function SteppedAtendimentoForm({
       form.setValue("value", "");
     }
   }, [cpfSearch]);
+
+  // ✅ Função para verificar status do contrato do pet
+  const checkContractStatus = async (petId: string) => {
+    try {
+      const endpoint = mode === 'admin'
+        ? `/admin/api/pets/${petId}/contracts`
+        : `/api/units/${slug}/pets/${petId}/contracts`;
+      
+      const response = await fetch(endpoint, {
+        headers: mode === 'unit' ? { 'Authorization': `Bearer ${getAuthToken()}` } : {}
+      });
+      
+      if (response.ok) {
+        const contracts = await response.json();
+        
+        // Verificar se há contrato suspenso
+        const suspendedContract = contracts.find((contract: any) => contract.status === 'suspended');
+        if (suspendedContract) {
+          setContractStatus({ status: 'suspended', contractId: suspendedContract.id });
+          return;
+        }
+        
+        // Verificar se há contrato cancelado
+        const cancelledContract = contracts.find((contract: any) => contract.status === 'cancelled');
+        if (cancelledContract) {
+          setContractStatus({ status: 'cancelled', contractId: cancelledContract.id });
+          return;
+        }
+        
+        // Contrato ativo ou sem problemas
+        setContractStatus(null);
+      } else {
+        setContractStatus(null);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status do contrato:', error);
+      setContractStatus(null);
+    }
+  };
 
   // Função para salvar peso do pet
   const saveWeight = async () => {
@@ -377,6 +419,9 @@ export default function SteppedAtendimentoForm({
         setSelectedPet(petToSelect);
         setEditedWeight(petToSelect.weight?.toString() || "");
         
+        // ✅ Verificar status do contrato do pet auto-selecionado
+        await checkContractStatus(petToSelect.id);
+        
         // Buscar histórico do pet auto-selecionado
         try {
           const historyResponse = await fetch(
@@ -438,7 +483,10 @@ export default function SteppedAtendimentoForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        if (!response.ok) throw new Error("Erro ao criar atendimento");
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Erro ao criar atendimento");
+        }
         return response.json();
       } else {
         const token = getAuthToken();
@@ -455,7 +503,10 @@ export default function SteppedAtendimentoForm({
             value: data.value ? parseFloat(data.value.replace(',', '.')) : 0
           }),
         });
-        if (!response.ok) throw new Error("Erro ao criar atendimento");
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Erro ao criar atendimento");
+        }
         return response.json();
       }
     },
@@ -499,6 +550,10 @@ export default function SteppedAtendimentoForm({
       case 1:
         return selectedClient && form.getValues("clientId");
       case 2:
+        // ✅ Bloquear avanço se o contrato estiver suspenso ou cancelado
+        if (contractStatus && (contractStatus.status === 'suspended' || contractStatus.status === 'cancelled')) {
+          return false;
+        }
         return form.getValues("petId");
       case 3:
         return form.getValues("networkUnitId") && form.getValues("procedure");
@@ -678,6 +733,9 @@ export default function SteppedAtendimentoForm({
                                   petId: value,
                                   petName: pet?.name
                                 });
+                                
+                                // ✅ Verificar status do contrato do pet
+                                await checkContractStatus(value);
                                 
                                 // Buscar histórico de atendimentos
                                 try {
@@ -937,6 +995,40 @@ export default function SteppedAtendimentoForm({
                                     </div>
                                   )}
                                 </div>
+                                
+                                {/* ✅ ALERTA DE PLANO SUSPENSO OU CANCELADO */}
+                                {contractStatus && (contractStatus.status === 'suspended' || contractStatus.status === 'cancelled') && (
+                                  <div 
+                                    className="bg-red-50 border-2 border-red-500 rounded-lg p-4"
+                                    role="alert"
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div className="flex-shrink-0 mt-0.5">
+                                        <svg 
+                                          className="w-6 h-6 text-red-600" 
+                                          fill="currentColor" 
+                                          viewBox="0 0 20 20"
+                                        >
+                                          <path 
+                                            fillRule="evenodd" 
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" 
+                                            clipRule="evenodd" 
+                                          />
+                                        </svg>
+                                      </div>
+                                      <div className="flex-grow">
+                                        <h3 className="font-bold text-red-800 mb-1">
+                                          {contractStatus.status === 'suspended' ? 'Plano Suspenso' : 'Plano Cancelado'}
+                                        </h3>
+                                        <p className="text-red-700 text-sm">
+                                          {contractStatus.status === 'suspended' 
+                                            ? 'Não é possível criar atendimento. O plano deste pet está suspenso. Por favor, regularize o contrato antes de continuar.'
+                                            : 'Não é possível criar atendimento. O plano deste pet foi cancelado.'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                                 
                                 {/* Histórico de Atendimentos */}
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">

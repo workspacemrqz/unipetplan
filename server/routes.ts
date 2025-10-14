@@ -2198,6 +2198,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ✅ Get contracts for a specific pet
+  app.get("/admin/api/pets/:id/contracts", requireAdmin, async (req, res) => {
+    try {
+      const petId = req.params.id;
+      const contracts = await storage.getContractsByPetId(petId);
+      res.json(contracts);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching pet contracts:", error);
+      res.status(500).json({ error: "Erro ao buscar contratos do pet" });
+    }
+  });
+
   // Create new pet
   app.post("/admin/api/pets", requireAdmin, async (req, res) => {
     try {
@@ -2624,6 +2636,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/admin/api/atendimentos", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const { procedures, ...atendimentoData } = req.body;
+      
+      // ✅ VALIDAR STATUS DO CONTRATO DO PET
+      if (atendimentoData.petId) {
+        const petContracts = await storage.getContractsByPetId(atendimentoData.petId);
+        
+        // Verificar se há contrato suspenso
+        const suspendedContract = petContracts.find((contract: any) => contract.status === 'suspended');
+        if (suspendedContract) {
+          return res.status(403).json({ 
+            error: "Plano suspenso",
+            message: "Não é possível criar atendimento. O plano deste pet está suspenso. Por favor, regularize o contrato antes de continuar.",
+            contractStatus: 'suspended',
+            contractId: suspendedContract.id
+          });
+        }
+        
+        // Verificar se há contrato cancelado
+        const cancelledContract = petContracts.find((contract: any) => contract.status === 'cancelled');
+        if (cancelledContract) {
+          return res.status(403).json({ 
+            error: "Plano cancelado",
+            message: "Não é possível criar atendimento. O plano deste pet foi cancelado.",
+            contractStatus: 'cancelled',
+            contractId: cancelledContract.id
+          });
+        }
+      }
       
       // Validar dados básicos (temporariamente sem procedure obrigatório)
       const validatedData = {

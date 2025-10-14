@@ -327,7 +327,18 @@ export default function Contracts() {
         });
       }
       
+      // ✅ Invalidar queries de contratos
       queryClient.invalidateQueries({ queryKey: ['/admin/api/contracts'] });
+      
+      // ✅ Invalidar queries de contratos do pet para garantir que o status seja atualizado em todas as telas
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          return typeof key === 'string' && 
+                 (key.includes('/contracts') || key.includes('/pets'));
+        }
+      });
+      
       toast({
         title: "Sucesso",
         description: "Contrato atualizado com sucesso!",
