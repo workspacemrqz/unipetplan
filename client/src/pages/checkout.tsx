@@ -1649,60 +1649,62 @@ export default function Checkout() {
                     </div>
                   </div>
                   
-                  {/* Campo de cupom de desconto */}
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <label className="block text-sm font-medium mb-3">
-                      Cupom de Desconto
-                    </label>
-                    <div className="space-y-2">
-                      <input
-                        type="text"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleApplyCoupon();
-                          }
-                        }}
-                        placeholder="Digite o código do cupom"
-                        disabled={!!appliedCoupon}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      />
-                      {appliedCoupon ? (
-                        <button
-                          type="button"
-                          onClick={handleRemoveCoupon}
-                          className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                        >
-                          Remover
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={(e) => handleApplyCoupon(e)}
-                          disabled={isValidatingCoupon || !couponCode.trim()}
-                          className="w-full unipet-button-primary text-base sm:text-lg py-2 text-[var(--text-light)] rounded-lg transition-transform duration-300 hover:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                          style={{
-                            background: 'var(--btn-cotacao-gratuita-bg)',
-                            border: 'none'
+                  {/* Campo de cupom de desconto - Escondido quando está processando o pagamento */}
+                  {!isLoading && (
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <label className="block text-sm font-medium mb-3">
+                        Cupom de Desconto
+                      </label>
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleApplyCoupon();
+                            }
                           }}
-                        >
-                          {isValidatingCoupon ? 'Validando...' : 'Aplicar desconto'}
-                        </button>
+                          placeholder="Digite o código do cupom"
+                          disabled={!!appliedCoupon}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        />
+                        {appliedCoupon ? (
+                          <button
+                            type="button"
+                            onClick={handleRemoveCoupon}
+                            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                          >
+                            Remover
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => handleApplyCoupon(e)}
+                            disabled={isValidatingCoupon || !couponCode.trim()}
+                            className="w-full unipet-button-primary text-base sm:text-lg py-2 text-[var(--text-light)] rounded-lg transition-transform duration-300 hover:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{
+                              background: 'var(--btn-cotacao-gratuita-bg)',
+                              border: 'none'
+                            }}
+                          >
+                            {isValidatingCoupon ? 'Validando...' : 'Aplicar desconto'}
+                          </button>
+                        )}
+                      </div>
+                      {couponError && (
+                        <p className="mt-2 text-sm text-red-600">{couponError}</p>
+                      )}
+                      {appliedCoupon && (
+                        <p className="mt-2 text-sm text-green-600">
+                          ✓ Cupom aplicado: {appliedCoupon.type === 'percentage' 
+                            ? `${appliedCoupon.value}% de desconto` 
+                            : `R$ ${Number(appliedCoupon.value).toFixed(2)} de desconto`}
+                        </p>
                       )}
                     </div>
-                    {couponError && (
-                      <p className="mt-2 text-sm text-red-600">{couponError}</p>
-                    )}
-                    {appliedCoupon && (
-                      <p className="mt-2 text-sm text-green-600">
-                        ✓ Cupom aplicado: {appliedCoupon.type === 'percentage' 
-                          ? `${appliedCoupon.value}% de desconto` 
-                          : `R$ ${Number(appliedCoupon.value).toFixed(2)} de desconto`}
-                      </p>
-                    )}
-                  </div>
+                  )}
                   
                   {/* Formulário de cartão de crédito */}
                   {paymentData.method === 'credit_card' && (
