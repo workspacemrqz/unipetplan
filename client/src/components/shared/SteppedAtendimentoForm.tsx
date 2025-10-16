@@ -1214,66 +1214,99 @@ export default function SteppedAtendimentoForm({
                                     Carregando procedimentos...
                                   </p>
                                 ) : filteredProcedures.length > 0 ? (
-                                  filteredProcedures.map((proc: any) => (
-                                    <label
-                                      key={proc.id}
-                                      className="flex items-start space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        className="mt-1 accent-[#277677]"
-                                        checked={selectedProcedures.some(p => p.name === proc.name)}
-                                        onChange={(e) => {
-                                          if (e.target.checked) {
-                                            const newProcedures = [...selectedProcedures, proc];
-                                            setSelectedProcedures(newProcedures);
-                                            
-                                            logAction(mode, slug, "procedure_added", {
-                                              procedureName: proc.name,
-                                              coparticipation: proc.coparticipation || 0,
-                                              value: proc.coparticipation || 0
-                                            });
-                                            
-                                            // Atualizar o campo procedure com lista concatenada
-                                            const procedureNames = newProcedures.map(p => p.name).join(", ");
-                                            field.onChange(procedureNames);
-                                            
-                                            // Calcular valor total
-                                            const totalValue = newProcedures.reduce((sum, p) => sum + (p.coparticipation || 0), 0);
-                                            form.setValue("value", totalValue.toFixed(2).replace('.', ','));
-                                          } else {
-                                            const newProcedures = selectedProcedures.filter(p => p.name !== proc.name);
-                                            setSelectedProcedures(newProcedures);
-                                            
-                                            // Atualizar o campo procedure com lista concatenada
-                                            const procedureNames = newProcedures.map(p => p.name).join(", ");
-                                            field.onChange(procedureNames || "");
-                                            
-                                            // Calcular valor total
-                                            const totalValue = newProcedures.reduce((sum, p) => sum + (p.coparticipation || 0), 0);
-                                            form.setValue("value", totalValue.toFixed(2).replace('.', ','));
-                                          }
-                                        }}
-                                      />
-                                      <div className="flex-1">
-                                        <span className="text-sm font-medium">{proc.name}</span>
-                                        {(proc.annualLimit === -1 || proc.isUnlimited) ? (
-                                          <span className="text-xs text-green-600 ml-2">
-                                            (Ilimitado)
-                                          </span>
-                                        ) : proc.annualLimit && proc.annualLimit > 0 ? (
-                                          <span className="text-xs text-muted-foreground ml-2">
-                                            (Limite: {proc.remaining}/{proc.annualLimit})
-                                          </span>
-                                        ) : null}
-                                        {proc.coparticipation > 0 && (
-                                          <div className="text-xs text-gray-500 mt-1">
-                                            Coparticipação: R$ {proc.coparticipation.toFixed(2).replace('.', ',')}
-                                          </div>
+                                  filteredProcedures.map((proc: any) => {
+                                    const isDisabled = !proc.canUse;
+                                    const hasWaitingPeriod = proc.waitingDaysRemaining > 0;
+                                    const limitExhausted = !proc.isUnlimited && proc.remaining === 0;
+                                    
+                                    return (
+                                      <label
+                                        key={proc.id}
+                                        className={cn(
+                                          "flex items-start space-x-2 p-2 rounded",
+                                          isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-gray-50"
                                         )}
-                                      </div>
-                                    </label>
-                                  ))
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          className="mt-1 accent-[#277677]"
+                                          checked={selectedProcedures.some(p => p.name === proc.name)}
+                                          disabled={isDisabled}
+                                          onChange={(e) => {
+                                            if (e.target.checked) {
+                                              const newProcedures = [...selectedProcedures, proc];
+                                              setSelectedProcedures(newProcedures);
+                                              
+                                              logAction(mode, slug, "procedure_added", {
+                                                procedureName: proc.name,
+                                                coparticipation: proc.coparticipation || 0,
+                                                value: proc.coparticipation || 0
+                                              });
+                                              
+                                              // Atualizar o campo procedure com lista concatenada
+                                              const procedureNames = newProcedures.map(p => p.name).join(", ");
+                                              field.onChange(procedureNames);
+                                              
+                                              // Calcular valor total
+                                              const totalValue = newProcedures.reduce((sum, p) => sum + (p.coparticipation || 0), 0);
+                                              form.setValue("value", totalValue.toFixed(2).replace('.', ','));
+                                            } else {
+                                              const newProcedures = selectedProcedures.filter(p => p.name !== proc.name);
+                                              setSelectedProcedures(newProcedures);
+                                              
+                                              // Atualizar o campo procedure com lista concatenada
+                                              const procedureNames = newProcedures.map(p => p.name).join(", ");
+                                              field.onChange(procedureNames || "");
+                                              
+                                              // Calcular valor total
+                                              const totalValue = newProcedures.reduce((sum, p) => sum + (p.coparticipation || 0), 0);
+                                              form.setValue("value", totalValue.toFixed(2).replace('.', ','));
+                                            }
+                                          }}
+                                        />
+                                        <div className="flex-1">
+                                          <span className={cn("text-sm font-medium", isDisabled && "text-gray-500")}>
+                                            {proc.name}
+                                          </span>
+                                          
+                                          {/* Status badges */}
+                                          {(proc.annualLimit === -1 || proc.isUnlimited) ? (
+                                            <span className="text-xs text-green-600 ml-2">
+                                              (Ilimitado)
+                                            </span>
+                                          ) : proc.annualLimit && proc.annualLimit > 0 ? (
+                                            <span className={cn(
+                                              "text-xs ml-2",
+                                              limitExhausted ? "text-red-600" : "text-muted-foreground"
+                                            )}>
+                                              (Limite: {proc.remaining}/{proc.annualLimit})
+                                            </span>
+                                          ) : null}
+                                          
+                                          {/* Waiting period warning */}
+                                          {hasWaitingPeriod && (
+                                            <div className="text-xs text-orange-600 mt-1">
+                                              ⏳ Aguardando carência: {proc.waitingDaysRemaining} dia(s)
+                                            </div>
+                                          )}
+                                          
+                                          {/* Limit exhausted warning */}
+                                          {limitExhausted && !hasWaitingPeriod && (
+                                            <div className="text-xs text-red-600 mt-1">
+                                              ❌ Limite anual esgotado
+                                            </div>
+                                          )}
+                                          
+                                          {/* Coparticipation value */}
+                                          {proc.coparticipation > 0 && (
+                                            <div className="text-xs text-gray-500 mt-1">
+                                              Coparticipação: R$ {proc.coparticipation.toFixed(2).replace('.', ',')}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </label>
+                                    );
+                                  })
                                 ) : (
                                   <div className="p-4 text-sm text-muted-foreground text-center">
                                     Nenhum procedimento encontrado

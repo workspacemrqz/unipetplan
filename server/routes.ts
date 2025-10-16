@@ -2184,7 +2184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           coparticipation: pp.coparticipacao ? pp.coparticipacao / 100 : 0,
           isUnlimited: isUnlimited
         };
-      }).filter((p: any) => p.canUse); // Return all usable procedures (including unlimited ones)
+      }); // Return all procedures with their status (let frontend handle enablement)
       
       res.json({
         procedures: availableProcedures,
