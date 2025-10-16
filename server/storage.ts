@@ -1397,8 +1397,19 @@ export class DatabaseStorage implements IStorage {
     const contractNumber = contract.contractNumber || `UNIPET-${Date.now()}-${contract.petId?.substring(0, 4).toUpperCase() || 'XXXX'}`;
     
     // Buscar o plano para determinar se tem coparticipação
+    // BASIC e INFINITY (sem carência) TÊM coparticipação
+    // COMFORT e PLATINUM (com carência) NÃO têm coparticipação
     const [plan] = await db.select().from(plans).where(eq(plans.id, contract.planId));
-    const hasCoparticipation = plan?.planType === 'with_waiting_period';
+    
+    if (!plan) {
+      throw new Error(`Plano não encontrado: ${contract.planId}`);
+    }
+    
+    if (plan.planType !== 'with_waiting_period' && plan.planType !== 'without_waiting_period') {
+      throw new Error(`Tipo de plano inválido: ${plan.planType}`);
+    }
+    
+    const hasCoparticipation = plan.planType === 'without_waiting_period';
     
     // Mapear explicitamente para os campos corretos do schema
     const payload = {
