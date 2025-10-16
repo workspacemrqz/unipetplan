@@ -25,11 +25,13 @@ import { getDateRangeParams } from "@/lib/date-utils";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { normalizeCPF } from "@/../../shared/cpf-utils";
 
 interface FinancialEntry {
   id: string;
   date: string;
   clientName: string;
+  clientCPF?: string;
   petName: string;
   procedure: string;
   coparticipacao: string;
@@ -113,13 +115,17 @@ export default function RelatorioFinanceiro() {
     }).format(numValue);
   };
 
-  // Filter entries by search query
+  // Filter entries by search query (includes CPF)
   const filteredEntries = (searchQuery
-    ? entries.filter(entry =>
-        entry.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        entry.petName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        entry.procedure.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? entries.filter(entry => {
+        const normalizedSearchQuery = normalizeCPF(searchQuery);
+        const normalizedEntryCPF = entry.clientCPF ? normalizeCPF(entry.clientCPF) : '';
+        
+        return entry.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          entry.petName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          entry.procedure.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          normalizedEntryCPF.includes(normalizedSearchQuery);
+      })
     : entries)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -228,11 +234,15 @@ export default function RelatorioFinanceiro() {
               return searchQuery 
                 ? allData.filter(entry => {
                     const searchLower = searchQuery.toLowerCase();
+                    const normalizedSearchQuery = normalizeCPF(searchQuery);
+                    const normalizedEntryCPF = entry.clientCPF ? normalizeCPF(entry.clientCPF) : '';
+                    
                     return (
                       entry.clientName?.toLowerCase().includes(searchLower) ||
                       entry.petName?.toLowerCase().includes(searchLower) ||
                       entry.procedure?.toLowerCase().includes(searchLower) ||
-                      entry.networkUnitName?.toLowerCase().includes(searchLower)
+                      entry.networkUnitName?.toLowerCase().includes(searchLower) ||
+                      normalizedEntryCPF.includes(normalizedSearchQuery)
                     );
                   })
                 : allData;
