@@ -1286,14 +1286,14 @@ export default function SteppedAtendimentoForm({
                                           {/* Waiting period warning */}
                                           {hasWaitingPeriod && (
                                             <div className="text-xs text-orange-600 mt-1">
-                                              ⏳ Aguardando carência: {proc.waitingDaysRemaining} dia(s)
+                                              Aguardando carência: {proc.waitingDaysRemaining} dia(s)
                                             </div>
                                           )}
                                           
                                           {/* Limit exhausted warning */}
                                           {limitExhausted && !hasWaitingPeriod && (
                                             <div className="text-xs text-red-600 mt-1">
-                                              ❌ Limite anual esgotado
+                                              Limite anual esgotado
                                             </div>
                                           )}
                                           
