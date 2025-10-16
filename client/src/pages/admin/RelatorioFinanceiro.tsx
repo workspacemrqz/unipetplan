@@ -25,7 +25,6 @@ import { getDateRangeParams } from "@/lib/date-utils";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
 import { ExportButton } from "@/components/admin/ExportButton";
-import { normalizeCPF } from "@/../../shared/cpf-utils";
 
 interface FinancialEntry {
   id: string;
@@ -69,6 +68,17 @@ export default function RelatorioFinanceiro() {
     endDate: CalendarDate | null;
   }>({ startDate: null, endDate: null });
 
+  // Debounce search query
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Debounce date filter changes
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -84,13 +94,16 @@ export default function RelatorioFinanceiro() {
 
   useEffect(() => {
     fetchFinancialReport();
-  }, [debouncedDateFilter]);
+  }, [debouncedDateFilter, debouncedSearchQuery]);
 
   const fetchFinancialReport = async () => {
     setLoading(true);
     try {
       const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
-      const queryParams = new URLSearchParams(dateParams as any);
+      const queryParams = new URLSearchParams({
+        ...dateParams,
+        ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {})
+      } as any);
       
       const response = await fetch(`/admin/api/relatorio-financeiro?${queryParams}`, {
         credentials: 'include'
@@ -115,19 +128,8 @@ export default function RelatorioFinanceiro() {
     }).format(numValue);
   };
 
-  // Filter entries by search query (includes CPF)
-  const filteredEntries = (searchQuery
-    ? entries.filter(entry => {
-        const normalizedSearchQuery = normalizeCPF(searchQuery);
-        const normalizedEntryCPF = entry.clientCPF ? normalizeCPF(entry.clientCPF) : '';
-        
-        return entry.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          entry.petName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          entry.procedure.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          normalizedEntryCPF.includes(normalizedSearchQuery);
-      })
-    : entries)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Entries are already filtered and sorted by the backend
+  const filteredEntries = entries;
 
   const handleViewDetails = (entry: FinancialEntry) => {
     setSelectedEntry(entry);
@@ -220,9 +222,14 @@ export default function RelatorioFinanceiro() {
             pageName="Relatório Financeiro"
             prepareData={async () => {
               // Buscar TODOS os dados com os filtros aplicados (sem paginação)
-              const queryParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
-              const params = new URLSearchParams(queryParams);
-              const response = await fetch(`/admin/api/financial-report?${params}`);
+              const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
+              const queryParams = new URLSearchParams({
+                ...dateParams,
+                ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {})
+              } as any);
+              const response = await fetch(`/admin/api/relatorio-financeiro?${queryParams}`, {
+                credentials: 'include'
+              });
               
               if (!response.ok) {
                 throw new Error('Erro ao buscar dados para exportação');
@@ -230,22 +237,8 @@ export default function RelatorioFinanceiro() {
               
               const allData: FinancialEntry[] = await response.json();
               
-              // Aplicar filtro de busca se houver
-              return searchQuery 
-                ? allData.filter(entry => {
-                    const searchLower = searchQuery.toLowerCase();
-                    const normalizedSearchQuery = normalizeCPF(searchQuery);
-                    const normalizedEntryCPF = entry.clientCPF ? normalizeCPF(entry.clientCPF) : '';
-                    
-                    return (
-                      entry.clientName?.toLowerCase().includes(searchLower) ||
-                      entry.petName?.toLowerCase().includes(searchLower) ||
-                      entry.procedure?.toLowerCase().includes(searchLower) ||
-                      entry.networkUnitName?.toLowerCase().includes(searchLower) ||
-                      normalizedEntryCPF.includes(normalizedSearchQuery)
-                    );
-                  })
-                : allData;
+              // Dados já estão filtrados pelo backend
+              return allData;
             }}
             columns={[
               { key: 'date', label: 'Data', formatter: (v) => v ? format(new Date(v), "dd/MM/yyyy", { locale: ptBR }) : '' },

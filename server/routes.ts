@@ -2538,8 +2538,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get financial report for all units
   app.get("/admin/api/relatorio-financeiro", requireAdmin, async (req, res) => {
     try {
-      // Extract date filter parameters
-      const { startDate, endDate } = req.query;
+      // Extract date filter parameters and search query
+      const { startDate, endDate, search } = req.query;
       
       // Get all atendimentos with network unit info
       const result = await storage.getAtendimentosWithNetworkUnits({});
@@ -2578,6 +2578,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         })
       );
+      
+      // Apply search filter if present (after procedures are loaded)
+      if (search && typeof search === 'string' && search.trim()) {
+        const searchLower = search.toLowerCase();
+        // Normalize search term for CPF (remove special characters)
+        const normalizedSearch = search.replace(/\D/g, '');
+        
+        allAtendimentos = allAtendimentos.filter((atendimento: any) => {
+          // Search in clientName
+          if (atendimento.clientName && atendimento.clientName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in clientCPF (normalized)
+          if (atendimento.clientCPF) {
+            const normalizedCPF = atendimento.clientCPF.replace(/\D/g, '');
+            if (normalizedCPF.includes(normalizedSearch)) {
+              return true;
+            }
+          }
+          // Search in petName
+          if (atendimento.petName && atendimento.petName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in procedures
+          if (atendimento.procedures && atendimento.procedures.length > 0) {
+            const hasMatchingProcedure = atendimento.procedures.some((proc: any) => {
+              const procName = proc.procedureName || proc.name || '';
+              return procName.toLowerCase().includes(searchLower);
+            });
+            if (hasMatchingProcedure) return true;
+          }
+          // Search in legacy procedure field
+          if (atendimento.procedure && atendimento.procedure.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in network unit name
+          if (atendimento.networkUnit?.name && atendimento.networkUnit.name.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          return false;
+        });
+      }
       
       // Create financial report entries - one entry per procedure
       const financialEntries: any[] = [];
