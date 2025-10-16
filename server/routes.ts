@@ -1990,6 +1990,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               clientName: client?.fullName || 'N/A',
               clientEmail: client?.email || 'N/A',
               clientPhone: client?.phone || 'N/A',
+              clientCPF: client?.cpf || '',
               petName: pet?.name || 'N/A',
               petSpecies: pet?.species || 'N/A',
               planName: plan?.name || 'N/A',
@@ -2027,6 +2028,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           clientName: client?.fullName || 'N/A',
           clientEmail: client?.email || 'N/A',
           clientPhone: client?.phone || 'N/A',
+          clientCPF: client?.cpf || '',
           petName: pet?.name || 'N/A',
           petSpecies: pet?.species || 'N/A',
           planName: plan?.name || 'N/A',
@@ -2456,13 +2458,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Apply filters
       let filteredAtendimentos = allAtendimentos;
       
-      // Search filter - search in procedure, procedureNotes, or generalNotes
+      // Search filter - search in procedure, procedureNotes, generalNotes, clientName, petName, or clientCPF
       if (search && search.trim()) {
         const searchTerm = search.trim().toLowerCase();
+        // Normalize search term for CPF (remove special characters)
+        const normalizedSearch = search.trim().replace(/\D/g, '');
+        
         filteredAtendimentos = filteredAtendimentos.filter(atendimento => 
           (atendimento.procedure && atendimento.procedure.toLowerCase().includes(searchTerm)) ||
           (atendimento.procedureNotes && atendimento.procedureNotes.toLowerCase().includes(searchTerm)) ||
-          (atendimento.generalNotes && atendimento.generalNotes.toLowerCase().includes(searchTerm))
+          (atendimento.generalNotes && atendimento.generalNotes.toLowerCase().includes(searchTerm)) ||
+          (atendimento.clientName && atendimento.clientName.toLowerCase().includes(searchTerm)) ||
+          (atendimento.petName && atendimento.petName.toLowerCase().includes(searchTerm)) ||
+          (atendimento.clientCPF && atendimento.clientCPF.replace(/\D/g, '').includes(normalizedSearch))
         );
       }
       
@@ -2572,6 +2580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               atendimentoId: atendimento.id,
               date: atendimento.createdAt,
               clientName: atendimento.clientName || 'Não informado',
+              clientCPF: atendimento.clientCPF || '',
               petName: atendimento.petName || '',
               procedure: proc.procedureName || proc.name || 'Não informado',
               coparticipacao: proc.coparticipacao || '0',
@@ -2586,6 +2595,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             atendimentoId: atendimento.id,
             date: atendimento.createdAt,
             clientName: atendimento.clientName || 'Não informado',
+            clientCPF: atendimento.clientCPF || '',
             petName: atendimento.petName || '',
             procedure: atendimento.procedure || 'Não informado',
             coparticipacao: atendimento.coparticipacao || '0',
