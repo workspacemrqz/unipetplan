@@ -79,18 +79,32 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
     setDateFilter({ startDate, endDate });
   };
 
+  // Debounce search query
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  
   useEffect(() => {
     if (unitSlug) {
       fetchFinancialReport();
     }
-  }, [unitSlug, debouncedDateFilter]);
+  }, [unitSlug, debouncedDateFilter, debouncedSearchQuery]);
 
   const fetchFinancialReport = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('unit-token');
       const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
-      const queryParams = new URLSearchParams(dateParams as any);
+      const queryParams = new URLSearchParams({
+        ...dateParams,
+        ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {})
+      } as any);
       
       const response = await fetch(`/api/units/${unitSlug}/relatorio-financeiro?${queryParams}`, {
         headers: {
@@ -117,15 +131,8 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
     }).format(numValue);
   };
 
-  // Filter entries by search query
-  const filteredEntries = (searchQuery
-    ? entries.filter(entry =>
-        entry.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        entry.petName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        entry.procedure.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : entries)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Entries are already filtered and sorted by the backend
+  const filteredEntries = entries;
 
   const handleViewDetails = (entry: FinancialEntry) => {
     setSelectedEntry(entry);
@@ -369,7 +376,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar..."
+              placeholder="Buscar por nome, CPF, pet ou procedimento..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-80"
