@@ -24,12 +24,14 @@ import { ptBR } from "date-fns/locale";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { normalizeCPF } from "@/../../shared/cpf-utils";
 
 interface PaymentReceipt {
   id: string;
   receiptNumber: string;
   clientName: string;
   clientEmail: string;
+  clientCPF?: string;
   paymentAmount: string;
   paymentMethod: string;
   paymentDate: string;
@@ -79,10 +81,15 @@ export default function Financial() {
 
   const filteredReceipts = (searchQuery
     ? receipts.filter(
-        (receipt) =>
-          receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase())
+        (receipt) => {
+          const normalizedSearchQuery = normalizeCPF(searchQuery);
+          const normalizedReceiptCPF = receipt.clientCPF ? normalizeCPF(receipt.clientCPF) : '';
+          
+          return receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            normalizedReceiptCPF.includes(normalizedSearchQuery);
+        }
       )
     : receipts)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -161,11 +168,15 @@ export default function Financial() {
     
     // Aplicar filtros de busca se houver
     const filtered = searchQuery
-      ? allReceipts.filter((receipt: PaymentReceipt) =>
-          receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+      ? allReceipts.filter((receipt: PaymentReceipt) => {
+          const normalizedSearchQuery = normalizeCPF(searchQuery);
+          const normalizedReceiptCPF = receipt.clientCPF ? normalizeCPF(receipt.clientCPF) : '';
+          
+          return receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            normalizedReceiptCPF.includes(normalizedSearchQuery);
+        })
       : allReceipts;
     
     // Retornar dados formatados para exportação
