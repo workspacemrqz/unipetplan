@@ -687,6 +687,17 @@ export const insertFaqItemSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
+export const updateFaqItemSchema = z.object({
+  question: z.string()
+    .min(1, "Pergunta é obrigatória")
+    .max(500, "Pergunta deve ter no máximo 500 caracteres"),
+  answer: z.string()
+    .min(1, "Resposta é obrigatória")
+    .max(2000, "Resposta deve ter no máximo 2000 caracteres"),
+  displayOrder: z.number().min(0).optional(), // Optional for updates
+  isActive: z.boolean().default(true),
+});
+
 export const insertSiteSettingsSchema = z.object({
   whatsapp: z.string().optional(),
   email: z.string().optional(),

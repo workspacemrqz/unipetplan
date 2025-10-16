@@ -2380,14 +2380,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/admin/api/faq/:id", requireAdmin, async (req, res) => {
     try {
-      const validatedData = insertFaqItemSchema.parse(req.body);
-      // Ensure required properties are present for update
+      const { updateFaqItemSchema } = await import("../shared/schema");
+      
+      // Get existing item to preserve displayOrder if not provided
+      const existingItem = await storage.getFaqItem(req.params.id);
+      if (!existingItem) {
+        return res.status(404).json({ error: "Item do FAQ não encontrado" });
+      }
+      
+      // Validate the update data
+      const validatedData = updateFaqItemSchema.parse(req.body);
+      
+      // Build update data, preserving existing displayOrder if not provided
       const updateData = {
-        displayOrder: validatedData.displayOrder!,
-        question: validatedData.question!,
-        answer: validatedData.answer!,
-        isActive: validatedData.isActive
+        question: validatedData.question,
+        answer: validatedData.answer,
+        isActive: validatedData.isActive,
+        displayOrder: validatedData.displayOrder ?? existingItem.displayOrder
       };
+      
       const updatedItem = await storage.updateFaqItem(req.params.id, updateData);
       if (!updatedItem) {
         return res.status(404).json({ error: "Item do FAQ não encontrado" });
