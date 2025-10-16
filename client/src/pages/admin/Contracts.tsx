@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { normalizeCPF } from "@/../../shared/cpf-utils";
 
 interface ContractWithDetails {
   id: string;
@@ -45,6 +46,7 @@ interface ContractWithDetails {
   clientName?: string;
   clientEmail?: string;
   clientPhone?: string;
+  clientCPF?: string;
   petName?: string;
   petSpecies?: string;
   planName?: string;
@@ -130,11 +132,15 @@ export default function Contracts() {
 
   const filteredContracts = contracts
     .filter((contract) => {
-      // Text search filter
+      // Text search filter (includes CPF)
+      const normalizedSearchQuery = normalizeCPF(searchQuery);
+      const normalizedContractCPF = contract.clientCPF ? normalizeCPF(contract.clientCPF) : '';
+      
       const matchesSearch = !searchQuery || 
         contract.contractNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         contract.clientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        contract.petName?.toLowerCase().includes(searchQuery.toLowerCase());
+        contract.petName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        normalizedContractCPF.includes(normalizedSearchQuery);
 
       // Status filter
       const matchesStatus = statusFilter === "all" || contract.status === statusFilter;
