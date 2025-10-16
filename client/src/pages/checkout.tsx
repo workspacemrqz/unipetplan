@@ -204,6 +204,7 @@ export default function Checkout() {
   });
   
   const [isLoading, setIsLoading] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const { data: species, isLoading: speciesLoading } = useSpecies();
   const [collapsedPets, setCollapsedPets] = useState<boolean[]>([false]); // Controla quais pets estão colapsados
@@ -645,6 +646,7 @@ export default function Checkout() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    setIsProcessingPayment(true);
     try {
       // Validar regras de parcelas antes de enviar
       if (paymentData.method === 'credit_card' && paymentData.creditCard) {
@@ -654,12 +656,14 @@ export default function Checkout() {
         if (isBasicOrInfinity && installments !== 1) {
           alert('Planos Basic e Infinity permitem apenas pagamento à vista (1x).');
           setIsLoading(false);
+          setIsProcessingPayment(false);
           return;
         }
         
         if (!isBasicOrInfinity && (installments < 1 || installments > 12)) {
           alert('Este plano permite parcelamento de 1x a 12x.');
           setIsLoading(false);
+          setIsProcessingPayment(false);
           return;
         }
       }
@@ -809,6 +813,7 @@ export default function Checkout() {
             title,
             message: userMessage
           });
+          setIsProcessingPayment(false);
         } catch {
           // Se não conseguir fazer parse da resposta, usar erro genérico
           setPaymentError({
@@ -816,6 +821,7 @@ export default function Checkout() {
             title: 'Erro no Pagamento',
             message: 'Ocorreu um erro no processamento do pagamento. Verifique os dados e tente novamente.'
           });
+          setIsProcessingPayment(false);
         }
       }
     } catch (error) {
@@ -825,8 +831,10 @@ export default function Checkout() {
         title: 'Erro de Conexão',
         message: 'Não foi possível conectar com o servidor. Verifique sua conexão e tente novamente.'
       });
+      setIsProcessingPayment(false);
     } finally {
       setIsLoading(false);
+      setIsProcessingPayment(false);
     }
   };
 
@@ -1650,7 +1658,7 @@ export default function Checkout() {
                   </div>
                   
                   {/* Campo de cupom de desconto - Escondido quando está processando o pagamento */}
-                  {!isLoading && (
+                  {!isProcessingPayment && (
                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                       <label className="block text-sm font-medium mb-3">
                         Cupom de Desconto
@@ -2025,7 +2033,10 @@ export default function Checkout() {
             
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => setPaymentError({ show: false, title: '', message: '' })}
+                onClick={() => {
+                  setPaymentError({ show: false, title: '', message: '' });
+                  setIsProcessingPayment(false);
+                }}
                 className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Fechar
@@ -2033,6 +2044,7 @@ export default function Checkout() {
               <button
                 onClick={() => {
                   setPaymentError({ show: false, title: '', message: '' });
+                  setIsProcessingPayment(false);
                   // Voltar para o step de pagamento para correção
                   setCurrentStep(4);
                 }}
