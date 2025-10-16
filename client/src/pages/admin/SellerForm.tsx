@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertSellerSchema, type RulesSettings } from "@shared/schema";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { fetchAddressByCEP } from "@/utils/api-helpers";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 
 export default function SellerForm() {
@@ -137,20 +138,18 @@ export default function SellerForm() {
     const cleanCEP = cep.replace(/\D/g, "");
     if (cleanCEP.length === 8) {
       try {
-        const response = await fetch(`/api/cep/${cleanCEP}`);
-        const result = await response.json();
+        const result = await fetchAddressByCEP(cep);
         
-        if (response.ok && result.success && result.data) {
-          const { data } = result;
-          form.setValue("address", data.street || "");
-          form.setValue("district", data.neighborhood || "");
-          form.setValue("city", data.city || "");
-          form.setValue("state", data.state || "");
+        if (result.success && result.data) {
+          form.setValue("address", result.data.street || "");
+          form.setValue("district", result.data.neighborhood || "");
+          form.setValue("city", result.data.city || "");
+          form.setValue("state", result.data.state || "");
         } else {
           console.error("CEP não encontrado ou inválido");
           toast({
             title: "CEP não encontrado",
-            description: "Não foi possível encontrar o endereço para o CEP informado.",
+            description: result.error || "Não foi possível encontrar o endereço para o CEP informado.",
             variant: "destructive",
           });
         }

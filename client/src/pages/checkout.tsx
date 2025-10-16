@@ -18,6 +18,7 @@ import Footer from "@/components/layout/footer";
 import { useSpecies } from "@/hooks/use-species";
 import { logger } from "@/utils/logger";
 import { getSellerReferral } from "@/lib/sellerReferral";
+import { fetchAddressByCEP as fetchCEPData } from "@/utils/api-helpers";
 
 interface Plan {
   id: string;
@@ -136,23 +137,23 @@ export default function Checkout() {
     setCepError('');
     
     try {
-      const response = await fetch(`/api/cep/${cleanCEP}`);
-      const result = await response.json();
+      const result = await fetchCEPData(cep);
       
       if (result.success && result.data) {
+        const data = result.data;
         setCustomerData(prev => ({
           ...prev,
-          address: result.data.logradouro || '',
-          district: result.data.bairro || '',
-          city: result.data.localidade || '',
-          state: result.data.uf || '',
+          address: data.logradouro || '',
+          district: data.bairro || '',
+          city: data.localidade || '',
+          state: data.uf || '',
           // Mantém os campos que o usuário já preencheu
           number: prev.number,
           complement: prev.complement
         }));
         setCepError('');
       } else {
-        setCepError('CEP não encontrado. Por favor, verifique e tente novamente.');
+        setCepError(result.error || 'CEP não encontrado. Por favor, verifique e tente novamente.');
       }
     } catch (error) {
       logger.error('Erro ao buscar CEP:', error);
