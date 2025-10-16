@@ -190,14 +190,20 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Apply search filter if present
       if (search) {
         const searchLower = search.toLowerCase();
+        // Normalize search term for CPF (remove special characters)
+        const normalizedSearch = search.replace(/\D/g, '');
+        
         allAtendimentos = allAtendimentos.filter((atendimento: any) => {
           // Search in clientName
           if (atendimento.clientName && atendimento.clientName.toLowerCase().includes(searchLower)) {
             return true;
           }
-          // Search in clientCpf
-          if (atendimento.clientCpf && atendimento.clientCpf.toLowerCase().includes(searchLower)) {
-            return true;
+          // Search in clientCpf (normalized)
+          if (atendimento.clientCpf) {
+            const normalizedCpf = atendimento.clientCpf.replace(/\D/g, '');
+            if (normalizedCpf.includes(normalizedSearch)) {
+              return true;
+            }
           }
           // Search in petName
           if (atendimento.petName && atendimento.petName.toLowerCase().includes(searchLower)) {
@@ -457,8 +463,8 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
-      // Extract date filter parameters
-      const { startDate, endDate } = req.query;
+      // Extract date filter parameters and search
+      const { startDate, endDate, search } = req.query;
       
       // Get atendimentos for this unit with network unit info
       const result = await storage.getAtendimentosWithNetworkUnits({
@@ -500,6 +506,44 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
           };
         })
       );
+      
+      // Apply search filter if present (after procedures are loaded)
+      if (search && typeof search === 'string' && search.trim()) {
+        const searchLower = search.toLowerCase();
+        // Normalize search term for CPF (remove special characters)
+        const normalizedSearch = search.replace(/\D/g, '');
+        
+        allAtendimentos = allAtendimentos.filter((atendimento: any) => {
+          // Search in clientName
+          if (atendimento.clientName && atendimento.clientName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in clientCpf (normalized)
+          if (atendimento.clientCpf) {
+            const normalizedCpf = atendimento.clientCpf.replace(/\D/g, '');
+            if (normalizedCpf.includes(normalizedSearch)) {
+              return true;
+            }
+          }
+          // Search in petName
+          if (atendimento.petName && atendimento.petName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in procedures
+          if (atendimento.procedures && atendimento.procedures.length > 0) {
+            const hasMatchingProcedure = atendimento.procedures.some((proc: any) => {
+              const procName = proc.procedureName || proc.name || '';
+              return procName.toLowerCase().includes(searchLower);
+            });
+            if (hasMatchingProcedure) return true;
+          }
+          // Search in legacy procedure field
+          if (atendimento.procedure && atendimento.procedure.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          return false;
+        });
+      }
       
       // Create financial report entries - one entry per procedure
       const financialEntries: any[] = [];
