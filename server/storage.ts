@@ -1396,6 +1396,10 @@ export class DatabaseStorage implements IStorage {
     // Gerar contractNumber automaticamente se não fornecido
     const contractNumber = contract.contractNumber || `UNIPET-${Date.now()}-${contract.petId?.substring(0, 4).toUpperCase() || 'XXXX'}`;
     
+    // Buscar o plano para determinar se tem coparticipação
+    const [plan] = await db.select().from(plans).where(eq(plans.id, contract.planId));
+    const hasCoparticipation = plan?.planType === 'with_waiting_period';
+    
     // Mapear explicitamente para os campos corretos do schema
     const payload = {
       clientId: contract.clientId,
@@ -1408,6 +1412,7 @@ export class DatabaseStorage implements IStorage {
       monthlyAmount: contract.monthlyAmount,
       paymentMethod: contract.paymentMethod,
       cieloPaymentId: contract.cieloPaymentId,
+      hasCoparticipation: hasCoparticipation, // Define coparticipação com base no tipo do plano
       // Annual plan fields
       ...((contract as any).billingPeriod !== undefined && { billingPeriod: (contract as any).billingPeriod }),
       ...((contract as any).annualAmount !== undefined && { annualAmount: (contract as any).annualAmount }),
