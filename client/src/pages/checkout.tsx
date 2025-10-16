@@ -1425,11 +1425,7 @@ export default function Checkout() {
                       {/* Indicador de carregamento */}
                       {isLoadingCEP && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-teal-500 rounded-full loading-dot"></div>
-                            <div className="w-2 h-2 bg-teal-500 rounded-full loading-dot"></div>
-                            <div className="w-2 h-2 bg-teal-500 rounded-full loading-dot"></div>
-                          </div>
+                          <Loader2 className="h-5 w-5 animate-spin text-teal-500" />
                         </div>
                       )}
                     </div>

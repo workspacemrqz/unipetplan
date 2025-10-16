@@ -134,9 +134,12 @@ export default function SellerForm() {
     mutation.mutate(data);
   };
 
+  const [isLoadingCEP, setIsLoadingCEP] = useState(false);
+
   const handleCEPLookup = async (cep: string) => {
     const cleanCEP = cep.replace(/\D/g, "");
     if (cleanCEP.length === 8) {
+      setIsLoadingCEP(true);
       try {
         const result = await fetchAddressByCEP(cep);
         
@@ -160,6 +163,8 @@ export default function SellerForm() {
           description: "Ocorreu um erro ao buscar o endereço. Tente novamente.",
           variant: "destructive",
         });
+      } finally {
+        setIsLoadingCEP(false);
       }
     }
   };
@@ -291,12 +296,19 @@ export default function SellerForm() {
                     <FormItem>
                       <FormLabel>CEP *</FormLabel>
                       <FormControl>
-                        <Input 
-                          {...field} 
-                          placeholder="00000-000" 
-                          maxLength={9}
-                          onBlur={(e) => handleCEPLookup(e.target.value)}
-                        />
+                        <div className="relative">
+                          <Input 
+                            {...field} 
+                            placeholder="00000-000" 
+                            maxLength={9}
+                            onBlur={(e) => handleCEPLookup(e.target.value)}
+                          />
+                          {isLoadingCEP && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
