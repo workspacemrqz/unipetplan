@@ -2380,7 +2380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/admin/api/faq/:id", requireAdmin, async (req, res) => {
     try {
-      const { updateFaqItemSchema } = await import("../shared/schema");
+      const { updateFaqItemSchema } = await import("../shared/schema.js");
       
       // Get existing item to preserve displayOrder if not provided
       const existingItem = await storage.getFaqItem(req.params.id);
