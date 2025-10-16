@@ -1981,30 +1981,41 @@ export default function Checkout() {
                 </span>
               </button>
 
-              <button
-                onClick={handleNextStep}
-                disabled={
-                  isLoading || 
-                  (currentStep === 2 && (!isPetsDataValid() || !areAllPetsCollapsed())) ||
-                  (currentStep === 3 && !isCustomerDataValid()) ||
-                  (currentStep === 4 && !isPaymentDataValid())
-                }
-                className="flex items-center justify-center w-full xs:w-auto px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-transform duration-300 hover:scale-95"
-                style={{
-                  background: 'var(--btn-ver-planos-bg)',
-                  color: 'var(--btn-ver-planos-text)',
-                  border: 'none'
-                }}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <span className="flex items-center">
-                    {currentStep === 4 ? 'Finalizar' : 'Próximo'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </span>
-                )}
-              </button>
+              {/* Botão Próximo/Finalizar - Escondido quando está processando pagamento na etapa 4 */}
+              {!(currentStep === 4 && isProcessingPayment) && (
+                <button
+                  onClick={handleNextStep}
+                  disabled={
+                    isLoading || 
+                    (currentStep === 2 && (!isPetsDataValid() || !areAllPetsCollapsed())) ||
+                    (currentStep === 3 && !isCustomerDataValid()) ||
+                    (currentStep === 4 && !isPaymentDataValid())
+                  }
+                  className="flex items-center justify-center w-full xs:w-auto px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-transform duration-300 hover:scale-95"
+                  style={{
+                    background: 'var(--btn-ver-planos-bg)',
+                    color: 'var(--btn-ver-planos-text)',
+                    border: 'none'
+                  }}
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <span className="flex items-center">
+                      {currentStep === 4 ? 'Finalizar' : 'Próximo'}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </span>
+                  )}
+                </button>
+              )}
+              
+              {/* Mensagem de processamento quando o botão está oculto */}
+              {currentStep === 4 && isProcessingPayment && (
+                <div className="flex items-center justify-center w-full xs:w-auto px-6 py-3">
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" style={{ color: 'var(--btn-ver-planos-bg)' }} />
+                  <span className="text-gray-600 font-medium">Processando pagamento...</span>
+                </div>
+              )}
             </div>
             </div>
           )}
