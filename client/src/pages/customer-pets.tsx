@@ -198,6 +198,14 @@ export default function CustomerPets() {
 
   const uploadImage = async (petId: string, file: File) => {
     setUploadingImage(petId);
+    
+    const resetFileInput = () => {
+      const fileInput = document.querySelector(`#file-input-${petId}`) as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
+    };
+    
     try {
       // Convert file to base64
       const reader = new FileReader();
@@ -221,11 +229,7 @@ export default function CustomerPets() {
               pet.id === petId ? { ...pet, ...result.pet } : pet
             ));
             
-            // Reset file input after successful upload
-            const fileInput = document.querySelector(`#file-input-${petId}`) as HTMLInputElement;
-            if (fileInput) {
-              fileInput.value = '';
-            }
+            resetFileInput();
             
             toast({
               title: "Sucesso!",
@@ -234,7 +238,7 @@ export default function CustomerPets() {
           } else {
             const errorData = await response.json();
             const errorMessage = errorData.error || 'Erro ao fazer upload da imagem';
-            setError(errorMessage);
+            resetFileInput();
             toast({
               title: "Erro",
               description: errorMessage,
@@ -243,11 +247,10 @@ export default function CustomerPets() {
           }
         } catch (error) {
           console.error('Error uploading image:', error);
-          const errorMessage = 'Erro ao fazer upload da imagem';
-          setError(errorMessage);
+          resetFileInput();
           toast({
             title: "Erro",
-            description: errorMessage,
+            description: 'Erro ao fazer upload da imagem',
             variant: "destructive",
           });
         } finally {
@@ -257,11 +260,10 @@ export default function CustomerPets() {
       
       reader.onerror = () => {
         console.error('Error reading file:', reader.error);
-        const errorMessage = 'Erro ao processar o arquivo. Tente novamente.';
-        setError(errorMessage);
+        resetFileInput();
         toast({
           title: "Erro",
-          description: errorMessage,
+          description: 'Erro ao processar o arquivo. Tente novamente.',
           variant: "destructive",
         });
         setUploadingImage(null);
@@ -270,11 +272,10 @@ export default function CustomerPets() {
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error reading file:', error);
-      const errorMessage = 'Erro ao processar arquivo';
-      setError(errorMessage);
+      resetFileInput();
       toast({
         title: "Erro",
-        description: errorMessage,
+        description: 'Erro ao processar arquivo',
         variant: "destructive",
       });
       setUploadingImage(null);
@@ -286,11 +287,9 @@ export default function CustomerPets() {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        const errorMessage = 'Por favor, selecione apenas arquivos de imagem';
-        setError(errorMessage);
         toast({
           title: "Erro",
-          description: errorMessage,
+          description: 'Por favor, selecione apenas arquivos de imagem',
           variant: "destructive",
         });
         // Reset file input
@@ -300,11 +299,9 @@ export default function CustomerPets() {
       
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        const errorMessage = 'Imagem muito grande. Máximo 5MB';
-        setError(errorMessage);
         toast({
           title: "Erro",
-          description: errorMessage,
+          description: 'Imagem muito grande. Máximo 5MB',
           variant: "destructive",
         });
         // Reset file input
