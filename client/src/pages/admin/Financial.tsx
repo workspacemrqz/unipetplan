@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
@@ -24,7 +24,6 @@ import { ptBR } from "date-fns/locale";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
 import { ExportButton } from "@/components/admin/ExportButton";
-import { normalizeCPF } from "@/../../shared/cpf-utils";
 
 interface PaymentReceipt {
   id: string;
@@ -67,6 +66,7 @@ const statusStyle = "border border-border rounded-lg bg-background text-foregrou
 
 export default function Financial() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [selectedReceipt, setSelectedReceipt] = useState<PaymentReceipt | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
@@ -75,23 +75,33 @@ export default function Financial() {
   const pageSize = 10;
   const { toast } = useToast();
 
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setCurrentPage(1); // Reset to page 1 when searching
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const { data: receipts = [], isLoading } = useQuery<PaymentReceipt[]>({
-    queryKey: ["/admin/api/payment-receipts"],
+    queryKey: ["/admin/api/payment-receipts", { search: debouncedSearchQuery }],
+    queryFn: async ({ queryKey }) => {
+      const [endpoint, params] = queryKey as [string, { search: string }];
+      const queryParams = new URLSearchParams();
+      if (params.search) {
+        queryParams.append('search', params.search);
+      }
+      const url = queryParams.toString() ? `${endpoint}?${queryParams}` : endpoint;
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) throw new Error('Failed to fetch payment receipts');
+      return response.json();
+    },
   });
 
-  const filteredReceipts = (searchQuery
-    ? receipts.filter(
-        (receipt) => {
-          const normalizedSearchQuery = normalizeCPF(searchQuery);
-          const normalizedReceiptCPF = receipt.clientCPF ? normalizeCPF(receipt.clientCPF) : '';
-          
-          return receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            normalizedReceiptCPF.includes(normalizedSearchQuery);
-        }
-      )
-    : receipts)
+  // Receipts are already filtered and sorted by the backend
+  const filteredReceipts = receipts
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const totalReceipts = filteredReceipts.length;
@@ -157,8 +167,13 @@ export default function Financial() {
   };
 
   const prepareExportData = async () => {
-    // Buscar TODOS os dados sem paginação
-    const response = await fetch(`/admin/api/payment-receipts?limit=999999`);
+    // Buscar TODOS os dados com o filtro aplicado (sem paginação)
+    const queryParams = new URLSearchParams();
+    if (debouncedSearchQuery) {
+      queryParams.append('search', debouncedSearchQuery);
+    }
+    const url = queryParams.toString() ? `/admin/api/payment-receipts?${queryParams}` : '/admin/api/payment-receipts';
+    const response = await fetch(url, { credentials: 'include' });
     
     if (!response.ok) {
       throw new Error('Erro ao buscar dados para exportação');
@@ -166,18 +181,8 @@ export default function Financial() {
     
     const allReceipts = await response.json();
     
-    // Aplicar filtros de busca se houver
-    const filtered = searchQuery
-      ? allReceipts.filter((receipt: PaymentReceipt) => {
-          const normalizedSearchQuery = normalizeCPF(searchQuery);
-          const normalizedReceiptCPF = receipt.clientCPF ? normalizeCPF(receipt.clientCPF) : '';
-          
-          return receipt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            receipt.clientEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            normalizedReceiptCPF.includes(normalizedSearchQuery);
-        })
-      : allReceipts;
+    // Dados já estão filtrados pelo backend
+    const filtered = allReceipts;
     
     // Retornar dados formatados para exportação
     return filtered.map((receipt: PaymentReceipt) => ({
@@ -211,10 +216,7 @@ export default function Financial() {
             <Input
               placeholder="Buscar por nome, recibo, email ou CPF..."
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-80"
             />
           </div>

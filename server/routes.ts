@@ -1884,7 +1884,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all payment receipts
   app.get("/admin/api/payment-receipts", requireAdmin, async (req, res) => {
     try {
-      const receipts = await storage.getAllPaymentReceipts();
+      const { search } = req.query;
+      let receipts = await storage.getAllPaymentReceipts();
+      
+      // Apply search filter if present
+      if (search && typeof search === 'string' && search.trim()) {
+        const searchLower = search.toLowerCase();
+        // Normalize search term for CPF (remove special characters)
+        const normalizedSearch = search.replace(/\D/g, '');
+        
+        receipts = receipts.filter((receipt: any) => {
+          // Search in clientName
+          if (receipt.clientName && receipt.clientName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in clientCPF (normalized)
+          if (receipt.clientCPF) {
+            const normalizedCPF = receipt.clientCPF.replace(/\D/g, '');
+            if (normalizedCPF.includes(normalizedSearch)) {
+              return true;
+            }
+          }
+          // Search in receiptNumber
+          if (receipt.receiptNumber && receipt.receiptNumber.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in clientEmail
+          if (receipt.clientEmail && receipt.clientEmail.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in petName
+          if (receipt.petName && receipt.petName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in procedure
+          if (receipt.procedure && receipt.procedure.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          // Search in networkUnitName
+          if (receipt.networkUnitName && receipt.networkUnitName.toLowerCase().includes(searchLower)) {
+            return true;
+          }
+          return false;
+        });
+      }
+      
       res.json(receipts);
     } catch (error) {
       console.error("❌ [ADMIN] Error fetching payment receipts:", error);
