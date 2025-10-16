@@ -553,6 +553,8 @@ export default function Checkout() {
   const handlePlanSelect = (plan: Plan) => {
     setSelectedPlan(plan);
     setCurrentStep(2);
+    // Scroll suave para o topo da página quando muda de step
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNextStep = () => {
@@ -570,6 +572,8 @@ export default function Checkout() {
       setCurrentStep(currentStep + 1);
       // Reset validation errors quando muda de step
       setShowValidationErrors(false);
+      // Scroll suave para o topo da página quando muda de step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       handleSubmit();
     }
@@ -581,6 +585,8 @@ export default function Checkout() {
     
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      // Scroll suave para o topo da página quando muda de step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       navigate('/plans');
     }
