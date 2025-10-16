@@ -1974,10 +1974,13 @@ export class DatabaseStorage implements IStorage {
           id: crypto.randomUUID(),
           procedureId,
           planId: p.planId,
-          waitingPeriodDays: p.waitingPeriodDays || 0,
-          coparticipationOverride: p.coparticipationOverride || null,
-          coverageOverride: p.coverageOverride || null,
+          price: p.price || 0, // Valor a receber em centavos
+          payValue: p.payValue || 0, // Valor a pagar em centavos
+          coparticipacao: p.coparticipacao || 0, // Coparticipação em centavos
+          carencia: p.carencia || null, // Período de carência (texto)
+          limitesAnuais: p.limitesAnuais || null, // Limites anuais (texto)
           isIncluded: p.isIncluded !== undefined ? p.isIncluded : true,
+          displayOrder: p.displayOrder || 0,
           createdAt: new Date(),
         }))
       );
