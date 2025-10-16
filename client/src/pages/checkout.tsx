@@ -1582,8 +1582,8 @@ export default function Checkout() {
                     </div>
                     <span className="text-sm text-gray-700">
                       Li e aceito os{' '}
-                      <a href="/termos-de-privacidade" target="_blank" className="underline text-teal-600 hover:text-teal-700">
-                        Termos de Privacidade
+                      <a href="/politica-privacidade" target="_blank" className="underline text-teal-600 hover:text-teal-700">
+                        Política de Privacidade
                       </a>
                     </span>
                   </label>
@@ -1971,8 +1971,8 @@ export default function Checkout() {
                       </div>
                       <span className="text-sm text-gray-700">
                         Li e aceito os{' '}
-                        <a href="/termos-e-condicoes" target="_blank" className="underline text-teal-600 hover:text-teal-700">
-                          Termos e Condições
+                        <a href="/termos-uso" target="_blank" className="underline text-teal-600 hover:text-teal-700">
+                          Termos de Uso
                         </a>
                         {' '}e o{' '}
                         <a href={getContractLink()} target="_blank" className="underline text-teal-600 hover:text-teal-700">
