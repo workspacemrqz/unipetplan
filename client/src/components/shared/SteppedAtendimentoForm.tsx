@@ -115,6 +115,7 @@ export default function SteppedAtendimentoForm({
   const [isSearchingClient, setIsSearchingClient] = useState(false);
   const [selectedPet, setSelectedPet] = useState<any>(null);
   const [petHistory, setPetHistory] = useState<any[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [selectedProcedures, setSelectedProcedures] = useState<any[]>([]);  // Novo estado para múltiplos procedimentos
   
   // Estados para edição de peso
@@ -213,6 +214,7 @@ export default function SteppedAtendimentoForm({
       setClientPets([]);
       setSelectedPet(null); // Limpar pet selecionado
       setPetHistory([]); // Limpar histórico
+      setIsLoadingHistory(false); // Resetar loading
       setSelectedProcedures([]); // Limpar procedimentos selecionados
       form.setValue("clientId", "");
       form.setValue("petId", "");
@@ -410,6 +412,7 @@ export default function SteppedAtendimentoForm({
       form.setValue("value", "");
       setSelectedPet(null); // Limpar pet anteriormente selecionado
       setPetHistory([]); // Limpar histórico anterior
+      setIsLoadingHistory(false); // Resetar loading
       setSelectedProcedures([]); // Limpar procedimentos selecionados
       
       // Auto-selecionar se houver apenas um pet
@@ -424,6 +427,7 @@ export default function SteppedAtendimentoForm({
         
         // Buscar histórico do pet auto-selecionado
         try {
+          setIsLoadingHistory(true);
           const historyResponse = await fetch(
             mode === 'admin' 
               ? `/admin/api/pets/${petToSelect.id}/atendimentos`
@@ -442,6 +446,8 @@ export default function SteppedAtendimentoForm({
         } catch (error) {
           console.error('Erro ao buscar histórico:', error);
           setPetHistory([]);
+        } finally {
+          setIsLoadingHistory(false);
         }
       }
       
@@ -739,6 +745,7 @@ export default function SteppedAtendimentoForm({
                                 
                                 // Buscar histórico de atendimentos
                                 try {
+                                  setIsLoadingHistory(true);
                                   const historyResponse = await fetch(
                                     mode === 'admin' 
                                       ? `/admin/api/pets/${value}/atendimentos`
@@ -757,6 +764,8 @@ export default function SteppedAtendimentoForm({
                                 } catch (error) {
                                   console.error('Erro ao buscar histórico:', error);
                                   setPetHistory([]);
+                                } finally {
+                                  setIsLoadingHistory(false);
                                 }
                               }} 
                               value={field.value}
@@ -1035,7 +1044,12 @@ export default function SteppedAtendimentoForm({
                                   <h3 className="font-semibold text-base md:text-lg mb-3 text-[#277677]">
                                     Histórico de Atendimentos
                                   </h3>
-                                  {petHistory && petHistory.length > 0 ? (
+                                  {isLoadingHistory ? (
+                                    <div className="flex items-center justify-center py-8">
+                                      <Loader2 className="h-6 w-6 animate-spin text-[#277677]" />
+                                      <span className="ml-2 text-sm text-gray-600">Carregando histórico...</span>
+                                    </div>
+                                  ) : petHistory && petHistory.length > 0 ? (
                                     <div 
                                       className="space-y-3 max-h-[300px] overflow-y-auto pr-2"
                                       style={{ 
