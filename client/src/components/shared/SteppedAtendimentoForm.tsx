@@ -124,7 +124,7 @@ export default function SteppedAtendimentoForm({
   const [isSavingWeight, setIsSavingWeight] = useState(false);
   
   // ✅ Estado para controlar status do contrato do pet
-  const [contractStatus, setContractStatus] = useState<{ status: string; contractId?: string } | null>(null);
+  const [contractStatus, setContractStatus] = useState<{ status: string; contractId?: string; planName?: string } | null>(null);
 
   // Função para formatar CPF
   const formatCpf = (value: string) => {
@@ -238,22 +238,69 @@ export default function SteppedAtendimentoForm({
       if (response.ok) {
         const contracts = await response.json();
         
+        // Buscar o contrato ativo para pegar o planId
+        const activeContract = contracts.find((contract: any) => 
+          contract.status === 'active' || contract.status === 'awaiting_payment'
+        );
+        
+        // Buscar qualquer contrato (ativo, suspenso ou cancelado) para pegar o planId
+        const contractWithPlan = contracts.find((contract: any) => 
+          contract.planId && (
+            contract.status === 'active' || 
+            contract.status === 'awaiting_payment' || 
+            contract.status === 'suspended' || 
+            contract.status === 'cancelled'
+          )
+        );
+        
+        let planName = '';
+        if (contractWithPlan && contractWithPlan.planId) {
+          // Buscar informações do plano do endpoint público
+          try {
+            const planResponse = await fetch('/api/plans');
+            
+            if (planResponse.ok) {
+              const plansData = await planResponse.json();
+              const plan = plansData.find((p: any) => p.id === contractWithPlan.planId);
+              planName = plan?.name || '';
+            }
+          } catch (error) {
+            console.error('Erro ao buscar informações do plano:', error);
+          }
+        }
+        
         // Verificar se há contrato suspenso
         const suspendedContract = contracts.find((contract: any) => contract.status === 'suspended');
         if (suspendedContract) {
-          setContractStatus({ status: 'suspended', contractId: suspendedContract.id });
+          setContractStatus({ 
+            status: 'suspended', 
+            contractId: suspendedContract.id,
+            planName: planName || ''
+          });
           return;
         }
         
         // Verificar se há contrato cancelado
         const cancelledContract = contracts.find((contract: any) => contract.status === 'cancelled');
         if (cancelledContract) {
-          setContractStatus({ status: 'cancelled', contractId: cancelledContract.id });
+          setContractStatus({ 
+            status: 'cancelled', 
+            contractId: cancelledContract.id,
+            planName: planName || ''
+          });
           return;
         }
         
         // Contrato ativo ou sem problemas
-        setContractStatus(null);
+        if (activeContract && planName) {
+          setContractStatus({ 
+            status: 'active', 
+            contractId: activeContract.id,
+            planName 
+          });
+        } else {
+          setContractStatus(null);
+        }
       } else {
         setContractStatus(null);
       }
@@ -814,15 +861,35 @@ export default function SteppedAtendimentoForm({
                                     <h3 className="font-semibold text-base md:text-lg text-[#277677]">
                                       Informações do Pet
                                     </h3>
-                                    <span 
-                                      className="px-3 py-1 rounded-full text-xs font-medium w-fit" 
-                                      style={{ 
-                                        backgroundColor: selectedPet.planId ? 'rgba(39, 118, 119, 0.1)' : 'rgba(128, 128, 128, 0.1)', 
-                                        color: selectedPet.planId ? '#277677' : '#666666'
-                                      }}
-                                    >
-                                      {selectedPet.planId ? 'Plano Ativo' : 'Sem Plano'}
-                                    </span>
+                                    {contractStatus && contractStatus.planName ? (
+                                      <span 
+                                        className="px-3 py-1 rounded-full text-xs font-medium w-fit" 
+                                        style={{ 
+                                          backgroundColor: contractStatus.status === 'active' 
+                                            ? 'rgba(39, 118, 119, 0.1)' 
+                                            : contractStatus.status === 'suspended' 
+                                            ? 'rgba(255, 193, 7, 0.1)'
+                                            : 'rgba(239, 68, 68, 0.1)',
+                                          color: contractStatus.status === 'active' 
+                                            ? '#277677' 
+                                            : contractStatus.status === 'suspended'
+                                            ? '#b45309'
+                                            : '#dc2626'
+                                        }}
+                                      >
+                                        Plano {contractStatus.planName.toUpperCase()}
+                                      </span>
+                                    ) : (
+                                      <span 
+                                        className="px-3 py-1 rounded-full text-xs font-medium w-fit" 
+                                        style={{ 
+                                          backgroundColor: selectedPet.planId ? 'rgba(39, 118, 119, 0.1)' : 'rgba(128, 128, 128, 0.1)', 
+                                          color: selectedPet.planId ? '#277677' : '#666666'
+                                        }}
+                                      >
+                                        {selectedPet.planId ? 'Verificando plano...' : 'Sem Plano'}
+                                      </span>
+                                    )}
                                   </div>
                                   <div className="flex gap-4">
                                     {/* Foto do Pet */}
