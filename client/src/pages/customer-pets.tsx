@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface Pet {
   id: string;
@@ -64,6 +65,7 @@ interface Atendimento {
 export default function CustomerPets() {
   const [, navigate] = useLocation();
   const { client, isLoading: authLoading, error: authError } = useAuth();
+  const { toast } = useToast();
   const [pets, setPets] = useState<Pet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -199,6 +201,7 @@ export default function CustomerPets() {
     try {
       // Convert file to base64
       const reader = new FileReader();
+      
       reader.onload = async () => {
         try {
           const base64String = reader.result as string;
@@ -217,21 +220,63 @@ export default function CustomerPets() {
             setPets(prev => prev.map(pet => 
               pet.id === petId ? { ...pet, ...result.pet } : pet
             ));
+            
+            // Reset file input after successful upload
+            const fileInput = document.querySelector(`#file-input-${petId}`) as HTMLInputElement;
+            if (fileInput) {
+              fileInput.value = '';
+            }
+            
+            toast({
+              title: "Sucesso!",
+              description: "Foto do pet atualizada com sucesso.",
+            });
           } else {
             const errorData = await response.json();
-            setError(errorData.error || 'Erro ao fazer upload da imagem');
+            const errorMessage = errorData.error || 'Erro ao fazer upload da imagem';
+            setError(errorMessage);
+            toast({
+              title: "Erro",
+              description: errorMessage,
+              variant: "destructive",
+            });
           }
         } catch (error) {
           console.error('Error uploading image:', error);
-          setError('Erro ao fazer upload da imagem');
+          const errorMessage = 'Erro ao fazer upload da imagem';
+          setError(errorMessage);
+          toast({
+            title: "Erro",
+            description: errorMessage,
+            variant: "destructive",
+          });
         } finally {
           setUploadingImage(null);
         }
       };
+      
+      reader.onerror = () => {
+        console.error('Error reading file:', reader.error);
+        const errorMessage = 'Erro ao processar o arquivo. Tente novamente.';
+        setError(errorMessage);
+        toast({
+          title: "Erro",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        setUploadingImage(null);
+      };
+      
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error reading file:', error);
-      setError('Erro ao processar arquivo');
+      const errorMessage = 'Erro ao processar arquivo';
+      setError(errorMessage);
+      toast({
+        title: "Erro",
+        description: errorMessage,
+        variant: "destructive",
+      });
       setUploadingImage(null);
     }
   };
@@ -241,13 +286,29 @@ export default function CustomerPets() {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        setError('Por favor, selecione apenas arquivos de imagem');
+        const errorMessage = 'Por favor, selecione apenas arquivos de imagem';
+        setError(errorMessage);
+        toast({
+          title: "Erro",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        // Reset file input
+        event.target.value = '';
         return;
       }
       
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError('Imagem muito grande. Máximo 5MB');
+        const errorMessage = 'Imagem muito grande. Máximo 5MB';
+        setError(errorMessage);
+        toast({
+          title: "Erro",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        // Reset file input
+        event.target.value = '';
         return;
       }
       
