@@ -466,6 +466,7 @@ export default function Checkout() {
           logger.log('🎉 PIX APROVADO! Redirecionando para login com popup de sucesso...');
           clearInterval(pollInterval);
           setIsPaymentConfirmed(true);
+          setIsProcessingPayment(false); // Resetar ao confirmar PIX
           
           // Forçar redirecionamento usando window.location para garantir navegação
           setTimeout(() => {
@@ -489,6 +490,7 @@ export default function Checkout() {
           logger.log('🎉 PIX JÁ ESTAVA APROVADO! Redirecionando imediatamente...');
           clearInterval(pollInterval);
           setIsPaymentConfirmed(true);
+          setIsProcessingPayment(false); // Resetar ao confirmar PIX
           
           // Forçar redirecionamento
           setTimeout(() => {
@@ -586,6 +588,13 @@ export default function Checkout() {
   const handlePrevStep = () => {
     // Reset validation errors ao voltar
     setShowValidationErrors(false);
+    
+    // Se estiver na etapa 4 com PIX, limpar dados do PIX e resetar processamento
+    if (currentStep === 4 && pixData) {
+      setPixData(null);
+      setIsProcessingPayment(false);
+      setIsPaymentConfirmed(false);
+    }
     
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
@@ -779,9 +788,12 @@ export default function Checkout() {
             orderId: result.payment.orderId,
             paymentId: result.payment.paymentId
           });
+          // IMPORTANTE: Manter isProcessingPayment como true para PIX
+          // Não resetar aqui pois o pagamento ainda está sendo processado
         } else if (paymentData.method === 'credit_card' && result.payment?.status === 2) {
           // Para cartão aprovado (status 2), redirecionar imediatamente para customer/login com parâmetro para mostrar popup
           logger.log('🎉 [CHECKOUT] Pagamento com cartão aprovado, redirecionando para login!');
+          setIsProcessingPayment(false); // Resetar apenas para cartão aprovado
           navigate('/cliente/login?payment_success=true');
         } else {
           navigate(`/checkout-success?order=${result.payment?.orderId}&method=${paymentData.method}`);
@@ -834,7 +846,11 @@ export default function Checkout() {
       setIsProcessingPayment(false);
     } finally {
       setIsLoading(false);
-      setIsProcessingPayment(false);
+      // Não resetar isProcessingPayment aqui se for PIX, pois o pagamento continua em andamento
+      // Será resetado apenas quando o PIX for confirmado ou cancelado
+      if (paymentData.method !== 'pix' || !pixData) {
+        setIsProcessingPayment(false);
+      }
     }
   };
 
