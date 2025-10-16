@@ -1927,7 +1927,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllPaymentReceipts(): Promise<any[]> {
-    return await db.select().from(paymentReceipts).orderBy(desc(paymentReceipts.createdAt));
+    const results = await db
+      .select({
+        id: paymentReceipts.id,
+        contractId: paymentReceipts.contractId,
+        sellerId: paymentReceipts.sellerId,
+        cieloPaymentId: paymentReceipts.cieloPaymentId,
+        receiptNumber: paymentReceipts.receiptNumber,
+        paymentAmount: paymentReceipts.paymentAmount,
+        paymentDate: paymentReceipts.paymentDate,
+        paymentMethod: paymentReceipts.paymentMethod,
+        status: paymentReceipts.status,
+        pdfFileName: paymentReceipts.pdfFileName,
+        pdfObjectKey: paymentReceipts.pdfObjectKey,
+        proofOfSale: paymentReceipts.proofOfSale,
+        authorizationCode: paymentReceipts.authorizationCode,
+        tid: paymentReceipts.tid,
+        returnCode: paymentReceipts.returnCode,
+        returnMessage: paymentReceipts.returnMessage,
+        clientName: paymentReceipts.clientName,
+        clientEmail: paymentReceipts.clientEmail,
+        petName: paymentReceipts.petName,
+        planName: paymentReceipts.planName,
+        petsData: paymentReceipts.petsData,
+        createdAt: paymentReceipts.createdAt,
+        updatedAt: paymentReceipts.updatedAt,
+        clientCPF: clients.cpf,
+      })
+      .from(paymentReceipts)
+      .leftJoin(contracts, eq(paymentReceipts.contractId, contracts.id))
+      .leftJoin(clients, eq(contracts.clientId, clients.id))
+      .orderBy(desc(paymentReceipts.createdAt));
+    
+    return results;
   }
 
   async getRulesSettings(): Promise<any | undefined> {
