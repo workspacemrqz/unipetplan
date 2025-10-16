@@ -44,6 +44,7 @@ interface AtendimentoWithNetworkUnit {
     name: string;
   };
   clientName?: string;
+  clientCPF?: string;
   petName?: string;
   procedureNotes?: string;
   generalNotes?: string;
