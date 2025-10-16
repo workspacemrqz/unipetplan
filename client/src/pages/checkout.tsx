@@ -295,13 +295,8 @@ export default function Checkout() {
     newCollapsedState[index] = true;
     setCollapsedPets(newCollapsedState);
     
-    // Scroll suave para o container do pet salvo
-    setTimeout(() => {
-      const petContainer = document.getElementById(`pet-container-${index}`);
-      if (petContainer) {
-        petContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
+    // Scroll suave para o topo da página após salvar o pet
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Reset do estado de edição para que o botão de apagar apareça
     const newEditingState = [...editingPets];
@@ -1112,7 +1107,7 @@ export default function Checkout() {
                     const isCollapsed = collapsedPets[index];
                     
                     return (
-                      <div key={index} id={`pet-container-${index}`} className={`border border-gray-200 rounded-lg relative ${isCollapsed ? 'py-3 px-4' : 'p-6'}`}>
+                      <div key={index} className={`border border-gray-200 rounded-lg relative ${isCollapsed ? 'py-3 px-4' : 'p-6'}`}>
                         <div className={`flex justify-between items-center ${isCollapsed ? 'mb-0' : 'mb-4'}`}>
                           <div className="flex flex-col lg:flex-row lg:items-center">
                           <h3 
