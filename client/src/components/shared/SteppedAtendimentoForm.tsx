@@ -1173,9 +1173,22 @@ export default function SteppedAtendimentoForm({
                         control={form.control}
                         name="procedure"
                         render={({ field }) => {
-                          const filteredProcedures = availableProcedures?.procedures?.filter((proc: any) => 
+                          // Ordenar procedimentos: liberados primeiro, depois carência, depois esgotados
+                          const sortedProcedures = (availableProcedures?.procedures || []).sort((a: any, b: any) => {
+                            // Definir prioridade de cada procedimento
+                            const getPriority = (proc: any) => {
+                              if (proc.canUse) return 1; // Liberados primeiro
+                              if (proc.waitingDaysRemaining > 0) return 2; // Em carência segundo
+                              if (!proc.isUnlimited && proc.remaining === 0) return 3; // Esgotados por último
+                              return 4; // Outros casos
+                            };
+                            
+                            return getPriority(a) - getPriority(b);
+                          });
+                          
+                          const filteredProcedures = sortedProcedures.filter((proc: any) => 
                             proc.name.toLowerCase().includes(procedureSearch.toLowerCase())
-                          ) || [];
+                          );
 
                           return (
                             <FormItem>
