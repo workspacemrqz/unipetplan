@@ -136,16 +136,30 @@ export default function ClientForm() {
     const cleanCEP = cep.replace(/\D/g, "");
     if (cleanCEP.length === 8) {
       try {
-        const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
-        const data = await response.json();
-        if (!data.erro) {
-          form.setValue("address", data.logradouro || "");
-          form.setValue("district", data.bairro || "");
-          form.setValue("city", data.localidade || "");
-          form.setValue("state", data.uf || "");
+        const response = await fetch(`/api/cep/${cleanCEP}`);
+        const result = await response.json();
+        
+        if (response.ok && result.success && result.data) {
+          const { data } = result;
+          form.setValue("address", data.street || "");
+          form.setValue("district", data.neighborhood || "");
+          form.setValue("city", data.city || "");
+          form.setValue("state", data.state || "");
+        } else {
+          console.error("CEP não encontrado ou inválido");
+          toast({
+            title: "CEP não encontrado",
+            description: "Não foi possível encontrar o endereço para o CEP informado.",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
+        toast({
+          title: "Erro ao buscar CEP",
+          description: "Ocorreu um erro ao buscar o endereço. Tente novamente.",
+          variant: "destructive",
+        });
       }
     }
   };
