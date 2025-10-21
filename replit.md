@@ -19,6 +19,11 @@ Key features include extensive admin management (FAQs, Site Settings, Network Un
 ### System Design Choices
 The API is RESTful with structured error handling. Performance optimizations include code splitting, lazy loading, optimized bundle sizes, connection pooling, query optimization, and response compression. Deployment involves separate client/server builds for development and a unified server for production, with standardized port configuration and enhanced CORS/security for Replit environments, including trust proxy configuration. The development workflow uses a simple two-server setup with Vite proxying API requests.
 
+### Authentication Improvements (October 2025)
+**Unified Login System**: Single login form at `/unidade/:slug` that automatically detects user type (unit, veterinarian, or admin) through the `/api/unified-auth/login` endpoint. The system tries unit authentication first, then veterinarian/admin if unit fails. Users are redirected based on their role: units and admins to dashboard (`/painel`), veterinarians to new attendance page (`/atendimentos/novo`). This replaces the previous tab-based login system for improved UX.
+
+**Veterinarian/Admin Management**: The veterinarians table now includes an `isAdmin` boolean field to distinguish between regular veterinarians and administrators. Administrators automatically receive full system access (`canAccessAtendimentos=true`) and don't require veterinary-specific fields (CRMV, specialty, type). The "Corpo Clínico" interface dynamically adapts form fields based on user role selection.
+
 ## External Dependencies
 
 -   **Frontend Libraries**: React, React DOM, React Hook Form, TanStack React Query, Radix UI, Lucide React, Tailwind CSS.
