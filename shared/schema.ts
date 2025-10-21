@@ -603,6 +603,21 @@ export const adminActionLogs = pgTable("admin_action_logs", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
+// Atendimento history logs table for tracking all changes
+export const atendimentoHistoryLogs = pgTable("atendimento_history_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  atendimentoId: varchar("atendimento_id").notNull().references(() => atendimentos.id, { onDelete: "cascade" }),
+  actionType: varchar("action_type").notNull(), // "created", "field_updated", "status_changed", "procedure_added", "procedure_removed", "note_updated"
+  fieldName: varchar("field_name"), // Which field was changed
+  oldValue: text("old_value"), // Previous value
+  newValue: text("new_value"), // New value
+  userName: varchar("user_name").notNull(), // Name of the user who made the change
+  userId: varchar("user_id"), // ID reference (could be adminUserId, veterinarianId, or unitId)
+  userType: varchar("user_type").notNull(), // "admin", "veterinarian", "unit"
+  description: text("description"), // Human-readable description of the change
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
 // === VALIDATION SCHEMAS ===
 
 export const insertContactSubmissionSchema = z.object({
