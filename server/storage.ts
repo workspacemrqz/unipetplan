@@ -590,6 +590,7 @@ export class DatabaseStorage implements IStorage {
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
         contractText: plans.contractText,
+        contractUrl: plans.contractUrl,
       }).from(plans).where(eq(plans.isActive, true)).orderBy(asc(plans.displayOrder));
 
       return result;
@@ -627,6 +628,7 @@ export class DatabaseStorage implements IStorage {
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
         contractText: plans.contractText,
+        contractUrl: plans.contractUrl,
       }).from(plans).orderBy(asc(plans.displayOrder));
 
       return result;
@@ -668,6 +670,7 @@ export class DatabaseStorage implements IStorage {
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
         contractText: plans.contractText,
+        contractUrl: plans.contractUrl,
       }).from(plans).where(eq(plans.id, id));
 
       return plan || undefined;
@@ -703,6 +706,7 @@ export class DatabaseStorage implements IStorage {
         annualInstallmentPrice: plans.annualInstallmentPrice,
         annualInstallmentCount: plans.annualInstallmentCount,
         contractText: plans.contractText,
+        contractUrl: plans.contractUrl,
       }).from(plans).where(eq(plans.name, name));
 
       return plan || undefined;
