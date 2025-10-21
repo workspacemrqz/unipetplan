@@ -7080,6 +7080,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           petId: contract.petId,
           planName: plan?.name || 'Plano não encontrado',
           petName: pet?.name || 'Pet não encontrado',
+          planContractText: plan?.contractText || null,
           isOverdue: paymentStatus.isOverdue,
           daysPastDue: paymentStatus.daysPastDue,
           nextDueDate: paymentStatus.nextDueDate ? paymentStatus.nextDueDate.toISOString() : null,

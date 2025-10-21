@@ -66,6 +66,7 @@ import { useConfirmDialog } from "@/hooks/admin/use-confirm-dialog";
 import { PasswordDialog } from "@/components/admin/ui/password-dialog";
 import { usePasswordDialog } from "@/hooks/admin/use-password-dialog";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { usePermissions } from "@/hooks/use-permissions";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
 import { cn, capitalizeFirst } from "@/lib/utils";
@@ -102,6 +103,7 @@ export default function Atendimentos() {
   const confirmDialog = useConfirmDialog();
   const passwordDialog = usePasswordDialog();
   const queryClient = useQueryClient();
+  const { canAdd, canEdit } = usePermissions();
 
   const [dateFilter, setDateFilter] = useState<{
     startDate: CalendarDate | null;
@@ -461,6 +463,8 @@ export default function Atendimentos() {
             variant="admin-action"
             size="sm"
             onClick={() => setLocation("/atendimentos/novo")}
+            disabled={!canAdd()}
+            title={!canAdd() ? "Você não tem permissão para adicionar" : "Adicionar atendimento"}
           >
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
@@ -595,8 +599,9 @@ export default function Atendimentos() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEdit(atendimento)}
+                          disabled={!canEdit()}
                           data-testid={`button-edit-${atendimento.id}`}
-                          title="Editar status"
+                          title={!canEdit() ? "Você não tem permissão para editar" : "Editar status"}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -851,7 +856,8 @@ export default function Atendimentos() {
             <Button
               variant="admin-action"
               onClick={handleSaveStatus}
-              disabled={isSaving}
+              disabled={!canEdit() || isSaving}
+              title={!canEdit() ? "Você não tem permissão para editar" : "Salvar alterações"}
             >
               {isSaving ? (
                 <>

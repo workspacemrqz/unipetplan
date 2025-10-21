@@ -14,14 +14,20 @@ export default function RelatorioFinanceiroPage() {
   }, [slug]);
 
   const checkAuthentication = async () => {
-    const token = localStorage.getItem('unit-token');
+    const unitToken = localStorage.getItem('unit-token');
+    const veterinarianToken = localStorage.getItem('veterinarian-token');
     const unitSlug = localStorage.getItem('unit-slug');
     
-    if (!token || unitSlug !== slug) {
+    // Verificar se existe unit-token OU veterinarian-token
+    const hasValidToken = unitToken || veterinarianToken;
+    
+    if (!hasValidToken || unitSlug !== slug) {
+      console.log('❌ [RELATORIO-FINANCEIRO] Auth failed - redirecting to login');
       setLocation(`/unidade/${slug}`);
       return;
     }
     
+    console.log('✅ [RELATORIO-FINANCEIRO] Auth successful');
     setLoading(false);
   };
 

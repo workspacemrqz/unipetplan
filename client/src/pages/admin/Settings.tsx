@@ -11,6 +11,7 @@ import { InputMasked } from "@/components/ui/input-masked";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { usePermissions } from "@/hooks/use-permissions";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertSiteSettingsSchema, insertRulesSettingsSchema, insertChatSettingsSchema } from "@shared/schema";
 import { Save, Loader2 } from "lucide-react";
@@ -27,6 +28,7 @@ export default function Settings() {
   const queryClient = useQueryClient();
   const hasInitializedRef = useRef(false);
   const { logAction } = useAdminLogger();
+  const { canEdit } = usePermissions();
 
   const { data: siteSettings, isLoading: siteLoading } = useQuery({
     queryKey: ["/admin/api/settings/site"],
@@ -665,7 +667,8 @@ export default function Settings() {
                     type="submit"
                     variant="admin-action"
                     size="sm"
-                    disabled={saveSiteMutation.isPending}
+                    disabled={!canEdit() || saveSiteMutation.isPending}
+                    title={!canEdit() ? "Você não tem permissão para editar" : "Salvar alterações"}
                     data-testid="button-save-site"
                     className="min-w-[140px]"
                   >

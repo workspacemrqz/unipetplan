@@ -35,6 +35,7 @@ import { Plus, Search, Edit, Trash2, HelpCircle, MoreHorizontal, ChevronLeft, Ch
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/use-column-preferences";
+import { usePermissions } from "@/hooks/use-permissions";
 import { z } from "zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -67,6 +68,7 @@ export default function FAQ() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { logAction } = useAdminLogger();
+  const { canAdd, canEdit, canDelete } = usePermissions();
 
   const { data: faqItems, isLoading } = useQuery({
     queryKey: ["/admin/api/faq"],
@@ -497,6 +499,8 @@ export default function FAQ() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEdit(item)}
+                          disabled={!canEdit()}
+                          title={!canEdit() ? "Você não tem permissão para editar" : "Editar item"}
                           data-testid={`button-edit-${item.id}`}
                         >
                           <Edit className="h-4 w-4" />
@@ -506,7 +510,8 @@ export default function FAQ() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleDelete(item.id)}
-                          disabled={deleteMutation.isPending}
+                          disabled={!canDelete() || deleteMutation.isPending}
+                          title={!canDelete() ? "Você não tem permissão para excluir" : "Excluir item"}
                           data-testid={`button-delete-${item.id}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -531,6 +536,8 @@ export default function FAQ() {
                       variant="outline"
                       size="sm"
                       onClick={() => setDialogOpen(true)}
+                      disabled={!canAdd()}
+                      title={!canAdd() ? "Você não tem permissão para adicionar" : "Criar primeiro item"}
                       data-testid="button-add-first-faq"
                       className="mt-4"
                     >

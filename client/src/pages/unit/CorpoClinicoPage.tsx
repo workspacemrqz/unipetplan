@@ -100,19 +100,25 @@ export default function CorpoClinicoPage() {
   }, [slug]);
 
   const checkAuthentication = async () => {
-    const token = localStorage.getItem('unit-token');
+    const unitToken = localStorage.getItem('unit-token');
+    const veterinarianToken = localStorage.getItem('veterinarian-token');
     const unitSlug = localStorage.getItem('unit-slug');
     
-    if (!token || unitSlug !== slug) {
+    // Verificar se existe unit-token OU veterinarian-token
+    const hasValidToken = unitToken || veterinarianToken;
+    
+    if (!hasValidToken || unitSlug !== slug) {
+      console.log('❌ [CORPO-CLINICO] Auth failed - redirecting to login');
       setLocation(`/unidade/${slug}`);
       return;
     }
     
+    console.log('✅ [CORPO-CLINICO] Auth successful');
     setLoading(false);
   };
 
   const logAction = async (actionType: string, actionData?: any) => {
-    const token = localStorage.getItem('unit-token');
+    const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
     if (!token || !slug) return;
     
     try {
@@ -132,7 +138,7 @@ export default function CorpoClinicoPage() {
   const { data: veterinarians = [], isLoading: isLoadingVets } = useQuery<Veterinarian[]>({
     queryKey: [`/api/units/${slug}/veterinarios`],
     queryFn: async () => {
-      const token = localStorage.getItem('unit-token');
+      const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
       const response = await fetch(`/api/units/${slug}/veterinarios`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -168,7 +174,7 @@ export default function CorpoClinicoPage() {
 
   const createMutation = useMutation({
     mutationFn: async (data: VeterinarianFormData) => {
-      const token = localStorage.getItem('unit-token');
+      const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
       const endpoint = editingVet
         ? `/api/units/${slug}/veterinarios/${editingVet.id}`
         : `/api/units/${slug}/veterinarios`;
@@ -228,7 +234,7 @@ export default function CorpoClinicoPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const token = localStorage.getItem('unit-token');
+      const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
       const response = await fetch(`/api/units/${slug}/veterinarios/${id}`, {
         method: 'DELETE',
         headers: {
@@ -269,7 +275,7 @@ export default function CorpoClinicoPage() {
 
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      const token = localStorage.getItem('unit-token');
+      const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
       const response = await fetch(`/api/units/${slug}/veterinarios/${id}`, {
         method: 'PUT',
         headers: {

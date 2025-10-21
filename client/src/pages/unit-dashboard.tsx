@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import UnitLayout from '@/components/unit/UnitLayout';
 import LoadingDots from '@/components/ui/LoadingDots';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDate } from "@internationalized/date";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
@@ -102,11 +102,13 @@ export default function UnitDashboard() {
     
     // Verificar se há algum token válido (unit ou veterinarian)
     if ((!unitToken && !vetToken) || unitSlug !== slug) {
-      // Redirecionar para a página de login da unidade, não para a unidade em si
-      setLocation(`/unidade/${slug}/login`);
+      console.log('❌ [DASHBOARD] Auth failed - redirecting to login');
+      // Redirecionar para a página de login da unidade
+      setLocation(`/unidade/${slug}`);
       return;
     }
     
+    console.log('✅ [DASHBOARD] Auth successful');
     setLoading(false);
     fetchDashboardData();
   };
@@ -116,8 +118,8 @@ export default function UnitDashboard() {
     const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
     
     if (!token) {
-      console.error('❌ Nenhum token encontrado para autenticação');
-      setLocation(`/unidade/${slug}/login`);
+      console.error('❌ [DASHBOARD] Nenhum token encontrado para autenticação');
+      setLocation(`/unidade/${slug}`);
       return;
     }
     
@@ -522,7 +524,7 @@ export default function UnitDashboard() {
                     paddingAngle={4}
                     label={(props: any) => {
                       const RADIAN = Math.PI / 180;
-                      const { cx, cy, midAngle, innerRadius, outerRadius, name, value, index } = props;
+                      const { cx, cy, midAngle, innerRadius, outerRadius, name, value } = props;
                       const radius = innerRadius + (outerRadius - innerRadius) * 1.5;
                       const x = cx + radius * Math.cos(-midAngle * RADIAN);
                       const y = cy + radius * Math.sin(-midAngle * RADIAN);

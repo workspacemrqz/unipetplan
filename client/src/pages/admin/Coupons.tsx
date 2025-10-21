@@ -45,6 +45,7 @@ import { Separator } from "@/components/admin/ui/separator";
 import { Plus, Edit, Trash2, DollarSign, Search, MoreHorizontal, ChevronLeft, ChevronRight, CreditCard, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
+import { usePermissions } from "@/hooks/use-permissions";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
@@ -76,6 +77,7 @@ export default function Coupons() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { logAction } = useAdminLogger();
+  const { canAdd, canEdit, canDelete } = usePermissions();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -328,7 +330,12 @@ export default function Coupons() {
         <div className="flex gap-2">
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="admin-action" size="sm">
+              <Button 
+                variant="admin-action" 
+                size="sm"
+                disabled={!canAdd()}
+                title={!canAdd() ? "Você não tem permissão para adicionar" : "Adicionar cupom"}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Adicionar
               </Button>
@@ -568,6 +575,8 @@ export default function Coupons() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleEdit(coupon)}
+                            disabled={!canEdit()}
+                            title={!canEdit() ? "Você não tem permissão para editar" : "Editar cupom"}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -575,6 +584,8 @@ export default function Coupons() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleDelete(coupon.id)}
+                            disabled={!canDelete()}
+                            title={!canDelete() ? "Você não tem permissão para excluir" : "Excluir cupom"}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -598,6 +609,8 @@ export default function Coupons() {
                         variant="outline"
                         size="sm"
                         onClick={() => setIsDialogOpen(true)}
+                        disabled={!canAdd()}
+                        title={!canAdd() ? "Você não tem permissão para adicionar" : "Criar primeiro cupom"}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Criar Primeiro Cupom

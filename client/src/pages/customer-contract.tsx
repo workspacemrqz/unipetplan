@@ -107,6 +107,7 @@ export default function CustomerContract() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
   
+  
   // Fetch contracts and pets
   useEffect(() => {
     const loadContracts = async () => {
@@ -153,7 +154,7 @@ export default function CustomerContract() {
     }
   }, [uniquePets, selectedPet]);
   
-  // Get selected contract and plan
+  // Get selected contract
   const selectedContract = useMemo(() => {
     if (!selectedPet) return null;
     return contracts.find(c => c.petId === selectedPet);
@@ -222,16 +223,25 @@ export default function CustomerContract() {
     );
   }
 
-  // Get contract text from database or use default
+  // Get contract text from plan contract, siteSettings, or use default
   const getContractText = () => {
+    // Priority 1: Check if the selected contract's plan has its own contractText
+    if (selectedContract?.planContractText && selectedContract.planContractText.trim()) {
+      // Replace placeholders in the plan's contract text
+      return selectedContract.planContractText
+        .replace(/\[Nome do Cliente\]/g, client?.full_name || '[Nome do Cliente]')
+        .replace(/\[CPF do Cliente\]/g, client?.cpf || '[CPF do Cliente]');
+    }
+    
+    // Priority 2: Check if siteSettings has contractText
     if (siteSettings?.contractText && siteSettings.contractText.trim()) {
-      // Replace placeholders in the contract text
+      // Replace placeholders in the site settings contract text
       return siteSettings.contractText
         .replace(/\[Nome do Cliente\]/g, client?.full_name || '[Nome do Cliente]')
         .replace(/\[CPF do Cliente\]/g, client?.cpf || '[CPF do Cliente]');
     }
     
-    // Default contract text
+    // Priority 3: Use default contract text
     return getDefaultContractText();
   };
 

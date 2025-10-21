@@ -35,6 +35,7 @@ import { apiRequest } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { usePermissions } from "@/hooks/use-permissions";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import { ExportButton } from "@/components/admin/ExportButton";
 
@@ -77,6 +78,7 @@ export default function Network() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { logAction } = useAdminLogger();
+  const { canAdd, canEdit, canDelete } = usePermissions();
 
   const { data: units, isLoading } = useQuery<NetworkUnit[]>({
     queryKey: ["/admin/api/network-units"],
@@ -329,6 +331,8 @@ export default function Network() {
             variant="admin-action"
             size="sm"
             onClick={() => setLocation("/rede/novo")}
+            disabled={!canAdd()}
+            title={!canAdd() ? "Você não tem permissão para adicionar" : "Adicionar nova unidade"}
             data-testid="button-new-unit"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -488,6 +492,8 @@ export default function Network() {
                           variant="outline"
                           size="sm"
                           onClick={() => setLocation(`/rede/${unit.id}/editar`)}
+                          disabled={!canEdit()}
+                          title={!canEdit() ? "Você não tem permissão para editar" : "Editar unidade"}
                           data-testid={`button-edit-${unit.id}`}
                         >
                           <Edit className="h-4 w-4" />
@@ -496,7 +502,8 @@ export default function Network() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleDelete(unit.id)}
-                          disabled={deleteUnitMutation.isPending}
+                          disabled={!canDelete() || deleteUnitMutation.isPending}
+                          title={!canDelete() ? "Você não tem permissão para excluir" : "Excluir unidade"}
                           data-testid={`button-delete-${unit.id}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -521,6 +528,8 @@ export default function Network() {
                       variant="outline"
                       size="sm"
                       onClick={() => setLocation("/rede/novo")}
+                      disabled={!canAdd()}
+                      title={!canAdd() ? "Você não tem permissão para adicionar" : "Cadastrar primeira unidade"}
                       data-testid="button-add-first-unit"
                     >
                       <Plus className="h-4 w-4 mr-2" />

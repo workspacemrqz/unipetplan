@@ -3,6 +3,77 @@
 ## Overview
 UNIPET PLAN is a comprehensive pet health plan management system for pet insurance administration, customer relationship management, and healthcare network unit management. It includes a customer-facing website for plan selection and quote requests, and an admin dashboard for content and business management. The system aims to streamline pet healthcare administration and enhance user experience through a full-stack TypeScript solution, focusing on business vision and market potential in the pet insurance sector.
 
+## Recent Changes
+
+### Admin Login Redirect Investigation (October 21, 2025)
+**Investigation Completed**: Comprehensive investigation of admin login redirecionamento system to identify and prevent potential `/admin/admin` redirect issue.
+
+**Problem Reported**: After login, the system could be redirecting to `unipetplan.com.br/admin/admin` instead of `/admin`, resulting in a 404 error.
+
+**Root Cause Identified**: Route duplication in `client/src/App.tsx` (lines 289-290):
+```typescript
+// BEFORE (Duplicated routes)
+<Route path="/admin" component={AdminRouter} />
+<Route path="/admin/:rest*" component={AdminRouter} />
+```
+
+Both routes were rendering the same `AdminRouter` component which uses `<WouterRouter base="/admin">`, potentially causing path concatenation issues.
+
+**Solution Applied**:
+- ✅ Removed duplicate route in `client/src/App.tsx`
+- ✅ Kept only the catch-all route: `<Route path="/admin/:rest*" component={AdminRouter} />`
+- ✅ AdminRouter configuration remains unchanged with `base="/admin"`
+
+**Files Modified**:
+- `client/src/App.tsx` (line 289): Removed duplicate route `<Route path="/admin" component={AdminRouter} />`
+
+**Testing Performed**:
+- ✅ `/admin` without login → Correctly redirects to `/admin/login`
+- ✅ `/admin/admin` without login → Correctly redirects to `/admin/login` (no 404)
+- ✅ Admin routes functioning correctly with proper authentication guard
+
+**Verification**:
+- ✅ `admin-login.tsx` (line 54): Redirect code confirmed correct: `window.location.href = '/admin'`
+- ✅ `AuthGuard.tsx`: Authentication verification working properly
+- ✅ No backend middleware adding extra `/admin` prefix
+- ✅ Wouter routing with `base="/admin"` functioning as expected
+
+**Result**: The potential routing issue has been prevented by removing route duplication. The login flow now works correctly with a clean routing structure.
+
+### User Management - Deactivate/Delete Actions (October 21, 2025)
+**Investigation Completed**: Comprehensive code review of user deactivation and deletion functionality in the Administration panel (`/admin/administracao`) confirmed all features are working correctly:
+
+**Backend Endpoints (server/routes.ts)**:
+- ✅ `PUT /admin/api/users/:id` (lines 3681-3715): Updates user data including `isActive` status with proper authentication, validation, password hashing, and admin action logging
+- ✅ `DELETE /admin/api/users/:id` (lines 3717-3730): Deletes user with proper authentication and admin action logging
+- ✅ `POST /admin/api/admin/verify-password` (lines 717-760): Verifies admin password for deletion confirmation with rate limiting
+
+**Database Layer (server/storage.ts)**:
+- ✅ `updateUser(id, userData)` (lines 2070-2077): Updates user records with automatic `updatedAt` timestamp
+- ✅ `deleteUser(id)` (lines 2079-2082): Deletes user records, returns boolean for success confirmation
+
+**Frontend Implementation (client/src/pages/admin/Administration.tsx)**:
+- ✅ `toggleUserMutation` (lines 217-235): Toggles user active status with cache invalidation and toast feedback
+- ✅ `deleteMutation` (lines 169-187): Deletes users with cache invalidation and toast feedback
+- ✅ `handleToggleStatus` (line 311-313): Toggles between active/inactive states
+- ✅ `handleDelete` (lines 273-278): Opens secure deletion confirmation dialog
+- ✅ `confirmDelete` (lines 280-309): Verifies admin password before executing deletion
+
+**UI Components**:
+- ✅ Active/Inactive Switch (lines 843-853): Visual toggle with loading state and test IDs
+- ✅ Edit Button (lines 858-867): Permission-controlled with disabled state and tooltips
+- ✅ Delete Button (lines 868-877): Permission-controlled with disabled state and tooltips
+- ✅ Deletion Confirmation Dialog (lines 1283-1342): Secure password verification, error handling, loading states
+
+**Security Features**:
+- Password verification required for all deletions
+- Permission-based button enabling/disabling via `canEdit()` and `canDelete()`
+- Rate limiting on password verification endpoint
+- Admin action logging for all modifications
+- Input validation with Zod schemas
+
+**No corrections needed** - all functionality is properly implemented with security best practices, error handling, and user feedback mechanisms.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 

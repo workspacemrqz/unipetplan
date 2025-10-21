@@ -39,6 +39,8 @@ export default function UnitLoginPage() {
     setError('');
     setIsSubmitting(true);
 
+    console.log('🔐 [UNIT-LOGIN] Iniciando login...', { slug, login });
+
     try {
       // Use unified authentication endpoint
       const response = await fetch('/api/unified-auth/login', {
@@ -50,28 +52,51 @@ export default function UnitLoginPage() {
       });
 
       const data = await response.json();
+      console.log('📥 [UNIT-LOGIN] Resposta recebida:', { 
+        ok: response.ok, 
+        status: response.status,
+        userType: data.userType,
+        redirectPath: data.redirectPath,
+        hasToken: !!data.token
+      });
 
       if (response.ok) {
         // Store authentication based on user type
         if (data.userType === 'unit') {
           // Unit authentication
+          console.log('✅ [UNIT-LOGIN] Autenticando como unidade');
           localStorage.setItem('unit-token', data.token);
           localStorage.setItem('unit-slug', slug || '');
           localStorage.setItem('unit-name', data.unitName);
+          console.log('💾 [UNIT-LOGIN] Tokens salvos:', {
+            'unit-token': '***',
+            'unit-slug': slug,
+            'unit-name': data.unitName
+          });
         } else if (data.userType === 'veterinarian' || data.userType === 'admin') {
           // Veterinarian/Admin authentication
+          console.log('✅ [UNIT-LOGIN] Autenticando como ' + data.userType);
           localStorage.setItem('veterinarian-token', data.token);
           localStorage.setItem('veterinarian-name', data.veterinarianName);
           localStorage.setItem('unit-slug', data.unitSlug);
           localStorage.setItem('unit-name', data.unitName);
+          console.log('💾 [UNIT-LOGIN] Tokens salvos:', {
+            'veterinarian-token': '***',
+            'veterinarian-name': data.veterinarianName,
+            'unit-slug': data.unitSlug,
+            'unit-name': data.unitName
+          });
         }
         
         // Redirect to the appropriate path returned by backend
+        console.log('🔄 [UNIT-LOGIN] Redirecionando para:', data.redirectPath);
         setLocation(data.redirectPath);
       } else {
+        console.error('❌ [UNIT-LOGIN] Erro de autenticação:', data.error);
         setError(data.error || 'Credenciais inválidas');
       }
     } catch (err) {
+      console.error('❌ [UNIT-LOGIN] Erro ao fazer login:', err);
       setError('Erro ao fazer login. Tente novamente.');
     } finally {
       setIsSubmitting(false);

@@ -29,6 +29,7 @@ import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { usePermissions } from "@/hooks/use-permissions";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { normalizeCPF } from "@/../../shared/cpf-utils";
 
@@ -101,6 +102,7 @@ export default function Contracts() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { logAction } = useAdminLogger();
+  const { canEdit } = usePermissions();
 
   const [dateFilter, setDateFilter] = useState<{
     startDate: CalendarDate | null;
@@ -813,7 +815,8 @@ export default function Contracts() {
                 </Button>
                 <Button
                   onClick={handleSaveEdit}
-                  disabled={updateContractMutation.isPending}
+                  disabled={!canEdit() || updateContractMutation.isPending}
+                  title={!canEdit() ? "Você não tem permissão para editar" : "Salvar alterações"}
                   className="min-w-[100px]"
                 >
                   {updateContractMutation.isPending ? (

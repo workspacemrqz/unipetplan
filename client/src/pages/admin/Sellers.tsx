@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMasks } from "@/hooks/admin/use-masks";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { usePermissions } from "@/hooks/use-permissions";
 import { ExportButton } from "@/components/admin/ExportButton";
 
 interface Seller {
@@ -80,6 +81,7 @@ export default function Sellers() {
   const queryClient = useQueryClient();
   const { applyCPFMask: cpfMask, applyPhoneMask: phoneMask, applyCEPMask: cepMask } = useMasks();
   const { logAction } = useAdminLogger();
+  const { canAdd, canEdit } = usePermissions();
 
   const { data: sellers = [], isLoading } = useQuery<Seller[]>({
     queryKey: ["/admin/api/sellers"],
@@ -327,6 +329,8 @@ export default function Sellers() {
             variant="admin-action"
             size="sm"
             onClick={() => setLocation("/vendedores/novo")}
+            disabled={!canAdd()}
+            title={!canAdd() ? "Você não tem permissão para adicionar" : "Adicionar vendedor"}
           >
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
@@ -414,6 +418,8 @@ export default function Sellers() {
                         size="sm"
                         className="mt-4"
                         onClick={() => setLocation("/vendedores/novo")}
+                        disabled={!canAdd()}
+                        title={!canAdd() ? "Você não tem permissão para adicionar" : "Cadastrar primeiro vendedor"}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Cadastrar Primeiro Vendedor
@@ -453,6 +459,8 @@ export default function Sellers() {
                             variant="outline"
                             size="sm"
                             onClick={() => setLocation(`/vendedores/${seller.id}/editar`)}
+                            disabled={!canEdit()}
+                            title={!canEdit() ? "Você não tem permissão para editar" : "Editar vendedor"}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>

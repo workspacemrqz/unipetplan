@@ -25,6 +25,7 @@ import { createSmartInvalidation } from "@/lib/admin/cacheUtils";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { usePermissions } from "@/hooks/use-permissions";
 import type { Plan } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +47,7 @@ export default function Plans() {
   const smartCache = createSmartInvalidation(queryClient);
   const { toast } = useToast();
   const { logAction } = useAdminLogger();
+  const { canAdd, canEdit } = usePermissions();
 
   const { data: plans, isLoading } = useQuery<Plan[]>({
     queryKey: ["/admin/api/plans"],
@@ -255,6 +257,8 @@ export default function Plans() {
                           variant="outline"
                           size="sm"
                           onClick={() => setLocation(`/planos/${plan.id}/editar`)}
+                          disabled={!canEdit()}
+                          title={!canEdit() ? "Você não tem permissão para editar" : "Editar plano"}
                           data-testid={`button-edit-${plan.id}`}
                         >
                           <Edit className="h-4 w-4" />
@@ -279,6 +283,8 @@ export default function Plans() {
                       variant="outline"
                       size="sm"
                       onClick={() => setLocation("/planos/novo")}
+                      disabled={!canAdd()}
+                      title={!canAdd() ? "Você não tem permissão para adicionar" : "Criar primeiro plano"}
                       data-testid="button-add-first-plan"
                     >
                       <Plus className="h-4 w-4 mr-2" />

@@ -40,6 +40,7 @@ import { apiRequest } from "@/lib/admin/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
+import { usePermissions } from "@/hooks/use-permissions";
 import { z } from "zod";
 import { ExportButton } from "@/components/admin/ExportButton";
 
@@ -211,6 +212,7 @@ export default function Procedures() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { logAction } = useAdminLogger();
+  const { canAdd, canEdit, canDelete } = usePermissions();
 
   const { data: procedures, isLoading } = useQuery<Procedure[]>({
     queryKey: ["/admin/api/procedures"],
@@ -1549,7 +1551,13 @@ export default function Procedures() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button variant="admin-action" size="sm" data-testid="button-new-procedure">
+              <Button 
+                variant="admin-action" 
+                size="sm" 
+                data-testid="button-new-procedure"
+                disabled={!canAdd()}
+                title={!canAdd() ? "Você não tem permissão para adicionar" : "Adicionar procedimento"}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Adicionar
               </Button>
@@ -1692,6 +1700,8 @@ export default function Procedures() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEdit(item)}
+                          disabled={!canEdit()}
+                          title={!canEdit() ? "Você não tem permissão para editar" : "Editar procedimento"}
                           data-testid={`button-edit-${item.id}`}
                         >
                           <Edit className="h-4 w-4" />
@@ -1701,7 +1711,8 @@ export default function Procedures() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleDelete(item.id)}
-                          disabled={deleteMutation.isPending}
+                          disabled={!canDelete() || deleteMutation.isPending}
+                          title={!canDelete() ? "Você não tem permissão para excluir" : "Excluir procedimento"}
                           data-testid={`button-delete-${item.id}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1730,6 +1741,8 @@ export default function Procedures() {
                       variant="outline"
                       size="sm"
                       onClick={() => setDialogOpen(true)}
+                      disabled={!canAdd()}
+                      title={!canAdd() ? "Você não tem permissão para adicionar" : "Criar primeiro procedimento"}
                       data-testid="button-add-first-procedure"
                     >
                       <Plus className="h-4 w-4 mr-2" />
