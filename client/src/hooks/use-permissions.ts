@@ -36,86 +36,120 @@ export function usePermissions() {
     // Superadmin has access to all paths
     if (currentUser.role === "superadmin") return true;
     
-    // Map paths to permission IDs
+    // Map paths to permission IDs - COMPREHENSIVE MAPPING
     const pathPermissionMap: Record<string, string> = {
       "/admin": "dashboard",
+      "/admin/dashboard": "dashboard",
       "/admin/clientes": "clients",
       "/admin/contratos": "contracts",
       "/admin/atendimentos": "atendimentos",
       "/admin/financeiro": "financeiro",
       "/admin/cupom": "cupom",
+      "/admin/coupons": "cupom",
       "/admin/relatorio-financeiro": "relatorio-financeiro",
       "/admin/formularios": "formularios",
       "/admin/avaliacoes": "avaliacoes",
       "/admin/rede": "rede",
+      "/admin/network": "rede",
       "/admin/vendedores": "vendedores",
+      "/admin/sellers": "vendedores",
       "/admin/procedimentos": "procedimentos",
+      "/admin/procedures": "procedimentos",
       "/admin/perguntas-frequentes": "perguntas-frequentes",
+      "/admin/faq": "perguntas-frequentes",
+      "/admin/administracao": "dashboard", // Admin page requires at least dashboard access
+      "/admin/configuracoes": "dashboard", // Settings page requires at least dashboard access
+      "/admin/settings": "dashboard",
     };
 
-    // Check for exact path match
-    const permissionId = pathPermissionMap[path];
-    if (permissionId) {
-      return hasPermission(permissionId);
+    // Check for exact path match first
+    const exactPermission = pathPermissionMap[path];
+    if (exactPermission !== undefined) {
+      return hasPermission(exactPermission);
     }
 
-    // Check for path prefix match (for sub-routes)
-    for (const [mappedPath, permission] of Object.entries(pathPermissionMap)) {
-      if (path.startsWith(mappedPath + "/") || path === mappedPath) {
-        return hasPermission(permission);
+    // Check for path prefix match (for sub-routes like /admin/clientes/123)
+    // Sort paths by length descending to match most specific first
+    const sortedPaths = Object.keys(pathPermissionMap).sort((a, b) => b.length - a.length);
+    
+    for (const mappedPath of sortedPaths) {
+      if (path === mappedPath || path.startsWith(mappedPath + "/")) {
+        const permission = pathPermissionMap[mappedPath];
+        if (permission) {
+          return hasPermission(permission);
+        }
       }
     }
 
-    // If no specific permission is mapped, allow access
-    return true;
+    // CRITICAL SECURITY FIX: Default to DENY access for unmapped paths
+    console.warn(`[PERMISSION-DENIED] Access denied to unmapped path: ${path}`);
+    return false; // DENY by default
   };
 
   const getAccessiblePaths = (): string[] => {
     if (isLoading || !currentUser) return [];
     
-    // Superadmin has access to all paths
-    if (currentUser.role === "superadmin") {
-      return [
-        "/admin",
-        "/admin/clientes",
-        "/admin/contratos",
-        "/admin/atendimentos",
-        "/admin/financeiro",
-        "/admin/cupom",
-        "/admin/relatorio-financeiro",
-        "/admin/formularios",
-        "/admin/avaliacoes",
-        "/admin/rede",
-        "/admin/vendedores",
-        "/admin/procedimentos",
-        "/admin/perguntas-frequentes",
-      ];
-    }
-    
-    const paths: string[] = [];
+    // Map paths to permission IDs - MUST MATCH hasPathAccess mapping
     const pathPermissionMap: Record<string, string> = {
       "/admin": "dashboard",
+      "/admin/dashboard": "dashboard",
       "/admin/clientes": "clients",
       "/admin/contratos": "contracts",
       "/admin/atendimentos": "atendimentos",
       "/admin/financeiro": "financeiro",
       "/admin/cupom": "cupom",
+      "/admin/coupons": "cupom",
       "/admin/relatorio-financeiro": "relatorio-financeiro",
       "/admin/formularios": "formularios",
       "/admin/avaliacoes": "avaliacoes",
       "/admin/rede": "rede",
+      "/admin/network": "rede",
       "/admin/vendedores": "vendedores",
+      "/admin/sellers": "vendedores",
       "/admin/procedimentos": "procedimentos",
+      "/admin/procedures": "procedimentos",
       "/admin/perguntas-frequentes": "perguntas-frequentes",
+      "/admin/faq": "perguntas-frequentes",
+      "/admin/administracao": "dashboard",
+      "/admin/configuracoes": "dashboard",
+      "/admin/settings": "dashboard",
     };
+    
+    // Superadmin has access to all paths
+    if (currentUser.role === "superadmin") {
+      // Return unique paths only (no duplicates for aliases)
+      const uniquePaths = new Set<string>();
+      Object.keys(pathPermissionMap).forEach(path => {
+        // Only return primary paths, not aliases
+        if (!path.includes("coupons") && 
+            !path.includes("network") && 
+            !path.includes("sellers") && 
+            !path.includes("procedures") && 
+            !path.includes("faq") && 
+            !path.includes("settings")) {
+          uniquePaths.add(path);
+        }
+      });
+      return Array.from(uniquePaths);
+    }
+    
+    const accessiblePaths = new Set<string>();
 
     for (const [path, permissionId] of Object.entries(pathPermissionMap)) {
       if (hasPermission(permissionId)) {
-        paths.push(path);
+        // Only add primary paths, not aliases
+        if (!path.includes("coupons") && 
+            !path.includes("network") && 
+            !path.includes("sellers") && 
+            !path.includes("procedures") && 
+            !path.includes("faq") && 
+            !path.includes("settings")) {
+          accessiblePaths.add(path);
+        }
       }
     }
 
-    return paths;
+    return Array.from(accessiblePaths);
   };
 
   return {
