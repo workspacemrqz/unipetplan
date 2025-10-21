@@ -33,6 +33,7 @@ import { Plus, Search, Edit, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, Mor
 import LoadingDots from "@/components/ui/LoadingDots";
 
 const veterinarianSchema = z.object({
+  userRole: z.enum(["veterinario", "administrador"]).default("veterinario"),
   name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   crmv: z.string().optional(),
   email: z.string().email("Email inválido"),
@@ -42,6 +43,7 @@ const veterinarianSchema = z.object({
   login: z.string().optional(),
   password: z.string().optional(),
   canAccessAtendimentos: z.boolean().default(false),
+  isAdmin: z.boolean().default(false),
   isActive: z.boolean().default(true),
 });
 
@@ -58,6 +60,7 @@ interface Veterinarian {
   login?: string | null;
   passwordHash?: string | null;
   canAccessAtendimentos: boolean;
+  isAdmin: boolean;
   isActive: boolean;
   networkUnitId: string;
   createdAt: Date;
@@ -148,6 +151,7 @@ export default function CorpoClinicoPage() {
   const form = useForm<VeterinarianFormData>({
     resolver: zodResolver(veterinarianSchema),
     defaultValues: {
+      userRole: "veterinario",
       name: "",
       crmv: "",
       email: "",
@@ -157,6 +161,7 @@ export default function CorpoClinicoPage() {
       login: "",
       password: "",
       canAccessAtendimentos: false,
+      isAdmin: false,
       isActive: true,
     },
   });
@@ -633,11 +638,49 @@ export default function CorpoClinicoPage() {
           <DialogContent className="overflow-y-auto max-h-[90vh]">
             <DialogHeader>
               <DialogTitle className="text-foreground">
-                {editingVet ? "Editar Veterinário" : "Novo Veterinário"}
+                {editingVet ? "Editar Registro" : "Novo Registro"}
               </DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {/* Campo de seleção de tipo de usuário - apenas para novos registros */}
+                {!editingVet && (
+                  <FormField
+                    control={form.control}
+                    name="userRole"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Usuário *</FormLabel>
+                        <Select 
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Se for administrador, definir automaticamente alguns campos
+                            if (value === "administrador") {
+                              form.setValue("canAccessAtendimentos", true);
+                              form.setValue("isAdmin", true);
+                              form.setValue("type", "permanente");
+                            } else {
+                              form.setValue("isAdmin", false);
+                            }
+                          }} 
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo de usuário" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="veterinario">Veterinário</SelectItem>
+                            <SelectItem value="administrador">Administrador da Unidade</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -653,19 +696,22 @@ export default function CorpoClinicoPage() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="crmv"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>CRMV</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Ex: CRMV-SP 12345" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Campo CRMV - apenas para veterinários */}
+                  {form.watch("userRole") === "veterinario" && (
+                    <FormField
+                      control={form.control}
+                      name="crmv"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>CRMV</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Ex: CRMV-SP 12345" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <FormField
                     control={form.control}
@@ -695,41 +741,47 @@ export default function CorpoClinicoPage() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="specialty"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Especialidade</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Ex: Cirurgia, Dermatologia" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                  {/* Campo Especialidade - apenas para veterinários */}
+                  {form.watch("userRole") === "veterinario" && (
+                    <FormField
+                      control={form.control}
+                      name="specialty"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Especialidade</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o tipo" />
-                            </SelectTrigger>
+                            <Input {...field} placeholder="Ex: Cirurgia, Dermatologia" />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="permanente">Permanente</SelectItem>
-                            <SelectItem value="volante">Volante</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  {/* Campo Tipo - apenas para veterinários */}
+                  {form.watch("userRole") === "veterinario" && (
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tipo *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o tipo" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="permanente">Permanente</SelectItem>
+                              <SelectItem value="volante">Volante</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
 
                 <div className="border-t pt-4">
@@ -787,28 +839,31 @@ export default function CorpoClinicoPage() {
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="canAccessAtendimentos"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between rounded-lg border p-3 mt-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">
-                            Permitir criar atendimentos
-                          </FormLabel>
-                          <p className="text-sm text-muted-foreground">
-                            O veterinário poderá criar e gerenciar atendimentos
-                          </p>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  {/* Campo de permissão de atendimentos - apenas para veterinários */}
+                  {form.watch("userRole") === "veterinario" && (
+                    <FormField
+                      control={form.control}
+                      name="canAccessAtendimentos"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border p-3 mt-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">
+                              Permitir criar atendimentos
+                            </FormLabel>
+                            <p className="text-sm text-muted-foreground">
+                              O veterinário poderá criar e gerenciar atendimentos
+                            </p>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
 
                 <FormField
@@ -819,7 +874,9 @@ export default function CorpoClinicoPage() {
                       <div className="space-y-0.5">
                         <FormLabel className="text-base">Ativo</FormLabel>
                         <p className="text-sm text-muted-foreground">
-                          Veterinário está ativo no sistema
+                          {form.watch("userRole") === "administrador" 
+                            ? "Administrador está ativo no sistema" 
+                            : "Veterinário está ativo no sistema"}
                         </p>
                       </div>
                       <FormControl>
