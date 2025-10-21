@@ -3714,6 +3714,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Deactivate admin user (set isActive to false)
+  app.put("/admin/api/users/:id/deactivate", requireAdmin, adminCRUDLimiter, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const updatedUser = await storage.updateUser(id, { isActive: false });
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      await logAdminAction(req, 'updated', 'admin_user', id, { action: 'deactivated' });
+      
+      // Remove password from response
+      const { password: _, ...userResponse } = updatedUser;
+      res.json({ success: true, message: "Usuário desativado com sucesso", user: userResponse });
+    } catch (error) {
+      console.error("❌ [ADMIN] Error deactivating user:", error);
+      res.status(500).json({ error: "Erro ao desativar usuário" });
+    }
+  });
+
   app.delete("/admin/api/users/:id", requireAdmin, adminCRUDLimiter, async (req, res) => {
     try {
       const { id } = req.params;
