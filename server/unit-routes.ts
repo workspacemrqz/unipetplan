@@ -672,7 +672,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         userName: userName,
         userId: unitInfo?.veterinarianId || unitInfo?.unitId || null,
         userType: userType,
-        description: `Status alterado de "${statusLabels[atendimento.status] || atendimento.status}" para "${statusLabels[status] || status}" por ${userName}`
+        description: `Status alterado de "${statusLabels[atendimento.status as string] || atendimento.status}" para "${statusLabels[status as string] || status}" por ${userName}`
       });
       
       // Update the atendimento status
