@@ -21,7 +21,7 @@ export default defineConfig({
     // Configurações de proxy para desenvolvimento
     proxy: {
       '/api': {
-        target: process.env.VITE_API_TARGET || 'http://localhost:3000',
+        target: process.env.VITE_API_TARGET || 'http://localhost:3001',
         changeOrigin: true,
         secure: false,
         timeout: 60000,
@@ -41,7 +41,7 @@ export default defineConfig({
         }
       },
       '/admin/api': {
-        target: process.env.VITE_API_TARGET || 'http://localhost:3000',
+        target: process.env.VITE_API_TARGET || 'http://localhost:3001',
         changeOrigin: true,
         secure: false,
         timeout: 60000,
