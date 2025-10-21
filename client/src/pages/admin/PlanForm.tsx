@@ -21,6 +21,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { apiRequest } from "@/lib/admin/queryClient";
+import { ExportButton } from "@/components/admin/ExportButton";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { getDefaultContractText } from "@/lib/default-contract-texts";
@@ -364,7 +365,56 @@ export default function PlanForm() {
           {isEdit && (
             <Card style={{ backgroundColor: '#FFFFFF' }}>
               <CardHeader>
-                <CardTitle className="text-foreground">Procedimentos</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-foreground">Procedimentos</CardTitle>
+                  {Array.isArray(planProcedures) && planProcedures.length > 0 && (
+                    <ExportButton
+                      data={planProcedures}
+                      filename={`procedimentos-plano-${form.getValues("name")}`}
+                      title={`Procedimentos - ${form.getValues("name")}`}
+                      columns={[
+                        {
+                          key: "procedureName",
+                          label: "Procedimento"
+                        },
+                        {
+                          key: "procedureDescription", 
+                          label: "Descrição"
+                        },
+                        {
+                          key: "isIncluded",
+                          label: "Incluído",
+                          formatter: (value: boolean) => value ? "Sim" : "Não"
+                        },
+                        {
+                          key: "price",
+                          label: "Valor a Receber (R$)",
+                          formatter: (value: number) => `R$ ${(value / 100).toFixed(2).replace('.', ',')}`
+                        },
+                        {
+                          key: "payValue",
+                          label: "Valor a Pagar (R$)",
+                          formatter: (value: number) => `R$ ${(value / 100).toFixed(2).replace('.', ',')}`
+                        },
+                        {
+                          key: "coparticipacao",
+                          label: "Coparticipação (R$)",
+                          formatter: (value: number) => value > 0 ? `R$ ${(value / 100).toFixed(2).replace('.', ',')}` : "-"
+                        },
+                        {
+                          key: "carencia",
+                          label: "Carência",
+                          formatter: (value: string) => value && value !== '0 dias' ? value : "-"
+                        },
+                        {
+                          key: "limitesAnuais",
+                          label: "Limites Anuais",
+                          formatter: (value: string) => value && value !== '0' && value !== '0 vezes no ano' ? value : "-"
+                        }
+                      ]}
+                    />
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {Array.isArray(planProcedures) && planProcedures.length > 0 ? (

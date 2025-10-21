@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Exportação de Procedimentos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #277677;
+            padding-bottom: 10px;
+        }
+        
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+        
+        button {
+            background-color: #277677;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #1e5a5b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>Procedimentos - Plano INFINITY</h1>
+            <button onclick="exportToExcel()">📥 Exportar Excel</button>
+        </div>
+        
+        <table id="proceduresTable">
+            <thead>
+                <tr>
+                    <th>Procedimento</th>
+                    <th>Descrição</th>
+                    <th>Incluído</th>
+                    <th>Valor a Receber (R$)</th>
+                    <th>Valor a Pagar (R$)</th>
+                    <th>Coparticipação (R$)</th>
+                    <th>Carência</th>
+                    <th>Limites Anuais</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Esplenectomia acima de 15kg</td>
+                    <td>Procedimento cirúrgico</td>
+                    <td>Sim</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 550,00</td>
+                    <td>30 dias</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>ANESTESIA SHUNT ATE 5KG</td>
+                    <td>Anestesia especializada</td>
+                    <td>Sim</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 300,00</td>
+                    <td>30 dias</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Correção de Hernia Perineal bilateral + orquiectomia</td>
+                    <td>Cirurgia complexa</td>
+                    <td>Sim</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 960,00</td>
+                    <td>30 dias</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>ORQUIECTOMIA (logomorfo/ coelhos e similares)</td>
+                    <td>Castração para roedores</td>
+                    <td>Sim</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 250,00</td>
+                    <td>30 dias</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>ECG (Eletrocardiograma) canino / felino</td>
+                    <td>Exame cardíaco</td>
+                    <td>Sim</td>
+                    <td>R$ 0,00</td>
+                    <td>R$ 0,00</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="success-message" id="successMessage">
+            ✅ Planilha Excel exportada com sucesso!
+        </div>
+    </div>
+    
+    <script>
+        function exportToExcel() {
+            // Coletar dados da tabela
+            const table = document.getElementById('proceduresTable');
+            const rows = table.querySelectorAll('tbody tr');
+            
+            const data = [];
+            
+            // Adicionar cabeçalhos
+            data.push([
+                'Procedimento',
+                'Descrição', 
+                'Incluído',
+                'Valor a Receber (R$)',
+                'Valor a Pagar (R$)',
+                'Coparticipação (R$)',
+                'Carência',
+                'Limites Anuais'
+            ]);
+            
+            // Adicionar dados das linhas
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => cell.textContent.trim());
+                data.push(rowData);
+            });
+            
+            // Criar workbook e worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Ajustar largura das colunas
+            const colWidths = [
+                { wch: 45 }, // Procedimento
+                { wch: 25 }, // Descrição
+                { wch: 10 }, // Incluído
+                { wch: 20 }, // Valor a Receber
+                { wch: 20 }, // Valor a Pagar
+                { wch: 20 }, // Coparticipação
+                { wch: 15 }, // Carência
+                { wch: 15 }  // Limites Anuais
+            ];
+            ws['!cols'] = colWidths;
+            
+            // Adicionar worksheet ao workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Procedimentos');
+            
+            // Salvar arquivo
+            const filename = 'procedimentos-plano-INFINITY.xlsx';
+            XLSX.writeFile(wb, filename);
+            
+            // Mostrar mensagem de sucesso
+            const successMsg = document.getElementById('successMessage');
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
