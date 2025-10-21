@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/admin/ui/dialog";
-import { Search, FileText, MoreHorizontal, Eye, Copy, Check, Loader2 } from "lucide-react";
+import { Search, FileText, MoreHorizontal, Eye, Copy, Check, Loader2, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarDate } from "@internationalized/date";
@@ -25,6 +25,7 @@ import { getDateRangeParams } from "@/lib/date-utils";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useToast } from "@/hooks/use-toast";
 import { ExportButton } from "@/components/admin/ExportButton";
+import jsPDF from 'jspdf';
 
 interface FinancialEntry {
   id: string;
@@ -54,6 +55,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
   const [selectedEntry, setSelectedEntry] = useState<FinancialEntry | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
+  const [downloadState, setDownloadState] = useState<'idle' | 'downloading' | 'downloaded'>('idle');
   const { toast } = useToast();
   
   const [dateFilter, setDateFilter] = useState<{
@@ -177,6 +179,130 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
         description: "Não foi possível copiar as informações. Tente novamente.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!selectedEntry || downloadState !== 'idle') return;
+    
+    try {
+      setDownloadState('downloading');
+      
+      // Criar novo documento PDF
+      const pdf = new jsPDF();
+      
+      // Configurar fontes e cores
+      pdf.setFontSize(16);
+      pdf.setTextColor(40, 40, 40);
+      pdf.text('DETALHES DO PROCEDIMENTO', 105, 20, { align: 'center' });
+      
+      // Adicionar linha separadora
+      pdf.setDrawColor(39, 118, 119); // Cor primária
+      pdf.setLineWidth(0.5);
+      pdf.line(20, 25, 190, 25);
+      
+      // Configurar fonte para o conteúdo
+      pdf.setFontSize(12);
+      pdf.setTextColor(60, 60, 60);
+      
+      // Posição inicial para o texto
+      let yPosition = 40;
+      
+      // Adicionar informações do procedimento
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Informações do Procedimento', 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      yPosition += 10;
+      
+      // Data
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Data:', 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      const dataText = selectedEntry.date ? format(new Date(selectedEntry.date), "dd/MM/yyyy", { locale: ptBR }) : "Não informado";
+      pdf.text(dataText, 35, yPosition);
+      yPosition += 8;
+      
+      // Cliente
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Cliente:', 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(selectedEntry.clientName, 40, yPosition);
+      yPosition += 8;
+      
+      // Pet
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Pet:', 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(selectedEntry.petName || "Não informado", 32, yPosition);
+      yPosition += 8;
+      
+      // Procedimento
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Procedimento:', 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      const procedureText = selectedEntry.procedure;
+      const procedureLines = pdf.splitTextToSize(procedureText, 130);
+      pdf.text(procedureLines, 52, yPosition);
+      yPosition += (procedureLines.length * 5) + 3;
+      
+      // Coparticipação
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Coparticipação:', 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(formatCurrency(selectedEntry.coparticipacao), 55, yPosition);
+      yPosition += 8;
+      
+      // Valor Pago
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Valor Pago:', 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(formatCurrency(selectedEntry.value), 47, yPosition);
+      yPosition += 15;
+      
+      // Unidade (se disponível)
+      if (unitSlug) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Unidade:', 20, yPosition);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Hospital Veterinário Animal\'s 24 Horas', 40, yPosition);
+        yPosition += 8;
+      }
+      
+      // Adicionar linha separadora no final
+      pdf.setDrawColor(39, 118, 119);
+      pdf.setLineWidth(0.5);
+      pdf.line(20, yPosition + 5, 190, yPosition + 5);
+      
+      // Adicionar rodapé
+      pdf.setFontSize(10);
+      pdf.setTextColor(150, 150, 150);
+      const dataGeracao = format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+      pdf.text(`Documento gerado em ${dataGeracao}`, 105, 280, { align: 'center' });
+      
+      // Gerar nome do arquivo
+      const fileName = `procedimento_${selectedEntry.clientName.replace(/\s+/g, '_')}_${format(new Date(), 'dd-MM-yyyy')}.pdf`;
+      
+      // Baixar o PDF
+      pdf.save(fileName);
+      
+      setDownloadState('downloaded');
+      
+      toast({
+        title: "PDF gerado com sucesso!",
+        description: "O arquivo foi baixado para o seu dispositivo.",
+      });
+      
+      setTimeout(() => {
+        setDownloadState('idle');
+      }, 2000);
+    } catch (error) {
+      setDownloadState('idle');
+      toast({
+        title: "Erro ao gerar PDF",
+        description: "Não foi possível gerar o PDF. Tente novamente.",
+        variant: "destructive",
+      });
+      console.error('Erro ao gerar PDF:', error);
     }
   };
 
@@ -538,6 +664,19 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
                 {copyState === 'copied' && <Check className="h-4 w-4" />}
                 {copyState === 'idle' && <Copy className="h-4 w-4" />}
                 {copyState === 'copying' ? 'Copiando...' : copyState === 'copied' ? 'Copiado!' : 'Copiar'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDownloadPDF}
+                disabled={downloadState === 'downloading'}
+                className={`gap-2 h-8 transition-all duration-300 ${
+                  downloadState === 'downloaded' ? 'bg-[#e6f4f4] border-[#277677] text-[#277677]' : ''
+                }`}
+              >
+                {downloadState === 'downloading' && <Loader2 className="h-4 w-4 animate-spin" />}
+                {downloadState === 'downloaded' && <Check className="h-4 w-4" />}
+                {downloadState === 'idle' && <Download className="h-4 w-4" />}
+                {downloadState === 'downloading' ? 'Baixando...' : downloadState === 'downloaded' ? 'Baixado!' : 'Baixar PDF'}
               </Button>
               <Button
                 variant="outline" 
