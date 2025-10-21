@@ -61,29 +61,48 @@ export default function UnitLoginPage() {
       });
 
       if (response.ok) {
+        // Helper function to normalize slugs
+        const normalizeSlug = (s: string | null | undefined): string => {
+          if (!s) return '';
+          return s.trim().toLowerCase();
+        };
+        
         // Store authentication based on user type
         if (data.userType === 'unit') {
           // Unit authentication
           console.log('✅ [UNIT-LOGIN] Autenticando como unidade');
+          const normalizedSlug = normalizeSlug(slug);
+          console.log('🔍 [UNIT-LOGIN] DEBUG - slug original:', slug);
+          console.log('🔍 [UNIT-LOGIN] DEBUG - slug normalizado:', normalizedSlug);
           localStorage.setItem('unit-token', data.token);
-          localStorage.setItem('unit-slug', slug || '');
+          localStorage.setItem('unit-slug', normalizedSlug);
           localStorage.setItem('unit-name', data.unitName);
           console.log('💾 [UNIT-LOGIN] Tokens salvos:', {
             'unit-token': '***',
-            'unit-slug': slug,
+            'unit-slug': normalizedSlug,
             'unit-name': data.unitName
           });
         } else if (data.userType === 'veterinarian' || data.userType === 'admin') {
           // Veterinarian/Admin authentication
           console.log('✅ [UNIT-LOGIN] Autenticando como ' + data.userType);
+          
+          // CORREÇÃO: Usar sempre o slug da URL ao invés do unitSlug retornado pelo backend
+          // Isso garante que o slug armazenado sempre será igual ao slug da URL
+          const normalizedSlug = normalizeSlug(slug);
+          
+          console.log('🔍 [UNIT-LOGIN] DEBUG - slug da URL (original):', slug);
+          console.log('🔍 [UNIT-LOGIN] DEBUG - unitSlug do backend:', data.unitSlug);
+          console.log('🔍 [UNIT-LOGIN] DEBUG - usando slug normalizado da URL:', normalizedSlug);
+          
           localStorage.setItem('veterinarian-token', data.token);
           localStorage.setItem('veterinarian-name', data.veterinarianName);
-          localStorage.setItem('unit-slug', data.unitSlug);
+          // IMPORTANTE: Usar o slug da URL, não o retornado pelo backend
+          localStorage.setItem('unit-slug', normalizedSlug);
           localStorage.setItem('unit-name', data.unitName);
           console.log('💾 [UNIT-LOGIN] Tokens salvos:', {
             'veterinarian-token': '***',
             'veterinarian-name': data.veterinarianName,
-            'unit-slug': data.unitSlug,
+            'unit-slug': normalizedSlug,
             'unit-name': data.unitName
           });
         }

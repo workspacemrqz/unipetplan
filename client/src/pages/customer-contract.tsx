@@ -114,7 +114,7 @@ export default function CustomerContract() {
       if (!client || authLoading) return;
       
       try {
-        const response = await fetch('/api/customer/contracts', {
+        const response = await fetch('/api/clients/contracts', {
           credentials: 'include',
         });
         

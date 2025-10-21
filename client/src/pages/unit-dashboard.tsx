@@ -100,9 +100,29 @@ export default function UnitDashboard() {
     const vetToken = localStorage.getItem('veterinarian-token');
     const unitSlug = localStorage.getItem('unit-slug');
     
+    // Helper function to normalize slugs
+    const normalizeSlug = (s: string | null | undefined): string => {
+      if (!s) return '';
+      return s.trim().toLowerCase();
+    };
+    
+    // Normalize both slugs for comparison
+    const normalizedUrlSlug = normalizeSlug(slug);
+    const normalizedStoredSlug = normalizeSlug(unitSlug);
+    
+    console.log('🔍 [DASHBOARD] DEBUG - slug da URL (original):', slug);
+    console.log('🔍 [DASHBOARD] DEBUG - slug da URL (normalizado):', normalizedUrlSlug);
+    console.log('🔍 [DASHBOARD] DEBUG - unitSlug do localStorage (original):', unitSlug);
+    console.log('🔍 [DASHBOARD] DEBUG - unitSlug do localStorage (normalizado):', normalizedStoredSlug);
+    console.log('🔍 [DASHBOARD] DEBUG - slugs normalizados iguais?', normalizedUrlSlug === normalizedStoredSlug);
+    console.log('🔍 [DASHBOARD] DEBUG - unitToken exists?', !!unitToken);
+    console.log('🔍 [DASHBOARD] DEBUG - vetToken exists?', !!vetToken);
+    
     // Verificar se há algum token válido (unit ou veterinarian)
-    if ((!unitToken && !vetToken) || unitSlug !== slug) {
+    // CORREÇÃO: Comparar slugs normalizados ao invés de comparação estrita
+    if ((!unitToken && !vetToken) || normalizedStoredSlug !== normalizedUrlSlug) {
       console.log('❌ [DASHBOARD] Auth failed - redirecting to login');
+      console.log('❌ [DASHBOARD] Reason: No tokens?', (!unitToken && !vetToken), 'Slug mismatch?', normalizedStoredSlug !== normalizedUrlSlug);
       // Redirecionar para a página de login da unidade
       setLocation(`/unidade/${slug}`);
       return;
