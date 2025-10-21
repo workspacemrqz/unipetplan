@@ -366,7 +366,7 @@ export default function Administration() {
     if (role === "superadmin") {
       return (
         <div className="flex flex-wrap gap-1">
-          <Badge variant="success" className="text-xs">
+          <Badge variant="default" className="text-xs bg-green-100 text-green-800 border-green-200">
             Acesso Total
           </Badge>
         </div>

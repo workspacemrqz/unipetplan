@@ -33,7 +33,14 @@ import {
 import { sanitizeText } from "./utils/text-sanitizer.js";
 import { sanitizeEmail } from "./utils/log-sanitizer.js";
 import { enforceCorrectBillingPeriod } from "./utils/billing-validation.js";
-import { setupAuth, requireAuth, requireAdmin, requireSellerAuth } from "./auth.js";
+import { 
+  setupAuth, 
+  requireAuth, 
+  requireAdmin, 
+  requireSellerAuth,
+  requirePermission,
+  requireAnyPermission 
+} from "./auth.js";
 import bcrypt from "bcryptjs";
 import { supabaseStorage } from "./supabase-storage.js";
 import { CieloService, type CreditCardPaymentRequest } from "./services/cielo-service.js";
@@ -1157,7 +1164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==== ADMIN ROUTES ====
   // Admin clients routes
-  app.get("/admin/api/clients", requireAdmin, async (req, res) => {
+  app.get("/admin/api/clients", requireAdmin, requirePermission("clients"), async (req, res) => {
     try {
       const { startDate, endDate } = req.query;
       const clients = await storage.getAllClients();
@@ -2017,7 +2024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==== ADMIN CONTRACTS ROUTES ====
   // Get all contracts with client and pet details
-  app.get("/admin/api/contracts", requireAdmin, async (req, res) => {
+  app.get("/admin/api/contracts", requireAdmin, requirePermission("contracts"), async (req, res) => {
     try {
       const contracts = await storage.getAllContracts();
       
@@ -2472,7 +2479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin atendimentos routes
-  app.get("/admin/api/atendimentos", requireAdmin, async (req, res) => {
+  app.get("/admin/api/atendimentos", requireAdmin, requirePermission("atendimentos"), async (req, res) => {
     
     try {
       const atendimentos = await storage.getAllAtendimentos();
@@ -2580,7 +2587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get financial report for all units
-  app.get("/admin/api/relatorio-financeiro", requireAdmin, async (req, res) => {
+  app.get("/admin/api/relatorio-financeiro", requireAdmin, requirePermission("relatorio-financeiro"), async (req, res) => {
     try {
       // Extract date filter parameters and search query
       const { startDate, endDate, search } = req.query;

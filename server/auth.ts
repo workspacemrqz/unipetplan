@@ -132,3 +132,76 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   console.log("✅ [REQUIRE-ADMIN] Autenticação bem-sucedida");
   next();
 }
+
+/**
+ * Middleware para verificar permissões específicas
+ * Verifica se o usuário tem a permissão necessária para acessar uma rota
+ */
+export function requirePermission(permissionId: string) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    console.log(`🔐 [REQUIRE-PERMISSION] Verificando permissão: ${permissionId}`);
+    
+    // Primeiro verifica se está autenticado
+    if (!req.session || !req.session.admin || !req.session.admin.authenticated) {
+      console.log("❌ [REQUIRE-PERMISSION] Usuário não autenticado");
+      return res.status(401).json({ error: "Não autenticado" });
+    }
+
+    const { role, permissions = [] } = req.session.admin;
+    
+    // Superadmin tem todas as permissões
+    if (role === 'superadmin') {
+      console.log("✅ [REQUIRE-PERMISSION] Superadmin tem acesso total");
+      return next();
+    }
+    
+    // Verifica se o usuário tem a permissão específica
+    if (permissions.includes(permissionId)) {
+      console.log(`✅ [REQUIRE-PERMISSION] Usuário tem permissão: ${permissionId}`);
+      return next();
+    }
+    
+    // Usuário não tem a permissão necessária
+    console.log(`❌ [REQUIRE-PERMISSION] Usuário sem permissão: ${permissionId}`);
+    return res.status(403).json({ 
+      error: "Acesso negado",
+      message: "Você não tem permissão para acessar este recurso"
+    });
+  };
+}
+
+/**
+ * Middleware para verificar múltiplas permissões (usuário precisa ter pelo menos uma)
+ */
+export function requireAnyPermission(permissionIds: string[]) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    console.log(`🔐 [REQUIRE-ANY-PERMISSION] Verificando permissões: ${permissionIds.join(', ')}`);
+    
+    if (!req.session || !req.session.admin || !req.session.admin.authenticated) {
+      console.log("❌ [REQUIRE-ANY-PERMISSION] Usuário não autenticado");
+      return res.status(401).json({ error: "Não autenticado" });
+    }
+
+    const { role, permissions = [] } = req.session.admin;
+    
+    // Superadmin tem todas as permissões
+    if (role === 'superadmin') {
+      console.log("✅ [REQUIRE-ANY-PERMISSION] Superadmin tem acesso total");
+      return next();
+    }
+    
+    // Verifica se o usuário tem pelo menos uma das permissões
+    const hasPermission = permissionIds.some(permId => permissions.includes(permId));
+    
+    if (hasPermission) {
+      console.log(`✅ [REQUIRE-ANY-PERMISSION] Usuário tem pelo menos uma permissão necessária`);
+      return next();
+    }
+    
+    console.log(`❌ [REQUIRE-ANY-PERMISSION] Usuário sem nenhuma das permissões necessárias`);
+    return res.status(403).json({ 
+      error: "Acesso negado",
+      message: "Você não tem permissão para acessar este recurso"
+    });
+  };
+}
