@@ -240,7 +240,7 @@ export default function Atendimentos() {
     // Informações Básicas
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome do Procedimento: ${selectedAtendimento.procedure || selectedAtendimento.procedureName || 'Não informado'}\n`;
+    text += `Nome do Procedimento: ${capitalizeFirst(selectedAtendimento.procedure || selectedAtendimento.procedureName || 'Não informado')}\n`;
     text += `Status: ${getStatusLabel(selectedAtendimento.status)}\n`;
     text += `Valor: R$ ${selectedAtendimento.value || 'Não informado'}\n\n`;
 
@@ -249,10 +249,10 @@ export default function Atendimentos() {
       text += "INFORMAÇÕES DO CLIENTE, PET E UNIDADE:\n";
       text += "-".repeat(40) + "\n";
       if (selectedAtendimento.clientName) {
-        text += `Cliente: ${selectedAtendimento.clientName}\n`;
+        text += `Cliente: ${capitalizeFirst(selectedAtendimento.clientName)}\n`;
       }
       if (selectedAtendimento.petName) {
-        text += `Pet: ${selectedAtendimento.petName}\n`;
+        text += `Pet: ${capitalizeFirst(selectedAtendimento.petName)}\n`;
       }
       if (selectedAtendimento.networkUnit?.name) {
         text += `Unidade: ${selectedAtendimento.networkUnit.name}\n`;
@@ -338,7 +338,7 @@ export default function Atendimentos() {
       let proceduresText = 'Não informado';
       if (atendimento.procedures && Array.isArray(atendimento.procedures) && atendimento.procedures.length > 0) {
         proceduresText = atendimento.procedures
-          .map((p: any) => String(p.procedureName || p.name || 'Procedimento'))
+          .map((p: any) => capitalizeFirst(String(p.procedureName || p.name || 'Procedimento')))
           .filter(name => name && name !== 'undefined' && name !== 'null')
           .join(', ');
       }
@@ -365,8 +365,8 @@ export default function Atendimentos() {
       return {
         'Procedimentos': proceduresText,
         'Unidade': String(atendimento.networkUnit?.name || 'Não informada'),
-        'Cliente': String(atendimento.clientName || 'Não informado'),
-        'Pet': String(atendimento.petName || 'Não informado'),
+        'Cliente': capitalizeFirst(String(atendimento.clientName || 'Não informado')),
+        'Pet': capitalizeFirst(String(atendimento.petName || 'Não informado')),
         'Valor': valueText,
         'Status': String(getStatusLabel(atendimento.status) || 'Pendente'),
         'Veterinário': String(atendimento.veterinarianName || 'Unidade'),
@@ -753,10 +753,10 @@ export default function Atendimentos() {
                   <h4 className="font-semibold text-foreground mb-2">Cliente e Pet</h4>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{selectedAtendimento.clientName || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{capitalizeFirst(selectedAtendimento.clientName || 'Não informado')}</span></span>
                     </div>
                     <div>
-                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{selectedAtendimento.petName || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{capitalizeFirst(selectedAtendimento.petName || 'Não informado')}</span></span>
                     </div>
                     <div>
                       <span><strong className="text-primary">Unidade:</strong> <span className="text-foreground">{selectedAtendimento.networkUnit?.name || 'Não informada'}</span></span>
@@ -912,11 +912,11 @@ export default function Atendimentos() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-muted-foreground">Cliente:</span>
-                    <span className="ml-2 text-foreground">{historyAtendimento.clientName}</span>
+                    <span className="ml-2 text-foreground">{capitalizeFirst(historyAtendimento.clientName || 'Não informado')}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Pet:</span>
-                    <span className="ml-2 text-foreground">{historyAtendimento.petName}</span>
+                    <span className="ml-2 text-foreground">{capitalizeFirst(historyAtendimento.petName || 'Não informado')}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Status Atual:</span>

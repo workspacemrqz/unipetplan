@@ -280,7 +280,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
     // Informações Básicas
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome do Procedimento: ${selectedAtendimento.procedure || selectedAtendimento.procedureName || 'Não informado'}\n`;
+    text += `Nome do Procedimento: ${capitalizeFirst(selectedAtendimento.procedure || selectedAtendimento.procedureName || 'Não informado')}\n`;
     text += `Status: ${getStatusLabel(selectedAtendimento.status)}\n`;
     text += `Valor: R$ ${selectedAtendimento.value || 'Não informado'}\n\n`;
 
@@ -289,10 +289,10 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
       text += "INFORMAÇÕES DO CLIENTE, PET E UNIDADE:\n";
       text += "-".repeat(40) + "\n";
       if (selectedAtendimento.clientName) {
-        text += `Cliente: ${selectedAtendimento.clientName}\n`;
+        text += `Cliente: ${capitalizeFirst(selectedAtendimento.clientName)}\n`;
       }
       if (selectedAtendimento.petName) {
-        text += `Pet: ${selectedAtendimento.petName}\n`;
+        text += `Pet: ${capitalizeFirst(selectedAtendimento.petName)}\n`;
       }
       if (selectedAtendimento.networkUnit?.name) {
         text += `Unidade: ${selectedAtendimento.networkUnit.name}\n`;
@@ -519,12 +519,12 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                     )}
                     {visibleColumns.includes("Cliente") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        {atendimento.clientName || "Não informado"}
+                        {capitalizeFirst(atendimento.clientName || "Não informado")}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Pet") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        {atendimento.petName || "Não informado"}
+                        {capitalizeFirst(atendimento.petName || "Não informado")}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Valor") && (
@@ -719,10 +719,10 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                   <h4 className="font-semibold text-foreground mb-2">Cliente e Pet</h4>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{selectedAtendimento.clientName || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{capitalizeFirst(selectedAtendimento.clientName || 'Não informado')}</span></span>
                     </div>
                     <div>
-                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{selectedAtendimento.petName || 'Não informado'}</span></span>
+                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{capitalizeFirst(selectedAtendimento.petName || 'Não informado')}</span></span>
                     </div>
                     <div>
                       <span><strong className="text-primary">Unidade:</strong> <span className="text-foreground">{selectedAtendimento.networkUnit?.name || 'Não informada'}</span></span>
@@ -857,11 +857,11 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-muted-foreground">Cliente:</span>
-                    <span className="ml-2 text-foreground">{historyAtendimento.clientName || 'Não informado'}</span>
+                    <span className="ml-2 text-foreground">{capitalizeFirst(historyAtendimento.clientName || 'Não informado')}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Pet:</span>
-                    <span className="ml-2 text-foreground">{historyAtendimento.petName || 'Não informado'}</span>
+                    <span className="ml-2 text-foreground">{capitalizeFirst(historyAtendimento.petName || 'Não informado')}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Status Atual:</span>
