@@ -1388,7 +1388,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(401).json({ error: "Autenticação necessária" });
       }
       
-      const { name, crmv, email, phone, specialty, type, login, password, canAccessAtendimentos } = req.body;
+      const { name, crmv, email, phone, specialty, type, login, password, canAccessAtendimentos, isAdmin } = req.body;
       
       // Validate required fields
       if (!name || !email || !phone || !type) {
@@ -1412,6 +1412,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         login: login || null,
         passwordHash,
         canAccessAtendimentos: canAccessAtendimentos || false,
+        isAdmin: isAdmin || false,
         isActive: true
       });
       
@@ -1442,7 +1443,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         return res.status(403).json({ error: "Acesso negado" });
       }
       
-      const { name, crmv, email, phone, specialty, type, login, password, canAccessAtendimentos, isActive } = req.body;
+      const { name, crmv, email, phone, specialty, type, login, password, canAccessAtendimentos, isAdmin, isActive } = req.body;
       
       const updateData: any = {};
       if (name !== undefined) updateData.name = name;
@@ -1453,6 +1454,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       if (type !== undefined) updateData.type = type;
       if (login !== undefined) updateData.login = login;
       if (canAccessAtendimentos !== undefined) updateData.canAccessAtendimentos = canAccessAtendimentos;
+      if (isAdmin !== undefined) updateData.isAdmin = isAdmin;
       if (isActive !== undefined) updateData.isActive = isActive;
       
       // Hash new password if provided
