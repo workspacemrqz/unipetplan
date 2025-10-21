@@ -31,6 +31,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { apiRequest } from "@/lib/admin/queryClient";
+import { usePermissions } from "@/hooks/use-permissions";
 import { 
   type User as UserType, 
   type NetworkUnitWithCredentialStatus, 
@@ -92,6 +93,7 @@ export default function Administration() {
   const networkPageSize = 10;
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { canAdd, canEdit, canDelete } = usePermissions();
 
   const { data: users = [], isLoading } = useQuery<UserType[]>({
     queryKey: ["/admin/api/users"],
@@ -738,6 +740,8 @@ export default function Administration() {
                     isActive: true,
                   });
                 }}
+                disabled={!canAdd()}
+                title={!canAdd() ? "Você não tem permissão para adicionar usuários" : ""}
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Adicionar
@@ -856,6 +860,8 @@ export default function Administration() {
                             size="sm"
                             onClick={() => handleEdit(user)}
                             data-testid={`button-edit-${user.id}`}
+                            disabled={!canEdit()}
+                            title={!canEdit() ? "Você não tem permissão para editar usuários" : ""}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -863,8 +869,9 @@ export default function Administration() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleDelete({ id: user.id, username: user.username })}
-                            disabled={deleteMutation.isPending}
+                            disabled={deleteMutation.isPending || !canDelete()}
                             data-testid={`button-delete-${user.id}`}
+                            title={!canDelete() ? "Você não tem permissão para excluir usuários" : ""}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -889,6 +896,8 @@ export default function Administration() {
                         size="sm"
                         onClick={() => setDialogOpen(true)}
                         data-testid="button-add-first-user"
+                        disabled={!canAdd()}
+                        title={!canAdd() ? "Você não tem permissão para adicionar usuários" : ""}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Criar Primeiro Usuário

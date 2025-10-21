@@ -37,6 +37,7 @@ const planFormSchema = z.object({
   displayOrder: z.number().optional(),
   isActive: z.boolean(),
   contractText: z.string().optional(),
+  contractUrl: z.string().optional(),
 });
 
 export default function PlanForm() {
@@ -79,6 +80,7 @@ export default function PlanForm() {
       displayOrder: 0,
       isActive: true,
       contractText: "",
+      contractUrl: "",
     },
   });
   
@@ -127,6 +129,7 @@ export default function PlanForm() {
         displayOrder: planData.displayOrder || 0,
         isActive: planData.isActive ?? true,
         contractText: contractTextToUse,
+        contractUrl: planData.contractUrl || "",
       });
       
       setHasResetForm(true);
@@ -358,6 +361,28 @@ export default function PlanForm() {
                   </FormItem>
                 )}
               />
+              <div className="mt-6">
+                <FormField
+                  control={form.control}
+                  name="contractUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL do Contrato (Área do Cliente)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          placeholder="/contrato/basic ou https://link-externo-do-contrato.pdf"
+                          data-testid="input-contract-url"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        URL que vincula este plano ao contrato na área do cliente. Use rotas internas (/contrato/basic) ou links externos.
+                      </p>
+                    </FormItem>
+                  )}
+                />
+              </div>
             </CardContent>
           </Card>
 

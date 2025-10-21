@@ -86,6 +86,36 @@ export function usePermissions() {
     return false; // DENY by default
   };
 
+  const canAdd = (): boolean => {
+    if (isLoading || !currentUser) return false;
+    
+    // Users with 'view' role cannot add
+    if (currentUser.role === "view") return false;
+    
+    // Superadmin and other roles can add
+    return true;
+  };
+
+  const canEdit = (): boolean => {
+    if (isLoading || !currentUser) return false;
+    
+    // Users with 'view' role cannot edit
+    if (currentUser.role === "view") return false;
+    
+    // Superadmin and other roles can edit
+    return true;
+  };
+
+  const canDelete = (): boolean => {
+    if (isLoading || !currentUser) return false;
+    
+    // Users with 'view' role cannot delete
+    if (currentUser.role === "view") return false;
+    
+    // Only certain roles can delete
+    return ["superadmin", "admin", "delete"].includes(currentUser.role);
+  };
+
   const getAccessiblePaths = (): string[] => {
     if (isLoading || !currentUser) return [];
     
@@ -158,5 +188,8 @@ export function usePermissions() {
     hasPermission,
     hasPathAccess,
     getAccessiblePaths,
+    canAdd,
+    canEdit,
+    canDelete,
   };
 }

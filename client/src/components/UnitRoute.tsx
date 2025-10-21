@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import UnitDashboard from "@/pages/UnitDashboard";
+import UnitDashboard from "@/pages/unit-dashboard";
 import NotFound from "@/pages/not-found";
 import LoadingDots from "@/components/ui/LoadingDots";
 

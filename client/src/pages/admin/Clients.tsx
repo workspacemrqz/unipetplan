@@ -27,6 +27,7 @@ import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { usePermissions } from "@/hooks/use-permissions";
 
 // Interfaces
 interface Pet {
@@ -111,6 +112,7 @@ export default function Clients() {
   const pageSize = 10;
   const { toast } = useToast();
   const { logAction } = useAdminLogger();
+  const { canAdd, canEdit } = usePermissions();
 
   const { data: clients = [], isLoading } = useQuery<Client[]>({
     queryKey: ["/admin/api/clients"],
@@ -481,6 +483,8 @@ export default function Clients() {
             size="sm"
             onClick={() => setLocation("/clientes/novo")}
             data-testid="button-new-client"
+            disabled={!canAdd()}
+            title={!canAdd() ? "Você não tem permissão para adicionar clientes" : ""}
           >
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
@@ -602,6 +606,8 @@ export default function Clients() {
                           size="sm"
                           onClick={() => setLocation(`/clientes/${client.id}/pets/novo`)}
                           data-testid={`button-add-pet-${client.id}`}
+                          disabled={!canAdd()}
+                          title={!canAdd() ? "Você não tem permissão para adicionar pets" : ""}
                         >
                           <AddPetIcon className="h-4 w-4" />
                         </Button>
@@ -610,6 +616,8 @@ export default function Clients() {
                           size="sm"
                           onClick={() => setLocation(`/clientes/${client.id}/editar`)}
                           data-testid={`button-edit-${client.id}`}
+                          disabled={!canEdit()}
+                          title={!canEdit() ? "Você não tem permissão para editar clientes" : ""}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -635,6 +643,8 @@ export default function Clients() {
                       className="mt-4"
                       onClick={() => setLocation("/clientes/novo")}
                       data-testid="button-add-first-client"
+                      disabled={!canAdd()}
+                      title={!canAdd() ? "Você não tem permissão para adicionar clientes" : ""}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Cadastrar Primeiro Cliente

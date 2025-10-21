@@ -96,11 +96,14 @@ export default function UnitDashboard() {
   };
 
   const checkAuthentication = async () => {
-    const token = localStorage.getItem('unit-token');
+    const unitToken = localStorage.getItem('unit-token');
+    const vetToken = localStorage.getItem('veterinarian-token');
     const unitSlug = localStorage.getItem('unit-slug');
     
-    if (!token || unitSlug !== slug) {
-      setLocation(`/unidade/${slug}`);
+    // Verificar se há algum token válido (unit ou veterinarian)
+    if ((!unitToken && !vetToken) || unitSlug !== slug) {
+      // Redirecionar para a página de login da unidade, não para a unidade em si
+      setLocation(`/unidade/${slug}/login`);
       return;
     }
     
@@ -109,7 +112,14 @@ export default function UnitDashboard() {
   };
 
   const fetchDashboardData = async () => {
-    const token = localStorage.getItem('unit-token');
+    // Usar o token disponível (unit ou veterinarian)
+    const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
+    
+    if (!token) {
+      console.error('❌ Nenhum token encontrado para autenticação');
+      setLocation(`/unidade/${slug}/login`);
+      return;
+    }
     
     // Build query params for date range
     const params = new URLSearchParams();
@@ -193,7 +203,13 @@ export default function UnitDashboard() {
   };
 
   const fetchChartData = async () => {
-    const token = localStorage.getItem('unit-token');
+    // Usar o token disponível (unit ou veterinarian)
+    const token = localStorage.getItem('unit-token') || localStorage.getItem('veterinarian-token');
+    
+    if (!token) {
+      console.error('❌ Nenhum token encontrado para atualização dos gráficos');
+      return;
+    }
     
     // Build query params for date range
     const params = new URLSearchParams();
