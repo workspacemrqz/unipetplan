@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { motion } from "framer-motion";
-import { Lock, User, Loader2, Building, Stethoscope } from "lucide-react";
+import { Lock, User, Loader2 } from "lucide-react";
 import LoadingDots from '@/components/ui/LoadingDots';
 
 export default function UnitLoginPage() {
@@ -13,7 +13,6 @@ export default function UnitLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginType, setLoginType] = useState<'unit' | 'veterinarian'>('unit');
 
   useEffect(() => {
     fetchUnitName();
@@ -41,46 +40,34 @@ export default function UnitLoginPage() {
     setIsSubmitting(true);
 
     try {
-      let response;
-      
-      if (loginType === 'unit') {
-        // Unit login - original flow
-        response = await fetch('/api/unit-auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ slug, login, password }),
-        });
-      } else {
-        // Veterinarian login - new flow with slug validation
-        response = await fetch('/api/veterinarian-auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ slug, login, password }),
-        });
-      }
+      // Use unified authentication endpoint
+      const response = await fetch('/api/unified-auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slug, login, password }),
+      });
 
       const data = await response.json();
 
       if (response.ok) {
-        if (loginType === 'unit') {
+        // Store authentication based on user type
+        if (data.userType === 'unit') {
           // Unit authentication
           localStorage.setItem('unit-token', data.token);
           localStorage.setItem('unit-slug', slug || '');
-          localStorage.setItem('unit-name', unitName);
-          setLocation(`/unidade/${slug}/painel`);
-        } else {
-          // Veterinarian authentication
+          localStorage.setItem('unit-name', data.unitName);
+        } else if (data.userType === 'veterinarian' || data.userType === 'admin') {
+          // Veterinarian/Admin authentication
           localStorage.setItem('veterinarian-token', data.token);
           localStorage.setItem('veterinarian-name', data.veterinarianName);
           localStorage.setItem('unit-slug', data.unitSlug);
           localStorage.setItem('unit-name', data.unitName);
-          // Redirect veterinarian to the atendimentos page
-          setLocation(`/unidade/${data.unitSlug}/atendimentos/novo`);
         }
+        
+        // Redirect to the appropriate path returned by backend
+        setLocation(data.redirectPath);
       } else {
         setError(data.error || 'Credenciais inválidas');
       }
@@ -120,51 +107,12 @@ export default function UnitLoginPage() {
 
           {/* Login Form */}
           <div className="rounded-xl shadow-lg p-8 bg-background">
-            {/* Login Type Selector - Tab Style */}
-            <div className="flex mb-6 bg-muted rounded-lg p-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginType('unit');
-                  setError('');
-                  setLogin('');
-                  setPassword('');
-                }}
-                className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-md transition-all duration-200 ${
-                  loginType === 'unit'
-                    ? 'bg-background shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Building className="w-4 h-4" />
-                <span className="text-sm font-medium">Unidade</span>
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginType('veterinarian');
-                  setError('');
-                  setLogin('');
-                  setPassword('');
-                }}
-                className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-md transition-all duration-200 ${
-                  loginType === 'veterinarian'
-                    ? 'bg-background shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Stethoscope className="w-4 h-4" />
-                <span className="text-sm font-medium">Veterinário</span>
-              </button>
-            </div>
-
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Login Field */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  Login {loginType === 'veterinarian' && 'do Veterinário'}
+                  Login
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -178,11 +126,7 @@ export default function UnitLoginPage() {
                       backgroundColor: '#FFFFFF',
                       paddingLeft: '2.5rem'
                     }}
-                    placeholder={
-                      loginType === 'unit'
-                        ? "Digite o login da unidade"
-                        : "Digite o login do veterinário"
-                    }
+                    placeholder="Digite seu login"
                     required
                     disabled={isSubmitting}
                   />
@@ -239,12 +183,8 @@ export default function UnitLoginPage() {
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <span className="flex items-center space-x-2">
-                    {loginType === 'unit' ? (
-                      <Building className="w-5 h-5" />
-                    ) : (
-                      <Stethoscope className="w-5 h-5" />
-                    )}
-                    <span>Entrar como {loginType === 'unit' ? 'Unidade' : 'Veterinário'}</span>
+                    <Lock className="w-5 h-5" />
+                    <span>Entrar</span>
                   </span>
                 )}
               </button>
@@ -255,10 +195,7 @@ export default function UnitLoginPage() {
           {/* Additional Info */}
           <div className="text-center mt-6">
             <p className="text-sm text-muted-foreground">
-              {loginType === 'unit' 
-                ? 'Acesso restrito para unidades credenciadas'
-                : 'Acesso exclusivo para veterinários credenciados'
-              }
+              Acesso restrito para usuários autorizados
             </p>
           </div>
         </motion.div>

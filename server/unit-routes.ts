@@ -1248,6 +1248,116 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
 
   // ===== VETERINARIANS MANAGEMENT =====
   
+  // Unified login endpoint - tries both unit and veterinarian/admin authentication
+  app.post("/api/unified-auth/login", async (req: Request, res: Response) => {
+    try {
+      const { slug, login, password } = req.body;
+      
+      if (!slug || !login || !password) {
+        return res.status(400).json({ error: "Dados incompletos" });
+      }
+      
+      // ✅ SECURITY FIX: Enforce SESSION_SECRET without fallback
+      if (!process.env.SESSION_SECRET) {
+        console.error('❌ [SECURITY] SESSION_SECRET not configured for JWT');
+        return res.status(500).json({ error: 'Configuração de segurança ausente' });
+      }
+      
+      // First, try unit authentication
+      const unit = await storage.getNetworkUnitBySlug(slug);
+      if (!unit) {
+        return res.status(404).json({ error: "Unidade não encontrada" });
+      }
+      
+      // Check if it's the unit login
+      if (unit.login === login) {
+        // Verify unit password
+        const isValidUnitPassword = await bcrypt.compare(password, unit.senhaHash || '');
+        
+        if (isValidUnitPassword) {
+          // Generate JWT token for unit
+          const token = jwt.sign(
+            { unitId: unit.id, slug: unit.urlSlug },
+            process.env.SESSION_SECRET,
+            { expiresIn: '8h' }
+          );
+          
+          console.log(`✅ [UNIFIED-AUTH] Unit logged in: ${unit.name}`);
+          return res.json({ 
+            token, 
+            unitName: unit.name,
+            userType: 'unit',
+            redirectPath: `/unidade/${slug}/painel`
+          });
+        }
+      }
+      
+      // If unit auth failed, try veterinarian/admin authentication
+      const veterinarian = await storage.getVeterinarianByLogin(login);
+      if (veterinarian) {
+        // Check if veterinarian is active
+        if (!veterinarian.isActive) {
+          return res.status(401).json({ error: "Usuário inativo" });
+        }
+        
+        // Check if has access to atendimentos
+        if (!veterinarian.canAccessAtendimentos) {
+          return res.status(401).json({ error: "Acesso não autorizado" });
+        }
+        
+        // Verify password
+        if (!veterinarian.passwordHash) {
+          return res.status(401).json({ error: "Credenciais não configuradas" });
+        }
+        
+        const isValidVetPassword = await bcrypt.compare(password, veterinarian.passwordHash);
+        
+        if (isValidVetPassword) {
+          // Validate that the veterinarian belongs to the requested unit
+          if (veterinarian.networkUnitId !== unit.id) {
+            console.log(`⚠️ [UNIFIED-AUTH] User ${veterinarian.name} (unit: ${veterinarian.networkUnitId}) tried to login through unit ${unit.id}`);
+            return res.status(403).json({ error: "Você não tem permissão para acessar esta unidade" });
+          }
+          
+          // Generate JWT token for veterinarian/admin
+          const token = jwt.sign(
+            { 
+              veterinarianId: veterinarian.id,
+              unitId: veterinarian.networkUnitId,
+              slug: unit.urlSlug,
+              type: 'veterinarian',
+              isAdmin: veterinarian.isAdmin || false
+            },
+            process.env.SESSION_SECRET,
+            { expiresIn: '8h' }
+          );
+          
+          // Determine redirect path based on user type
+          const redirectPath = veterinarian.isAdmin 
+            ? `/unidade/${unit.urlSlug}/painel` // Admins go to dashboard
+            : `/unidade/${unit.urlSlug}/atendimentos/novo`; // Veterinarians go to atendimentos
+          
+          console.log(`✅ [UNIFIED-AUTH] ${veterinarian.isAdmin ? 'Admin' : 'Veterinarian'} logged in: ${veterinarian.name}`);
+          return res.json({ 
+            token, 
+            veterinarianName: veterinarian.name,
+            unitName: unit.name,
+            unitSlug: unit.urlSlug,
+            userType: veterinarian.isAdmin ? 'admin' : 'veterinarian',
+            redirectPath
+          });
+        }
+      }
+      
+      // If both authentications failed
+      return res.status(401).json({ error: "Credenciais inválidas" });
+      
+    } catch (error) {
+      console.error("❌ [UNIFIED-AUTH] Login error:", error);
+      res.status(500).json({ error: "Erro ao fazer login" });
+    }
+  });
+
   // Veterinarian login
   app.post("/api/veterinarian-auth/login", async (req: Request, res: Response) => {
     try {
