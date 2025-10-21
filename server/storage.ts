@@ -209,6 +209,10 @@ export interface IStorage {
   getAllAtendimentos(): Promise<Atendimento[]>;
   getActiveAtendimentos(): Promise<Atendimento[]>;
   deleteAtendimento(id: string): Promise<boolean>;
+  
+  // Atendimento History
+  createAtendimentoHistoryLog(log: any): Promise<any>;
+  getAtendimentoHistory(atendimentoId: string): Promise<any[]>;
 
   // Satisfaction Surveys
   createSatisfactionSurvey(survey: InsertSatisfactionSurvey): Promise<SatisfactionSurvey>;
@@ -440,6 +444,8 @@ export class InMemoryStorage implements IStorage {
   async getAllAtendimentos(): Promise<Atendimento[]> { return []; }
   async getActiveAtendimentos(): Promise<Atendimento[]> { return []; }
   async deleteAtendimento(id: string): Promise<boolean> { return true; }
+  async createAtendimentoHistoryLog(log: any): Promise<any> { return log; }
+  async getAtendimentoHistory(atendimentoId: string): Promise<any[]> { return []; }
   async createSatisfactionSurvey(survey: InsertSatisfactionSurvey): Promise<SatisfactionSurvey> { return survey as any; }
   async getSatisfactionSurvey(id: string): Promise<SatisfactionSurvey | undefined> { return undefined; }
   async getSatisfactionSurveysByClientId(clientId: string): Promise<SatisfactionSurvey[]> { return []; }
@@ -1720,6 +1726,27 @@ export class DatabaseStorage implements IStorage {
   async deleteAtendimento(id: string): Promise<boolean> {
     const result = await db.delete(atendimentos).where(eq(atendimentos.id, id));
     return (result.rowCount || 0) > 0;
+  }
+
+  // Atendimento History
+  async createAtendimentoHistoryLog(log: any): Promise<any> {
+    const result = await db.execute(sql`
+      INSERT INTO atendimento_history_logs 
+      (atendimento_id, action_type, field_name, old_value, new_value, user_name, user_id, user_type, description, created_at)
+      VALUES (${log.atendimentoId}, ${log.actionType}, ${log.fieldName || null}, ${log.oldValue || null}, ${log.newValue || null}, 
+              ${log.userName}, ${log.userId || null}, ${log.userType}, ${log.description || null}, ${new Date()})
+      RETURNING *
+    `);
+    return result.rows[0];
+  }
+
+  async getAtendimentoHistory(atendimentoId: string): Promise<any[]> {
+    const result = await db.execute(sql`
+      SELECT * FROM atendimento_history_logs 
+      WHERE atendimento_id = ${atendimentoId}
+      ORDER BY created_at DESC
+    `);
+    return result.rows;
   }
 
   // Satisfaction Surveys

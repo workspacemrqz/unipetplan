@@ -2844,6 +2844,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Get admin user information
+      const adminUser = (req.session as any)?.user;
+      const adminName = adminUser?.email || 'Administrador';
+      
+      // Create history log for atendimento creation
+      await storage.createAtendimentoHistoryLog({
+        atendimentoId: newAtendimento.id,
+        actionType: 'created',
+        fieldName: null,
+        oldValue: null,
+        newValue: null,
+        userName: adminName,
+        userId: adminUser?.id || null,
+        userType: 'admin',
+        description: 'Atendimento criado pelo administrador'
+      });
+      
       await logAdminAction(req, 'created', 'atendimento', newAtendimento.id, { clientId: atendimentoData.clientId, networkUnitId: atendimentoData.networkUnitId });
       console.log(`✅ [ADMIN] Atendimento created:`, newAtendimento.id);
       res.status(201).json(newAtendimento);
@@ -2861,10 +2878,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const atendimentoData = insertAtendimentoSchema.partial().parse(req.body);
       
+      // Get current atendimento before update to track changes
+      const currentAtendimento = await storage.getAtendimento(req.params.id);
+      if (!currentAtendimento) {
+        return res.status(404).json({ error: "atendimento não encontrado" });
+      }
+      
       // Convert Brazilian decimal format (10,00) to numeric format (10.00)
       const processedAtendimentoData = { ...atendimentoData } as Partial<InsertAtendimento>;
       if (atendimentoData.value && typeof atendimentoData.value === 'string') {
         processedAtendimentoData.value = atendimentoData.value.replace('.', '').replace(',', '.') as string;
+      }
+      
+      // Track changes for history log
+      const adminUser = (req.session as any)?.user;
+      const adminName = adminUser?.email || 'Administrador';
+      
+      // Create history logs for each changed field
+      for (const [field, newValue] of Object.entries(processedAtendimentoData)) {
+        const oldValue = (currentAtendimento as any)[field];
+        
+        if (oldValue !== newValue) {
+          let description = '';
+          
+          // Create human-readable descriptions
+          if (field === 'status') {
+            const statusLabels: Record<string, string> = {
+              'open': 'Aberta',
+              'closed': 'Concluída',
+              'cancelled': 'Cancelada'
+            };
+            description = `Status alterado de "${statusLabels[oldValue as string] || oldValue}" para "${statusLabels[newValue as string] || newValue}"`;
+          } else if (field === 'value') {
+            description = `Valor alterado de "R$ ${oldValue || '0'}" para "R$ ${newValue}"`;
+          } else if (field === 'procedureNotes') {
+            description = 'Notas do procedimento atualizadas';
+          } else if (field === 'generalNotes') {
+            description = 'Notas gerais atualizadas';
+          } else {
+            description = `Campo ${field} atualizado`;
+          }
+          
+          await storage.createAtendimentoHistoryLog({
+            atendimentoId: req.params.id,
+            actionType: field === 'status' ? 'status_changed' : 'field_updated',
+            fieldName: field,
+            oldValue: oldValue?.toString() || null,
+            newValue: newValue?.toString() || null,
+            userName: adminName,
+            userId: adminUser?.id || null,
+            userType: 'admin',
+            description: description
+          });
+        }
       }
       
       const updatedAtendimento = await storage.updateAtendimento(req.params.id, processedAtendimentoData);
@@ -2900,6 +2966,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting atendimento:", error);
       res.status(500).json({ error: "Erro ao deletar atendimento" });
+    }
+  });
+
+  // Get atendimento history
+  app.get("/admin/api/atendimentos/:id/history", requireAdmin, async (req, res) => {
+    try {
+      const history = await storage.getAtendimentoHistory(req.params.id);
+      res.json(history);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching atendimento history:", error);
+      res.status(500).json({ error: "Erro ao buscar histórico do atendimento" });
     }
   });
 
