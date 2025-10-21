@@ -19,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2, Plus, Edit } from "lucide-react";
+import { Search, FileText, Eye, Copy, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2, Plus, Edit, Clock, User, Calendar } from "lucide-react";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -82,6 +82,9 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
   const [editOpen, setEditOpen] = useState(false);
   const [editingAtendimento, setEditingAtendimento] = useState<AtendimentoWithNetworkUnit | null>(null);
   const [newStatus, setNewStatus] = useState("");
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyAtendimento, setHistoryAtendimento] = useState<AtendimentoWithNetworkUnit | null>(null);
+  const [historyLogs, setHistoryLogs] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied'>('idle');
   const { visibleColumns, toggleColumn } = useColumnPreferences('unit.atendimentos.columns', allColumns);
@@ -170,6 +173,47 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
     setEditingAtendimento(atendimento);
     setNewStatus(atendimento.status);
     setEditOpen(true);
+  };
+
+  const handleViewHistory = async (atendimento: AtendimentoWithNetworkUnit) => {
+    setHistoryAtendimento(atendimento);
+    setHistoryOpen(true);
+    
+    try {
+      // Verificar primeiro veterinarian-token, depois unit-token
+      const veterinarianToken = localStorage.getItem('veterinarian-token');
+      const unitToken = localStorage.getItem('unit-token');
+      const token = veterinarianToken || unitToken;
+      
+      if (!token) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      const response = await fetch(`/api/units/${unitSlug}/atendimentos/${atendimento.id}/history`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setHistoryLogs(data);
+      } else {
+        setHistoryLogs([]);
+        toast({
+          title: "Aviso",
+          description: "Não foi possível carregar o histórico de ações.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      setHistoryLogs([]);
+      toast({
+        title: "Erro",
+        description: "Erro ao buscar histórico de ações.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSaveStatus = async () => {
@@ -508,6 +552,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                             size="sm"
                             onClick={() => handleViewDetails(atendimento)}
                             data-testid={`button-view-${atendimento.id}`}
+                            title="Ver detalhes"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -516,8 +561,18 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                             size="sm"
                             onClick={() => handleEdit(atendimento)}
                             data-testid={`button-edit-${atendimento.id}`}
+                            title="Editar status"
                           >
                             <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewHistory(atendimento)}
+                            data-testid={`button-history-${atendimento.id}`}
+                            title="Ver histórico de ações"
+                          >
+                            <Search className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -775,6 +830,112 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
               )}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* History Dialog */}
+      <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
+        <DialogContent hideCloseButton className="overflow-y-auto max-h-[75vh]">
+          <DialogHeader className="flex flex-row items-center justify-between pr-2">
+            <DialogTitle className="flex items-center space-x-2">
+              <Clock className="h-5 w-5 text-primary" />
+              <span>Histórico de Ações</span>
+            </DialogTitle>
+            <Button
+              variant="outline"
+              onClick={() => setHistoryOpen(false)}
+              className="h-8"
+            >
+              Fechar
+            </Button>
+          </DialogHeader>
+          
+          {historyAtendimento && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-foreground mb-2">Informações do Atendimento</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Cliente:</span>
+                    <span className="ml-2 text-foreground">{historyAtendimento.clientName || 'Não informado'}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Pet:</span>
+                    <span className="ml-2 text-foreground">{historyAtendimento.petName || 'Não informado'}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Status Atual:</span>
+                    <span className="ml-2 text-foreground">{getStatusLabel(historyAtendimento.status)}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Valor:</span>
+                    <span className="ml-2 text-foreground">
+                      R$ {historyAtendimento.value ? parseFloat(historyAtendimento.value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-foreground mb-3">Histórico de Alterações</h4>
+                {historyLogs.length > 0 ? (
+                  <div className="space-y-3">
+                    {historyLogs.map((log, index) => (
+                      <div key={log.id || index} className="border-l-4 border-primary pl-4 pb-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <User className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium text-sm text-foreground">
+                                {log.user_name || log.userName || 'Sistema'}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                ({log.user_type || log.userType === 'admin' ? 'Administrador' : 
+                                  log.user_type || log.userType === 'veterinarian' ? 'Veterinário' : 
+                                  log.user_type || log.userType === 'unit' ? 'Unidade' : 'Sistema'})
+                              </span>
+                            </div>
+                            <p className="text-sm text-foreground mb-1">
+                              {log.description || 
+                               (log.action_type || log.actionType === 'created' ? 'Atendimento criado' : 
+                                log.action_type || log.actionType === 'status_changed' ? 'Status alterado' : 
+                                log.action_type || log.actionType === 'field_updated' ? `Campo ${log.field_name || log.fieldName} atualizado` : 
+                                'Ação realizada')}
+                            </p>
+                            {(log.old_value || log.oldValue || log.new_value || log.newValue) && (
+                              <div className="text-xs text-muted-foreground bg-gray-50 rounded p-2 mt-1">
+                                {log.old_value || log.oldValue && (
+                                  <div>
+                                    <span className="font-medium">De:</span> {log.old_value || log.oldValue}
+                                  </div>
+                                )}
+                                {log.new_value || log.newValue && (
+                                  <div>
+                                    <span className="font-medium">Para:</span> {log.new_value || log.newValue}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            {log.created_at || log.createdAt ? 
+                              format(new Date(log.created_at || log.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : 
+                              'Data não disponível'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Clock className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
+                    <p>Nenhum histórico de alterações encontrado.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

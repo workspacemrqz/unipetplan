@@ -686,6 +686,37 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
     }
   });
   
+  // Get atendimento history (authenticated)
+  app.get(["/api/unit/:slug/atendimentos/:id/history", "/api/units/:slug/atendimentos/:id/history"], requireUnitAuth, async (req: UnitRequest, res: Response) => {
+    try {
+      const unitId = req.unit?.unitId;
+      const atendimentoId = req.params.id;
+      
+      if (!unitId) {
+        return res.status(401).json({ error: "Autenticação necessária" });
+      }
+      
+      // Verify that the atendimento was created by this unit
+      const atendimento = await storage.getAtendimento(atendimentoId);
+      if (!atendimento) {
+        return res.status(404).json({ error: "Atendimento não encontrado" });
+      }
+      
+      if (atendimento.createdByUnitId !== unitId) {
+        return res.status(403).json({ error: "Você não tem permissão para visualizar o histórico deste atendimento" });
+      }
+      
+      // Get history logs for this atendimento
+      const history = await storage.getAtendimentoHistory(atendimentoId);
+      
+      console.log(`✅ [UNIT] Retrieved ${history.length} history logs for atendimento ${atendimentoId}`);
+      res.json(history);
+    } catch (error) {
+      console.error("❌ [UNIT] Error fetching atendimento history:", error);
+      res.status(500).json({ error: "Erro ao buscar histórico do atendimento" });
+    }
+  });
+  
   // Get unit clients (authenticated)
   app.get("/api/unit/:slug/clients", requireUnitAuth, async (req: UnitRequest, res: Response) => {
     try {
