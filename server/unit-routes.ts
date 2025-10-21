@@ -409,6 +409,34 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         console.log(`✅ [UNIT] Saved ${procedures.length} procedures for atendimento ${newAtendimento.id}`);
       }
       
+      // Create history log for atendimento creation
+      const unitInfo = req.unit;
+      let userName = 'Unidade';
+      let userType = 'unit';
+      
+      if (unitInfo?.type === 'veterinarian' && unitInfo?.veterinarianId) {
+        // Get veterinarian name if possible
+        const veterinarian = await storage.getVeterinarianById(unitInfo.veterinarianId);
+        userName = veterinarian?.name || `Veterinário ${unitInfo.veterinarianId}`;
+        userType = 'veterinarian';
+      } else if (unitInfo?.unitId) {
+        // Get unit name if possible
+        const unit = await storage.getNetworkUnitById(unitInfo.unitId);
+        userName = unit?.name || `Unidade ${unitInfo.unitId}`;
+      }
+      
+      await storage.createAtendimentoHistoryLog({
+        atendimentoId: newAtendimento.id,
+        actionType: 'created',
+        fieldName: null,
+        oldValue: null,
+        newValue: null,
+        userName: userName,
+        userId: unitInfo?.veterinarianId || unitInfo?.unitId || null,
+        userType: userType,
+        description: `Atendimento criado por ${userName}`
+      });
+      
       // Automatically register procedure usage when atendimento is created
       if (atendimentoData.petId && atendimentoData.procedureId) {
         try {
@@ -612,6 +640,40 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       if (atendimento.createdByUnitId !== unitId) {
         return res.status(403).json({ error: "Você não tem permissão para editar este atendimento" });
       }
+      
+      // Create history log before update
+      const unitInfo = req.unit;
+      let userName = 'Unidade';
+      let userType = 'unit';
+      
+      if (unitInfo?.type === 'veterinarian' && unitInfo?.veterinarianId) {
+        // Get veterinarian name if possible
+        const veterinarian = await storage.getVeterinarianById(unitInfo.veterinarianId);
+        userName = veterinarian?.name || `Veterinário ${unitInfo.veterinarianId}`;
+        userType = 'veterinarian';
+      } else if (unitInfo?.unitId) {
+        // Get unit name if possible
+        const unit = await storage.getNetworkUnitById(unitInfo.unitId);
+        userName = unit?.name || `Unidade ${unitInfo.unitId}`;
+      }
+      
+      const statusLabels: Record<string, string> = {
+        'open': 'Aberta',
+        'closed': 'Concluída',
+        'cancelled': 'Cancelada'
+      };
+      
+      await storage.createAtendimentoHistoryLog({
+        atendimentoId: atendimentoId,
+        actionType: 'status_changed',
+        fieldName: 'status',
+        oldValue: atendimento.status,
+        newValue: status,
+        userName: userName,
+        userId: unitInfo?.veterinarianId || unitInfo?.unitId || null,
+        userType: userType,
+        description: `Status alterado de "${statusLabels[atendimento.status] || atendimento.status}" para "${statusLabels[status] || status}" por ${userName}`
+      });
       
       // Update the atendimento status
       const updatedAtendimento = await storage.updateAtendimento(atendimentoId, { status });
