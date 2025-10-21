@@ -58,6 +58,7 @@ const allColumns = [
   "Nome",
   "Email",
   "Função",
+  "Permissões",
   "Status",
   "Ações",
 ] as const;
@@ -355,8 +356,71 @@ export default function Administration() {
       case "admin": return "Administrador";
       case "manager": return "Gerente";
       case "user": return "Usuário";
+      case "superadmin": return "Super Admin";
       default: return role;
     }
+  };
+
+  const getPermissionLabels = (permissions: string[] = [], role: string) => {
+    // Super admin tem todas as permissões
+    if (role === "superadmin") {
+      return (
+        <div className="flex flex-wrap gap-1">
+          <Badge variant="success" className="text-xs">
+            Acesso Total
+          </Badge>
+        </div>
+      );
+    }
+
+    // Se não houver permissões específicas
+    if (!permissions || permissions.length === 0) {
+      return (
+        <div className="flex flex-wrap gap-1">
+          <Badge variant="secondary" className="text-xs">
+            Sem permissões
+          </Badge>
+        </div>
+      );
+    }
+
+    // Mapear permissões para labels legíveis
+    const permissionLabels = permissions
+      .map((permId: string) => {
+        const permission = AVAILABLE_PERMISSIONS.find(p => p.id === permId);
+        return permission ? permission.label : null;
+      })
+      .filter(Boolean);
+
+    // Mostrar as primeiras 3 permissões + indicador de mais
+    if (permissionLabels.length > 3) {
+      const displayedPermissions = permissionLabels.slice(0, 3);
+      const remainingCount = permissionLabels.length - 3;
+      
+      return (
+        <div className="flex flex-wrap gap-1">
+          {displayedPermissions.map((label, index) => (
+            <Badge key={index} variant="outline" className="text-xs">
+              {label}
+            </Badge>
+          ))}
+          <Badge variant="secondary" className="text-xs">
+            +{remainingCount} mais
+          </Badge>
+        </div>
+      );
+    }
+
+    // Mostrar todas as permissões se forem 3 ou menos
+    return (
+      <div className="flex flex-wrap gap-1">
+        {permissionLabels.map((label, index) => (
+          <Badge key={index} variant="outline" className="text-xs">
+            {label}
+          </Badge>
+        ))}
+      </div>
+    );
   };
 
   const handlePermissionChange = (permission: string, checked: boolean) => {
@@ -727,6 +791,7 @@ export default function Administration() {
                 {visibleColumns.includes("Nome") && <TableHead className="w-[200px] bg-white">Nome</TableHead>}
                 {visibleColumns.includes("Email") && <TableHead className="w-[250px] bg-white">Email</TableHead>}
                 {visibleColumns.includes("Função") && <TableHead className="w-[120px] bg-white">Função</TableHead>}
+                {visibleColumns.includes("Permissões") && <TableHead className="w-[300px] bg-white">Permissões</TableHead>}
                 {visibleColumns.includes("Status") && <TableHead className="w-[100px] bg-white">Status</TableHead>}
                 {visibleColumns.includes("Ações") && <TableHead className="w-[150px] bg-white">Ações</TableHead>}
               </TableRow>
@@ -761,6 +826,11 @@ export default function Administration() {
                         <Badge variant="neutral" className="text-xs">
                           {getRoleLabel(user.role)}
                         </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.includes("Permissões") && (
+                      <TableCell className="bg-white">
+                        {getPermissionLabels(user.permissions, user.role)}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Status") && (
