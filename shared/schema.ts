@@ -141,6 +141,7 @@ export const veterinarians = pgTable("veterinarians", {
   login: text("login").unique(),
   passwordHash: text("password_hash"),
   canAccessAtendimentos: boolean("can_access_atendimentos").default(false).notNull(),
+  isAdmin: boolean("is_admin").default(false).notNull(), // Indica se é administrador da unidade
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
