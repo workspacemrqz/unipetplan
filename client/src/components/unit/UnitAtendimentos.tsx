@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { DateFilterComponent } from "@/components/admin/DateFilterComponent";
 import { getDateRangeParams } from "@/lib/date-utils";
-import { cn } from "@/lib/utils";
+import { cn, capitalizeFirst } from "@/lib/utils";
 
 // Types for atendimentos data
 interface AtendimentoWithNetworkUnit {
@@ -500,13 +500,13 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                           {atendimento.procedures && atendimento.procedures.length > 0 ? (
                             atendimento.procedures.map((proc: any, index: number) => (
                               <Badge key={index} variant="secondary" className="text-xs">
-                                {proc.procedureName || proc.name}
+                                {capitalizeFirst(proc.procedureName || proc.name)}
                               </Badge>
                             ))
                           ) : atendimento.procedure ? (
                             atendimento.procedure.split(/[,/]/).map((proc: string, index: number) => (
                               <Badge key={index} variant="secondary" className="text-xs">
-                                {proc.trim()}
+                                {capitalizeFirst(proc.trim())}
                               </Badge>
                             ))
                           ) : (
@@ -690,7 +690,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                             className="pb-2 border-b border-gray-100 last:border-b-0 last:pb-0"
                           >
                             <p className="text-foreground break-words whitespace-pre-wrap font-medium">
-                              {proc.procedureName || proc.name}
+                              {capitalizeFirst(proc.procedureName || proc.name)}
                             </p>
                             {proc.value && (
                               <p className="text-sm text-muted-foreground mt-1">
@@ -700,7 +700,7 @@ export default function UnitAtendimentos({ unitSlug }: { unitSlug: string }) {
                           </div>
                         ))
                       ) : (
-                        <span className="text-foreground break-words whitespace-pre-wrap">{selectedAtendimento.procedure || 'Não informado'}</span>
+                        <span className="text-foreground break-words whitespace-pre-wrap">{capitalizeFirst(selectedAtendimento.procedure || 'Não informado')}</span>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">

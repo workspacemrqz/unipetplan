@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import LoadingDots from '@/components/ui/LoadingDots';
+import { capitalizeFirst } from '@/lib/utils';
 
 interface Procedure {
   id: string;
@@ -197,7 +198,7 @@ export function ProceduresTab() {
                   <TableBody>
                     {filteredProcedures.map((procedure) => (
                         <TableRow key={procedure.id}>
-                          <TableCell className="font-medium">{procedure.name}</TableCell>
+                          <TableCell className="font-medium">{capitalizeFirst(procedure.name)}</TableCell>
                           <TableCell>
                             <Badge variant="neutral" className="text-xs">
                               {procedure.type}

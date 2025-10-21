@@ -42,3 +42,19 @@ export function isValidSlug(slug: string): boolean {
   const validPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
   return validPattern.test(slug)
 }
+
+/**
+ * Capitalizes only the first letter of a text, leaving the rest in lowercase
+ * 
+ * @param text - The text to capitalize
+ * @returns The text with only the first letter capitalized
+ * 
+ * @example
+ * capitalizeFirst("ESTUDO DA COLUNA (CERVICAL)") // returns "Estudo da coluna (cervical)"
+ * capitalizeFirst("consulta veterinária") // returns "Consulta veterinária"
+ */
+export function capitalizeFirst(text: string): string {
+  if (!text || text.length === 0) return text
+  
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+}
