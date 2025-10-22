@@ -14,10 +14,10 @@ export default function CustomerProcedures() {
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isLoading && !client && !error) {
+    if (!isLoading && !client) {
       navigate('/cliente/login');
     }
-  }, [isLoading, client, error, navigate]);
+  }, [isLoading, client, navigate]);
 
   if (isLoading) {
     return (

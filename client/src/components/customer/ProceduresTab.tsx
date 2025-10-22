@@ -70,6 +70,12 @@ export function ProceduresTab() {
         credentials: 'include',
       });
 
+      if (response.status === 401) {
+        // User not authenticated, redirect to login
+        window.location.href = '/cliente/login';
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Erro ao carregar dados de procedimentos');
       }
