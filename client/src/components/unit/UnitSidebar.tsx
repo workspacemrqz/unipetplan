@@ -31,67 +31,106 @@ export default function UnitSidebar() {
   // Detectar tipo de usuário baseado no token armazenado
   const isVeterinarian = !!localStorage.getItem('veterinarian-token');
   const isUnitAdmin = localStorage.getItem('is-unit-admin') === 'true';
-  
-  // Veterinário admin tem acesso completo, veterinário comum tem acesso limitado
-  const hasFullAccess = !isVeterinarian || (isVeterinarian && isUnitAdmin);
+  const isDirectUnitLogin = !!localStorage.getItem('unit-token') && !isVeterinarian;
   
   // Definir navegação baseada no tipo de usuário
-  const navigation: NavigationSection[] = hasFullAccess 
-    ? [
-        // Menu completo para unidades e admins
-        {
-          name: "Principal",
-          items: [
-            { name: "Dashboard", href: `/unidade/${slug}/painel`, iconName: "Dashboard" }
-          ]
-        },
-        {
-          name: "Atendimentos",
-          items: [
-            { 
-              name: "Atendimentos", 
-              href: `/unidade/${slug}/atendimentos`, 
-              iconName: "Atendimento"
-            },
-            { 
-              name: "Novo Atendimento", 
-              href: `/unidade/${slug}/atendimentos/novo`, 
-              iconName: "Plus" 
-            }
-          ]
-        },
-        {
-          name: "Gestão",
-          items: [
-            { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, iconName: "Procedimento" },
-            { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, iconName: "Admin" }
-          ]
-        },
-        {
-          name: "Financeiro",
-          items: [
-            { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, iconName: "Pagamento" }
-          ]
-        }
-      ]
-    : [
-        // Menu reduzido para veterinários comuns
-        {
-          name: "Atendimentos",
-          items: [
-            { 
-              name: "Atendimentos", 
-              href: `/unidade/${slug}/atendimentos`, 
-              iconName: "Atendimento"
-            },
-            { 
-              name: "Novo Atendimento", 
-              href: `/unidade/${slug}/atendimentos/novo`, 
-              iconName: "Plus" 
-            }
-          ]
-        }
-      ];
+  const navigation: NavigationSection[] = [];
+  
+  if (isDirectUnitLogin) {
+    // Menu completo apenas para login direto da unidade
+    navigation.push(
+      {
+        name: "Principal",
+        items: [
+          { name: "Dashboard", href: `/unidade/${slug}/painel`, iconName: "Dashboard" }
+        ]
+      },
+      {
+        name: "Atendimentos",
+        items: [
+          { 
+            name: "Atendimentos", 
+            href: `/unidade/${slug}/atendimentos`, 
+            iconName: "Atendimento"
+          },
+          { 
+            name: "Novo Atendimento", 
+            href: `/unidade/${slug}/atendimentos/novo`, 
+            iconName: "Plus" 
+          }
+        ]
+      },
+      {
+        name: "Gestão",
+        items: [
+          { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, iconName: "Procedimento" },
+          { name: "Corpo Clínico", href: `/unidade/${slug}/corpo-clinico`, iconName: "Admin" }
+        ]
+      },
+      {
+        name: "Financeiro",
+        items: [
+          { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, iconName: "Pagamento" }
+        ]
+      }
+    );
+  } else if (isVeterinarian && isUnitAdmin) {
+    // Menu para veterinários admin (sem Corpo Clínico)
+    navigation.push(
+      {
+        name: "Principal",
+        items: [
+          { name: "Dashboard", href: `/unidade/${slug}/painel`, iconName: "Dashboard" }
+        ]
+      },
+      {
+        name: "Atendimentos",
+        items: [
+          { 
+            name: "Atendimentos", 
+            href: `/unidade/${slug}/atendimentos`, 
+            iconName: "Atendimento"
+          },
+          { 
+            name: "Novo Atendimento", 
+            href: `/unidade/${slug}/atendimentos/novo`, 
+            iconName: "Plus" 
+          }
+        ]
+      },
+      {
+        name: "Gestão",
+        items: [
+          { name: "Procedimentos", href: `/unidade/${slug}/procedimentos`, iconName: "Procedimento" }
+        ]
+      },
+      {
+        name: "Financeiro",
+        items: [
+          { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, iconName: "Pagamento" }
+        ]
+      }
+    );
+  } else {
+    // Menu reduzido para veterinários comuns
+    navigation.push(
+      {
+        name: "Atendimentos",
+        items: [
+          { 
+            name: "Atendimentos", 
+            href: `/unidade/${slug}/atendimentos`, 
+            iconName: "Atendimento"
+          },
+          { 
+            name: "Novo Atendimento", 
+            href: `/unidade/${slug}/atendimentos/novo`, 
+            iconName: "Plus" 
+          }
+        ]
+      }
+    );
+  }
 
   // Expand section containing current route on mount and route change
   useEffect(() => {
