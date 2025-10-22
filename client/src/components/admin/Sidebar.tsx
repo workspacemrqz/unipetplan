@@ -111,6 +111,8 @@ export default function Sidebar() {
 
   // Expand section containing current route
   useEffect(() => {
+    const sectionsToExpand = new Set<string>();
+    
     for (const section of filteredNavigation) {
       const hasActiveItem = section.items.some(item => {
         const fullPath = item.href === '/' ? '/admin' : `/admin${item.href}`;
@@ -119,15 +121,21 @@ export default function Sidebar() {
           : location.startsWith(fullPath);
       });
       if (hasActiveItem) {
-        setExpandedSections(prev => {
-          const newSet = new Set(prev);
-          newSet.add(section.name);
-          return newSet;
-        });
+        sectionsToExpand.add(section.name);
         break;
       }
     }
-  }, [location, filteredNavigation]);
+    
+    // Only update if the sections to expand actually changed
+    setExpandedSections(prev => {
+      // Check if sets are equal
+      if (prev.size === sectionsToExpand.size && 
+          [...prev].every(section => sectionsToExpand.has(section))) {
+        return prev; // Return the same set to avoid re-render
+      }
+      return sectionsToExpand;
+    });
+  }, [location, filteredNavigation]); // Re-run when location or filteredNavigation changes
 
   // Função para alternar a expansão de uma seção
   const toggleSection = (sectionName: string) => {
