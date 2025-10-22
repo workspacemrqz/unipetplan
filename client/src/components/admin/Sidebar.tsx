@@ -112,9 +112,12 @@ export default function Sidebar() {
   // Expand section containing current route
   useEffect(() => {
     for (const section of filteredNavigation) {
-      const hasActiveItem = section.items.some(item => 
-        item.href === '/' ? location === item.href : location.startsWith(item.href)
-      );
+      const hasActiveItem = section.items.some(item => {
+        const fullPath = item.href === '/' ? '/admin' : `/admin${item.href}`;
+        return fullPath === '/admin' 
+          ? location === '/admin' || location === '/admin/'
+          : location.startsWith(fullPath);
+      });
       if (hasActiveItem) {
         setExpandedSections(prev => {
           const newSet = new Set(prev);
@@ -141,16 +144,18 @@ export default function Sidebar() {
 
   // Map navigation paths to prefetch page types
   const getPageTypeFromPath = (href: string): 'clients' | 'atendimentos' | 'plans' | 'dashboard' | null => {
-    if (href === '/') return 'dashboard';
-    if (href.startsWith('/clientes')) return 'clients';
-    if (href.startsWith('/atendimentos')) return 'atendimentos';
-    if (href.startsWith('/planos')) return 'plans';
+    // Remove the /admin prefix for path checking
+    const cleanPath = href.replace('/admin', '');
+    if (cleanPath === '/' || cleanPath === '') return 'dashboard';
+    if (cleanPath.startsWith('/clientes')) return 'clients';
+    if (cleanPath.startsWith('/atendimentos')) return 'atendimentos';
+    if (cleanPath.startsWith('/planos')) return 'plans';
     return null;
   };
 
   // Hover handler for navigation items to trigger prefetching
-  const handleNavigationHover = (href: string) => {
-    const pageType = getPageTypeFromPath(href);
+  const handleNavigationHover = (fullPath: string) => {
+    const pageType = getPageTypeFromPath(fullPath);
     if (pageType && pageType !== getPageTypeFromPath(location)) {
       // Only prefetch if not already on that page
       cacheManager.prefetchPageData(pageType).catch(error => {
@@ -195,14 +200,17 @@ export default function Sidebar() {
               {isExpanded && (
                 <div className="space-y-1">
               {section.items.map((item) => {
-                // Use startsWith for nested routes to highlight parent sections
-                const isActive = item.href === '/' 
-                  ? location === item.href  // Dashboard exact match
-                  : location.startsWith(item.href); // Other routes use startsWith for nested routes
+                // Compute the full admin path
+                const fullPath = item.href === '/' ? '/admin' : `/admin${item.href}`;
+                
+                // Use startsWith for nested routes to highlight parent sections  
+                const isActive = fullPath === '/admin'
+                  ? location === '/admin' || location === '/admin/'  // Dashboard exact match
+                  : location.startsWith(fullPath); // Other routes use startsWith for nested routes
                 return (
                   <Link 
                     key={item.name} 
-                    href={item.href}
+                    href={fullPath}
                     className={cn(
                       "flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group",
                       isActive
@@ -210,7 +218,7 @@ export default function Sidebar() {
                         : "text-gray-600 hover:bg-primary/10 hover:text-primary"
                     )}
                     data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    onMouseEnter={() => handleNavigationHover(item.href)}
+                    onMouseEnter={() => handleNavigationHover(fullPath)}
                   >
                     <CustomIcon 
                       name={item.iconName} 
