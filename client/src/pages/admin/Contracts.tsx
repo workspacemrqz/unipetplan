@@ -32,6 +32,7 @@ import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { usePermissions } from "@/hooks/use-permissions";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { normalizeCPF } from "@/../../shared/cpf-utils";
+import { capitalizeFirst } from "@/lib/utils";
 
 interface ContractWithDetails {
   id: string;
@@ -214,10 +215,10 @@ export default function Contracts() {
     text += "=".repeat(50) + "\n\n";
     
     text += `Nº Contrato: ${selectedContract.contractNumber}\n`;
-    text += `Cliente: ${selectedContract.clientName || "N/A"}\n`;
+    text += `Cliente: ${selectedContract.clientName ? capitalizeFirst(selectedContract.clientName) : "N/A"}\n`;
     text += `Email: ${selectedContract.clientEmail || "N/A"}\n`;
     text += `Telefone: ${selectedContract.clientPhone || "N/A"}\n`;
-    text += `Pet: ${selectedContract.petName || "N/A"} (${selectedContract.petSpecies || "N/A"})\n`;
+    text += `Pet: ${selectedContract.petName ? capitalizeFirst(selectedContract.petName) : "N/A"} (${selectedContract.petSpecies || "N/A"})\n`;
     text += `Plano: ${selectedContract.planName || "N/A"}\n`;
     text += `Status: ${statusLabels[selectedContract.status] || selectedContract.status}\n`;
     text += `Período de Cobrança: ${billingPeriodLabels[selectedContract.billingPeriod] || selectedContract.billingPeriod}\n`;
@@ -281,10 +282,10 @@ export default function Contracts() {
     // Retornar dados formatados para exportação
     return allContracts.map((contract: ContractWithDetails) => ({
       'Nº Contrato': contract.contractNumber || '',
-      'Cliente': contract.clientName || 'N/A',
+      'Cliente': contract.clientName ? capitalizeFirst(contract.clientName) : 'N/A',
       'Email do Cliente': contract.clientEmail || 'N/A',
       'Telefone do Cliente': contract.clientPhone || 'N/A',
-      'Pet': contract.petName || 'N/A',
+      'Pet': contract.petName ? capitalizeFirst(contract.petName) : 'N/A',
       'Espécie do Pet': contract.petSpecies || 'N/A',
       'Plano': contract.planName || 'N/A',
       'Status': statusLabels[contract.status] || contract.status,
@@ -527,12 +528,12 @@ export default function Contracts() {
                     )}
                     {visibleColumns.includes("Cliente") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        {contract.clientName || "N/A"}
+                        {contract.clientName ? capitalizeFirst(contract.clientName) : "N/A"}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Pet") && (
                       <TableCell className="whitespace-nowrap bg-white">
-                        {contract.petName || "N/A"}
+                        {contract.petName ? capitalizeFirst(contract.petName) : "N/A"}
                       </TableCell>
                     )}
                     {visibleColumns.includes("Plano") && (

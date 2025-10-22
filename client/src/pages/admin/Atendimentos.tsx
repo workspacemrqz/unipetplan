@@ -242,7 +242,7 @@ export default function Atendimentos() {
     // Informações Básicas
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome do Procedimento: ${capitalizeFirst(selectedAtendimento.procedure || selectedAtendimento.procedureName || 'Não informado')}\n`;
+    text += `Nome do Procedimento: ${selectedAtendimento.procedure ? capitalizeFirst(selectedAtendimento.procedure) : (selectedAtendimento.procedureName ? capitalizeFirst(selectedAtendimento.procedureName) : 'Não informado')}\n`;
     text += `Status: ${getStatusLabel(selectedAtendimento.status)}\n`;
     text += `Valor: R$ ${selectedAtendimento.value || 'Não informado'}\n\n`;
 
@@ -257,7 +257,7 @@ export default function Atendimentos() {
         text += `Pet: ${capitalizeFirst(selectedAtendimento.petName)}\n`;
       }
       if (selectedAtendimento.networkUnit?.name) {
-        text += `Unidade: ${selectedAtendimento.networkUnit.name}\n`;
+        text += `Unidade: ${capitalizeFirst(selectedAtendimento.networkUnit.name)}\n`;
       }
       text += "\n";
     }
@@ -340,7 +340,7 @@ export default function Atendimentos() {
       let proceduresText = 'Não informado';
       if (atendimento.procedures && Array.isArray(atendimento.procedures) && atendimento.procedures.length > 0) {
         proceduresText = atendimento.procedures
-          .map((p: any) => capitalizeFirst(String(p.procedureName || p.name || 'Procedimento')))
+          .map((p: any) => (p.procedureName || p.name) ? capitalizeFirst(String(p.procedureName || p.name)) : 'Procedimento')
           .filter(name => name && name !== 'undefined' && name !== 'null')
           .join(', ');
       }
@@ -367,8 +367,8 @@ export default function Atendimentos() {
       return {
         'Procedimentos': proceduresText,
         'Unidade': String(atendimento.networkUnit?.name || 'Não informada'),
-        'Cliente': capitalizeFirst(String(atendimento.clientName || 'Não informado')),
-        'Pet': capitalizeFirst(String(atendimento.petName || 'Não informado')),
+        'Cliente': atendimento.clientName ? capitalizeFirst(String(atendimento.clientName)) : 'Não informado',
+        'Pet': atendimento.petName ? capitalizeFirst(String(atendimento.petName)) : 'Não informado',
         'Valor': valueText,
         'Status': String(getStatusLabel(atendimento.status) || 'Pendente'),
         'Veterinário': String(atendimento.veterinarianName || 'Unidade'),
@@ -544,13 +544,13 @@ export default function Atendimentos() {
                         {atendimento.procedures && atendimento.procedures.length > 0 ? (
                           atendimento.procedures.map((proc: any, index: number) => (
                             <Badge key={index} variant="secondary" className="text-xs">
-                              {capitalizeFirst(proc.procedureName || proc.name)}
+                              {(proc.procedureName || proc.name) ? capitalizeFirst(proc.procedureName || proc.name) : 'Procedimento'}
                             </Badge>
                           ))
                         ) : atendimento.procedure ? (
                           atendimento.procedure.split(/[,/]/).map((proc: string, index: number) => (
                             <Badge key={index} variant="secondary" className="text-xs">
-                              {capitalizeFirst(proc.trim())}
+                              {proc.trim() ? capitalizeFirst(proc.trim()) : 'Procedimento'}
                             </Badge>
                           ))
                         ) : (
@@ -563,7 +563,7 @@ export default function Atendimentos() {
                   )}
                   {visibleColumns.includes("Unidade") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      {atendimento.networkUnit?.name || "Não informada"}
+                      {atendimento.networkUnit?.name ? capitalizeFirst(atendimento.networkUnit.name) : "Não informada"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Valor") && (
@@ -729,7 +729,7 @@ export default function Atendimentos() {
                             className="pb-2 border-b border-gray-100 last:border-b-0 last:pb-0"
                           >
                             <p className="text-foreground break-words whitespace-pre-wrap font-medium">
-                              {capitalizeFirst(proc.procedureName || proc.name)}
+                              {(proc.procedureName || proc.name) ? capitalizeFirst(proc.procedureName || proc.name) : 'Procedimento'}
                             </p>
                             {proc.value && (
                               <p className="text-sm text-muted-foreground mt-1">
@@ -739,7 +739,7 @@ export default function Atendimentos() {
                           </div>
                         ))
                       ) : (
-                        <span className="text-foreground break-words whitespace-pre-wrap">{capitalizeFirst(selectedAtendimento.procedure || 'Não informado')}</span>
+                        <span className="text-foreground break-words whitespace-pre-wrap">{selectedAtendimento.procedure ? capitalizeFirst(selectedAtendimento.procedure) : 'Não informado'}</span>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
@@ -758,10 +758,10 @@ export default function Atendimentos() {
                   <h4 className="font-semibold text-foreground mb-2">Cliente e Pet</h4>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{capitalizeFirst(selectedAtendimento.clientName || 'Não informado')}</span></span>
+                      <span><strong className="text-primary">Cliente:</strong> <span className="text-foreground">{selectedAtendimento.clientName ? capitalizeFirst(selectedAtendimento.clientName) : 'Não informado'}</span></span>
                     </div>
                     <div>
-                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{capitalizeFirst(selectedAtendimento.petName || 'Não informado')}</span></span>
+                      <span><strong className="text-primary">Pet:</strong> <span className="text-foreground">{selectedAtendimento.petName ? capitalizeFirst(selectedAtendimento.petName) : 'Não informado'}</span></span>
                     </div>
                     <div>
                       <span><strong className="text-primary">Unidade:</strong> <span className="text-foreground">{selectedAtendimento.networkUnit?.name || 'Não informada'}</span></span>
@@ -918,11 +918,11 @@ export default function Atendimentos() {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-muted-foreground">Cliente:</span>
-                    <span className="ml-2 text-foreground">{capitalizeFirst(historyAtendimento.clientName || 'Não informado')}</span>
+                    <span className="ml-2 text-foreground">{historyAtendimento.clientName ? capitalizeFirst(historyAtendimento.clientName) : 'Não informado'}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Pet:</span>
-                    <span className="ml-2 text-foreground">{capitalizeFirst(historyAtendimento.petName || 'Não informado')}</span>
+                    <span className="ml-2 text-foreground">{historyAtendimento.petName ? capitalizeFirst(historyAtendimento.petName) : 'Não informado'}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Status Atual:</span>

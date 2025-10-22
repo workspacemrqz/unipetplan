@@ -28,6 +28,7 @@ import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { usePermissions } from "@/hooks/use-permissions";
+import { capitalizeFirst } from "@/lib/utils";
 
 // Interfaces
 interface Pet {
@@ -193,7 +194,7 @@ export default function Clients() {
     // Informações Pessoais
     text += "INFORMAÇÕES PESSOAIS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome Completo: ${selectedClient.fullName}\n`;
+    text += `Nome Completo: ${capitalizeFirst(selectedClient.fullName)}\n`;
     text += `Email: ${selectedClient.email || "Não informado"}\n`;
     text += `Telefone: ${formatBrazilianPhoneForDisplay(selectedClient.phone)}\n`;
     text += `CPF: ${selectedClient.cpf}\n\n`;
@@ -201,10 +202,10 @@ export default function Clients() {
     // Informações de Localização
     text += "INFORMAÇÕES DE LOCALIZAÇÃO:\n";
     text += "-".repeat(30) + "\n";
-    text += `Cidade: ${selectedClient.city || "Não informado"}\n`;
+    text += `Cidade: ${selectedClient.city ? capitalizeFirst(selectedClient.city) : "Não informado"}\n`;
     text += `Estado: ${selectedClient.state || "Não informado"}\n`;
     text += `CEP: ${selectedClient.cep || "Não informado"}\n`;
-    text += `Endereço: ${selectedClient.address || "Não informado"}\n\n`;
+    text += `Endereço: ${selectedClient.address ? capitalizeFirst(selectedClient.address) : "Não informado"}\n\n`;
 
     // Informações do Cadastro
     text += "INFORMAÇÕES DO CADASTRO:\n";
@@ -222,7 +223,7 @@ export default function Clients() {
       
       clientPets.forEach((pet: Pet, index: number) => {
         text += `\nPet ${index + 1}:\n`;
-        text += `  Nome: ${pet.name}\n`;
+        text += `  Nome: ${capitalizeFirst(pet.name)}\n`;
         text += `  Espécie: ${pet.species}\n`;
         if (pet.breed) text += `  Raça: ${pet.breed}\n`;
         if (pet.age) text += `  Idade: ${pet.age}\n`;
@@ -311,7 +312,7 @@ export default function Clients() {
       
       // Adiciona apenas os campos que estão visíveis na tabela
       if (visibleColumns.includes("Nome")) {
-        pdfData['Nome'] = client.fullName || client.full_name || '';
+        pdfData['Nome'] = (client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : '';
       }
       if (visibleColumns.includes("Email")) {
         pdfData['Email'] = client.email || 'Não informado';
@@ -323,7 +324,7 @@ export default function Clients() {
         pdfData['CPF'] = client.cpf || '';
       }
       if (visibleColumns.includes("Cidade")) {
-        pdfData['Cidade'] = client.city || 'Não informado';
+        pdfData['Cidade'] = client.city ? capitalizeFirst(client.city) : 'Não informado';
       }
       if (visibleColumns.includes("Data")) {
         pdfData['Data de Cadastro'] = client.createdAt ? 
@@ -360,15 +361,15 @@ export default function Clients() {
         // Dados organizados do cliente - Seção Principal
         const exportData: any = {
           // === INFORMAÇÕES DO CLIENTE ===
-          '👤 Nome Completo': client.fullName || client.full_name || '',
+          '👤 Nome Completo': (client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : '',
           '📧 Email': client.email || 'Não informado',
           '📱 Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
           '📄 CPF': client.cpf || '',
           
           // === ENDEREÇO ===
           '📍 CEP': client.cep || 'Não informado',
-          '🏠 Endereço': client.address || 'Não informado',
-          '🌆 Cidade': client.city || 'Não informado',
+          '🏠 Endereço': client.address ? capitalizeFirst(client.address) : 'Não informado',
+          '🌆 Cidade': client.city ? capitalizeFirst(client.city) : 'Não informado',
           '🗺️ Estado': client.state || 'Não informado',
           
           // === DATAS ===
@@ -385,7 +386,7 @@ export default function Clients() {
             const petNum = index + 1;
             
             // === DADOS BÁSICOS DO PET ===
-            exportData[`[PET ${petNum}] Nome`] = pet.name || '';
+            exportData[`[PET ${petNum}] Nome`] = pet.name ? capitalizeFirst(pet.name) : '';
             exportData[`[PET ${petNum}] Espécie`] = pet.species || '';
             exportData[`[PET ${petNum}] Raça`] = pet.breed || 'Não informado';
             exportData[`[PET ${petNum}] Sexo`] = pet.sex || pet.gender || 'Não informado';
@@ -562,7 +563,7 @@ export default function Clients() {
                 <TableRow key={client.id} className="bg-white border-b border-[#eaeaea]">
                   {visibleColumns.includes("Nome") && (
                     <TableCell className="font-medium whitespace-nowrap bg-white">
-                      {client.fullName || client.full_name}
+                      {(client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : ''}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Telefone") && (
@@ -582,7 +583,7 @@ export default function Clients() {
                   )}
                   {visibleColumns.includes("Cidade") && (
                     <TableCell className="whitespace-nowrap bg-white">
-                      {client.city || "Não informado"}
+                      {client.city ? capitalizeFirst(client.city) : "Não informado"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Data") && (
@@ -742,7 +743,7 @@ export default function Clients() {
                   <h4 className="font-semibold text-foreground mb-2">Informações Pessoais</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Nome Completo:</strong> <span className="text-foreground">{selectedClient.fullName}</span></span>
+                      <span><strong className="text-primary">Nome Completo:</strong> <span className="text-foreground">{capitalizeFirst(selectedClient.fullName)}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Email:</strong> <span className="text-foreground">{selectedClient.email || "Não informado"}</span></span>
@@ -760,7 +761,7 @@ export default function Clients() {
                   <h4 className="font-semibold text-foreground mb-2">Informações de Localização</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Cidade:</strong> <span className="text-foreground">{selectedClient.city || "Não informado"}</span></span>
+                      <span><strong className="text-primary">Cidade:</strong> <span className="text-foreground">{selectedClient.city ? capitalizeFirst(selectedClient.city) : "Não informado"}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span><strong className="text-primary">Estado:</strong> <span className="text-foreground">{selectedClient.state || "Não informado"}</span></span>
@@ -769,7 +770,7 @@ export default function Clients() {
                       <span><strong className="text-primary">CEP:</strong> <span className="text-foreground">{selectedClient.cep || "Não informado"}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span><strong className="text-primary">Endereço:</strong> <span className="text-foreground">{selectedClient.address || "Não informado"}</span></span>
+                      <span><strong className="text-primary">Endereço:</strong> <span className="text-foreground">{selectedClient.address ? capitalizeFirst(selectedClient.address) : "Não informado"}</span></span>
                     </div>
                   </div>
                 </div>
@@ -802,7 +803,7 @@ export default function Clients() {
                         <div className="grid grid-cols-1 gap-2 text-sm">
                           {/* Informações Básicas */}
                           <div className="flex items-center space-x-2">
-                            <span><strong className="text-primary">Nome:</strong> <span className="text-foreground">{pet.name}</span></span>
+                            <span><strong className="text-primary">Nome:</strong> <span className="text-foreground">{capitalizeFirst(pet.name)}</span></span>
                           </div>
                           <div className="flex items-center space-x-2">
                             <span><strong className="text-primary">Espécie:</strong> <span className="text-foreground">{pet.species}</span></span>

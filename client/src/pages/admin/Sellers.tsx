@@ -29,6 +29,7 @@ import { useColumnPreferences } from "@/hooks/admin/use-column-preferences";
 import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { usePermissions } from "@/hooks/use-permissions";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { capitalizeFirst } from "@/lib/utils";
 
 interface Seller {
   id: string;
@@ -179,7 +180,7 @@ export default function Sellers() {
     // Dados Fiscais
     text += "DADOS FISCAIS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome Completo: ${selectedSeller.fullName}\n`;
+    text += `Nome Completo: ${capitalizeFirst(selectedSeller.fullName)}\n`;
     text += `CPF: ${cpfMask(selectedSeller.cpf)}\n\n`;
 
     // Contato
@@ -196,8 +197,8 @@ export default function Sellers() {
     if (selectedSeller.complement) {
       text += `Complemento: ${selectedSeller.complement}\n`;
     }
-    text += `Bairro: ${selectedSeller.district}\n`;
-    text += `Cidade/Estado: ${selectedSeller.city}/${selectedSeller.state}\n\n`;
+    text += `Bairro: ${capitalizeFirst(selectedSeller.district)}\n`;
+    text += `Cidade/Estado: ${capitalizeFirst(selectedSeller.city)}/${selectedSeller.state}\n\n`;
 
     // Dados de Pagamento
     text += "DADOS DE PAGAMENTO:\n";
@@ -275,15 +276,15 @@ export default function Sellers() {
     
     // Retornar dados formatados para exportação
     return filtered.map((seller: Seller) => ({
-      'Nome Completo': seller.fullName || '',
+      'Nome Completo': seller.fullName ? capitalizeFirst(seller.fullName) : '',
       'CPF': cpfMask(seller.cpf),
       'Email': seller.email || '',
       'Telefone': phoneMask(seller.phone),
       'CEP': cepMask(seller.cep),
-      'Endereço': `${seller.address}, ${seller.number}`,
+      'Endereço': `${capitalizeFirst(seller.address)}, ${seller.number}`,
       'Complemento': seller.complement || '',
-      'Bairro': seller.district || '',
-      'Cidade': seller.city || '',
+      'Bairro': seller.district ? capitalizeFirst(seller.district) : '',
+      'Cidade': seller.city ? capitalizeFirst(seller.city) : '',
       'Estado': seller.state || '',
       'Chave PIX': seller.pixKey || '',
       'Tipo de Chave PIX': seller.pixKeyType || '',
@@ -430,10 +431,10 @@ export default function Sellers() {
               ) : (
                 displaySellers.map((seller) => (
                   <TableRow key={seller.id} className="bg-white border-b border-[#eaeaea]">
-                    {visibleColumns.includes("Nome") && <TableCell className="font-medium whitespace-nowrap bg-white">{seller.fullName}</TableCell>}
+                    {visibleColumns.includes("Nome") && <TableCell className="font-medium whitespace-nowrap bg-white">{capitalizeFirst(seller.fullName)}</TableCell>}
                     {visibleColumns.includes("Email") && <TableCell className="whitespace-nowrap bg-white">{seller.email}</TableCell>}
                     {visibleColumns.includes("CPF") && <TableCell className="whitespace-nowrap bg-white">{cpfMask(seller.cpf)}</TableCell>}
-                    {visibleColumns.includes("Cidade") && <TableCell className="whitespace-nowrap bg-white">{seller.city}</TableCell>}
+                    {visibleColumns.includes("Cidade") && <TableCell className="whitespace-nowrap bg-white">{capitalizeFirst(seller.city)}</TableCell>}
                     {visibleColumns.includes("CPA") && <TableCell className="whitespace-nowrap bg-white">{seller.cpaPercentage}%</TableCell>}
                     {visibleColumns.includes("Recorrente") && <TableCell className="whitespace-nowrap bg-white">{seller.recurringCommissionPercentage}%</TableCell>}
                     {visibleColumns.includes("Status") && (

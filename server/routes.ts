@@ -68,6 +68,7 @@ import { setupProcedureUsageRoutes } from "./procedure-usage-routes.js";
 import multer from "multer";
 import { getCsrfToken, validateCsrf } from "./middleware/csrf.js";
 import fileType from 'file-type';
+import { normalizeTextField } from './lib/text-formatter.js';
 
 // Extend express-session types
 declare module 'express-session' {
@@ -1268,17 +1269,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Map snake_case to camelCase for database
       const dbClientData = {
-        fullName: clientData.full_name,
+        fullName: normalizeTextField(clientData.full_name),
         email: clientData.email,
         phone: clientData.phone,
         cpf: clientData.cpf,
         cep: clientData.cep,
-        address: clientData.address,
+        address: normalizeTextField(clientData.address),
         number: clientData.number,
         complement: clientData.complement,
-        district: clientData.district,
+        district: normalizeTextField(clientData.district),
         state: clientData.state,
-        city: clientData.city
+        city: normalizeTextField(clientData.city)
       };
       
       const newClient = await storage.createClient(dbClientData);
@@ -1302,17 +1303,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Map snake_case to camelCase for database
       const dbClientData: any = {};
-      if (clientData.full_name !== undefined) dbClientData.fullName = clientData.full_name;
+      if (clientData.full_name !== undefined) dbClientData.fullName = normalizeTextField(clientData.full_name);
       if (clientData.email !== undefined) dbClientData.email = clientData.email;
       if (clientData.phone !== undefined) dbClientData.phone = clientData.phone;
       if (clientData.cpf !== undefined) dbClientData.cpf = clientData.cpf;
       if (clientData.cep !== undefined) dbClientData.cep = clientData.cep;
-      if (clientData.address !== undefined) dbClientData.address = clientData.address;
+      if (clientData.address !== undefined) dbClientData.address = normalizeTextField(clientData.address);
       if (clientData.number !== undefined) dbClientData.number = clientData.number;
       if (clientData.complement !== undefined) dbClientData.complement = clientData.complement;
-      if (clientData.district !== undefined) dbClientData.district = clientData.district;
+      if (clientData.district !== undefined) dbClientData.district = normalizeTextField(clientData.district);
       if (clientData.state !== undefined) dbClientData.state = clientData.state;
-      if (clientData.city !== undefined) dbClientData.city = clientData.city;
+      if (clientData.city !== undefined) dbClientData.city = normalizeTextField(clientData.city);
       
       const updatedClient = await storage.updateClient(req.params.id, dbClientData);
       
@@ -2272,6 +2273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Tratar campos vazios antes de salvar no banco
       const processedPetData = {
         ...validatedPetData,
+        name: normalizeTextField(validatedPetData.name),
         weight: validatedPetData.weight && validatedPetData.weight !== "" ? validatedPetData.weight : null,
         birthDate: validatedPetData.birthDate || null,
         vaccineData: validatedPetData.vaccineData || [],
@@ -2296,6 +2298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Tratar campos vazios antes de salvar no banco
       const processedPetData = {
         ...validatedPetData,
+        name: validatedPetData.name ? normalizeTextField(validatedPetData.name) : undefined,
         weight: validatedPetData.weight && validatedPetData.weight !== "" ? validatedPetData.weight : null,
         birthDate: validatedPetData.birthDate || null,
         vaccineData: validatedPetData.vaccineData || [],
@@ -3159,10 +3162,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Ensure required properties are present
       const unitData = {
-        name: validatedData.name!,
+        name: normalizeTextField(validatedData.name!),
         phone: validatedData.phone!,
-        address: validatedData.address!,
-        cidade: validatedData.cidade!,
+        address: normalizeTextField(validatedData.address!),
+        cidade: normalizeTextField(validatedData.cidade!),
         services: validatedData.services!,
         imageUrl: validatedData.imageUrl!,
         isActive: validatedData.isActive,
@@ -3453,6 +3456,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const updateData = updateNetworkUnitSchema.partial().parse(req.body);
+      
+      // Normalize text fields
+      if (updateData.name) updateData.name = normalizeTextField(updateData.name);
+      if (updateData.address) updateData.address = normalizeTextField(updateData.address);
+      if (updateData.cidade) updateData.cidade = normalizeTextField(updateData.cidade);
       
       const updatedUnit = await storage.updateNetworkUnit(id, updateData);
       
@@ -6464,7 +6472,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create client with UUID
       const clientData = {
         ...parsed,
-        fullName: parsed.full_name,
+        fullName: normalizeTextField(parsed.full_name),
+        address: normalizeTextField(parsed.address),
+        city: normalizeTextField(parsed.city),
+        district: normalizeTextField(parsed.district),
         cpfHash: cpfHash,
         id: `client-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       };
@@ -7997,15 +8008,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Prepare update data (only allow certain fields to be updated)
       const updateData: any = {};
-      if (full_name !== undefined) updateData.fullName = full_name;
+      if (full_name !== undefined) updateData.fullName = normalizeTextField(full_name);
       if (email !== undefined) updateData.email = email;
       if (phone !== undefined) updateData.phone = phone;
-      if (address !== undefined) updateData.address = address;
+      if (address !== undefined) updateData.address = normalizeTextField(address);
       if (number !== undefined) updateData.number = number;
       if (complement !== undefined) updateData.complement = complement;
-      if (district !== undefined) updateData.district = district;
+      if (district !== undefined) updateData.district = normalizeTextField(district);
       if (state !== undefined) updateData.state = state;
-      if (city !== undefined) updateData.city = city;
+      if (city !== undefined) updateData.city = normalizeTextField(city);
       if (cep !== undefined) updateData.cep = cep;
 
       // Update client

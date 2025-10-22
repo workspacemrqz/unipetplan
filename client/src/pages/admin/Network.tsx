@@ -38,6 +38,7 @@ import { useAdminLogger } from "@/hooks/admin/use-admin-logger";
 import { usePermissions } from "@/hooks/use-permissions";
 import { formatBrazilianPhoneForDisplay } from "@/hooks/use-site-settings";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { capitalizeFirst } from "@/lib/utils";
 
 interface NetworkUnit {
   id: string;
@@ -212,8 +213,8 @@ export default function Network() {
     // Informações Básicas
     text += "INFORMAÇÕES BÁSICAS:\n";
     text += "-".repeat(25) + "\n";
-    text += `Nome: ${selectedUnit.name}\n`;
-    text += `Endereço: ${selectedUnit.address}\n`;
+    text += `Nome: ${capitalizeFirst(selectedUnit.name)}\n`;
+    text += `Endereço: ${capitalizeFirst(selectedUnit.address)}\n`;
     text += `Telefone: ${formatBrazilianPhoneForDisplay(selectedUnit.phone)}\n`;
     if (selectedUnit.whatsapp) {
       text += `WhatsApp: ${formatBrazilianPhoneForDisplay(selectedUnit.whatsapp)}\n`;
@@ -284,9 +285,9 @@ export default function Network() {
       : units;
     
     return allData.map((unit: NetworkUnit) => ({
-      'Nome': unit.name || '',
-      'Endereço': unit.address || '',
-      'Cidade': unit.cidade || '',
+      'Nome': unit.name ? capitalizeFirst(unit.name) : '',
+      'Endereço': unit.address ? capitalizeFirst(unit.address) : '',
+      'Cidade': unit.cidade ? capitalizeFirst(unit.cidade) : '',
       'Telefone': formatBrazilianPhoneForDisplay(unit.phone),
       'WhatsApp': unit.whatsapp ? formatBrazilianPhoneForDisplay(unit.whatsapp) : 'N/A',
       'Serviços Oferecidos': unit.services && Array.isArray(unit.services) ? unit.services.join(', ') : 'N/A',
@@ -409,7 +410,7 @@ export default function Network() {
                 <TableRow key={unit.id} className="bg-white border-b border-[#eaeaea]">
                   {visibleColumns.includes("Nome") && (
                     <TableCell className="font-medium whitespace-nowrap bg-white" data-testid={`unit-name-${unit.id}`}>
-                      {unit.name}
+                      {capitalizeFirst(unit.name)}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Endereço") && (

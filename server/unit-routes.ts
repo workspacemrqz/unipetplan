@@ -5,6 +5,7 @@ import type { IStorage } from './storage.js';
 import { db } from './db.js';
 import { atendimentos, atendimentoProcedures, veterinarians, type InsertVeterinarian } from '../shared/schema.js';
 import { sql, eq, and, inArray } from 'drizzle-orm';
+import { normalizeTextField } from './lib/text-formatter.js';
 
 interface UnitRequest extends Request {
   unit?: {
@@ -846,17 +847,17 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       
       // Map snake_case to camelCase for database and add unitId
       const dbClientData = {
-        fullName: clientData.full_name || clientData.fullName,
+        fullName: normalizeTextField(clientData.full_name || clientData.fullName),
         email: clientData.email,
         phone: clientData.phone,
         cpf: clientData.cpf,
         cep: clientData.cep,
-        address: clientData.address,
+        address: normalizeTextField(clientData.address),
         number: clientData.number,
         complement: clientData.complement,
-        district: clientData.district,
+        district: normalizeTextField(clientData.district),
         state: clientData.state,
-        city: clientData.city,
+        city: normalizeTextField(clientData.city),
         createdByUnitId: unitId
       };
       
@@ -877,18 +878,18 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       
       // Map snake_case to camelCase for database
       const dbClientData: any = {};
-      if (clientData.full_name !== undefined) dbClientData.fullName = clientData.full_name;
-      if (clientData.fullName !== undefined) dbClientData.fullName = clientData.fullName;
+      if (clientData.full_name !== undefined) dbClientData.fullName = normalizeTextField(clientData.full_name);
+      if (clientData.fullName !== undefined) dbClientData.fullName = normalizeTextField(clientData.fullName);
       if (clientData.email !== undefined) dbClientData.email = clientData.email;
       if (clientData.phone !== undefined) dbClientData.phone = clientData.phone;
       if (clientData.cpf !== undefined) dbClientData.cpf = clientData.cpf;
       if (clientData.cep !== undefined) dbClientData.cep = clientData.cep;
-      if (clientData.address !== undefined) dbClientData.address = clientData.address;
+      if (clientData.address !== undefined) dbClientData.address = normalizeTextField(clientData.address);
       if (clientData.number !== undefined) dbClientData.number = clientData.number;
       if (clientData.complement !== undefined) dbClientData.complement = clientData.complement;
-      if (clientData.district !== undefined) dbClientData.district = clientData.district;
+      if (clientData.district !== undefined) dbClientData.district = normalizeTextField(clientData.district);
       if (clientData.state !== undefined) dbClientData.state = clientData.state;
-      if (clientData.city !== undefined) dbClientData.city = clientData.city;
+      if (clientData.city !== undefined) dbClientData.city = normalizeTextField(clientData.city);
       
       const updatedClient = await storage.updateClient(clientId, dbClientData);
       
@@ -917,6 +918,7 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Process pet data
       const processedPetData = {
         ...petData,
+        name: normalizeTextField(petData.name),
         weight: petData.weight && petData.weight !== "" ? petData.weight : null,
         birthDate: petData.birthDate || null,
         lastCheckup: petData.lastCheckup || null,
