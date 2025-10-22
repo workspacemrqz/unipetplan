@@ -104,16 +104,22 @@ export default function CorpoClinicoPage() {
     const veterinarianToken = localStorage.getItem('veterinarian-token');
     const unitSlug = localStorage.getItem('unit-slug');
     
-    // Verificar se existe unit-token OU veterinarian-token
-    const hasValidToken = unitToken || veterinarianToken;
+    // APENAS login direto da unidade pode acessar Corpo Clínico
+    // Veterinários (mesmo admin) NÃO podem acessar
+    const isDirectUnitLogin = unitToken && !veterinarianToken;
     
-    if (!hasValidToken || unitSlug !== slug) {
-      console.log('❌ [CORPO-CLINICO] Auth failed - redirecting to login');
+    if (!isDirectUnitLogin || unitSlug !== slug) {
+      console.log('❌ [CORPO-CLINICO] Acesso negado - apenas unidades podem gerenciar o corpo clínico');
+      toast({
+        title: "Acesso Negado",
+        description: "Apenas a unidade pode gerenciar o corpo clínico. Faça login com as credenciais da unidade.",
+        variant: "destructive",
+      });
       setLocation(`/unidade/${slug}`);
       return;
     }
     
-    console.log('✅ [CORPO-CLINICO] Auth successful');
+    console.log('✅ [CORPO-CLINICO] Auth successful - Direct unit login');
     setLoading(false);
   };
 
