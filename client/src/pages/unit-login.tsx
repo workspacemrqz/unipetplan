@@ -99,11 +99,22 @@ export default function UnitLoginPage() {
           // IMPORTANTE: Usar o slug da URL, não o retornado pelo backend
           localStorage.setItem('unit-slug', normalizedSlug);
           localStorage.setItem('unit-name', data.unitName);
+          
+          // Salvar informação de admin se o userType for 'admin'
+          if (data.userType === 'admin') {
+            localStorage.setItem('is-unit-admin', 'true');
+            console.log('✅ [UNIT-LOGIN] Usuário é admin da unidade');
+          } else {
+            // Remover flag de admin se for veterinário comum
+            localStorage.removeItem('is-unit-admin');
+          }
+          
           console.log('💾 [UNIT-LOGIN] Tokens salvos:', {
             'veterinarian-token': '***',
             'veterinarian-name': data.veterinarianName,
             'unit-slug': normalizedSlug,
-            'unit-name': data.unitName
+            'unit-name': data.unitName,
+            'is-unit-admin': data.userType === 'admin'
           });
         }
         

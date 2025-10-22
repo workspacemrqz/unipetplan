@@ -30,29 +30,15 @@ export default function UnitSidebar() {
   
   // Detectar tipo de usuário baseado no token armazenado
   const isVeterinarian = !!localStorage.getItem('veterinarian-token');
+  const isUnitAdmin = localStorage.getItem('is-unit-admin') === 'true';
+  
+  // Veterinário admin tem acesso completo, veterinário comum tem acesso limitado
+  const hasFullAccess = !isVeterinarian || (isVeterinarian && isUnitAdmin);
   
   // Definir navegação baseada no tipo de usuário
-  const navigation: NavigationSection[] = isVeterinarian 
+  const navigation: NavigationSection[] = hasFullAccess 
     ? [
-        // Menu reduzido para veterinários
-        {
-          name: "Atendimentos",
-          items: [
-            { 
-              name: "Atendimentos", 
-              href: `/unidade/${slug}/atendimentos`, 
-              iconName: "Atendimento"
-            },
-            { 
-              name: "Novo Atendimento", 
-              href: `/unidade/${slug}/atendimentos/novo`, 
-              iconName: "Plus" 
-            }
-          ]
-        }
-      ]
-    : [
-        // Menu completo para unidades
+        // Menu completo para unidades e admins
         {
           name: "Principal",
           items: [
@@ -85,6 +71,24 @@ export default function UnitSidebar() {
           name: "Financeiro",
           items: [
             { name: "Relatório Financeiro", href: `/unidade/${slug}/relatorio-financeiro`, iconName: "Pagamento" }
+          ]
+        }
+      ]
+    : [
+        // Menu reduzido para veterinários comuns
+        {
+          name: "Atendimentos",
+          items: [
+            { 
+              name: "Atendimentos", 
+              href: `/unidade/${slug}/atendimentos`, 
+              iconName: "Atendimento"
+            },
+            { 
+              name: "Novo Atendimento", 
+              href: `/unidade/${slug}/atendimentos/novo`, 
+              iconName: "Plus" 
+            }
           ]
         }
       ];
@@ -130,6 +134,7 @@ export default function UnitSidebar() {
     if (isVeterinarian) {
       localStorage.removeItem('veterinarian-token');
       localStorage.removeItem('veterinarian-name');
+      localStorage.removeItem('is-unit-admin');
     } else {
       localStorage.removeItem('unit-token');
     }
