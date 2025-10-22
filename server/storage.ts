@@ -2061,7 +2061,6 @@ export class DatabaseStorage implements IStorage {
       .values({
         ...userData,
         createdAt: new Date(),
-        updatedAt: new Date(),
       })
       .returning();
     return user;
@@ -2070,7 +2069,7 @@ export class DatabaseStorage implements IStorage {
   async updateUser(id: string, userData: any): Promise<any | undefined> {
     const [updated] = await db
       .update(users)
-      .set({ ...userData, updatedAt: new Date() })
+      .set(userData)
       .where(eq(users.id, id))
       .returning();
     return updated || undefined;
