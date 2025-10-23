@@ -1748,9 +1748,13 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Build conditions based on user type
       const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
       
-      // If it's a veterinarian, filter by their ID
-      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+      // If it's a veterinarian (but NOT admin), filter by their ID
+      // Admin veterinarians should see ALL chart data, just like unit login
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+        console.log(`✅ [UNIT] Filtering procedures chart for non-admin veterinarian ${req.unit.veterinarianId}`);
+      } else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+        console.log(`✅ [UNIT] Admin veterinarian - showing ALL procedures chart for unit ${unitId}`);
       }
 
       // Add date range filters if provided
@@ -1812,9 +1816,13 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Build conditions based on user type
       const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
       
-      // If it's a veterinarian, filter by their ID
-      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+      // If it's a veterinarian (but NOT admin), filter by their ID
+      // Admin veterinarians should see ALL chart data, just like unit login
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+        console.log(`✅ [UNIT] Filtering value-by-user chart for non-admin veterinarian ${req.unit.veterinarianId}`);
+      } else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+        console.log(`✅ [UNIT] Admin veterinarian - showing ALL value-by-user chart for unit ${unitId}`);
       }
 
       // Add date range filters if provided
@@ -1882,9 +1890,13 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Build conditions based on user type
       const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
       
-      // If it's a veterinarian, filter by their ID
-      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+      // If it's a veterinarian (but NOT admin), filter by their ID
+      // Admin veterinarians should see ALL chart data, just like unit login
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+        console.log(`✅ [UNIT] Filtering total-sales chart for non-admin veterinarian ${req.unit.veterinarianId}`);
+      } else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+        console.log(`✅ [UNIT] Admin veterinarian - showing ALL total-sales chart for unit ${unitId}`);
       }
 
       // Add date range filters if provided
