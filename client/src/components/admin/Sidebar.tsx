@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/admin/utils";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -92,6 +92,9 @@ export default function Sidebar() {
   // Estado para controlar quais seções estão expandidas
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   
+  // Ref para rastrear qual seção foi automaticamente expandida pela rota
+  const autoExpandedSectionRef = useRef<string | null>(null);
+  
   // Filtrar navegação baseado em permissões
   const filteredNavigation = useMemo(() => {
     return navigation.map(section => {
@@ -111,30 +114,47 @@ export default function Sidebar() {
 
   // Expand section containing current route
   useEffect(() => {
-    const sectionsToExpand = new Set<string>();
+    // Find the section with the most specific match (longest matching path)
+    let bestMatch: { section: typeof filteredNavigation[0], matchLength: number } | null = null;
     
     for (const section of filteredNavigation) {
-      const hasActiveItem = section.items.some(item => {
+      for (const item of section.items) {
         const fullPath = item.href === '/' ? '/admin' : `/admin${item.href}`;
-        return fullPath === '/admin' 
+        const isMatch = fullPath === '/admin' 
           ? location === '/admin' || location === '/admin/'
           : location.startsWith(fullPath);
-      });
-      if (hasActiveItem) {
-        sectionsToExpand.add(section.name);
-        break;
+        
+        if (isMatch) {
+          const matchLength = fullPath.length;
+          if (!bestMatch || matchLength > bestMatch.matchLength) {
+            bestMatch = { section, matchLength };
+          }
+        }
       }
     }
     
-    // Only update if the sections to expand actually changed
-    setExpandedSections(prev => {
-      // Check if sets are equal
-      if (prev.size === sectionsToExpand.size && 
-          [...prev].every(section => sectionsToExpand.has(section))) {
-        return prev; // Return the same set to avoid re-render
-      }
-      return sectionsToExpand;
-    });
+    // Update expanded sections: remove old auto-expanded, add new one
+    if (bestMatch) {
+      const newAutoExpanded = bestMatch.section.name;
+      const oldAutoExpanded = autoExpandedSectionRef.current;
+      
+      setExpandedSections(prev => {
+        const newSet = new Set(prev);
+        
+        // Remove the old auto-expanded section if it exists and is different
+        if (oldAutoExpanded && oldAutoExpanded !== newAutoExpanded) {
+          newSet.delete(oldAutoExpanded);
+        }
+        
+        // Add the new auto-expanded section
+        newSet.add(newAutoExpanded);
+        
+        return newSet;
+      });
+      
+      // Update the ref to track the new auto-expanded section
+      autoExpandedSectionRef.current = newAutoExpanded;
+    }
   }, [location, filteredNavigation]); // Re-run when location or filteredNavigation changes
 
   // Função para alternar a expansão de uma seção
