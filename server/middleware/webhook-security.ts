@@ -2,6 +2,31 @@ import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { isIPv4, isIPv6 } from 'net';
 
+/**
+ * Valida configuração de segurança do webhook na inicialização
+ * Em produção, falha se a configuração estiver incompleta
+ */
+export function validateWebhookSecurityConfig(): void {
+  const webhookSecret = process.env.CIELO_WEBHOOK_SECRET;
+  
+  if (!webhookSecret) {
+    const errorMsg = '⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado';
+    
+    if (process.env.NODE_ENV === 'production') {
+      // Em produção, não permitir inicialização sem configuração de segurança
+      console.error('❌ ' + errorMsg);
+      console.error('❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET');
+      console.error('❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro');
+      process.exit(1);
+    } else {
+      console.warn(errorMsg);
+      console.warn('⚠️ [WEBHOOK-SECURITY] Webhooks estarão desprotegidos em desenvolvimento');
+    }
+  } else {
+    console.log('✅ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET configurado');
+  }
+}
+
 // Lista de IPs autorizados da Cielo (produção e sandbox)
 const CIELO_ALLOWED_IPS = [
   // IPs de produção da Cielo
@@ -86,6 +111,7 @@ export function validateWebhookIP(req: Request): boolean {
 
 /**
  * Valida a assinatura HMAC do webhook
+ * IMPORTANTE: Requer que o body seja capturado com express.raw()
  */
 export function validateWebhookSignature(req: Request, secret: string): boolean {
   const signature = req.headers['x-cielo-signature'] || req.headers['cielo-signature'];
@@ -95,17 +121,19 @@ export function validateWebhookSignature(req: Request, secret: string): boolean 
     return false;
   }
   
-  // Obter o body raw para calcular a assinatura
+  // CRITICAL: Use raw body to avoid JSON parsing differences
+  // The body MUST be a Buffer from express.raw() middleware
   let rawBody: string;
   if (Buffer.isBuffer(req.body)) {
+    // This is the expected case when using express.raw()
     rawBody = req.body.toString('utf8');
-  } else if (typeof req.body === 'object') {
-    rawBody = JSON.stringify(req.body);
   } else {
-    rawBody = String(req.body);
+    // This should not happen if configured correctly
+    console.error('❌ [WEBHOOK-SECURITY] Body não é Buffer! Configure express.raw() antes deste middleware');
+    return false;
   }
   
-  // Calcular a assinatura esperada
+  // Calcular a assinatura esperada usando o raw body
   const expectedSignature = crypto
     .createHmac('sha256', secret)
     .update(rawBody)
@@ -190,9 +218,22 @@ export function validateCieloWebhook(req: Request, res: Response, next: NextFunc
     });
   }
   
-  // 3. Validar assinatura HMAC (se configurado)
+  // 3. Validar assinatura HMAC (OBRIGATÓRIO em produção)
   const webhookSecret = process.env.CIELO_WEBHOOK_SECRET;
-  if (webhookSecret) {
+  
+  // Em produção, falhar se a secret não estiver configurada
+  if (!webhookSecret) {
+    const errorMessage = 'CIELO_WEBHOOK_SECRET não configurado';
+    if (process.env.NODE_ENV === 'production') {
+      console.error('❌ [WEBHOOK-SECURITY] ' + errorMessage + ' (CRÍTICO em produção)');
+      return res.status(500).json({ 
+        error: 'Configuração de segurança ausente',
+        correlationId 
+      });
+    } else {
+      console.warn('⚠️ [WEBHOOK-SECURITY] ' + errorMessage + ' - webhook desprotegido em desenvolvimento');
+    }
+  } else {
     if (!validateWebhookSignature(req, webhookSecret)) {
       console.error('❌ [WEBHOOK-SECURITY] Assinatura inválida', {
         correlationId,
@@ -204,8 +245,21 @@ export function validateCieloWebhook(req: Request, res: Response, next: NextFunc
       });
     }
     console.log('✅ [WEBHOOK-SECURITY] Assinatura válida', { correlationId });
-  } else {
-    console.warn('⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado - assinatura não validada');
+    
+    // Parse JSON after validation (body is still a Buffer)
+    if (Buffer.isBuffer(req.body)) {
+      try {
+        const jsonBody = JSON.parse(req.body.toString('utf8'));
+        // Replace Buffer body with parsed JSON for the handler
+        req.body = jsonBody;
+      } catch (error) {
+        console.error('❌ [WEBHOOK-SECURITY] Erro ao parsear JSON do webhook', error);
+        return res.status(400).json({ 
+          error: 'Payload inválido',
+          correlationId 
+        });
+      }
+    }
   }
   
   // Webhook validado com sucesso

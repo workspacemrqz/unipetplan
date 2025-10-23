@@ -5,6 +5,7 @@ import { initializeDatabase, closeDatabase } from "./db.js";
 import { renewalCronJobs } from "./cron/renewal-jobs.js";
 import { configureSecurityMiddleware } from "./config/security.js";
 import { sanitizeObject } from "./utils/log-sanitizer.js";
+import { validateWebhookSecurityConfig } from "./middleware/webhook-security.js";
 import path from "path";
 import { existsSync } from "fs";
 
@@ -77,6 +78,9 @@ async function initializeServer(): Promise<void> {
     console.log('🔌 Inicializando banco de dados...');
     await initializeDatabase();
     console.log('✅ Banco de dados inicializado com sucesso');
+    
+    // Validar configuração de segurança do webhook
+    validateWebhookSecurityConfig();
 
     // 2. Registrar rotas
     console.log('🛣️ Registrando rotas...');
