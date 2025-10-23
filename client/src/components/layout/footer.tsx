@@ -166,6 +166,17 @@ export default function Footer() {
               {shouldShow.cnpj && (
                 <div className="mt-1">CNPJ: {settings.cnpj}</div>
               )}
+              <div className="mt-2">
+                Desenvolvido por{' '}
+                <a 
+                  href="https://wa.me/556281938192" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="font-bold transition-colors hover:text-primary"
+                >
+                  Evolut IA
+                </a>
+              </div>
             </div>
             <div className="flex flex-row justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm text-center">
               <Link 
