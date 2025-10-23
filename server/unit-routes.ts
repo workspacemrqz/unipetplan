@@ -128,7 +128,8 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
             unitId: decoded.unitId,
             slug: decoded.slug,
             veterinarianId: decoded.veterinarianId,
-            type: 'veterinarian'
+            type: 'veterinarian',
+            isAdmin: decoded.isAdmin || veterinarian.isAdmin || false
           };
         } else {
           // Unit token (default)
@@ -172,10 +173,13 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
         status: status !== 'all' ? status : undefined
       };
       
-      // If it's a veterinarian, filter by their ID
-      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+      // If it's a veterinarian (but NOT admin), filter by their ID
+      // Admin veterinarians should see ALL atendimentos, just like unit login
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
         filters.veterinarianId = req.unit.veterinarianId;
-        console.log(`✅ [UNIT] Filtering atendimentos for veterinarian ${req.unit.veterinarianId}`);
+        console.log(`✅ [UNIT] Filtering atendimentos for non-admin veterinarian ${req.unit.veterinarianId}`);
+      } else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+        console.log(`✅ [UNIT] Admin veterinarian - showing ALL atendimentos for unit ${unitId}`);
       }
       
       // Get atendimentos with filters
