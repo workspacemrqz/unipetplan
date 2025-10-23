@@ -87,7 +87,24 @@ if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.
 }
 ```
 
-### 5. Endpoints de Gráficos - CORRIGIDOS ✅
+### 5. Endpoint de Relatório Financeiro - CORRIGIDO ✅
+**Arquivo**: `server/unit-routes.ts` (linhas 515-527)
+
+```typescript
+// ✅ Veterinários admin veem TODOS os dados financeiros
+const filters: any = {
+  networkUnitId: unitId
+};
+
+if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
+  filters.veterinarianId = req.unit.veterinarianId;
+  console.log(`✅ [UNIT] Filtering financial report for non-admin veterinarian ${req.unit.veterinarianId}`);
+} else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+  console.log(`✅ [UNIT] Admin veterinarian - showing ALL financial report for unit ${unitId}`);
+}
+```
+
+### 6. Endpoints de Gráficos - CORRIGIDOS ✅
 
 #### Gráfico de Procedimentos Vendidos
 **Arquivo**: `server/unit-routes.ts` (linhas 1754-1761)
