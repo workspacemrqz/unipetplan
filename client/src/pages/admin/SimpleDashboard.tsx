@@ -27,7 +27,7 @@ export default function SimpleDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <Button onClick={() => setLocation('/admin/settings')}>
+        <Button onClick={() => setLocation('/configuracoes')}>
           <Plus className="h-4 w-4 mr-2" />
           Configurações
         </Button>
@@ -101,7 +101,7 @@ export default function SimpleDashboard() {
             <p className="text-sm text-muted-foreground mb-4">
               Novos contatos nas últimas 24h
             </p>
-            <Button onClick={() => setLocation('/admin/contacts')} className="w-full">
+            <Button onClick={() => setLocation('/formularios')} className="w-full">
               <FileText className="h-4 w-4 mr-2" />
               Ver Contatos
             </Button>
@@ -116,7 +116,7 @@ export default function SimpleDashboard() {
             <p className="text-sm text-muted-foreground mb-4">
               Visualizar e gerenciar todos os clientes cadastrados
             </p>
-            <Button onClick={() => setLocation('/admin/clients')} className="w-full">
+            <Button onClick={() => setLocation('/clientes')} className="w-full">
               <Users className="h-4 w-4 mr-2" />
               Ver Clientes
             </Button>
@@ -131,7 +131,7 @@ export default function SimpleDashboard() {
             <p className="text-sm text-muted-foreground mb-4">
               Configurar planos e preços
             </p>
-            <Button onClick={() => setLocation('/admin/plans')} className="w-full">
+            <Button onClick={() => setLocation('/planos')} className="w-full">
               <TrendingUp className="h-4 w-4 mr-2" />
               Gerenciar Planos
             </Button>
