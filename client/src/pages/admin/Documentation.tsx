@@ -1484,8 +1484,9 @@ export default function Documentation() {
                       </ul>
                       <p className="text-sm font-medium mt-3 mb-2">Segurança:</p>
                       <ul className="text-sm space-y-1 ml-4 text-muted-foreground">
-                        <li>• Senhas armazenadas com hash bcrypt (custo 12)</li>
-                        <li>• Suporte a senhas em texto plano para ambiente Replit (fallback)</li>
+                        <li>• Senhas criptografadas com hash bcrypt (salt rounds 12)</li>
+                        <li>• Migração automática de senhas antigas para bcrypt</li>
+                        <li>• Fallback para senhas em texto plano apenas em ambiente Replit para desenvolvimento</li>
                       </ul>
                     </div>
                   </div>
@@ -1512,32 +1513,47 @@ export default function Documentation() {
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Express Sessions com HTTP-Only Cookies</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Sessões armazenadas no servidor usando connect-pg-simple com PostgreSQL. Cookies de sessão 
-                          configurados como HTTP-Only para prevenir acesso via JavaScript (proteção contra XSS). 
-                          Expiração automática de sessões após período de inatividade.
+                          Sessões de administradores armazenadas no servidor usando connect-pg-simple com PostgreSQL. 
+                          Cookies configurados como HTTP-Only para prevenir acesso via JavaScript (proteção contra XSS). 
+                          Cookies Secure em produção e SameSite=lax para proteção CSRF adicional. Regeneração automática 
+                          de sessões após login para prevenir ataques de session fixation. Expiração automática após 24h 
+                          de inatividade.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Criptografia de Senhas com bcrypt</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Todas as senhas são hash com bcrypt usando cost factor 12 antes de armazenamento. 
-                          Senhas nunca são armazenadas em texto plano. Sistema suporta fallback para senhas 
-                          em texto plano apenas em ambiente Replit para facilitar desenvolvimento.
+                          Todas as senhas são criptografadas com bcrypt usando cost factor 12 (salt rounds) antes de 
+                          armazenamento, garantindo alta resistência a ataques de força bruta. Senhas nunca são 
+                          armazenadas em texto plano em produção. Sistema inclui migração automática de senhas antigas 
+                          e validação de força de senha. Fallback para senhas em texto plano apenas em ambiente Replit 
+                          para facilitar desenvolvimento.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">JWT Tokens para Clientes</p>
+                        <p className="font-medium">JWT Tokens para Clientes e Unidades</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Clientes autenticam via CPF e recebem JWT token com tempo de expiração configurável. 
-                          Tokens são validados em cada requisição para áreas protegidas.
+                          Clientes autenticam usando CPF (que é hasheado) e recebem JWT token assinado com tempo de 
+                          expiração configurável. Unidades da rede credenciada autenticam via slug único e senha. 
+                          Tokens são validados e verificados em cada requisição para áreas protegidas, garantindo que 
+                          apenas usuários autorizados acessem dados sensíveis.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Middlewares de Proteção de Rotas</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Todas as rotas admin protegidas por middleware requireAdmin(). Rotas de cliente protegidas 
-                          por requireAuth(). Rotas de unidades protegidas por requireUnitAuth(). Retorno 401 
-                          Unauthorized para acessos não autorizados.
+                          Sistema multinível de proteção: rotas admin protegidas por requireAdmin(), rotas de cliente 
+                          por requireAuth(), rotas de unidades por requireUnitAuth(). Verificação de propriedade de 
+                          recursos antes de permitir acesso. Retorno 401 Unauthorized para tentativas não autenticadas 
+                          e 403 Forbidden para acesso não autorizado a recursos.
+                        </p>
+                      </div>
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
+                        <p className="font-medium">API Key Validation com Timing-Safe Comparison</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Endpoints públicos sensíveis protegidos com API key validation usando crypto.timingSafeEqual() 
+                          para prevenir timing attacks. Validação de seller tokens com HMAC para links de vendedores. 
+                          Logging automático de tentativas de acesso não autorizado para auditoria de segurança.
                         </p>
                       </div>
                     </div>
@@ -1550,49 +1566,59 @@ export default function Documentation() {
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Helmet.js - Headers de Segurança</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Helmet configurado para adicionar headers de segurança HTTP: Content-Security-Policy, 
-                          X-Frame-Options (proteção contra clickjacking), X-Content-Type-Options, 
-                          Strict-Transport-Security (HSTS), X-XSS-Protection.
+                          Helmet configurado com múltiplos headers de segurança: HSTS (Strict-Transport-Security) com 
+                          maxAge de 1 ano e includeSubDomains, X-Frame-Options (proteção contra clickjacking), 
+                          X-Content-Type-Options: nosniff, X-XSS-Protection, Referrer-Policy: strict-origin-when-cross-origin. 
+                          Content-Security-Policy implementado (nota: atualmente usa unsafe-inline e unsafe-eval por 
+                          compatibilidade; migração para nonces está planejada).
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">CORS - Controle de Origem Cruzada</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          CORS configurado com whitelist de domínios permitidos. Validação rigorosa de origem usando 
-                          URL parsing. Rejeição automática de requisições de origens não autorizadas. Suporte a 
-                          credenciais (cookies) apenas para origens confiáveis.
+                          CORS configurado com whitelist rigorosa de domínios permitidos. Validação de origem usando 
+                          URL parsing (não apenas string matching) para maior segurança. Domínios Replit (.replit.dev, 
+                          .replit.app) e domínio de produção (unipetplan.com.br) são as únicas origens permitidas. 
+                          Suporte a credenciais (cookies) habilitado apenas para origens confiáveis. Rejeição automática 
+                          de requisições de origens não autorizadas.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Rate Limiting - Limitação de Taxa</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Express-rate-limit aplicado em rotas críticas (login, registro, pagamento). Limite de 
-                          requisições por IP/hora configurável. Proteção contra ataques de força bruta e DDoS. 
-                          Respostas 429 Too Many Requests quando limite excedido.
+                          Express-rate-limit aplicado com limites específicos por endpoint: Login (5 tentativas/15min), 
+                          Registro (10/15min), Checkout (10/15min), Uploads (20/15min), Contato (5/15min), Validação de 
+                          cupons (15/15min). Proteção contra ataques de força bruta, credential stuffing e DDoS. 
+                          Respostas 429 Too Many Requests quando limite excedido. skipSuccessfulRequests habilitado 
+                          em login para não penalizar autenticações bem-sucedidas.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">CSRF Protection</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Proteção CSRF implementada com csurf para formulários. Tokens CSRF gerados e validados 
-                          em operações sensíveis (mudança de senha, exclusão de dados). Rejeição de requisições 
-                          sem token válido.
+                          Proteção CSRF implementada com csurf para todos os endpoints não-GET. Tokens CSRF gerados, 
+                          armazenados em cookies HTTP-only e validados em operações sensíveis (criação, atualização, 
+                          exclusão de dados). Exceção correta para webhooks externos (que não podem enviar tokens CSRF). 
+                          Rejeição automática de requisições sem token válido com código 403 e mensagem de erro clara.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">Sanitização de Entrada - XSS Prevention</p>
+                        <p className="font-medium">Input Sanitization - Prevenção XSS</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Sanitize-html usado para limpar inputs de usuário antes de armazenamento. Remoção de 
-                          tags HTML maliciosas, scripts e eventos JavaScript. Validação de tipos de dados com 
-                          Zod antes de processamento.
+                          Sanitize-html aplicado em todos os inputs de usuário antes de armazenamento e exibição. 
+                          Whitelist rigorosa de tags HTML permitidas (p, br, strong, em, ul, ol, li, a). Remoção 
+                          automática de tags maliciosas, scripts embutidos, event handlers JavaScript e atributos 
+                          perigosos. Links externos automaticamente recebem rel="noopener noreferrer". Validação 
+                          adicional com schemas Zod para garantir tipos e formatos corretos dos dados.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">SQL Injection Prevention</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Uso exclusivo de queries parametrizadas via Drizzle ORM. Nunca concatenação direta de 
-                          strings SQL. Validação e sanitização de todos os inputs antes de queries. Prepared 
-                          statements para todas as operações de banco.
+                          Uso exclusivo de queries parametrizadas e prepared statements via Drizzle ORM. Zero 
+                          concatenação direta de strings SQL em todo o código. Validação e sanitização de todos os 
+                          inputs antes de queries. Drizzle ORM fornece camada adicional de proteção com type-safety 
+                          e query builder seguro. Todas as operações de banco usam placeholders parametrizados.
                         </p>
                       </div>
                     </div>
@@ -1605,33 +1631,42 @@ export default function Documentation() {
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Mass Assignment Protection</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Proteção contra mass assignment em todas as operações de criação/atualização. Whitelist 
-                          explícita de campos permitidos. Rejeição de campos não autorizados enviados pelo cliente. 
-                          Schemas Zod validam estrutura exata dos dados aceitos.
+                          Proteção rigorosa contra mass assignment em todas as operações CRUD. Whitelist explícita de 
+                          campos permitidos em cada endpoint. Schemas Zod validam estrutura exata dos dados aceitos, 
+                          rejeitando automaticamente campos não autorizados. Campos sensíveis (role, permissions, 
+                          is_active) nunca podem ser modificados via input do cliente. Prevenção de escalação de 
+                          privilégios via manipulação de requisições.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">IDOR Prevention - Insecure Direct Object Reference</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Validação de propriedade de recursos antes de permitir acesso. Verificação se usuário 
-                          autenticado é dono do recurso solicitado. Uso de UUIDs ao invés de IDs sequenciais para 
-                          dificultar enumeração. Retorno 403 Forbidden para tentativas de acesso não autorizado.
+                          Validação obrigatória de propriedade de recursos antes de permitir acesso ou modificação. 
+                          Verificação se usuário autenticado é dono do recurso solicitado (ex: cliente só acessa seus 
+                          próprios pets e contratos). Uso de UUIDs randomizados ao invés de IDs sequenciais para 
+                          dificultar enumeração de recursos. Retorno 403 Forbidden (não 404) para tentativas de acesso 
+                          não autorizado, evitando information disclosure.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">Validação de Uploads de Arquivos</p>
+                        <p className="font-medium">Validação Profunda de Uploads de Arquivos</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Validação rigorosa de tipo MIME de arquivos enviados. Limite de tamanho de arquivo configurável 
-                          (máx 5MB). Whitelist de extensões permitidas (.jpg, .png, .pdf). Renomeação automática de 
-                          arquivos para prevenir execução de código. Armazenamento em bucket isolado do Supabase Storage.
+                          Validação em múltiplas camadas: (1) Verificação de magic numbers (assinatura binária real do 
+                          arquivo) usando file-type library para detectar extensões falsificadas. (2) Whitelist rigorosa 
+                          de tipos MIME permitidos (image/jpeg, image/png, image/webp). (3) Detecção de código malicioso 
+                          embutido em imagens (PHP, scripts, shellcode). (4) Validação de dimensões usando Sharp 
+                          (máx 5000x5000px). (5) Limite de tamanho (2MB). (6) Sanitização de nomes de arquivo. (7) 
+                          Armazenamento isolado em bucket Supabase Storage com URLs públicas controladas.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">Logs de Auditoria</p>
+                        <p className="font-medium">Logs de Auditoria Completos</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Sistema completo de logging de todas as ações administrativas (CRUD operations). Registro de 
-                          IP, timestamp, usuário responsável e dados modificados. Logs imutáveis armazenados em tabela 
-                          separada. Facilita investigação de incidentes e compliance.
+                          Sistema completo de logging de todas as ações administrativas sensíveis (criação, edição, 
+                          exclusão de dados). Registro automático de IP do cliente, timestamp preciso, usuário 
+                          responsável, ação realizada e dados modificados (before/after). Logs imutáveis armazenados 
+                          em tabela separada (admin_logs). Facilita investigação de incidentes, compliance com LGPD 
+                          e rastreabilidade de mudanças. Retenção configurável de logs para auditoria.
                         </p>
                       </div>
                     </div>
@@ -1644,23 +1679,29 @@ export default function Documentation() {
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">PCI DSS Compliance via Cielo</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Dados de cartão nunca armazenados no servidor. Processamento delegado completamente à Cielo 
-                          (gateway PCI DSS Level 1 compliant). Apenas tokens de transação armazenados localmente. 
-                          Comunicação HTTPS obrigatória para todas as transações.
+                          Dados de cartão nunca trafegam ou são armazenados no servidor. Processamento de pagamentos 
+                          delegado completamente à Cielo (gateway PCI DSS Level 1 compliant). Apenas PaymentId (token 
+                          de transação) armazenado localmente. Comunicação HTTPS obrigatória para todas as transações. 
+                          Conformidade total com PCI DSS sem necessidade de certificação própria.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">Validação de Webhooks</p>
+                        <p className="font-medium">⚠️ Validação de Webhooks - PENDENTE</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Webhooks da Cielo validados por assinatura digital. Verificação de origem das requisições. 
-                          Proteção contra replay attacks com timestamps. Rejeição de webhooks malformados ou suspeitos.
+                          ATENÇÃO: Validação completa de webhooks da Cielo está em implementação. Atualmente webhooks 
+                          são aceitos sem validação de assinatura digital (vulnerabilidade conhecida em correção). 
+                          Planejado: (1) Whitelist de IPs oficiais da Cielo, (2) Validação de campos obrigatórios 
+                          (PaymentId, MerchantOrderId), (3) Consulta à API Cielo para confirmar status real de transações, 
+                          (4) Proteção contra replay attacks com timestamps. Esta é prioridade máxima antes de produção.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Ambiente Isolado para Testes</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Ambiente sandbox da Cielo para testes sem uso de dados reais. Separação clara entre 
-                          credenciais de produção e desenvolvimento. Impossível processar pagamentos reais em ambiente dev.
+                          Ambiente sandbox da Cielo para testes de integração sem uso de dados reais ou processamento 
+                          de cobranças. Separação clara entre credenciais de produção (CIELO_MERCHANT_ID e 
+                          CIELO_MERCHANT_KEY) e desenvolvimento. Impossível processar pagamentos reais em ambiente dev. 
+                          Testes podem ser feitos com cartões de crédito de teste fornecidos pela Cielo.
                         </p>
                       </div>
                     </div>
@@ -1673,40 +1714,57 @@ export default function Documentation() {
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Trust Proxy Configuration</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Express configurado com trust proxy para ambientes Replit/EasyPanel. Captura correta de IP 
-                          real do cliente através de proxies reversos. Essencial para rate limiting e logging precisos.
+                          Express configurado com trust proxy habilitado para ambientes com proxy reverso 
+                          (Replit, EasyPanel, Nginx). Captura correta do IP real do cliente através do header 
+                          X-Forwarded-For. Essencial para funcionamento correto de rate limiting, geolocalização 
+                          e logs de auditoria. Sem isso, todos os IPs apareceriam como localhost.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">Variáveis de Ambiente</p>
+                        <p className="font-medium">Variáveis de Ambiente e Secrets Management</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Todas as credenciais e chaves secretas armazenadas em variáveis de ambiente (.env). 
-                          Arquivo .env incluído em .gitignore para prevenir commit acidental. Validação de presença 
-                          de variáveis críticas na inicialização do servidor.
+                          Todas as credenciais sensíveis (DATABASE_URL, SESSION_SECRET, CIELO_MERCHANT_ID, 
+                          SUPABASE_KEY, JWT_SECRET) armazenadas exclusivamente em variáveis de ambiente (.env). 
+                          Arquivo .env incluído em .gitignore para prevenir commit acidental. Validação obrigatória 
+                          de presença de variáveis críticas na inicialização do servidor. Em produção, secrets gerenciados 
+                          via Replit Secrets ou variáveis de ambiente do host.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
                         <p className="font-medium">Tratamento de Erros Seguro</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Erros de servidor nunca expõem detalhes internos para cliente. Mensagens genéricas em produção, 
-                          detalhadas apenas em desenvolvimento. Stack traces e informações sensíveis logadas apenas no 
-                          servidor. Respostas padronizadas para diferentes tipos de erro.
+                          Erros de servidor nunca expõem detalhes internos, stack traces ou queries SQL para o cliente. 
+                          Mensagens genéricas em produção ("Erro interno do servidor"), detalhadas apenas em desenvolvimento 
+                          para debugging. Stack traces e informações sensíveis logadas apenas no servidor (console/arquivo). 
+                          Respostas padronizadas com códigos HTTP corretos (400, 401, 403, 404, 500) para cada tipo de erro.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">Atualizações de Dependências</p>
+                        <p className="font-medium">Atualizações de Dependências e Auditorias</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Dependências npm mantidas atualizadas para corrigir vulnerabilidades conhecidas. 
-                          Uso de npm audit para identificar e corrigir issues de segurança. Versionamento semântico 
-                          respeitado para evitar breaking changes.
+                          Dependências npm mantidas regularmente atualizadas para corrigir vulnerabilidades conhecidas. 
+                          Uso periódico de npm audit para identificar e corrigir CVEs (Common Vulnerabilities and Exposures). 
+                          Versionamento semântico respeitado para evitar breaking changes. Teste de regressão após 
+                          atualizações de segurança. Monitoramento de advisories de segurança das bibliotecas críticas.
                         </p>
                       </div>
                       <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
-                        <p className="font-medium">Compressão de Respostas</p>
+                        <p className="font-medium">Compressão e Otimização de Respostas</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Middleware compression configurado para reduzir tamanho de respostas HTTP. 
-                          Melhora performance e reduz consumo de banda. Compressão gzip/deflate automática 
-                          para respostas maiores que 1KB.
+                          Middleware compression configurado para compressão automática de respostas HTTP usando 
+                          gzip/deflate. Threshold de 1KB para ativar compressão (respostas menores não são comprimidas). 
+                          Melhora significativa de performance e redução de consumo de banda, especialmente para JSON 
+                          grandes e páginas HTML. Não interfere com segurança mas melhora experiência do usuário.
+                        </p>
+                      </div>
+                      <div className="border border-[#eaeaea] rounded-lg bg-white shadow-sm p-3">
+                        <p className="font-medium">Conformidade LGPD</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Medidas de segurança implementadas contribuem para conformidade com a LGPD (Lei Geral de 
+                          Proteção de Dados): criptografia de senhas, controle de acesso rigoroso, logs de auditoria 
+                          completos, proteção de dados pessoais com validação de propriedade, e minimização de exposição 
+                          de dados sensíveis. Sistema permite exercício dos direitos dos titulares (acesso, correção, 
+                          exclusão de dados).
                         </p>
                       </div>
                     </div>
