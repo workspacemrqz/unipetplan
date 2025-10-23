@@ -6,6 +6,7 @@ import { db } from './db.js';
 import { atendimentos, atendimentoProcedures, veterinarians, type InsertVeterinarian } from '../shared/schema.js';
 import { sql, eq, and, inArray } from 'drizzle-orm';
 import { normalizeTextField } from './lib/text-formatter.js';
+import { protectPublicEndpoint } from './middleware/api-security.js';
 
 interface UnitRequest extends Request {
   unit?: {
@@ -18,8 +19,13 @@ interface UnitRequest extends Request {
 
 export function setupUnitRoutes(app: any, storage: IStorage) {
   
-  // Get unit info by slug (public)
-  app.get("/api/network-units/:slug/info", async (req: Request, res: Response) => {
+  // Get unit info by slug - Now protected with rate limiting
+  app.get("/api/network-units/:slug/info", 
+    ...protectPublicEndpoint({
+      rateLimit: { max: 100, window: 60000 }, // 100 requests per minute
+      requireKey: false // Public info but rate limited
+    }),
+    async (req: Request, res: Response) => {
     try {
       const unit = await storage.getNetworkUnitBySlug(req.params.slug);
       if (!unit) {

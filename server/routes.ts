@@ -467,6 +467,8 @@ async function logAdminAction(
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Import API security middleware
+  const { protectPublicEndpoint, validateSellerToken, ipRateLimit } = await import("./middleware/api-security.js");
 
   // Static file serving disabled - using Supabase Storage for all images
   console.log('📁 [STATIC-FILES] Static file serving disabled - using Supabase Storage');
@@ -1579,8 +1581,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Track seller conversion (called during checkout)
-  app.post("/api/seller/track-conversion", async (req, res) => {
+  // Track seller conversion (called during checkout) - Now protected
+  app.post("/api/seller/track-conversion", 
+    ...protectPublicEndpoint({
+      rateLimit: { max: 30, window: 60000 }, // 30 requests per minute
+      requireKey: false // Don't require API key for checkout flow
+    }),
+    async (req, res) => {
     try {
       const { sellerId, revenue } = req.body;
       
@@ -1605,8 +1612,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get seller analytics
-  app.get("/api/seller/analytics/:sellerId", async (req, res) => {
+  // Get seller analytics - Now protected
+  app.get("/api/seller/analytics/:sellerId", 
+    ...protectPublicEndpoint({
+      rateLimit: { max: 100, window: 60000 }, // 100 requests per minute
+      requireKey: false // Allow sellers to check their own stats
+    }),
+    validateSellerToken, // Require seller-specific token
+    async (req, res) => {
     try {
       const { sellerId } = req.params;
       const { startDate, endDate } = req.query;
