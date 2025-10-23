@@ -31,7 +31,13 @@ export default function Documentation() {
       {/* Section Selector */}
       <div className="flex items-center gap-4">
         <Select value={selectedSection} onValueChange={setSelectedSection}>
-          <SelectTrigger className="w-[280px]">
+          <SelectTrigger 
+            className="w-48 [&>span]:text-left [&>span]:flex [&>span]:flex-col [&>span]:items-start"
+            style={{
+              borderColor: 'var(--border-gray)',
+              background: 'white'
+            }}
+          >
             <SelectValue placeholder="Selecione uma seção" />
           </SelectTrigger>
           <SelectContent>
