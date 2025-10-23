@@ -4081,9 +4081,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // CIELO WEBHOOK ENDPOINT
-  app.post("/api/webhooks/cielo", express.raw({ type: 'application/json' }), async (req, res) => {
-    const correlationId = req.headers['x-correlation-id'] as string || 
+  // Import webhook security middleware
+  const { validateCieloWebhook, webhookRateLimiter } = await import("./middleware/webhook-security.js");
+  
+  // CIELO WEBHOOK ENDPOINT - Now with security validation
+  app.post("/api/webhooks/cielo", 
+    express.raw({ type: 'application/json' }), 
+    webhookRateLimiter(), // Rate limiting for webhooks
+    validateCieloWebhook, // IP validation and signature verification
+    async (req, res) => {
+    const correlationId = (req as any).correlationId || 
+                         req.headers['x-correlation-id'] as string || 
                          req.headers['requestid'] as string || 
                          Math.random().toString(36).substring(7);
     
@@ -4135,11 +4143,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rawBody = JSON.stringify(notification);
       }
       
-      // Cielo doesn't send signature by default - accept all requests without validation
-      console.log('📨 [CIELO-WEBHOOK] Webhook da Cielo recebido (sem validação de assinatura)', {
+      // Webhook já foi validado pelo middleware de segurança
+      console.log('📨 [CIELO-WEBHOOK] Webhook da Cielo recebido e validado', {
         correlationId,
         paymentId: notification.PaymentId,
-        changeType: notification.ChangeType
+        changeType: notification.ChangeType,
+        validated: true
       });
 
       // Validate notification structure
