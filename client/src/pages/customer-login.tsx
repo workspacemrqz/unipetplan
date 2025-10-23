@@ -105,7 +105,7 @@ export default function CustomerLoginPage() {
             </div>
 
             {/* Login Form */}
-            <div className="rounded-xl shadow-lg p-8" style={{background: 'var(--bg-cream-lighter)'}}>
+            <div className="rounded-xl shadow-lg p-8 border-2" style={{background: 'var(--bg-cream-lighter)', borderColor: 'var(--border-gray)'}}>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Email Field */}
                 <div className="space-y-2">
