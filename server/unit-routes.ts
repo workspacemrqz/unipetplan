@@ -509,10 +509,22 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Extract date filter parameters and search
       const { startDate, endDate, search } = req.query;
       
-      // Get atendimentos for this unit with network unit info
-      const result = await storage.getAtendimentosWithNetworkUnits({
+      // Build filters based on user type
+      const filters: any = {
         networkUnitId: unitId
-      });
+      };
+      
+      // If it's a veterinarian (but NOT admin), filter by their ID
+      // Admin veterinarians should see ALL financial data, just like unit login
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
+        filters.veterinarianId = req.unit.veterinarianId;
+        console.log(`✅ [UNIT] Filtering financial report for non-admin veterinarian ${req.unit.veterinarianId}`);
+      } else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+        console.log(`✅ [UNIT] Admin veterinarian - showing ALL financial report for unit ${unitId}`);
+      }
+      
+      // Get atendimentos for this unit with network unit info
+      const result = await storage.getAtendimentosWithNetworkUnits(filters);
       
       let allAtendimentos = result?.atendimentos || [];
       
