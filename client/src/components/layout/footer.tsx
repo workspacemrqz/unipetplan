@@ -4,7 +4,6 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useSiteSettingsWithDefaults } from "@/hooks/use-site-settings";
 import { useWhatsAppRedirect } from "@/hooks/use-whatsapp-redirect";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 export default function Footer() {
   const { settings, shouldShow } = useSiteSettingsWithDefaults();
@@ -169,7 +168,7 @@ export default function Footer() {
               <div className="mt-2">
                 Desenvolvido por{' '}
                 <a 
-                  href="https://wa.me/556281938192" 
+                  href="https://wa.me/556281938192?text=Olá!%20Vim%20através%20do%20site%20da%20UNIPET%20PLAN%20e%20gostaria%20de%20conhecer%20mais%20sobre%20os%20serviços%20da%20Evolut%20IA." 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="font-bold transition-colors hover:text-primary"
