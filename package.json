@@ -20,9 +20,7 @@
     "test:run": "vitest run",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "tsx drizzle/studio.ts",
-    "clean:deep": "npm ci && cd client && npm ci",
-    "fix-dates": "tsx server/scripts/fix-installment-dates.ts",
-    "fix-dates:apply": "tsx server/scripts/fix-installment-dates.ts --apply"
+    "clean:deep": "npm ci && cd client && npm ci"
   },
   "keywords": [
     "plano-saude",
