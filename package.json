@@ -19,7 +19,6 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "db:push": "drizzle-kit push:pg",
-    "db:studio": "tsx drizzle/studio.ts",
     "clean:deep": "npm ci && cd client && npm ci"
   },
   "keywords": [
