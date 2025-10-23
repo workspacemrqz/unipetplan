@@ -42,6 +42,7 @@ import {
   requireAnyPermission 
 } from "./auth.js";
 import bcrypt from "bcryptjs";
+import { verifyPassword, getSecureAdminPassword, isBcryptHash } from "./utils/password-security.js";
 import { supabaseStorage } from "./supabase-storage.js";
 import { CieloService, type CreditCardPaymentRequest } from "./services/cielo-service.js";
 import { PaymentStatusService } from "./services/payment-status-service.js";
@@ -611,37 +612,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // If not found in database or password incorrect, check environment variables as fallback
       const adminLogin = process.env.LOGIN;
-      const adminPassword = process.env.SENHA;
+      const adminPassword = await getSecureAdminPassword();
 
       if (!adminLogin || !adminPassword) {
-        console.log("❌ [ADMIN-LOGIN] Invalid credentials and no env variables configured");
+        console.log("❌ [ADMIN-LOGIN] Invalid credentials and no env variables configured or security error");
         res.status(401).json({ error: "Credenciais inválidas" });
         return;
       }
 
       // Secure password comparison for environment variables
       const isValidLogin = loginData.login === adminLogin;
-      let isValidPassword = false;
-
-      // Check if password is bcrypt hash or plain text
-      if (adminPassword.startsWith('$2a$') || adminPassword.startsWith('$2b$')) {
-        // It's a bcrypt hash - secure comparison
-        isValidPassword = await bcrypt.compare(loginData.password, adminPassword);
-      } else {
-        // Plain text password - check environment
-        const isReplit = process.env.REPL_ID || process.env.REPL_OWNER || process.env.REPLIT_DEPLOYMENT;
-        const isProduction = process.env.NODE_ENV === 'production';
-        
-        if (isProduction && !isReplit) {
-          // Production (non-Replit): Plain text passwords not allowed
-          console.error("❌ [ADMIN-LOGIN] Plain text password detected in production. SENHA must be a bcrypt hash for security.");
-          return res.status(500).json({ error: "Configuração de segurança incorreta. Contate o administrador." });
-        } else {
-          // Development/Replit/staging: Allow plain text password with warning
-          const env = isReplit ? 'Replit' : (process.env.NODE_ENV || 'undefined');
-          console.warn("⚠️ [ADMIN-LOGIN] Plain text password in use (ENV: " + env + "). For production, use bcrypt hash.");
-          isValidPassword = loginData.password === adminPassword;
-        }
+      
+      // Use secure password verification
+      const passwordCheck = await verifyPassword(loginData.password, adminPassword, false);
+      const isValidPassword = passwordCheck.valid;
+      
+      if (passwordCheck.needsMigration) {
+        console.warn("⚠️ [ADMIN-LOGIN] Senha do admin precisa ser migrada para bcrypt");
       }
 
       if (isValidLogin && isValidPassword) {
@@ -723,34 +710,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ valid: false, error: "Senha não fornecida" });
       }
 
-      const adminPassword = process.env.SENHA;
+      const adminPassword = await getSecureAdminPassword();
 
       if (!adminPassword) {
-        console.error("❌ [VERIFY-PASSWORD] Missing environment variable SENHA");
+        console.error("❌ [VERIFY-PASSWORD] Missing environment variable SENHA or security error");
         return res.status(500).json({ valid: false, error: "Configuração do servidor incorreta" });
       }
 
-      let isValidPassword = false;
-
-      // Check if password is bcrypt hash or plain text
-      if (adminPassword.startsWith('$2a$') || adminPassword.startsWith('$2b$')) {
-        // It's a bcrypt hash - secure comparison
-        isValidPassword = await bcrypt.compare(password, adminPassword);
-      } else {
-        // Plain text password - check environment
-        const isReplit = process.env.REPL_ID || process.env.REPL_OWNER || process.env.REPLIT_DEPLOYMENT;
-        const isProduction = process.env.NODE_ENV === 'production';
-        
-        if (isProduction && !isReplit) {
-          // Production (non-Replit): Plain text passwords not allowed
-          console.error("❌ [VERIFY-PASSWORD] Plain text password detected in production. SENHA must be a bcrypt hash for security.");
-          return res.status(500).json({ valid: false, error: "Configuração de segurança incorreta" });
-        } else {
-          // Development/Replit/staging: Allow plain text password with warning
-          const env = isReplit ? 'Replit' : (process.env.NODE_ENV || 'undefined');
-          console.warn("⚠️ [VERIFY-PASSWORD] Plain text password in use (ENV: " + env + "). For production, use bcrypt hash.");
-          isValidPassword = password === adminPassword;
-        }
+      // Use secure password verification
+      const passwordCheck = await verifyPassword(password, adminPassword, false);
+      const isValidPassword = passwordCheck.valid;
+      
+      if (passwordCheck.needsMigration) {
+        console.warn("⚠️ [VERIFY-PASSWORD] Senha do admin precisa ser migrada para bcrypt");
       }
 
       res.json({ valid: isValidPassword });
