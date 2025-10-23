@@ -14,6 +14,7 @@ interface UnitRequest extends Request {
     slug: string;
     veterinarianId?: string;
     type?: 'unit' | 'veterinarian';
+    isAdmin?: boolean;
   };
 }
 
@@ -299,10 +300,13 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       // Build conditions based on user type
       const conditions: any[] = [eq(atendimentos.createdByUnitId, unitId)];
       
-      // If it's a veterinarian, filter by their ID
-      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+      // If it's a veterinarian (but NOT admin), filter by their ID
+      // Admin veterinarians should see ALL stats, just like unit login
+      if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
         conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
-        console.log(`✅ [UNIT] Filtering dashboard stats for veterinarian ${req.unit.veterinarianId}`);
+        console.log(`✅ [UNIT] Filtering dashboard stats for non-admin veterinarian ${req.unit.veterinarianId}`);
+      } else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+        console.log(`✅ [UNIT] Admin veterinarian - showing ALL dashboard stats for unit ${unitId}`);
       }
       
       // Add date range filters if provided
