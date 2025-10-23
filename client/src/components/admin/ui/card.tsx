@@ -9,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "rounded-lg border bg-white text-card-foreground shadow-sm",
       "max-w-full max-sm:overflow-hidden", // Prevent overflow only on mobile
       className
     )}
