@@ -42,11 +42,6 @@ export default function Footer() {
                 Cuidando da saúde do seu pet com carinho, qualidade e preços acessíveis.
               </span>
             </p>
-            {shouldShow.cnpj && (
-              <p className="mb-4 sm:mb-6 text-xs sm:text-sm text-foreground">
-                CNPJ: {settings.cnpj}
-              </p>
-            )}
             <div className="flex space-x-4">
               {shouldShow.facebookUrl && (
                 <a href={settings.facebookUrl || undefined} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-95 bg-primary text-primary-foreground">
