@@ -161,7 +161,7 @@ export default function UnitLoginPage() {
           </div>
 
           {/* Login Form */}
-          <div className="rounded-xl shadow-lg p-8 bg-background">
+          <div className="rounded-xl shadow-lg p-8 bg-background border-2" style={{borderColor: 'var(--border-gray)'}}>
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Login Field */}

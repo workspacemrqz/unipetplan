@@ -64,7 +64,7 @@ export default function SellerLogin() {
           </div>
 
           {/* Login Form */}
-          <div className="rounded-xl shadow-lg p-8 bg-background">
+          <div className="rounded-xl shadow-lg p-8 bg-background border-2" style={{borderColor: 'var(--border-gray)'}}>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div className="space-y-2">
