@@ -67,7 +67,7 @@ export default function UnitProcedures({ unitSlug }: { unitSlug: string }) {
 
   const fetchProcedures = async () => {
     try {
-      const token = localStorage.getItem('unit-token');
+      const token = localStorage.getItem('veterinarian-token') || localStorage.getItem('unit-token');
       const response = await fetch(`/api/unit/${unitSlug}/procedures-with-plans`, {
         headers: {
           'Authorization': `Bearer ${token}`

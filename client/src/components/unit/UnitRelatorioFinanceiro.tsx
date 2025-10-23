@@ -101,7 +101,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
   const fetchFinancialReport = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('unit-token');
+      const token = localStorage.getItem('veterinarian-token') || localStorage.getItem('unit-token');
       const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
       const queryParams = new URLSearchParams({
         ...dateParams,
@@ -309,7 +309,7 @@ export default function UnitRelatorioFinanceiro({ unitSlug }: { unitSlug: string
   // Função auxiliar para buscar todos os dados do relatório financeiro
   const fetchAllFinancialData = async (): Promise<FinancialEntry[]> => {
     try {
-      const token = localStorage.getItem('unit-token');
+      const token = localStorage.getItem('veterinarian-token') || localStorage.getItem('unit-token');
       const dateParams = getDateRangeParams(debouncedDateFilter.startDate, debouncedDateFilter.endDate);
       // Adicionar limit para garantir que busca todos os registros
       const allDataParams = {
