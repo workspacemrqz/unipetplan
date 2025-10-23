@@ -42,6 +42,11 @@ export default function Footer() {
                 Cuidando da saúde do seu pet com carinho, qualidade e preços acessíveis.
               </span>
             </p>
+            {shouldShow.cnpj && (
+              <p className="mb-4 sm:mb-6 text-xs sm:text-sm text-foreground">
+                CNPJ: {settings.cnpj}
+              </p>
+            )}
             <div className="flex space-x-4">
               {shouldShow.facebookUrl && (
                 <a href={settings.facebookUrl || undefined} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-95 bg-primary text-primary-foreground">
@@ -162,9 +167,6 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-xs sm:text-sm text-center md:text-left text-foreground">
               <div>© {new Date().getFullYear()} UNIPET PLAN - Todos os direitos reservados.</div>
-              {shouldShow.cnpj && (
-                <div className="mt-1">CNPJ: {settings.cnpj}</div>
-              )}
               <div className="mt-2">
                 Desenvolvido por{' '}
                 <a 
