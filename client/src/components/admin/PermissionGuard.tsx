@@ -14,7 +14,7 @@ export function PermissionGuard({
   children, 
   permission, 
   path, 
-  fallbackPath = "/admin" 
+  fallbackPath = "/" 
 }: PermissionGuardProps) {
   const [, setLocation] = useLocation();
   const { hasPermission, hasPathAccess, isLoading } = usePermissions();
