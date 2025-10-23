@@ -228,7 +228,10 @@ export default function Sidebar() {
               {isExpanded && (
                 <div className="space-y-1">
               {section.items.map((item) => {
-                // Compute the full admin path
+                // Use relative paths for wouter nested routing
+                const href = item.href; // Already relative: '/', '/clientes', etc.
+                
+                // Build full path for location comparison
                 const fullPath = item.href === '/' ? '/admin' : `/admin${item.href}`;
                 
                 // Use startsWith for nested routes to highlight parent sections  
@@ -238,7 +241,7 @@ export default function Sidebar() {
                 return (
                   <Link 
                     key={item.name} 
-                    href={fullPath}
+                    href={href}
                     className={cn(
                       "flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group",
                       isActive
