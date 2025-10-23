@@ -1,8 +1,8 @@
 # Controle de Acesso - Usuário Admin da Unidade
 
-## Resumo da Implementação Atual
+## Resumo da Implementação
 
-O sistema já implementa corretamente o controle de acesso solicitado, onde veterinários com `isAdmin=true` têm o mesmo nível de acesso que o login direto da unidade, **exceto** o acesso à página de Corpo Clínico.
+✅ **CORREÇÃO IMPLEMENTADA** - O sistema agora garante que veterinários com `isAdmin=true` tenham o mesmo nível de acesso que o login direto da unidade, **exceto** o acesso à página de Corpo Clínico.
 
 ## Estrutura de Autenticação
 
@@ -16,58 +16,127 @@ O sistema já implementa corretamente o controle de acesso solicitado, onde vete
    - Token: `veterinarian-token` no localStorage
    - Flag: `is-unit-admin = 'true'` no localStorage
    - Identificação: `isVeterinarian && isUnitAdmin`
+   - **JWT inclui**: `isAdmin: true` no payload
    - Acesso: COMPLETO exceto Corpo Clínico
 
 3. **Veterinário Comum**
    - Token: `veterinarian-token` no localStorage
    - Flag: `is-unit-admin = 'false'` no localStorage
-   - Acesso: LIMITADO (apenas Atendimentos)
+   - **JWT inclui**: `isAdmin: false` no payload
+   - Acesso: LIMITADO (apenas Atendimentos criados por eles)
+
+## Correções Implementadas
+
+### 1. Middleware `requireUnitAuth` - CORRIGIDO ✅
+**Arquivo**: `server/unit-routes.ts` (linhas 89-150)
+
+```typescript
+// Agora armazena isAdmin no contexto da requisição
+req.unit = {
+  unitId: decoded.unitId,
+  slug: decoded.slug,
+  veterinarianId: decoded.veterinarianId,
+  type: 'veterinarian',
+  isAdmin: decoded.isAdmin || veterinarian.isAdmin || false // ✅ NOVO
+};
+```
+
+### 2. Interface TypeScript - ATUALIZADA ✅
+**Arquivo**: `server/unit-routes.ts` (linhas 14-22)
+
+```typescript
+interface UnitRequest extends Request {
+  unit?: {
+    unitId: string;
+    slug: string;
+    veterinarianId?: string;
+    type?: 'unit' | 'veterinarian';
+    isAdmin?: boolean; // ✅ NOVO
+  };
+}
+```
+
+### 3. Endpoint de Atendimentos - CORRIGIDO ✅
+**Arquivo**: `server/unit-routes.ts` (linhas 179-186)
+
+```typescript
+// ✅ ANTES: Todos os veterinários viam apenas seus atendimentos
+// ❌ if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId) {
+//     filters.veterinarianId = req.unit.veterinarianId;
+//   }
+
+// ✅ AGORA: Veterinários admin veem TODOS os atendimentos
+if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
+  filters.veterinarianId = req.unit.veterinarianId;
+  console.log(`✅ [UNIT] Filtering atendimentos for non-admin veterinarian ${req.unit.veterinarianId}`);
+} else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+  console.log(`✅ [UNIT] Admin veterinarian - showing ALL atendimentos for unit ${unitId}`);
+}
+```
+
+### 4. Endpoint de Dashboard Stats - CORRIGIDO ✅
+**Arquivo**: `server/unit-routes.ts` (linhas 306-313)
+
+```typescript
+// ✅ Veterinários admin veem estatísticas de TODA a unidade
+if (req.unit?.type === 'veterinarian' && req.unit?.veterinarianId && !req.unit?.isAdmin) {
+  conditions.push(eq(atendimentos.veterinarianId, req.unit.veterinarianId));
+  console.log(`✅ [UNIT] Filtering dashboard stats for non-admin veterinarian ${req.unit.veterinarianId}`);
+} else if (req.unit?.type === 'veterinarian' && req.unit?.isAdmin) {
+  console.log(`✅ [UNIT] Admin veterinarian - showing ALL dashboard stats for unit ${unitId}`);
+}
+```
+
+### 5. Endpoints de Gráficos - CORRIGIDOS ✅
+
+#### Gráfico de Procedimentos Vendidos
+**Arquivo**: `server/unit-routes.ts` (linhas 1754-1761)
+- Veterinários admin veem todos os procedimentos da unidade
+
+#### Gráfico de Valor por Usuário
+**Arquivo**: `server/unit-routes.ts` (linhas 1822-1829)
+- Veterinários admin veem valores de todos os usuários
+
+#### Gráfico de Vendas Totais
+**Arquivo**: `server/unit-routes.ts` (linhas 1896-1903)
+- Veterinários admin veem vendas totais da unidade
 
 ## Controle de Acesso por Página
 
 ### ✅ Páginas Acessíveis por Veterinário Admin
 
 #### 1. Dashboard (`/unidade/{slug}/painel`)
-- **Arquivo**: `client/src/pages/unit-dashboard.tsx` (linhas 98-134)
-- **Lógica**: Aceita `unitToken` OU `vetToken`
-- **Status**: ✅ Funcionando corretamente
+- **Arquivo**: `client/src/pages/unit-dashboard.tsx`
+- **Dados**: ✅ TODOS os atendimentos, clientes e pets da unidade
+- **Status**: Funcionando corretamente
 
 #### 2. Atendimentos (`/unidade/{slug}/atendimentos`)
-- **Arquivo**: `client/src/pages/unit/AtendimentosPage.tsx` (linhas 16-30)
-- **Lógica**: Aceita `unitToken` OU `veterinarianToken`
-- **Status**: ✅ Funcionando corretamente
+- **Arquivo**: `client/src/pages/unit/AtendimentosPage.tsx`
+- **Dados**: ✅ TODOS os atendimentos da unidade
+- **Status**: Funcionando corretamente
 
 #### 3. Novo Atendimento (`/unidade/{slug}/atendimentos/novo`)
-- **Lógica**: Mesma autenticação da página de Atendimentos
-- **Status**: ✅ Funcionando corretamente
+- **Dados**: Acesso completo
+- **Status**: Funcionando corretamente
 
 #### 4. Procedimentos (`/unidade/{slug}/procedimentos`)
-- **Arquivo**: `client/src/pages/unit/ProcedimentosPage.tsx` (linhas 16-31)
-- **Lógica**: Aceita `unitToken` OU `veterinarianToken`
-- **Status**: ✅ Funcionando corretamente
+- **Arquivo**: `client/src/pages/unit/ProcedimentosPage.tsx`
+- **Dados**: ✅ TODOS os procedimentos da unidade
+- **Status**: Funcionando corretamente
 
 #### 5. Relatório Financeiro (`/unidade/{slug}/relatorio-financeiro`)
-- **Arquivo**: `client/src/pages/unit/RelatorioFinanceiroPage.tsx` (linhas 16-31)
-- **Lógica**: Aceita `unitToken` OU `veterinarianToken`
-- **Status**: ✅ Funcionando corretamente
+- **Arquivo**: `client/src/pages/unit/RelatorioFinanceiroPage.tsx`
+- **Dados**: ✅ TODOS os dados financeiros da unidade
+- **Status**: Funcionando corretamente
 
 ### ❌ Página BLOQUEADA para Veterinário Admin
 
 #### Corpo Clínico (`/unidade/{slug}/corpo-clinico`)
 - **Arquivo**: `client/src/pages/unit/CorpoClinicoPage.tsx` (linhas 102-124)
-- **Lógica**: 
-  ```typescript
-  const isDirectUnitLogin = unitToken && !veterinarianToken;
-  if (!isDirectUnitLogin || unitSlug !== slug) {
-    // Bloqueia e redireciona
-    setLocation(`/unidade/${slug}`);
-    return;
-  }
-  ```
 - **Comportamento**:
   - Apenas login direto da unidade pode acessar
   - Veterinários (incluindo admin) são BLOQUEADOS
-  - Mostra toast com mensagem: "Apenas a unidade pode gerenciar o corpo clínico"
+  - Mostra toast: "Apenas a unidade pode gerenciar o corpo clínico"
   - Redireciona para `/unidade/{slug}`
 - **Status**: ✅ Bloqueio funcionando corretamente
 
@@ -87,70 +156,59 @@ O sistema já implementa corretamente o controle de acesso solicitado, onde vete
 
 ### Menu para Veterinário Admin
 **Arquivo**: `client/src/components/unit/UnitSidebar.tsx` (linhas 77-113)
-- Dashboard
-- Atendimentos
-  - Atendimentos
-  - Novo Atendimento
+- Dashboard ✅
+- Atendimentos ✅
+  - Atendimentos ✅
+  - Novo Atendimento ✅
 - Gestão
-  - Procedimentos (SEM Corpo Clínico)
+  - Procedimentos ✅ (SEM Corpo Clínico)
 - Financeiro
-  - Relatório Financeiro
+  - Relatório Financeiro ✅
 
 ### Menu para Veterinário Comum
 **Arquivo**: `client/src/components/unit/UnitSidebar.tsx` (linhas 114-133)
 - Atendimentos
-  - Atendimentos
+  - Atendimentos (apenas os seus)
   - Novo Atendimento
 
 ## Autenticação Backend
-
-### Middleware de Autenticação
-**Arquivo**: `server/unit-routes.ts` (linhas 89-150)
-
-O middleware `requireUnitAuth` aceita AMBOS os tipos de token:
-1. Token de unidade (`type: 'unit'`)
-2. Token de veterinário (`type: 'veterinarian'`)
-
-Para tokens de veterinário, verifica:
-- ✅ Veterinário existe no banco
-- ✅ `isActive = true`
-- ✅ `canAccessAtendimentos = true`
-- ✅ Pertence à unidade correta
 
 ### Endpoint de Login Unificado
 **Arquivo**: `server/unit-routes.ts` (linhas 1260-1367)
 
 Endpoint: `POST /api/unified-auth/login`
 
-Processo:
-1. Primeiro tenta autenticar como unidade
-2. Se falhar, tenta autenticar como veterinário
-3. Gera JWT com informações adequadas:
-   - Para unidade: `{ unitId, slug }`
-   - Para veterinário: `{ veterinarianId, unitId, slug, type: 'veterinarian', isAdmin }`
+Gera JWT com informações adequadas:
+```typescript
+// Para veterinário/admin:
+const token = jwt.sign({
+  veterinarianId: veterinarian.id,
+  unitId: veterinarian.networkUnitId,
+  slug: unit.urlSlug,
+  type: 'veterinarian',
+  isAdmin: veterinarian.isAdmin || false // ✅ INCLUÍDO
+}, process.env.SESSION_SECRET, { expiresIn: '8h' });
+```
 
-## Criação de Administradores
+## Resumo das Mudanças
 
-### Como Criar um Admin
-1. Fazer login direto com credenciais da unidade
-2. Acessar `/unidade/{slug}/corpo-clinico`
-3. Adicionar novo veterinário
-4. Marcar checkbox `isAdmin = true`
-5. Definir login e senha
-6. Marcar `canAccessAtendimentos = true`
+### Antes da Correção ❌
+- Veterinários admin viam apenas SEUS atendimentos
+- Dashboard mostrava apenas estatísticas dos atendimentos criados por eles
+- Gráficos exibiam apenas dados deles
+- Sidebar correto (sem link de Corpo Clínico)
+- Página de Corpo Clínico bloqueada corretamente
 
-### Dados Armazenados
-**Tabela**: `veterinarians`
-- `isAdmin`: boolean (indica privilégios de admin)
-- `canAccessAtendimentos`: boolean (deve ser true para login)
-- `login`: string (para autenticação)
-- `passwordHash`: string (senha com bcrypt)
-- `isActive`: boolean (deve ser true)
-- `networkUnitId`: FK para a unidade
+### Depois da Correção ✅
+- Veterinários admin veem TODOS os atendimentos da unidade
+- Dashboard mostra estatísticas COMPLETAS da unidade
+- Gráficos exibem dados de TODA a unidade
+- Sidebar mantido (sem link de Corpo Clínico)
+- Página de Corpo Clínico continua bloqueada
 
 ## Validação de Segurança
 
-### ✅ Proteções Implementadas
+### ✅ Proteções Mantidas
 
 1. **Autenticação JWT**
    - Tokens assinados com `SESSION_SECRET`
@@ -174,14 +232,15 @@ Processo:
 
 ## Conclusão
 
-✅ **O controle de acesso está funcionando EXATAMENTE como solicitado:**
+✅ **O controle de acesso agora funciona CORRETAMENTE:**
 
-1. ✅ Veterinários admin têm acesso a Dashboard
-2. ✅ Veterinários admin têm acesso a Atendimentos
-3. ✅ Veterinários admin têm acesso a Procedimentos
-4. ✅ Veterinários admin têm acesso a Relatório Financeiro
-5. ✅ Veterinários admin NÃO veem link de Corpo Clínico no menu
-6. ✅ Veterinários admin são BLOQUEADOS se tentarem acessar Corpo Clínico diretamente
-7. ✅ Apenas login direto da unidade pode gerenciar Corpo Clínico
+1. ✅ Veterinários admin têm acesso a Dashboard com dados completos
+2. ✅ Veterinários admin veem TODOS os atendimentos da unidade
+3. ✅ Veterinários admin veem TODOS os procedimentos da unidade
+4. ✅ Veterinários admin veem TODOS os dados financeiros
+5. ✅ Veterinários admin veem gráficos completos da unidade
+6. ✅ Veterinários admin NÃO veem link de Corpo Clínico no menu
+7. ✅ Veterinários admin são BLOQUEADOS se tentarem acessar Corpo Clínico diretamente
+8. ✅ Apenas login direto da unidade pode gerenciar Corpo Clínico
 
-**Não são necessárias alterações no código atual.**
+**O problema foi identificado e corrigido com sucesso!**
