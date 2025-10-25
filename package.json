@@ -9,11 +9,10 @@
     "dev": "tsx server/index.ts",
     "dev:all": "node dev-server.cjs",
     "dev:frontend": "cd client && npm run dev",
-    "build": "npm run build:client && npm run build:server",
+    "build": "npm install --prefix client && npm run build:client && npm run build:server",
     "build:server": "tsc --project tsconfig.server.json",
     "build:client": "cd client && npm run build",
     "start": "NODE_ENV=production node dist/unified-server.js",
-    "heroku-postbuild": "npm install --prefix client && npm run build",
 
     "test": "vitest",
     "test:ui": "vitest --ui",

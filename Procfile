@@ -1,1 +1,1 @@
-web: npm run start
+web: NODE_ENV=production node dist/unified-server.js
