@@ -579,30 +579,6 @@ export const atendimentoProcedures = pgTable("atendimento_procedures", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-// Action logs table for tracking user actions in atendimentos creation
-export const actionLogs = pgTable("action_logs", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  actionType: text("action_type").notNull(), // "client_selected", "pet_selected", "procedure_added", "atendimento_created"
-  networkUnitId: varchar("network_unit_id").notNull().references(() => networkUnits.id),
-  userType: text("user_type").notNull(), // "admin", "unit", "veterinarian"
-  veterinarianId: varchar("veterinarian_id").references(() => veterinarians.id),
-  actionData: json("action_data"), // Optional detailed action data
-  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-});
-
-// Admin action logs table for tracking administrative actions
-export const adminActionLogs = pgTable("admin_action_logs", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  adminUserId: varchar("admin_user_id").references(() => users.id), // Nullable to support env-based admins
-  adminIdentifier: varchar("admin_identifier").notNull(), // Always stores login/email for tracking
-  actionType: varchar("action_type").notNull(), // "created", "updated", "deleted", "viewed"
-  entityType: varchar("entity_type").notNull(), // "client", "contract", "plan", "procedure"
-  entityId: varchar("entity_id").notNull(),
-  metadata: json("metadata"), // Additional action data
-  ip: varchar("ip"),
-  userAgent: varchar("user_agent"),
-  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-});
 
 // Atendimento history logs table for tracking all changes
 export const atendimentoHistoryLogs = pgTable("atendimento_history_logs", {
@@ -1107,7 +1083,6 @@ export const insertRulesSettingsSchema = createInsertSchema(rulesSettings).omit(
   ]).optional().refine(val => val === undefined || (val >= 0 && val <= 100), "Porcentagem de comissão recorrente deve estar entre 0 e 100")
 });
 export const insertAtendimentoSchema = createInsertSchema(atendimentos).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertActionLogSchema = createInsertSchema(actionLogs).omit({ id: true, createdAt: true });
 
 // Credential update schema for network units
 export const updateNetworkUnitCredentialsSchema = z.object({
@@ -1172,10 +1147,6 @@ export type Protocol = typeof protocols.$inferSelect;
 export type InsertProtocol = typeof protocols.$inferInsert;
 export type Atendimento = typeof atendimentos.$inferSelect;
 export type InsertAtendimento = typeof atendimentos.$inferInsert;
-export type ActionLog = typeof actionLogs.$inferSelect;
-export type InsertActionLog = typeof actionLogs.$inferInsert;
-export type AdminActionLog = typeof adminActionLogs.$inferSelect;
-export type InsertAdminActionLog = typeof adminActionLogs.$inferInsert;
 export type ProcedureUsage = typeof procedureUsage.$inferSelect;
 export type InsertProcedureUsage = typeof procedureUsage.$inferInsert;
 export type SatisfactionSurvey = typeof satisfactionSurveys.$inferSelect;
