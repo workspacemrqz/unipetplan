@@ -1011,7 +1011,7 @@ export default function Procedures() {
           errors[index] = 'Limites anuais é obrigatório quando habilitado';
           hasErrors = true;
         } else {
-          // Extract numeric value from string like "2 vezes no ano"
+          // Extract numeric value from string like "2 vezes no ano (por grupo)"
           const numericMatch = plan.limitesAnuais.match(/(\d+)/);
           const numericValue = numericMatch && numericMatch[1] ? parseInt(numericMatch[1], 10) : 0;
           if (numericValue < 1) {

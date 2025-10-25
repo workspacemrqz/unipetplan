@@ -434,7 +434,7 @@ export default function PlanForm() {
                         {
                           key: "limitesAnuais",
                           label: "Limites Anuais",
-                          formatter: (value: string) => value && value !== '0' && value !== '0 vezes no ano' ? value : "-"
+                          formatter: (value: string) => value && value !== '0' && value !== '0 vezes no ano (por grupo)' ? value : "-"
                         }
                       ]}
                     />
@@ -491,7 +491,7 @@ export default function PlanForm() {
                                   : '-'}
                               </TableCell>
                               <TableCell className="bg-white">
-                                {item.limitesAnuais && item.limitesAnuais !== '0' && item.limitesAnuais !== '0 vezes no ano' 
+                                {item.limitesAnuais && item.limitesAnuais !== '0' && item.limitesAnuais !== '0 vezes no ano (por grupo)' 
                                   ? item.limitesAnuais 
                                   : '-'}
                               </TableCell>

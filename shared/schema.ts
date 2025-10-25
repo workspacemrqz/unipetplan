@@ -529,7 +529,7 @@ export const procedurePlans = pgTable("procedure_plans", {
   payValue: integer("pay_value").default(0), // valor a pagar em centavos (editável pelo usuário)
   coparticipacao: integer("coparticipacao").default(0), // coparticipação em centavos
   carencia: text("carencia"), // período de carência (ex: "30 dias")
-  limitesAnuais: text("limites_anuais"), // limites anuais (ex: "2 vezes no ano" ou "ilimitado")
+  limitesAnuais: text("limites_anuais"), // limites anuais (ex: "2 vezes no ano (por grupo)" ou "ilimitado")
   isIncluded: boolean("is_included").default(true),
   displayOrder: integer("display_order").default(0),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
