@@ -5,6 +5,13 @@ import { isIPv4, isIPv6 } from 'net';
 /**
  * Valida configuração de segurança do webhook na inicialização
  * CIELO_WEBHOOK_SECRET é opcional - se configurado, valida header customizado
+ * 
+ * SETUP RECOMENDADO (mais seguro):
+ * 1. Gere um segredo forte (ex: webhook_secret_unipet_2025_xyz789abc123def456)
+ * 2. Configure no Replit: CIELO_WEBHOOK_SECRET = <seu segredo>
+ * 3. Configure na Cielo:
+ *    - Key: Authorization  (só letras! Cielo não aceita hífen, números ou caracteres especiais)
+ *    - Value: <mesmo segredo do passo 2>
  */
 export function validateWebhookSecurityConfig(): void {
   const webhookSecret = process.env.CIELO_WEBHOOK_SECRET;
@@ -12,9 +19,13 @@ export function validateWebhookSecurityConfig(): void {
   if (!webhookSecret) {
     console.warn('⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado');
     console.warn('⚠️ [WEBHOOK-SECURITY] Webhooks validados apenas por IP (menos seguro)');
-    console.warn('💡 [WEBHOOK-SECURITY] Recomendado: Configure header customizado na Cielo e defina CIELO_WEBHOOK_SECRET');
+    console.warn('💡 [WEBHOOK-SECURITY] SETUP RECOMENDADO:');
+    console.warn('   1. Configure CIELO_WEBHOOK_SECRET no Replit com um valor secreto forte');
+    console.warn('   2. Na Cielo, configure: Key="Authorization", Value=<mesmo valor do secret>');
+    console.warn('   3. OBS: Key só aceita LETRAS (sem hífen, números ou caracteres especiais)');
   } else {
     console.log('✅ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET configurado - validação por header ativa');
+    console.log('💡 [WEBHOOK-SECURITY] Na Cielo, configure: Key="Authorization", Value=<seu secret>');
   }
 }
 
@@ -103,17 +114,19 @@ export function validateWebhookIP(req: Request): boolean {
 /**
  * Valida o header customizado do webhook
  * A Cielo envia headers customizados (key/value) configurados no painel
- * Não é assinatura HMAC - apenas comparação de valor estático
+ * IMPORTANTE: Cielo só aceita nomes de header com LETRAS (sem hífen, números ou caracteres especiais)
+ * Recomendado: usar "Authorization" (padrão HTTP) ou "WebhookSecret"
  */
 export function validateWebhookHeader(req: Request, secret: string): boolean {
-  // Tentar vários nomes possíveis de header
-  const headerValue = req.headers['x-webhook-secret'] || 
-                      req.headers['x-cielo-webhook'] ||
-                      req.headers['webhook-secret'] ||
-                      req.headers['authorization'];
+  // Headers válidos na Cielo (apenas letras, sem hífen)
+  // O Express converte headers para lowercase, então verificamos em lowercase
+  const headerValue = req.headers['authorization'] || 
+                      req.headers['webhooksecret'] ||
+                      req.headers['cielotoken'];
   
   if (!headerValue || typeof headerValue !== 'string') {
     console.warn('⚠️ [WEBHOOK-SECURITY] Webhook sem header de autenticação');
+    console.warn('💡 [WEBHOOK-SECURITY] Headers verificados: Authorization, WebhookSecret, CieloToken');
     return false;
   }
   
@@ -122,7 +135,10 @@ export function validateWebhookHeader(req: Request, secret: string): boolean {
   const expectedBuffer = Buffer.from(secret);
   
   if (receivedBuffer.length !== expectedBuffer.length) {
-    console.warn('⚠️ [WEBHOOK-SECURITY] Tamanho do header inválido');
+    console.warn('⚠️ [WEBHOOK-SECURITY] Tamanho do header inválido', {
+      received: receivedBuffer.length,
+      expected: expectedBuffer.length
+    });
     return false;
   }
   
@@ -130,6 +146,8 @@ export function validateWebhookHeader(req: Request, secret: string): boolean {
   
   if (!isValid) {
     console.warn('⚠️ [WEBHOOK-SECURITY] Header de autenticação inválido');
+  } else {
+    console.log('✅ [WEBHOOK-SECURITY] Header de autenticação válido');
   }
   
   return isValid;
