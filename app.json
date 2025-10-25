@@ -1,9 +1,18 @@
 {
-  "name": "Sistema UNIPET",
-  "description": "Sistema de gerenciamento para pets",
+  "name": "UNIPET PLAN",
+  "description": "Sistema robusto de plano de saúde para pets com frontend React e backend Node.js",
   "repository": "https://github.com/your-username/your-repo",
   "logo": "",
-  "keywords": ["node", "express", "react", "typescript", "postgresql"],
+  "keywords": [
+    "node",
+    "express",
+    "react",
+    "typescript",
+    "postgresql",
+    "vite",
+    "drizzle-orm",
+    "tailwindcss"
+  ],
   "stack": "heroku-24",
   "buildpacks": [
     {
@@ -18,23 +27,74 @@
   },
   "env": {
     "NODE_ENV": {
-      "description": "Environment",
-      "value": "production"
-    },
-    "SESSION_SECRET": {
-      "description": "Secret key for session management",
-      "generator": "secret"
+      "description": "Node.js environment",
+      "value": "production",
+      "required": true
     },
     "DATABASE_URL": {
-      "description": "PostgreSQL database URL"
+      "description": "PostgreSQL connection string",
+      "required": true
+    },
+    "SESSION_SECRET": {
+      "description": "Secret key for session encryption",
+      "generator": "secret",
+      "required": true
+    },
+    "SUPABASE_URL": {
+      "description": "Supabase project URL for file storage",
+      "required": false
+    },
+    "SUPABASE_SERVICE_KEY": {
+      "description": "Supabase service role key for file storage",
+      "required": false
+    },
+    "CIELO_MERCHANT_ID": {
+      "description": "Cielo payment gateway Merchant ID",
+      "required": false
+    },
+    "CIELO_MERCHANT_KEY": {
+      "description": "Cielo payment gateway Merchant Key",
+      "required": false
+    },
+    "EMAIL_USER": {
+      "description": "Email address for sending notifications",
+      "required": false
+    },
+    "EMAIL_PASSWORD": {
+      "description": "Email password for authentication",
+      "required": false
+    },
+    "EMAIL_HOST": {
+      "description": "SMTP host for email service",
+      "value": "smtp.gmail.com",
+      "required": false
+    },
+    "EMAIL_PORT": {
+      "description": "SMTP port for email service",
+      "value": "587",
+      "required": false
+    },
+    "ADMIN_INITIAL_PASSWORD": {
+      "description": "Initial admin password",
+      "required": false
     },
     "SENHA": {
-      "description": "Admin password for system access"
+      "description": "Admin password for system access (legacy)",
+      "required": false
+    },
+    "VITE_API_TARGET": {
+      "description": "API target for Vite proxy during build",
+      "value": "http://localhost:3000",
+      "required": false
     }
   },
   "addons": [
     {
-      "plan": "heroku-postgresql:mini"
+      "plan": "heroku-postgresql:essential",
+      "as": "DATABASE"
     }
-  ]
+  ],
+  "scripts": {
+    "postdeploy": "npm run db:push"
+  }
 }
