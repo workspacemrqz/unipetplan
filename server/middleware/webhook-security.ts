@@ -186,37 +186,21 @@ export function validateCieloWebhook(req: Request, res: Response, next: NextFunc
     correlationId,
     ip: req.ip,
     userAgent: req.headers['user-agent'],
-    hasSignature: !!req.headers['x-cielo-signature'],
+    hasAuthorization: !!req.headers['authorization'],
     timestamp: new Date().toISOString()
   });
   
-  // 1. Validar IP de origem
-  if (!validateWebhookIP(req)) {
-    console.error('❌ [WEBHOOK-SECURITY] IP não autorizado', {
-      correlationId,
-      ip: req.ip,
-      timestamp: new Date().toISOString()
-    });
-    return res.status(403).json({ 
-      error: 'Acesso negado',
-      correlationId 
-    });
-  }
-  
-  // 2. Validar User-Agent (apenas warning, não bloquear)
-  if (!validateWebhookUserAgent(req)) {
-    console.warn('⚠️ [WEBHOOK-SECURITY] User-Agent suspeito mas permitindo acesso', {
-      correlationId,
-      userAgent: req.headers['user-agent']
-    });
-  }
-  
-  // 3. Validar header customizado (OPCIONAL - se CIELO_WEBHOOK_SECRET estiver configurado)
   const webhookSecret = process.env.CIELO_WEBHOOK_SECRET;
   
+  // Se o secret está configurado, validar primeiro o header
+  // Se passar, não precisa validar IP (útil quando atrás de proxy/CDN)
   if (webhookSecret) {
-    // Se o secret está configurado, validar o header customizado
-    if (!validateWebhookHeader(req, webhookSecret)) {
+    const isHeaderValid = validateWebhookHeader(req, webhookSecret);
+    
+    if (isHeaderValid) {
+      console.log('✅ [WEBHOOK-SECURITY] Header de autenticação válido, bypass de validação de IP', { correlationId });
+    } else {
+      // Header inválido - bloquear imediatamente
       console.error('❌ [WEBHOOK-SECURITY] Header de autenticação inválido', {
         correlationId,
         timestamp: new Date().toISOString()
@@ -226,10 +210,29 @@ export function validateCieloWebhook(req: Request, res: Response, next: NextFunc
         correlationId 
       });
     }
-    console.log('✅ [WEBHOOK-SECURITY] Header de autenticação válido', { correlationId });
   } else {
-    // Se não há secret configurado, apenas avisar (validação apenas por IP)
-    console.warn('⚠️ [WEBHOOK-SECURITY] Webhook aceito apenas com validação de IP (sem header de autenticação)');
+    // Sem secret configurado - validar apenas por IP
+    console.warn('⚠️ [WEBHOOK-SECURITY] Sem header de autenticação configurado, validando apenas por IP');
+    
+    if (!validateWebhookIP(req)) {
+      console.error('❌ [WEBHOOK-SECURITY] IP não autorizado e sem autenticação por header', {
+        correlationId,
+        ip: req.ip,
+        timestamp: new Date().toISOString()
+      });
+      return res.status(403).json({ 
+        error: 'Acesso negado',
+        correlationId 
+      });
+    }
+  }
+  
+  // Validar User-Agent (apenas warning, não bloquear)
+  if (!validateWebhookUserAgent(req)) {
+    console.warn('⚠️ [WEBHOOK-SECURITY] User-Agent suspeito mas permitindo acesso', {
+      correlationId,
+      userAgent: req.headers['user-agent']
+    });
   }
   
   // Parse JSON após validação (body ainda é um Buffer)
