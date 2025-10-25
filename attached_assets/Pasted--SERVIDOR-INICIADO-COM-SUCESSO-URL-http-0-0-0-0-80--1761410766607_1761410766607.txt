@@ -1,0 +1,264 @@
+
+🎉 SERVIDOR INICIADO COM SUCESSO!
+=====================================
+🌐 URL: http://0.0.0.0:80
+🏠 Host: 0.0.0.0 (Aceita conexões externas)
+🌍 Ambiente: production
+📁 Diretório: /workspace
+🔌 Banco: Conectado e saudável
+🛡️ Segurança: Ativa e configurada
+📊 Health Check: /api/health
+📦 Modo: Produção - arquivos estáticos servidos de dist/client
+🔒 HTTPS: Recomendado para produção
+=====================================
+
+⏰ Inicializando cron jobs de renovação automática...
+[CronJobs] Inicializando cron jobs de renovação automática
+[CronJobs] ✅ Job configurado: Notificações de vencimento (diário às 08:00)
+[CronJobs] ✅ Job configurado: Renovações automáticas (diário às 03:00)
+[CronJobs] ✅ Job configurado: Atualização de status (diário às 04:00)
+[CronJobs] ✅ Job configurado: Notificações de atraso (diário às 10:00)
+[CronJobs] 4 cron jobs iniciados com sucesso
+✅ 4 cron jobs iniciados com sucesso
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CHAT] Chat settings retrieved: {
+  hasBotIcon: true,
+  hasUserIcon: true,
+  botIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-bot-1761112511936.jpg',
+  userIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-user-1761112513424.jpg'
+}
+GET /api/chat/settings 304 in 37ms
+✅ [CORS] Same-origin request allowed
+GET /api/site-settings 304 in 74ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+GET /api/species 304 in 45ms
+GET /api/faq 304 in 90ms
+GET /api/plans 304 in 99ms
+✅ [CORS] Same-origin request allowed
+GET /api/plans 304 in 29ms
+
+🛑 Recebido SIGTERM, encerrando graciosamente...
+🔌 Fechando conexões com banco de dados...
+✅ Servidor HTTP fechado
+✅ Conexões com banco de dados fechadas
+✅ Encerramento gracioso concluído
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CHAT] Chat settings retrieved: {
+  hasBotIcon: true,
+  hasUserIcon: true,
+  botIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-bot-1761112511936.jpg',
+  userIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-user-1761112513424.jpg'
+}
+GET /api/chat/settings 304 in 12ms
+✅ [CORS] Same-origin request allowed
+GET /api/faq 304 in 18ms
+GET /api/site-settings 304 in 30ms
+GET /api/species 304 in 13ms
+✅ [CORS] Same-origin request allowed
+GET /api/plans 304 in 44ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+GET /api/plans 304 in 40ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CHAT] Chat settings retrieved: {
+  hasBotIcon: true,
+  hasUserIcon: true,
+  botIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-bot-1761112511936.jpg',
+  userIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-user-1761112513424.jpg'
+}
+GET /api/chat/settings 304 in 6ms
+✅ [CORS] Same-origin request allowed
+GET /api/faq 304 in 13ms
+✅ [CORS] Same-origin request allowed
+GET /api/site-settings 304 in 25ms
+GET /api/plans 304 in 27ms
+GET /api/species 304 in 16ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+GET /api/plans 304 in 19ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CHAT] Chat settings retrieved: {
+  hasBotIcon: true,
+  hasUserIcon: true,
+  botIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-bot-1761112511936.jpg',
+  userIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-user-1761112513424.jpg'
+}
+GET /api/chat/settings 304 in 7ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+GET /api/faq 304 in 13ms
+GET /api/site-settings 304 in 23ms
+GET /api/species 304 in 14ms
+✅ [CORS] Same-origin request allowed
+GET /api/plans 304 in 35ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+GET /api/plans 304 in 31ms
+✅ [CORS] Same-origin request allowed
+🔍 [WEBHOOK-SECURITY] Validando webhook {
+  correlationId: '5z8cre',
+  ip: '191.237.255.84',
+  userAgent: undefined,
+  hasAuthorization: true,
+  timestamp: '2025-10-25T16:45:11.769Z'
+}
+⚠️ [WEBHOOK-SECURITY] User-Agent suspeito: 
+⚠️ [WEBHOOK-SECURITY] User-Agent suspeito mas permitindo acesso { correlationId: '5z8cre', userAgent: undefined }
+✅ [WEBHOOK-SECURITY] Header de autenticação válido
+✅ [WEBHOOK-SECURITY] Header de autenticação válido, bypass de validação de IP { correlationId: '5z8cre' }
+✅ [WEBHOOK-SECURITY] Webhook autorizado {
+  correlationId: '5z8cre',
+  ip: '191.237.255.84',
+  timestamp: '2025-10-25T16:45:11.771Z'
+}
+📥 [CIELO-WEBHOOK] Webhook recebido {
+  correlationId: '5z8cre',
+  headers: {
+    'content-type': 'application/json',
+    'cielo-signature': undefined,
+    'user-agent': undefined
+  },
+  ip: '191.237.255.84',
+  bodyType: 'object',
+  bodyIsBuffer: false,
+  bodyLength: 0,
+  bodyPreview: '{"PaymentId":"b818f720-a7c1-427f-80a0-7b6dfd8c226b","ChangeType":1}'
+}
+📨 [CIELO-WEBHOOK] Webhook da Cielo recebido e validado {
+  correlationId: '5z8cre',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b',
+  changeType: 1,
+  validated: true
+}
+🔒 [SECURITY-AUDIT] Webhook Cielo recebido {
+  timestamp: '2025-10-25T16:45:11.774Z',
+  correlationId: '5z8cre',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b',
+  changeType: 1,
+  clientOrderId: undefined,
+  ip: '191.237.255.84',
+  userAgent: undefined
+}
+📥 [CIELO-WEBHOOK] Processando notificação {
+  correlationId: '5z8cre',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b',
+  changeType: 1,
+  clientOrderId: undefined
+}
+🔒 [SECURITY-AUDIT] Cielo Webhook Security Event {
+  timestamp: '2025-10-25T16:45:11.774Z',
+  event: 'webhook_received',
+  service: 'CieloWebhookService',
+  correlationId: '5z8cre',
+  details: {
+    paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b',
+    changeType: 1,
+    clientOrderId: undefined,
+    ipAddress: 'webhook',
+    userAgent: 'Cielo-Webhook'
+  }
+}
+🔍 [Cielo] Consultando pagamento {
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b'
+}
+🔗 [Cielo] URL de consulta: https://apiquery.cieloecommerce.cielo.com.br/1/sales/b818f720-a7c1-427f-80a0-7b6dfd8c226b
+❌ [Cielo] Erro na consulta: {
+  status: 404,
+  statusText: 'Not Found',
+  error: '',
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0'
+}
+⚠️ [Cielo] queryPayment tentativa 1 falhou, aguardando 1000ms {
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0',
+  error: 'Erro na API Cielo'
+}
+🔍 [Cielo] Consultando pagamento {
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b'
+}
+🔗 [Cielo] URL de consulta: https://apiquery.cieloecommerce.cielo.com.br/1/sales/b818f720-a7c1-427f-80a0-7b6dfd8c226b
+❌ [Cielo] Erro na consulta: {
+  status: 404,
+  statusText: 'Not Found',
+  error: '',
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0'
+}
+⚠️ [Cielo] queryPayment tentativa 2 falhou, aguardando 2000ms {
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0',
+  error: 'Erro na API Cielo'
+}
+🔍 [Cielo] Consultando pagamento {
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b'
+}
+🔗 [Cielo] URL de consulta: https://apiquery.cieloecommerce.cielo.com.br/1/sales/b818f720-a7c1-427f-80a0-7b6dfd8c226b
+❌ [Cielo] Erro na consulta: {
+  status: 404,
+  statusText: 'Not Found',
+  error: '',
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0'
+}
+🚨 [Cielo] queryPayment falhou após 3 tentativas {
+  correlationId: '26e7e9b8-736d-486f-9581-6360d5cf1eb0',
+  error: 'Erro na API Cielo'
+}
+❌ [CIELO-WEBHOOK] Erro ao processar mudança de status de pagamento {
+  correlationId: '5z8cre',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b',
+  error: 'Erro na API Cielo'
+}
+🔒 [SECURITY-AUDIT] Cielo Webhook Security Event {
+  timestamp: '2025-10-25T16:45:15.906Z',
+  event: 'webhook_processing_failed',
+  service: 'CieloWebhookService',
+  correlationId: '5z8cre',
+  details: {
+    paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b',
+    error: 'Erro na API Cielo',
+    ipAddress: 'webhook',
+    userAgent: 'Cielo-Webhook'
+  }
+}
+❌ [CIELO-WEBHOOK] Erro ao processar notificação {
+  correlationId: '5z8cre',
+  paymentId: 'b818f720-a7c1-427f-80a0-7b6dfd8c226b',
+  error: 'Erro na API Cielo'
+}
+🚨 [SECURITY-AUDIT] Webhook processing failed {
+  timestamp: '2025-10-25T16:45:15.907Z',
+  correlationId: '5z8cre',
+  error: 'Erro na API Cielo',
+  ip: '191.237.255.84'
+}
+POST /api/webhooks/cielo 500 in 4139ms
+❌ [CIELO-WEBHOOK] Erro ao processar webhook {
+  correlationId: '5z8cre',
+  error: 'Erro na API Cielo',
+  stack: 'CieloApiError: Erro na API Cielo\n' +
+    '    at file:///workspace/dist/server/services/cielo-service.js:384:23\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async CieloService.withRetry (file:///workspace/dist/server/services/cielo-service.js:105:24)\n' +
+    '    at async CieloWebhookService.handlePaymentStatusChange (file:///workspace/dist/server/services/cielo-webhook-service.js:64:36)\n' +
+    '    at async CieloWebhookService.processWebhookNotification (file:///workspace/dist/server/services/cielo-webhook-service.js:22:21)\n' +
+    '    at async file:///workspace/dist/server/routes.js:3480:13'
+}

@@ -57,6 +57,31 @@ export class CieloWebhookService {
       });
 
     } catch (error) {
+      // Verificar se é um erro 404 (pagamento não encontrado)
+      // Isso pode acontecer durante testes da Cielo ou se o pagamento foi cancelado/excluído
+      const isNotFound = error instanceof Error && 
+                         (error.message.includes('404') || 
+                          error.message.includes('Not Found') ||
+                          error.message.includes('não encontrado') ||
+                          error.message.includes('Erro na API Cielo'));
+      
+      if (isNotFound) {
+        console.warn('⚠️ [CIELO-WEBHOOK] Pagamento não encontrado na API - provavelmente teste da Cielo', {
+          correlationId,
+          paymentId: notification.PaymentId,
+          changeType: notification.ChangeType
+        });
+        
+        // Log informativo - não é um erro crítico
+        console.log('💡 [CIELO-WEBHOOK] Webhook de teste processado (pagamento não existe na API)', {
+          correlationId,
+          paymentId: notification.PaymentId
+        });
+        
+        // Não lançar erro - retornar normalmente
+        return;
+      }
+      
       console.error('❌ [CIELO-WEBHOOK] Erro ao processar notificação', {
         correlationId,
         paymentId: notification.PaymentId,
