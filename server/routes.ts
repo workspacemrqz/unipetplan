@@ -436,35 +436,6 @@ export async function createNextAnnualInstallmentIfNeeded(
   }
 }
 
-// Helper function to automatically log admin actions
-async function logAdminAction(
-  req: any,
-  actionType: 'created' | 'updated' | 'deleted' | 'viewed',
-  entityType: string,
-  entityId: string,
-  metadata: any = {}
-) {
-  try {
-    const adminUserId = req.session.admin?.userId || null; // Only use userId if it exists
-    const adminIdentifier = req.session.admin?.login || req.session.admin?.email || req.session.admin?.userId || 'unknown';
-    
-    await storage.createAdminActionLog({
-      adminUserId,
-      adminIdentifier,
-      actionType,
-      entityType,
-      entityId,
-      metadata,
-      ip: req.ip || req.connection.remoteAddress,
-      userAgent: req.headers['user-agent']
-    });
-    
-    console.log(`📝 [ADMIN-LOG] ${actionType} ${entityType} ${entityId} by ${adminIdentifier}`);
-  } catch (error) {
-    // Log errors silently - we don't want logging failures to break operations
-    console.error('❌ [ADMIN-LOG] Error creating admin log:', error);
-  }
-}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Import API security middleware
@@ -1257,7 +1228,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const newClient = await storage.createClient(dbClientData);
-      await logAdminAction(req, 'created', 'client', newClient.id, { name: clientData.full_name, email: clientData.email });
       res.status(201).json(newClient);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1296,7 +1266,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Client updated:", req.params.id);
-      await logAdminAction(req, 'updated', 'client', req.params.id, dbClientData);
       res.json(updatedClient);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating client:", error);
@@ -1320,7 +1289,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Client deleted:", req.params.id);
-      await logAdminAction(req, 'deleted', 'client', req.params.id, {});
       res.status(200).json({ success: true });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting client:", error);
@@ -1386,7 +1354,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newSeller = await storage.createSeller(dbSellerData);
       console.log("✅ [ADMIN] Seller created:", newSeller.id);
-      await logAdminAction(req, 'created', 'seller', newSeller.id, { name: sellerData.fullName });
       res.status(201).json(newSeller);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating seller:", error);
@@ -1428,7 +1395,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Seller updated:", req.params.id);
-      await logAdminAction(req, 'updated', 'seller', req.params.id, dbSellerData);
       res.json(updatedSeller);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating seller:", error);
@@ -1452,7 +1418,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("✅ [ADMIN] Seller deleted:", req.params.id);
-      await logAdminAction(req, 'deleted', 'seller', req.params.id, {});
       res.status(200).json({ success: true });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting seller:", error);
@@ -1511,7 +1476,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       console.log("✅ [ADMIN] Seller payment created:", payment.id);
-      await logAdminAction(req, 'created', 'seller_payment', payment.id, { sellerId: paymentData.sellerId, amount: paymentData.amount });
       res.json(payment);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating seller payment:", error);
@@ -2110,7 +2074,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       await storage.updateContract(id, updateData);
 
-      await logAdminAction(req, 'updated', 'contract', id, updateData);
       res.json({ 
         success: true,
         message: "Contrato atualizado com sucesso" 
@@ -2266,7 +2229,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } as any; // Type assertion para permitir campos opcionais
       
       const newPet = await storage.createPet(processedPetData);
-      await logAdminAction(req, 'created', 'pet', newPet.id, { name: processedPetData.name, species: processedPetData.species });
       res.status(201).json(newPet);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating pet:", error);
@@ -2296,7 +2258,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Pet não encontrado" });
       }
       
-      await logAdminAction(req, 'updated', 'pet', req.params.id, processedPetData);
       console.log("✅ [ADMIN] Pet updated:", req.params.id);
       res.json(updatedPet);
     } catch (error) {
@@ -2336,13 +2297,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Erro ao atualizar peso do pet" });
       }
       
-      // Log the weight update action
-      await logAdminAction(req, 'updated', 'pet_weight', id, { 
-        petName: pet.name, 
-        oldWeight: oldWeight, 
-        newWeight: weightNum 
-      });
-      
       console.log(`✅ [ADMIN] Pet weight updated: ${pet.name} - Old: ${oldWeight}kg, New: ${weightNum}kg`);
       
       res.json({ 
@@ -2366,7 +2320,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Pet não encontrado" });
       }
       
-      await logAdminAction(req, 'deleted', 'pet', req.params.id, {});
       console.log("✅ [ADMIN] Pet deleted:", req.params.id);
       res.status(200).json({ success: true });
     } catch (error) {
@@ -2408,7 +2361,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: validatedData.isActive
       };
       const newItem = await storage.createFaqItem(faqData);
-      await logAdminAction(req, 'created', 'faq', newItem.id, { question: faqData.question });
       console.log("✅ [ADMIN] FAQ item created:", newItem.id);
       res.json(newItem);
     } catch (error) {
@@ -2442,7 +2394,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedItem) {
         return res.status(404).json({ error: "Item do FAQ não encontrado" });
       }
-      await logAdminAction(req, 'updated', 'faq', req.params.id, updateData);
       console.log("✅ [ADMIN] FAQ item updated:", req.params.id);
       res.json(updatedItem);
     } catch (error) {
@@ -2457,7 +2408,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!success) {
         return res.status(404).json({ error: "Item do FAQ não encontrado" });
       }
-      await logAdminAction(req, 'deleted', 'faq', req.params.id, {});
       console.log("✅ [ADMIN] FAQ item deleted:", req.params.id);
       res.json({ success: true });
     } catch (error) {
@@ -2849,7 +2799,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: 'Atendimento criado pelo administrador'
       });
       
-      await logAdminAction(req, 'created', 'atendimento', newAtendimento.id, { clientId: atendimentoData.clientId, networkUnitId: atendimentoData.networkUnitId });
       console.log(`✅ [ADMIN] Atendimento created:`, newAtendimento.id);
       res.status(201).json(newAtendimento);
     } catch (error: any) {
@@ -2927,7 +2876,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
-      await logAdminAction(req, 'updated', 'atendimento', req.params.id, processedAtendimentoData);
       console.log(`✅ [ADMIN] Atendimento updated:`, updatedAtendimento.id);
       res.json(updatedAtendimento);
     } catch (error: any) {
@@ -2948,7 +2896,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "atendimento não encontrado" });
       }
       
-      await logAdminAction(req, 'deleted', 'atendimento', req.params.id, {});
       console.log(`✅ [ADMIN] Atendimento deleted:`, req.params.id);
       res.json({ success: true });
     } catch (error) {
@@ -3057,13 +3004,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newPlan = await storage.createPlan(newPlanData);
       
-      // Log admin action
-      await logAdminAction(req, 'created', 'plan', newPlan.id, { 
-        name: newPlanData.name, 
-        planType: newPlanData.planType,
-        basePrice: newPlanData.basePrice 
-      });
-      
       console.log(`✅ [ADMIN] New plan created successfully:`, newPlan.id);
       res.status(201).json(newPlan);
     } catch (error) {
@@ -3113,9 +3053,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Plano não encontrado" });
       }
       
-      // Log admin action
-      await logAdminAction(req, 'updated', 'plan', planId, planUpdateData);
-      
       console.log(`✅ [ADMIN] Plan ${planId} updated successfully`);
       res.json(updatedPlan);
     } catch (error) {
@@ -3162,7 +3099,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create the network unit
       const newUnit = await storage.createNetworkUnit(unitData);
-      await logAdminAction(req, 'created', 'network_unit', newUnit.id, { name: unitData.name });
       console.log("✨ [ADMIN] Network unit created successfully:", newUnit.id);
       
       res.status(201).json(newUnit);
@@ -3225,7 +3161,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Unidade não encontrada" });
       }
       
-      await logAdminAction(req, 'updated', 'network_unit_credentials', id, { credentialsUpdated: true });
       console.log(`✅ [CREDENTIALS] Credenciais atualizadas com sucesso para unidade: ${updatedUnit.name} (${updatedUnit.urlSlug})`);
       console.log(`🔑 [CREDENTIALS] Login: ${login} | Use esta senha para acessar: ${password}`);
       
@@ -3361,7 +3296,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📝 [ADMIN] aboutImageUrl field:", req.body.aboutImageUrl);
       const updatedSettings = await storage.updateSiteSettings(req.body);
       console.log("✅ [ADMIN] Site settings updated successfully, aboutImageUrl:", updatedSettings?.aboutImageUrl);
-      await logAdminAction(req, 'updated', 'site_settings', 'general', req.body);
       res.json(updatedSettings);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating site settings:", error);
@@ -3387,7 +3321,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/admin/api/settings/rules", requireAdmin, async (req, res) => {
     try {
       const updatedSettings = await storage.updateRulesSettings(req.body);
-      await logAdminAction(req, 'updated', 'site_settings', 'rules', req.body);
       res.json(updatedSettings);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating rules settings:", error);
@@ -3416,7 +3349,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📝 [ADMIN] Received chat settings update:", req.body);
       const updatedSettings = await storage.updateChatSettings(req.body);
       console.log("✅ [ADMIN] Chat settings updated successfully");
-      await logAdminAction(req, 'updated', 'site_settings', 'chat', req.body);
       res.json(updatedSettings);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating chat settings:", error);
@@ -3453,7 +3385,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Unidade não encontrada" });
       }
       
-      await logAdminAction(req, 'updated', 'network_unit', id, updateData);
       res.json(updatedUnit);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating network unit:", error);
@@ -3472,7 +3403,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Unidade não encontrada" });
       }
       
-      await logAdminAction(req, 'deleted', 'network_unit', id, {});
       res.status(204).send();
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting network unit:", error);
@@ -3547,7 +3477,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("📝 [ADMIN] Creating new procedure:", req.body);
       const newProcedure = await storage.createProcedure(req.body);
-      await logAdminAction(req, 'created', 'procedure', newProcedure.id, { name: req.body.name, category: req.body.category });
       console.log("✅ [ADMIN] Procedure created successfully:", newProcedure);
       res.status(201).json(newProcedure);
     } catch (error) {
@@ -3568,7 +3497,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Procedimento não encontrado" });
       }
       
-      await logAdminAction(req, 'updated', 'procedure', id, req.body);
       console.log("✅ [ADMIN] Procedure updated successfully:", updatedProcedure);
       res.json(updatedProcedure);
     } catch (error) {
@@ -3589,7 +3517,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Procedimento não encontrado" });
       }
       
-      await logAdminAction(req, 'deleted', 'procedure', id, {});
       console.log("✅ [ADMIN] Procedure deleted successfully");
       res.status(204).send();
     } catch (error) {
@@ -3625,7 +3552,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Delete existing relations and insert new ones atomically
       await storage.updateProcedurePlans(id, procedurePlans);
       
-      await logAdminAction(req, 'updated', 'procedure_plans', id, { plans: procedurePlans });
       console.log("✅ [ADMIN] Procedure plans updated successfully");
       res.json({ success: true });
     } catch (error) {
@@ -3660,8 +3586,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword
       });
       
-      await logAdminAction(req, 'created', 'admin_user', newUser.id, { username: validatedData.username, email: validatedData.email });
-      
       // Remove password from response
       const { password, ...userResponse } = newUser;
       res.status(201).json(userResponse);
@@ -3688,10 +3612,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
       
-      // Prepare update data without password for logging
-      const { password, ...updateData } = validatedData;
-      await logAdminAction(req, 'updated', 'admin_user', id, updateData);
-      
       // Remove password from response
       const { password: _, ...userResponse } = updatedUser;
       res.json(userResponse);
@@ -3717,8 +3637,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
       
-      await logAdminAction(req, 'updated', 'admin_user', id, { action: 'deactivated' });
-      
       // Remove password from response
       const { password: _, ...userResponse } = updatedUser;
       res.json({ success: true, message: "Usuário desativado com sucesso", user: userResponse });
@@ -3735,7 +3653,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!deleted) {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
-      await logAdminAction(req, 'deleted', 'admin_user', id, {});
       res.json({ success: true, message: "Usuário removido com sucesso" });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting user:", error);
@@ -3842,7 +3759,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // SECURITY: Use Zod schema validation to prevent mass assignment attacks
       const validatedCouponData = insertCouponSchema.parse(req.body);
       const coupon = await storage.createCoupon(validatedCouponData);
-      await logAdminAction(req, 'created', 'coupon', coupon.id, { code: validatedCouponData.code, type: validatedCouponData.type });
       res.status(201).json(coupon);
     } catch (error) {
       console.error("❌ [ADMIN] Error creating coupon:", error);
@@ -3859,7 +3775,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedCoupon) {
         return res.status(404).json({ error: "Cupom não encontrado" });
       }
-      await logAdminAction(req, 'updated', 'coupon', req.params.id, validatedCouponData);
       res.json(updatedCoupon);
     } catch (error) {
       console.error("❌ [ADMIN] Error updating coupon:", error);
@@ -3874,7 +3789,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!deleted) {
         return res.status(404).json({ error: "Cupom não encontrado" });
       }
-      await logAdminAction(req, 'deleted', 'coupon', req.params.id, {});
       res.json({ success: true, message: "Cupom removido com sucesso" });
     } catch (error) {
       console.error("❌ [ADMIN] Error deleting coupon:", error);
