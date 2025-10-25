@@ -820,10 +820,7 @@ export default function Administration() {
                   <TableRow key={user.id} className="bg-white border-b border-[#eaeaea]">
                     {visibleColumns.includes("Nome") && (
                       <TableCell className="font-medium whitespace-nowrap bg-white" data-testid={`user-name-${user.id}`}>
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-primary" />
-                          <span>{user.username}</span>
-                        </div>
+                        <span>{user.username}</span>
                       </TableCell>
                     )}
                     {visibleColumns.includes("Email") && (
