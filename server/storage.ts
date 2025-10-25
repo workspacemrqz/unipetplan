@@ -271,6 +271,10 @@ export interface IStorage {
   createVeterinarian(veterinarian: any): Promise<any>;
   updateVeterinarian(id: string, veterinarian: any): Promise<any | undefined>;
   deleteVeterinarian(id: string): Promise<boolean>;
+
+  // Action Logs (for network units)
+  createActionLog(log: any): Promise<any>;
+  getActionLogsByUnit(unitId: string): Promise<any[]>;
 }
 
 // Storage em memória para quando não houver banco de dados
@@ -479,6 +483,8 @@ export class InMemoryStorage implements IStorage {
   async createVeterinarian(veterinarian: any): Promise<any> { return veterinarian; }
   async updateVeterinarian(id: string, veterinarian: any): Promise<any | undefined> { return veterinarian; }
   async deleteVeterinarian(id: string): Promise<boolean> { return true; }
+  async createActionLog(log: any): Promise<any> { return { id: Date.now().toString(), ...log, createdAt: new Date() }; }
+  async getActionLogsByUnit(unitId: string): Promise<any[]> { return []; }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2345,6 +2351,16 @@ export class DatabaseStorage implements IStorage {
       .delete(veterinarians)
       .where(eq(veterinarians.id, id));
     return (result.rowCount || 0) > 0;
+  }
+
+  async createActionLog(log: any): Promise<any> {
+    console.log('📝 [ACTION-LOG] Creating action log:', log);
+    return { id: Date.now().toString(), ...log, createdAt: new Date() };
+  }
+
+  async getActionLogsByUnit(unitId: string): Promise<any[]> {
+    console.log('📝 [ACTION-LOG] Getting action logs for unit:', unitId);
+    return [];
   }
 
 }
