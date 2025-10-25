@@ -8,16 +8,3 @@ builder = "heroku/builder:24"
 [[build.buildpacks]]
 # Node.js buildpack for the application
 id = "heroku/nodejs"
-
-[build.env]
-# Build environment variables
-NODE_ENV = "production"
-NPM_CONFIG_PRODUCTION = "false"  # Install devDependencies for building
-
-[[build.env.vars]]
-name = "NODE_OPTIONS"
-value = "--max-old-space-size=4096"
-
-[[build.env.vars]]
-name = "NODE_VERBOSE"
-value = "false"
