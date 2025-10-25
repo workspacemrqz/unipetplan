@@ -36,16 +36,10 @@ import {
   type InsertSatisfactionSurvey,
   type Veterinarian,
   type InsertVeterinarian,
-  type ActionLog,
-  type InsertActionLog,
-  type AdminActionLog,
-  type InsertAdminActionLog,
   contactSubmissions,
   plans,
   networkUnits,
   veterinarians,
-  actionLogs,
-  adminActionLogs,
   faqItems,
   siteSettings,
   chatSettings,
@@ -277,31 +271,6 @@ export interface IStorage {
   createVeterinarian(veterinarian: any): Promise<any>;
   updateVeterinarian(id: string, veterinarian: any): Promise<any | undefined>;
   deleteVeterinarian(id: string): Promise<boolean>;
-
-  // Action Logs
-  createActionLog(data: InsertActionLog): Promise<ActionLog>;
-  getActionLogsByUnit(unitId: string): Promise<any[]>;
-  getAllActionLogs(filters?: {
-    startDate?: string;
-    endDate?: string;
-    userType?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ data: any[]; total: number; totalPages: number; page: number }>;
-
-  // Admin Action Logs
-  createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog>;
-  getAdminActionLogs(filters: {
-    startDate?: string;
-    endDate?: string;
-    adminUserId?: string;
-    actionType?: string;
-    entityType?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ data: AdminActionLog[]; total: number; totalPages: number; page: number }>;
-
-  // Chat Conversations - Removed (table no longer exists)
 }
 
 // Storage em memória para quando não houver banco de dados
@@ -510,31 +479,6 @@ export class InMemoryStorage implements IStorage {
   async createVeterinarian(veterinarian: any): Promise<any> { return veterinarian; }
   async updateVeterinarian(id: string, veterinarian: any): Promise<any | undefined> { return veterinarian; }
   async deleteVeterinarian(id: string): Promise<boolean> { return true; }
-  
-  // Action Logs
-  async createActionLog(data: InsertActionLog): Promise<ActionLog> { 
-    return { 
-      ...data, 
-      id: crypto.randomUUID(), 
-      createdAt: new Date() 
-    } as ActionLog; 
-  }
-  async getActionLogsByUnit(unitId: string): Promise<any[]> { return []; }
-  async getAllActionLogs(filters?: any): Promise<{ data: any[]; total: number; totalPages: number; page: number }> {
-    return { data: [], total: 0, totalPages: 0, page: 1 };
-  }
-  
-  // Admin Action Logs
-  async createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog> { 
-    return { 
-      ...data, 
-      id: crypto.randomUUID(), 
-      createdAt: new Date() 
-    } as AdminActionLog; 
-  }
-  async getAdminActionLogs(filters: any): Promise<{ data: AdminActionLog[]; total: number; totalPages: number; page: number }> { 
-    return { data: [], total: 0, totalPages: 0, page: 1 }; 
-  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2401,182 +2345,6 @@ export class DatabaseStorage implements IStorage {
       .delete(veterinarians)
       .where(eq(veterinarians.id, id));
     return (result.rowCount || 0) > 0;
-  }
-
-  // Action Logs
-  async createActionLog(data: InsertActionLog): Promise<ActionLog> {
-    const [log] = await db
-      .insert(actionLogs)
-      .values(data)
-      .returning();
-    return log;
-  }
-
-  async getActionLogsByUnit(unitId: string): Promise<any[]> {
-    const logs = await db
-      .select({
-        log: actionLogs,
-        veterinarian: veterinarians,
-      })
-      .from(actionLogs)
-      .leftJoin(veterinarians, eq(actionLogs.veterinarianId, veterinarians.id))
-      .where(eq(actionLogs.networkUnitId, unitId))
-      .orderBy(desc(actionLogs.createdAt));
-    
-    return logs.map((row) => ({
-      log: row.log,
-      veterinarian: row.veterinarian ? {
-        id: row.veterinarian.id,
-        name: row.veterinarian.name,
-      } : null,
-    }));
-  }
-
-  async getAllActionLogs(filters?: {
-    startDate?: string;
-    endDate?: string;
-    userType?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ data: any[]; total: number; totalPages: number; page: number }> {
-    const page = filters?.page || 1;
-    const limit = filters?.limit || 10;
-    const offset = (page - 1) * limit;
-
-    // Build where conditions
-    const conditions: any[] = [];
-    
-    if (filters?.userType && filters.userType !== 'all') {
-      conditions.push(eq(actionLogs.userType, filters.userType));
-    }
-    
-    if (filters?.startDate) {
-      conditions.push(sql`${actionLogs.createdAt} >= ${filters.startDate}`);
-    }
-    
-    if (filters?.endDate) {
-      conditions.push(sql`${actionLogs.createdAt} <= ${filters.endDate}`);
-    }
-
-    // Get total count
-    const countQuery = conditions.length > 0
-      ? db.select({ count: sql<number>`count(*)` }).from(actionLogs).where(and(...conditions))
-      : db.select({ count: sql<number>`count(*)` }).from(actionLogs);
-    
-    const [{ count: total }] = await countQuery;
-
-    // Get paginated data with join
-    const dataQuery = db
-      .select({
-        log: actionLogs,
-        veterinarian: veterinarians,
-        networkUnit: networkUnits,
-      })
-      .from(actionLogs)
-      .leftJoin(veterinarians, eq(actionLogs.veterinarianId, veterinarians.id))
-      .leftJoin(networkUnits, eq(actionLogs.networkUnitId, networkUnits.id))
-      .orderBy(desc(actionLogs.createdAt))
-      .limit(limit)
-      .offset(offset);
-
-    const logs = conditions.length > 0
-      ? await dataQuery.where(and(...conditions))
-      : await dataQuery;
-    
-    const totalPages = Math.ceil(total / limit);
-
-    const mappedData = logs.map((row) => ({
-      log: row.log,
-      veterinarian: row.veterinarian ? {
-        id: row.veterinarian.id,
-        name: row.veterinarian.name,
-      } : null,
-      networkUnit: row.networkUnit ? {
-        id: row.networkUnit.id,
-        name: row.networkUnit.name,
-      } : null,
-    }));
-
-    return {
-      data: mappedData,
-      total,
-      totalPages,
-      page,
-    };
-  }
-
-  // Admin Action Logs
-  async createAdminActionLog(data: InsertAdminActionLog): Promise<AdminActionLog> {
-    const [log] = await db
-      .insert(adminActionLogs)
-      .values(data)
-      .returning();
-    return log;
-  }
-
-  async getAdminActionLogs(filters: {
-    startDate?: string;
-    endDate?: string;
-    adminUserId?: string;
-    actionType?: string;
-    entityType?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ data: AdminActionLog[]; total: number; totalPages: number; page: number }> {
-    const page = filters.page || 1;
-    const limit = filters.limit || 10;
-    const offset = (page - 1) * limit;
-
-    // Build where conditions
-    const conditions: any[] = [];
-    
-    if (filters.adminUserId) {
-      conditions.push(eq(adminActionLogs.adminUserId, filters.adminUserId));
-    }
-    
-    if (filters.actionType) {
-      conditions.push(eq(adminActionLogs.actionType, filters.actionType));
-    }
-    
-    if (filters.entityType) {
-      conditions.push(eq(adminActionLogs.entityType, filters.entityType));
-    }
-    
-    if (filters.startDate) {
-      conditions.push(sql`${adminActionLogs.createdAt} >= ${filters.startDate}`);
-    }
-    
-    if (filters.endDate) {
-      conditions.push(sql`${adminActionLogs.createdAt} <= ${filters.endDate}`);
-    }
-
-    // Get total count
-    const countQuery = conditions.length > 0
-      ? db.select({ count: sql<number>`count(*)` }).from(adminActionLogs).where(and(...conditions))
-      : db.select({ count: sql<number>`count(*)` }).from(adminActionLogs);
-    
-    const [{ count: total }] = await countQuery;
-
-    // Get paginated data
-    const dataQuery = db
-      .select()
-      .from(adminActionLogs)
-      .orderBy(desc(adminActionLogs.createdAt))
-      .limit(limit)
-      .offset(offset);
-    
-    const data = conditions.length > 0
-      ? await dataQuery.where(and(...conditions))
-      : await dataQuery;
-
-    const totalPages = Math.ceil(Number(total) / limit);
-
-    return {
-      data,
-      total: Number(total),
-      totalPages,
-      page,
-    };
   }
 
 }
