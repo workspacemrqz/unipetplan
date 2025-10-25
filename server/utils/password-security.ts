@@ -39,9 +39,11 @@ export async function verifyPassword(
   // Verificar em produção
   const isProduction = process.env.NODE_ENV === 'production';
   const isReplit = process.env.REPL_ID || process.env.REPL_OWNER || process.env.REPLIT_DEPLOYMENT;
+  const isEasypanel = process.env.EASYPANEL || process.env.EASYPANEL_APP_ID;
+  const allowPlaintext = process.env.ALLOW_PLAINTEXT_PASSWORD === 'true';
   
-  // Em produção real (não Replit), não permitir plaintext
-  if (isProduction && !isReplit) {
+  // Em produção real (não Replit, não Easypanel e sem permissão explícita), não permitir plaintext
+  if (isProduction && !isReplit && !isEasypanel && !allowPlaintext) {
     console.error('❌ [SECURITY] Senha plaintext em produção não é permitida!');
     return { valid: false, needsMigration: true };
   }
@@ -144,9 +146,11 @@ export async function getSecureAdminPassword(): Promise<string | null> {
   
   // Se é plaintext, verificar ambiente
   const isProduction = process.env.NODE_ENV === 'production';
-  const isReplit = process.env.REPL_ID || process.env.REPL_OWNER;
+  const isReplit = process.env.REPL_ID || process.env.REPL_OWNER || process.env.REPLIT_DEPLOYMENT;
+  const isEasypanel = process.env.EASYPANEL || process.env.EASYPANEL_APP_ID;
+  const allowPlaintext = process.env.ALLOW_PLAINTEXT_PASSWORD === 'true';
   
-  if (isProduction && !isReplit) {
+  if (isProduction && !isReplit && !isEasypanel && !allowPlaintext) {
     console.error('❌ [SECURITY] Senha plaintext em produção! Configure SENHA com hash bcrypt');
     
     // Gerar hash para exemplo

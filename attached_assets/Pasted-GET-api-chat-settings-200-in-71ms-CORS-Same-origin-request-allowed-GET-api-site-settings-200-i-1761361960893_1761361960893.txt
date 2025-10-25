@@ -1,0 +1,63 @@
+GET /api/chat/settings 200 in 71ms
+✅ [CORS] Same-origin request allowed
+GET /api/site-settings 200 in 90ms
+GET /api/faq 200 in 89ms
+GET /api/species 200 in 13ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+GET /api/plans 304 in 47ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CHAT] Chat settings retrieved: {
+  hasBotIcon: true,
+  hasUserIcon: true,
+  botIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-bot-1761112511936.jpg',
+  userIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-user-1761112513424.jpg'
+}
+GET /api/chat/settings 304 in 9ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CHAT] Chat settings retrieved: {
+  hasBotIcon: true,
+  hasUserIcon: true,
+  botIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-bot-1761112511936.jpg',
+  userIconUrl: 'https://tkzzxsbwkgcdmcreducm.supabase.co/storage/v1/object/public/pet-images/chat-avatars/chat-user-1761112513424.jpg'
+}
+GET /api/chat/settings 304 in 9ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+GET /admin/api/auth/status 200 in 2ms
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Easypanel domain allowed: https://sites-sistema-unipet.h8upez.easypanel.host
+🔐 [ADMIN-LOGIN-v2] Login attempt received - CODE UPDATED OCT-13-2025
+❌ [SECURITY] Senha plaintext em produção! Configure SENHA com hash bcrypt
+❌ [ADMIN-LOGIN] Invalid credentials and no env variables configured or security error
+💡 [SECURITY] Use este hash no lugar da senha plaintext:
+SENHA="$2a$12$UECd3OMrmg1OU6LvfJbkhOQVSlqMO8T4tRX90Q48Ih9e.iUTTECp."
+POST /admin/api/login 401 in 341ms
+✅ [CORS] Easypanel domain allowed: https://sites-sistema-unipet.h8upez.easypanel.host
+🔐 [ADMIN-LOGIN-v2] Login attempt received - CODE UPDATED OCT-13-2025
+❌ [SECURITY] Senha plaintext em produção! Configure SENHA com hash bcrypt
+❌ [ADMIN-LOGIN] Invalid credentials and no env variables configured or security error
+💡 [SECURITY] Use este hash no lugar da senha plaintext:
+SENHA="$2a$12$oIK1fRWKL1tf3KanxeAlJenuej87vVPBsonolgm4KdNNsBx9CFklG"
+POST /admin/api/login 401 in 334ms
+✅ [CORS] Easypanel domain allowed: https://sites-sistema-unipet.h8upez.easypanel.host
+🔐 [ADMIN-LOGIN-v2] Login attempt received - CODE UPDATED OCT-13-2025
+❌ [SECURITY] Senha plaintext em produção! Configure SENHA com hash bcrypt
+💡 [SECURITY] Use este hash no lugar da senha plaintext:
+SENHA="$2a$12$LtB2IZOuWIIR4rAY.COCwOtql3w2UcLd7foY8bvASIy6F0iAV7CKW"
+❌ [ADMIN-LOGIN] Invalid credentials and no env variables configured or security error
+POST /admin/api/login 401 in 317ms
+✅ [CORS] Easypanel domain allowed: https://sites-sistema-unipet.h8upez.easypanel.host
+🚨 [SECURITY] Rate limit exceeded for admin login { ip: '179.242.252.165', timestamp: '2025-10-25T03:11:35.655Z' }
+POST /admin/api/login 429 in 2ms
