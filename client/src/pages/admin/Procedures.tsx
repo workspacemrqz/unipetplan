@@ -660,9 +660,9 @@ export default function Procedures() {
             finalCarencia = `${plan.carencia.trim()} dias`;
           }
 
-          // Formatar limites anuais para envio (adicionar " vezes no ano" se for apenas número)
+          // Formatar limites anuais para envio (adicionar " vezes no ano (por grupo)" se for apenas número)
           if ((plan as any).enableLimitesAnuais && plan.limitesAnuais && plan.limitesAnuais.trim() !== "" && /^\d+$/.test(plan.limitesAnuais.trim())) {
-            finalLimitesAnuais = `${plan.limitesAnuais.trim()} vezes no ano`;
+            finalLimitesAnuais = `${plan.limitesAnuais.trim()} vezes no ano (por grupo)`;
           } else if ((plan as any).enableLimitesAnuais && plan.limitesAnuais && plan.limitesAnuais.trim() !== "") {
             finalLimitesAnuais = plan.limitesAnuais;
           }
@@ -863,7 +863,7 @@ export default function Procedures() {
           text += `   Coparticipação: Sem coparticipação\n`;
         }
         text += `   Carência: ${planItem.carencia || '60 dias'}\n`;
-        text += `   Limites Anuais: ${planItem.limitesAnuais || '10 vezes no ano'}\n`;
+        text += `   Limites Anuais: ${planItem.limitesAnuais || '10 vezes no ano (por grupo)'}\n`;
         text += "\n";
       });
     } else {
@@ -1505,7 +1505,7 @@ export default function Procedures() {
 
                             <div className="col-span-2">
                               <p className="text-xs text-muted-foreground">Limites Anuais</p>
-                              <p className="font-medium break-words whitespace-pre-wrap">{planItem.limitesAnuais || '10 vezes no ano'}</p>
+                              <p className="font-medium break-words whitespace-pre-wrap">{planItem.limitesAnuais || '10 vezes no ano (por grupo)'}</p>
                             </div>
                           </div>
 

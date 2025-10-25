@@ -37,7 +37,7 @@ import {
   type NetworkUnitWithCredentialStatus, 
   insertUserSchema 
 } from "@shared/schema.js";
-import { UserCheck, Plus, Search, Edit, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, Globe, User, MoreHorizontal, Loader2 } from "lucide-react";
+import { UserCheck, Plus, Search, Edit, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, Globe, MoreHorizontal, Loader2 } from "lucide-react";
 
 const AVAILABLE_PERMISSIONS = [
   { id: "dashboard", label: "Dashboard", description: "Acesso ao painel principal (/admin)", path: "/admin" },
