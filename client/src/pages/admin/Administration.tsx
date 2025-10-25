@@ -297,11 +297,17 @@ export default function Administration() {
       }
 
       // Password is correct, proceed with deletion
-      deleteMutation.mutate(userToDelete.id);
-      setDeleteDialogOpen(false);
-      setDeletePassword("");
-      setUserToDelete(null);
-      setIsDeleting(false);
+      deleteMutation.mutate(userToDelete.id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setDeletePassword("");
+          setUserToDelete(null);
+          setIsDeleting(false);
+        },
+        onError: () => {
+          setIsDeleting(false);
+        }
+      });
     } catch (error) {
       setDeletePasswordError("Erro ao verificar senha");
       setIsDeleting(false);
