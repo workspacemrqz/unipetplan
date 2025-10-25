@@ -48,6 +48,12 @@ export function configureSecurityMiddleware(app: Application) {
           return callback(null, true);
         }
         
+        // Easypanel deployment domains
+        if (hostname.endsWith('.easypanel.host')) {
+          console.log('✅ [CORS] Easypanel domain allowed:', origin);
+          return callback(null, true);
+        }
+        
         // Custom production domains
         const productionDomains = ['unipetplan.com.br', 'www.unipetplan.com.br'];
         if (productionDomains.includes(hostname)) {

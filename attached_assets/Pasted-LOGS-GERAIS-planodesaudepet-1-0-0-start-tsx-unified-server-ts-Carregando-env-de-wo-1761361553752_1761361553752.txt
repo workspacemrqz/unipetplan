@@ -1,0 +1,196 @@
+LOGS GERAIS:
+
+> planodesaudepet@1.0.0 start
+> tsx unified-server.ts
+
+🔍 Carregando .env de: /workspace/.env
+📄 Status do .env: Carregado com sucesso
+🔍 Variáveis de ambiente carregadas:
+   LOGIN: ✅ Configurado
+   SENHA: ✅ Configurado
+   DATABASE_URL: ✅ Configurado
+   NODE_ENV: undefined
+✅ Todas as configurações obrigatórias estão presentes
+🔒 Validação de segurança concluída com sucesso
+
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+=====================================
+🌍 Ambiente: production
+🔌 Porta: 80
+🏠 Host: 0.0.0.0
+💾 Armazenamento: local
+🔑 Sessão: Configurada
+📞 Contato: Configurado via ambiente/banco
+=====================================
+
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+✅ [SECURITY] Helmet and CORS configured
+🚀 Inicializando servidor unificado UNIPET + Admin...
+🔌 Inicializando banco de dados...
+🔌 Inicializando conexão com banco de dados...
+✅ Conexão com banco de dados estabelecida com sucesso
+📊 Pool configurado com 20 conexões máximas
+✅ Banco de dados inicializado com sucesso
+🛣️ Registrando rotas compartilhadas (/api/* e /admin/api/*)...
+📁 [STATIC-FILES] Static file serving disabled - using Supabase Storage
+✅ Procedure usage routes registered successfully
+✅ Rotas registradas e compartilhadas com admin
+📁 Admin integrado no cliente principal - usando dist/client para todas as rotas
+📁 Configurando arquivos estáticos...
+✅ Arquivos estáticos configurados (UNIPET sempre servido)
+🛡️ Configurando tratamento de erros...
+
+🎉 SERVIDOR UNIFICADO INICIADO COM SUCESSO!
+==========================================
+🌐 URL: http://0.0.0.0:80
+🏠 Host: 0.0.0.0 (Aceita conexões externas)
+🌍 Ambiente: production
+📁 Diretório: /workspace
+🔌 Banco: Conectado e saudável
+
+📋 SERVIÇOS DISPONÍVEIS:
+  🦄 UNIPET:
+    • Frontend: / (raiz)
+    • APIs: /api/*
+    • Health: /api/health
+  🔧 ADMIN:
+    • Frontend: /admin
+    • APIs: /admin/api/*
+    • Health: /admin/health
+
+🔒 FUNCIONALIDADES:
+  • Roteamento unificado
+  • Banco de dados compartilhado
+  • Sessions e cookies configurados
+  • Tratamento de erros global
+  • Arquivos estáticos servidos
+  • Cache otimizado
+==========================================
+
+✅ [CORS] Same-origin request allowed
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+⚠️ [CORS] Blocked origin: https://sites-sistema-unipet.h8upez.easypanel.host
+Erro no servidor: Error: Not allowed by CORS
+    at origin (/workspace/server/config/security.ts:66:18)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/workspace/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/workspace/node_modules/express/lib/router/index.js:280:10)
+    at internalNext (file:///workspace/node_modules/helmet/index.mjs:533:6)
+✅ [CORS] Same-origin request allowed
+✅ [CORS] Same-origin request allowed
