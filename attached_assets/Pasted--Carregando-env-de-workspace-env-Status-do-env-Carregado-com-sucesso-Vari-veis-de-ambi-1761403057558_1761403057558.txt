@@ -1,0 +1,198 @@
+🔍 Carregando .env de: /workspace/.env
+📄 Status do .env: Carregado com sucesso
+🔍 Variáveis de ambiente carregadas:
+   LOGIN: ✅ Configurado
+   SENHA: ✅ Configurado
+   DATABASE_URL: ✅ Configurado
+   NODE_ENV: undefined
+✅ Todas as configurações obrigatórias estão presentes
+🔒 Validação de segurança concluída com sucesso
+
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+=====================================
+🌍 Ambiente: production
+🔌 Porta: 80
+🏠 Host: 0.0.0.0
+💾 Armazenamento: local
+🔑 Sessão: Configurada
+📞 Contato: Configurado via ambiente/banco
+=====================================
+
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+[NotificationService] SMTP não configurado. Variáveis necessárias: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+[NotificationService] Notificações por email serão simuladas (logs apenas)
+✅ [SECURITY] Helmet and CORS configured
+🚀 Inicializando servidor...
+🔌 Inicializando banco de dados...
+🔌 Inicializando conexão com banco de dados...
+✅ Conexão com banco de dados estabelecida com sucesso
+📊 Pool configurado com 20 conexões máximas
+❌ ⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado
+❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET
+❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro
+✅ Banco de dados inicializado com sucesso
+🔍 Carregando .env de: /workspace/.env
+📄 Status do .env: Carregado com sucesso
+🔍 Variáveis de ambiente carregadas:
+   LOGIN: ✅ Configurado
+   SENHA: ✅ Configurado
+   DATABASE_URL: ✅ Configurado
+   NODE_ENV: undefined
+✅ Todas as configurações obrigatórias estão presentes
+🔒 Validação de segurança concluída com sucesso
+
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+=====================================
+🌍 Ambiente: production
+🔌 Porta: 80
+🏠 Host: 0.0.0.0
+💾 Armazenamento: local
+🔑 Sessão: Configurada
+📞 Contato: Configurado via ambiente/banco
+=====================================
+
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+[NotificationService] SMTP não configurado. Variáveis necessárias: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+[NotificationService] Notificações por email serão simuladas (logs apenas)
+✅ [SECURITY] Helmet and CORS configured
+🚀 Inicializando servidor...
+🔌 Inicializando banco de dados...
+🔌 Inicializando conexão com banco de dados...
+✅ Conexão com banco de dados estabelecida com sucesso
+❌ ⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado
+❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET
+❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro
+📊 Pool configurado com 20 conexões máximas
+✅ Banco de dados inicializado com sucesso
+🔍 Carregando .env de: /workspace/.env
+📄 Status do .env: Carregado com sucesso
+🔍 Variáveis de ambiente carregadas:
+   LOGIN: ✅ Configurado
+   SENHA: ✅ Configurado
+   DATABASE_URL: ✅ Configurado
+   NODE_ENV: undefined
+✅ Todas as configurações obrigatórias estão presentes
+🔒 Validação de segurança concluída com sucesso
+
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+=====================================
+🌍 Ambiente: production
+🔌 Porta: 80
+🏠 Host: 0.0.0.0
+💾 Armazenamento: local
+🔑 Sessão: Configurada
+📞 Contato: Configurado via ambiente/banco
+=====================================
+
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+[NotificationService] SMTP não configurado. Variáveis necessárias: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+[NotificationService] Notificações por email serão simuladas (logs apenas)
+✅ [SECURITY] Helmet and CORS configured
+🚀 Inicializando servidor...
+🔌 Inicializando banco de dados...
+🔌 Inicializando conexão com banco de dados...
+❌ ⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado
+✅ Conexão com banco de dados estabelecida com sucesso
+📊 Pool configurado com 20 conexões máximas
+✅ Banco de dados inicializado com sucesso
+❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET
+❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro
+🔍 Carregando .env de: /workspace/.env
+📄 Status do .env: Carregado com sucesso
+🔍 Variáveis de ambiente carregadas:
+   LOGIN: ✅ Configurado
+   SENHA: ✅ Configurado
+   DATABASE_URL: ✅ Configurado
+   NODE_ENV: undefined
+✅ Todas as configurações obrigatórias estão presentes
+🔒 Validação de segurança concluída com sucesso
+
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+=====================================
+🌍 Ambiente: production
+🔌 Porta: 80
+🏠 Host: 0.0.0.0
+💾 Armazenamento: local
+🔑 Sessão: Configurada
+📞 Contato: Configurado via ambiente/banco
+=====================================
+
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+[NotificationService] SMTP não configurado. Variáveis necessárias: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+[NotificationService] Notificações por email serão simuladas (logs apenas)
+✅ [SECURITY] Helmet and CORS configured
+🚀 Inicializando servidor...
+🔌 Inicializando banco de dados...
+🔌 Inicializando conexão com banco de dados...
+✅ Conexão com banco de dados estabelecida com sucesso
+📊 Pool configurado com 20 conexões máximas
+✅ Banco de dados inicializado com sucesso
+❌ ⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado
+❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET
+❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro
+🔍 Carregando .env de: /workspace/.env
+📄 Status do .env: Carregado com sucesso
+🔍 Variáveis de ambiente carregadas:
+   LOGIN: ✅ Configurado
+   SENHA: ✅ Configurado
+   DATABASE_URL: ✅ Configurado
+   NODE_ENV: undefined
+✅ Todas as configurações obrigatórias estão presentes
+🔒 Validação de segurança concluída com sucesso
+
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+=====================================
+🌍 Ambiente: production
+🔌 Porta: 80
+🏠 Host: 0.0.0.0
+💾 Armazenamento: local
+🔑 Sessão: Configurada
+📞 Contato: Configurado via ambiente/banco
+=====================================
+
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+[NotificationService] SMTP não configurado. Variáveis necessárias: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+[NotificationService] Notificações por email serão simuladas (logs apenas)
+✅ [SECURITY] Helmet and CORS configured
+🚀 Inicializando servidor...
+🔌 Inicializando banco de dados...
+🔌 Inicializando conexão com banco de dados...
+✅ Conexão com banco de dados estabelecida com sucesso
+📊 Pool configurado com 20 conexões máximas
+✅ Banco de dados inicializado com sucesso
+❌ ⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado
+❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET
+❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro
+🔍 Carregando .env de: /workspace/.env
+📄 Status do .env: Carregado com sucesso
+🔍 Variáveis de ambiente carregadas:
+   LOGIN: ✅ Configurado
+   SENHA: ✅ Configurado
+   DATABASE_URL: ✅ Configurado
+   NODE_ENV: undefined
+✅ Todas as configurações obrigatórias estão presentes
+🔒 Validação de segurança concluída com sucesso
+
+🚀 CONFIGURAÇÃO AUTOMÁTICA APLICADA:
+=====================================
+🌍 Ambiente: production
+🔌 Porta: 80
+🏠 Host: 0.0.0.0
+💾 Armazenamento: local
+🔑 Sessão: Configurada
+📞 Contato: Configurado via ambiente/banco
+=====================================
+
+🔗 Conectando ao Supabase Storage: https://tkzzxsbwkgcdmcreducm.supabase.co
+[NotificationService] SMTP não configurado. Variáveis necessárias: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+[NotificationService] Notificações por email serão simuladas (logs apenas)
+✅ [SECURITY] Helmet and CORS configured
+🚀 Inicializando servidor...
+🔌 Inicializando banco de dados...
+🔌 Inicializando conexão com banco de dados...
+✅ Conexão com banco de dados estabelecida com sucesso
+❌ ⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado
+❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET
+❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro
+📊 Pool configurado com 20 conexões máximas
+✅ Banco de dados inicializado com sucesso

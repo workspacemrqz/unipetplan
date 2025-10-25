@@ -1,0 +1,208 @@
+Commit: Configure project for deployment using buildpacks
+
+Updates the 'start' script in package.json to use 'node dist/server/index.js' instead of 'tsx unified-server.ts', and adds 'Procfile' to specify the web process.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: 5b7b6773-9aef-4612-8793-1fd75237917a
+Replit-Commit-Checkpoint-Type: full_checkpoint
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/a97c3b3b-bf72-4b51-b9de-04488e63ff09/5b7b6773-9aef-4612-8793-1fd75237917a/ZEG0grw 
+##########################################
+### Download Github Archive Started...
+### Sat, 25 Oct 2025 14:33:29 GMT
+##########################################
+
+24: Pulling from heroku/builder
+Digest: sha256:8d0362e9b9f95957d46d9197935f4795b8b9ad4560a0e54053ebd652e1866aa2
+Status: Image is up to date for heroku/builder:24
+24: Pulling from heroku/heroku
+Digest: sha256:142c6c1ad5ec2288be2df80e9194ddaadff6eec79f46ee1613224c9a31bb38bb
+Status: Image is up to date for heroku/heroku:24
+0.20.14: Pulling from buildpacksio/lifecycle
+Digest: sha256:d8c1f586a468001ffc8237960779d11cc111762a794002e3858d489c5422c46b
+Status: Image is up to date for buildpacksio/lifecycle:0.20.14
+===> ANALYZING
+===> DETECTING
+[detector] 2 of 3 buildpacks participating
+[detector] heroku/nodejs   5.1.4
+[detector] heroku/procfile 4.2.1
+===> RESTORING
+[restorer] Skipping buildpack layer analysis
+===> BUILDING
+[builder] 
+[builder] ## Heroku Node.js
+[builder] 
+[builder] - Checking Node.js version
+[builder]   - Detected Node.js version range: `>=20.0.0 <21.0.0-0`
+[builder]   - Resolved Node.js version: `20.19.5`
+[builder] - Installing Node.js distribution
+[builder]   - GET https://nodejs.org/download/release/v20.19.5/node-v20.19.5-linux-x64.tar.gz ... (OK)
+[builder]   - Downloading ... (0.4s)
+[builder]   - Verifying checksum
+[builder]   - Extracting Node.js `20.19.5 (linux-amd64)`
+[builder]   - Installing Node.js `20.19.5 (linux-amd64)` ... (< 0.1s)
+[builder] - Determining npm package information
+[builder]   - Found `engines.npm` version `>=10.0.0 <11.0.0-0` declared in `package.json`
+[builder]   - GET https://registry.npmjs.org/npm ... (OK)
+[builder]   - Downloading ... (0.2s)
+[builder]   - Resolved npm version `>=10.0.0 <11.0.0-0` to `10.9.4`
+[builder] - Installing npm
+[builder]   - GET https://registry.npmjs.org/npm/-/npm-10.9.4.tgz ... (OK)
+[builder]   - Downloading ... (< 0.1s)
+[builder]   - Removing npm bundled with Node.js
+[builder]   - Installing requested npm
+[builder]   - Successfully installed `npm@10.9.4`
+[builder] - Installing node modules
+[builder]   - Using npm version `10.9.4`
+[builder]   - Creating npm cache
+[builder]   - Configuring npm cache directory
+[builder]   - Running `npm ci`
+[builder] 
+[builder]       npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+[builder]       npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+[builder]       npm warn deprecated csurf@1.11.0: This package is archived and no longer maintained. For support, visit https://github.com/expressjs/express/discussions
+[builder]       npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+[builder]       npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+[builder]       npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+[builder]       npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[builder]       npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[builder]       npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+[builder]       npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+[builder]       npm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported
+[builder] 
+[builder]       added 1100 packages, and audited 1101 packages in 31s
+[builder] 
+[builder]       158 packages are looking for funding
+[builder]         run `npm fund` for details
+[builder] 
+[builder]       10 vulnerabilities (2 low, 5 moderate, 3 high)
+[builder] 
+[builder]       To address issues that do not require attention, run:
+[builder]         npm audit fix
+[builder] 
+[builder]       To address all issues possible (including breaking changes), run:
+[builder]         npm audit fix --force
+[builder] 
+[builder]       Some issues need review, and may require choosing
+[builder]       a different dependency.
+[builder] 
+[builder]       Run `npm audit` for details.
+[builder] 
+[builder]   - Done (31.0s)
+[builder] - Running scripts
+[builder]   - Running `npm run build`
+[builder] 
+[builder] 
+[builder]       > planodesaudepet@1.0.0 build
+[builder]       > npm install --prefix client && npm run build:client && npm run build:server
+[builder] 
+[builder] 
+[builder]       added 301 packages, and audited 302 packages in 5s
+[builder] 
+[builder]       44 packages are looking for funding
+[builder]         run `npm fund` for details
+[builder] 
+[builder]       2 moderate severity vulnerabilities
+[builder] 
+[builder]       To address all issues, run:
+[builder]         npm audit fix
+[builder] 
+[builder]       Run `npm audit` for details.
+[builder] 
+[builder]       > planodesaudepet@1.0.0 build:client
+[builder]       > cd client && npm run build
+[builder] 
+[builder] 
+[builder]       > unipet-plan-client@1.0.0 build
+[builder]       > vite build
+[builder] 
+[builder]       vite v5.4.20 building for production...
+[builder] 
+[builder]       (!) outDir /workspace/dist/client is not inside project root and will not be emptied.
+[builder]       Use --emptyOutDir to override.
+[builder] 
+[builder]       transforming...
+[builder]       ✓ 5508 modules transformed.
+[builder]       rendering chunks...
+[builder]       computing gzip size...
+[builder]       ../dist/client/index.html                              1.62 kB │ gzip:   0.74 kB
+[builder]       ../dist/client/assets/index-C49l0OyB.css             123.71 kB │ gzip:  22.28 kB
+[builder]       ../dist/client/assets/about-section-C45ShREW.js        1.85 kB │ gzip:   0.89 kB
+[builder]       ../dist/client/assets/testimonials-Dlndf8TP.js         2.50 kB │ gzip:   1.10 kB
+[builder]       ../dist/client/assets/contact-section-BeGM45YU.js     12.73 kB │ gzip:   3.03 kB
+[builder]       ../dist/client/assets/utils-EgWvmOQl.js               21.46 kB │ gzip:   7.00 kB
+[builder]       ../dist/client/assets/purify.es-CATjCWkt.js           22.30 kB │ gzip:   8.55 kB
+[builder]       ../dist/client/assets/vendor-D9xS2ESZ.js             140.04 kB │ gzip:  44.96 kB
+[builder]       ../dist/client/assets/index.es-D9_ojjje.js           150.41 kB │ gzip:  50.56 kB
+[builder]       ../dist/client/assets/ui-tdkEEGIW.js                 153.04 kB │ gzip:  50.18 kB
+[builder]       ../dist/client/assets/html2canvas.esm-B_qGT6JC.js    198.48 kB │ gzip:  46.32 kB
+[builder]       ../dist/client/assets/index-pjhlSbEz.js            2,944.86 kB │ gzip: 729.45 kB
+[builder] 
+[builder]       (!) Some chunks are larger than 1000 kB after minification. Consider:
+[builder]       - Using dynamic import() to code-split the application
+[builder]       - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[builder]       - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[builder]       ✓ built in 40.31s
+[builder] 
+[builder]       > planodesaudepet@1.0.0 build:server
+[builder]       > tsc --project tsconfig.server.json
+[builder] 
+[builder]   - Done (53.6s)
+[builder] - Pruning dev dependencies
+[builder]   - Running `npm prune`
+[builder] 
+[builder] 
+[builder]       up to date, audited 880 packages in 2s
+[builder] 
+[builder]       109 packages are looking for funding
+[builder]         run `npm fund` for details
+[builder] 
+[builder]       4 vulnerabilities (2 low, 2 high)
+[builder] 
+[builder]       To address issues that do not require attention, run:
+[builder]         npm audit fix
+[builder] 
+[builder]       To address all issues possible (including breaking changes), run:
+[builder]         npm audit fix --force
+[builder] 
+[builder]       Some issues need review, and may require choosing
+[builder]       a different dependency.
+[builder] 
+[builder]       Run `npm audit` for details.
+[builder] 
+[builder]   - Done (1.9s)
+[builder] - Configuring default processes
+[builder]   - Skipping default web process (Procfile detected)
+[builder] - Done (finished in 1m 34s)
+[builder] 
+[builder] ## Procfile Buildpack
+[builder] 
+[builder] - Processes from `Procfile`
+[builder]   - web: `node dist/server/index.js`
+[builder] - Done (finished in < 0.1s)
+===> EXPORTING
+[exporter] Reusing layer 'heroku/nodejs:available_parallelism'
+[exporter] Reusing layer 'heroku/nodejs:dist'
+[exporter] Reusing layer 'heroku/nodejs:npm_engine'
+[exporter] Reusing layer 'heroku/nodejs:npm_runtime_config'
+[exporter] Reusing layer 'heroku/nodejs:web_env'
+[exporter] Reusing layer 'buildpacksio/lifecycle:launch.sbom'
+[exporter] Added 1/1 app layer(s)
+[exporter] Reusing layer 'buildpacksio/lifecycle:launcher'
+[exporter] Adding layer 'buildpacksio/lifecycle:config'
+[exporter] Reusing layer 'buildpacksio/lifecycle:process-types'
+[exporter] Adding label 'io.buildpacks.lifecycle.metadata'
+[exporter] Adding label 'io.buildpacks.build.metadata'
+[exporter] Adding label 'io.buildpacks.project.metadata'
+[exporter] Setting default process type 'web'
+[exporter] Saving easypanel/sites/sistema-unipet...
+[exporter] *** Images (f5a5287ffcb3):
+[exporter]       easypanel/sites/sistema-unipet
+[exporter] Adding cache layer 'heroku/nodejs:dist'
+[exporter] Adding cache layer 'heroku/nodejs:npm_cache'
+[exporter] Adding cache layer 'heroku/nodejs:npm_engine'
+[exporter] Adding cache layer 'heroku/nodejs:npm_packument'
+Successfully built image 'easypanel/sites/sistema-unipet'
+##########################################
+### Success
+### Sat, 25 Oct 2025 14:36:20 GMT
+##########################################
