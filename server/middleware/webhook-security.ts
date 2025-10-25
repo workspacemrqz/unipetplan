@@ -4,26 +4,17 @@ import { isIPv4, isIPv6 } from 'net';
 
 /**
  * Valida configuração de segurança do webhook na inicialização
- * Em produção, falha se a configuração estiver incompleta
+ * CIELO_WEBHOOK_SECRET é opcional - se configurado, valida header customizado
  */
 export function validateWebhookSecurityConfig(): void {
   const webhookSecret = process.env.CIELO_WEBHOOK_SECRET;
   
   if (!webhookSecret) {
-    const errorMsg = '⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado';
-    
-    if (process.env.NODE_ENV === 'production') {
-      // Em produção, não permitir inicialização sem configuração de segurança
-      console.error('❌ ' + errorMsg);
-      console.error('❌ [WEBHOOK-SECURITY] Servidor não pode iniciar em produção sem CIELO_WEBHOOK_SECRET');
-      console.error('❌ [WEBHOOK-SECURITY] Configure a variável de ambiente CIELO_WEBHOOK_SECRET com um valor seguro');
-      process.exit(1);
-    } else {
-      console.warn(errorMsg);
-      console.warn('⚠️ [WEBHOOK-SECURITY] Webhooks estarão desprotegidos em desenvolvimento');
-    }
+    console.warn('⚠️ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET não configurado');
+    console.warn('⚠️ [WEBHOOK-SECURITY] Webhooks validados apenas por IP (menos seguro)');
+    console.warn('💡 [WEBHOOK-SECURITY] Recomendado: Configure header customizado na Cielo e defina CIELO_WEBHOOK_SECRET');
   } else {
-    console.log('✅ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET configurado');
+    console.log('✅ [WEBHOOK-SECURITY] CIELO_WEBHOOK_SECRET configurado - validação por header ativa');
   }
 }
 
@@ -110,51 +101,35 @@ export function validateWebhookIP(req: Request): boolean {
 }
 
 /**
- * Valida a assinatura HMAC do webhook
- * IMPORTANTE: Requer que o body seja capturado com express.raw()
+ * Valida o header customizado do webhook
+ * A Cielo envia headers customizados (key/value) configurados no painel
+ * Não é assinatura HMAC - apenas comparação de valor estático
  */
-export function validateWebhookSignature(req: Request, secret: string): boolean {
-  const signature = req.headers['x-cielo-signature'] || req.headers['cielo-signature'];
+export function validateWebhookHeader(req: Request, secret: string): boolean {
+  // Tentar vários nomes possíveis de header
+  const headerValue = req.headers['x-webhook-secret'] || 
+                      req.headers['x-cielo-webhook'] ||
+                      req.headers['webhook-secret'] ||
+                      req.headers['authorization'];
   
-  if (!signature || typeof signature !== 'string') {
-    console.warn('⚠️ [WEBHOOK-SECURITY] Webhook sem assinatura');
+  if (!headerValue || typeof headerValue !== 'string') {
+    console.warn('⚠️ [WEBHOOK-SECURITY] Webhook sem header de autenticação');
     return false;
   }
-  
-  // CRITICAL: Use raw body to avoid JSON parsing differences
-  // The body MUST be a Buffer from express.raw() middleware
-  let rawBody: string;
-  if (Buffer.isBuffer(req.body)) {
-    // This is the expected case when using express.raw()
-    rawBody = req.body.toString('utf8');
-  } else {
-    // This should not happen if configured correctly
-    console.error('❌ [WEBHOOK-SECURITY] Body não é Buffer! Configure express.raw() antes deste middleware');
-    return false;
-  }
-  
-  // Calcular a assinatura esperada usando o raw body
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(rawBody)
-    .digest('hex');
   
   // Comparação segura contra timing attacks
-  const signatureBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expectedSignature);
+  const receivedBuffer = Buffer.from(headerValue);
+  const expectedBuffer = Buffer.from(secret);
   
-  if (signatureBuffer.length !== expectedBuffer.length) {
-    console.warn('⚠️ [WEBHOOK-SECURITY] Tamanho de assinatura inválido');
+  if (receivedBuffer.length !== expectedBuffer.length) {
+    console.warn('⚠️ [WEBHOOK-SECURITY] Tamanho do header inválido');
     return false;
   }
   
-  const isValid = crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
+  const isValid = crypto.timingSafeEqual(receivedBuffer, expectedBuffer);
   
   if (!isValid) {
-    console.warn('⚠️ [WEBHOOK-SECURITY] Assinatura inválida', {
-      received: signature.substring(0, 10) + '...',
-      expected: expectedSignature.substring(0, 10) + '...'
-    });
+    console.warn('⚠️ [WEBHOOK-SECURITY] Header de autenticação inválido');
   }
   
   return isValid;
@@ -218,47 +193,39 @@ export function validateCieloWebhook(req: Request, res: Response, next: NextFunc
     });
   }
   
-  // 3. Validar assinatura HMAC (OBRIGATÓRIO em produção)
+  // 3. Validar header customizado (OPCIONAL - se CIELO_WEBHOOK_SECRET estiver configurado)
   const webhookSecret = process.env.CIELO_WEBHOOK_SECRET;
   
-  // Em produção, falhar se a secret não estiver configurada
-  if (!webhookSecret) {
-    const errorMessage = 'CIELO_WEBHOOK_SECRET não configurado';
-    if (process.env.NODE_ENV === 'production') {
-      console.error('❌ [WEBHOOK-SECURITY] ' + errorMessage + ' (CRÍTICO em produção)');
-      return res.status(500).json({ 
-        error: 'Configuração de segurança ausente',
-        correlationId 
-      });
-    } else {
-      console.warn('⚠️ [WEBHOOK-SECURITY] ' + errorMessage + ' - webhook desprotegido em desenvolvimento');
-    }
-  } else {
-    if (!validateWebhookSignature(req, webhookSecret)) {
-      console.error('❌ [WEBHOOK-SECURITY] Assinatura inválida', {
+  if (webhookSecret) {
+    // Se o secret está configurado, validar o header customizado
+    if (!validateWebhookHeader(req, webhookSecret)) {
+      console.error('❌ [WEBHOOK-SECURITY] Header de autenticação inválido', {
         correlationId,
         timestamp: new Date().toISOString()
       });
       return res.status(401).json({ 
-        error: 'Assinatura inválida',
+        error: 'Autenticação inválida',
         correlationId 
       });
     }
-    console.log('✅ [WEBHOOK-SECURITY] Assinatura válida', { correlationId });
-    
-    // Parse JSON after validation (body is still a Buffer)
-    if (Buffer.isBuffer(req.body)) {
-      try {
-        const jsonBody = JSON.parse(req.body.toString('utf8'));
-        // Replace Buffer body with parsed JSON for the handler
-        req.body = jsonBody;
-      } catch (error) {
-        console.error('❌ [WEBHOOK-SECURITY] Erro ao parsear JSON do webhook', error);
-        return res.status(400).json({ 
-          error: 'Payload inválido',
-          correlationId 
-        });
-      }
+    console.log('✅ [WEBHOOK-SECURITY] Header de autenticação válido', { correlationId });
+  } else {
+    // Se não há secret configurado, apenas avisar (validação apenas por IP)
+    console.warn('⚠️ [WEBHOOK-SECURITY] Webhook aceito apenas com validação de IP (sem header de autenticação)');
+  }
+  
+  // Parse JSON após validação (body ainda é um Buffer)
+  if (Buffer.isBuffer(req.body)) {
+    try {
+      const jsonBody = JSON.parse(req.body.toString('utf8'));
+      // Substituir Buffer body pelo JSON parseado para o handler
+      req.body = jsonBody;
+    } catch (error) {
+      console.error('❌ [WEBHOOK-SECURITY] Erro ao parsear JSON do webhook', error);
+      return res.status(400).json({ 
+        error: 'Payload inválido',
+        correlationId 
+      });
     }
   }
   
