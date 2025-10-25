@@ -12,10 +12,9 @@
     "build": "npm run build:client && npm run build:server",
     "build:server": "tsc --project tsconfig.server.json",
     "build:client": "cd client && npm run build",
-    "start": "NODE_ENV=production tsx unified-server.ts",
-    "heroku-postbuild": "npm run install:all && npm run build",
-    "heroku-prebuild": "echo 'Starting Heroku prebuild...'",
-    "postinstall": "if [ \"$NODE_ENV\" = \"production\" ]; then npm run build; fi",
+    "start": "NODE_ENV=production node dist/unified-server.js",
+    "heroku-postbuild": "npm install --prefix client && npm run build",
+
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",

@@ -22,6 +22,6 @@
     "allowImportingTsExtensions": false,
     "moduleDetection": "force"
   },
-  "include": ["server/**/*", "shared/**/*"],
+  "include": ["server/**/*", "shared/**/*", "unified-server.ts"],
   "exclude": ["node_modules", "client/**/*", "dist/**/*", "*.config.ts", "*.config.js", "server/tests/**/*", "**/*.test.ts", "**/*.spec.ts"]
 }

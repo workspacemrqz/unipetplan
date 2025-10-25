@@ -121,9 +121,8 @@ Use qualquer serviço PostgreSQL (Supabase, Neon, etc.) e configure a `DATABASE_
 
 O projeto está configurado com os seguintes scripts:
 
-- **heroku-prebuild**: Executado antes da instalação
 - **heroku-postbuild**: Instala dependências do cliente e faz build completo
-- **start**: Inicia o servidor unificado em modo produção
+- **start**: Inicia o servidor compilado (`node dist/unified-server.js`) em modo produção
 
 ### Estrutura de Build
 
