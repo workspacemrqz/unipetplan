@@ -325,8 +325,13 @@ const requireClient = (req: any, res: any, next: any) => {
  * or via webhook for PIX payments)
  * @param pendingPayment - The pending payment data from database
  * @param correlationId - Correlation ID for logging
+ * @param contractStatus - Status do contrato a ser criado ('active' para pagamento confirmado, 'pending' para PIX pendente)
  */
-export async function processPendingPayment(pendingPayment: any, correlationId?: string): Promise<any> {
+export async function processPendingPayment(
+  pendingPayment: any, 
+  correlationId?: string,
+  contractStatus: 'active' | 'pending' = 'pending'
+): Promise<any> {
   const logPrefix = `[PROCESS-PENDING-${correlationId || 'UNKNOWN'}]`;
   console.log(`🔄 ${logPrefix} Processando pagamento pendente:`, {
     paymentId: pendingPayment.cieloPaymentId,
@@ -457,13 +462,13 @@ export async function processPendingPayment(pendingPayment: any, correlationId?:
         sellerId: pendingPayment.sellerId,
         contractNumber: `UNIPET-${Date.now()}-${pet.id.substring(0, 4).toUpperCase()}`,
         billingPeriod: pendingPayment.billingPeriod,
-        status: 'active' as const,
+        status: contractStatus,
         startDate: new Date(),
         monthlyAmount: contractMonthlyAmount.toFixed(2),
         annualAmount: contractAnnualAmount.toFixed(2),
         paymentMethod: pendingPayment.paymentMethod === 'credit_card' ? 'credit_card' : 'pix',
         cieloPaymentId: pendingPayment.cieloPaymentId,
-        receivedDate: new Date()
+        receivedDate: contractStatus === 'active' ? new Date() : null
       };
       
       const contract = await storage.createContract(contractData);
@@ -2867,6 +2872,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (atendimentoData.petId) {
         const petContracts = await storage.getContractsByPetId(atendimentoData.petId);
         
+        // ⚠️ CRÍTICO: Verificar se há contrato pendente (PIX não confirmado)
+        const pendingContract = petContracts.find((contract: any) => contract.status === 'pending');
+        if (pendingContract) {
+          return res.status(403).json({ 
+            error: "Pagamento pendente",
+            message: "Não é possível criar atendimento. O pagamento do plano deste pet ainda não foi confirmado. Aguarde a confirmação do pagamento PIX ou utilize cartão de crédito.",
+            contractStatus: 'pending',
+            contractId: pendingContract.id
+          });
+        }
+        
         // Verificar se há contrato suspenso
         const suspendedContract = petContracts.find((contract: any) => contract.status === 'suspended');
         if (suspendedContract) {
@@ -4769,7 +4785,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           try {
             // Usar a função helper para criar cliente, pets e contratos
-            const processResult = await processPendingPayment(pendingPayment, `CC-${Date.now()}`);
+            // Cartão aprovado (status 2) → criar contratos com status 'active'
+            const processResult = await processPendingPayment(pendingPayment, `CC-${Date.now()}`, 'active');
             
             // Incrementar uso do cupom se o pagamento foi bem-sucedido
             if (coupon) {
@@ -8411,90 +8428,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // ✅ NOVA LÓGICA: Criar contrato automaticamente se PIX foi aprovado mas não há contrato
-      if (!contract && queryResult.payment?.status === 2) {
-        console.log('🔧 [PIX-AUTO-CONTRACT] PIX aprovado sem contrato - tentando criar automaticamente', {
-          correlationId,
-          paymentId,
-          pixStatus: queryResult.payment.status
-        });
-        
-        try {
-          // Buscar dados de checkout da sessão atual se disponível
-          const sessionUserId = req.session.userId || req.session.client?.id;
-          if (sessionUserId) {
-            // Tentar recuperar dados de checkout baseado na sessão atual
-            const clients = await storage.getClientById(sessionUserId);
-            
-            if (clients) {
-              // Criar contrato com dados mínimos necessários
-              // Usar plano padrão se não encontrar específico
-              const allPlans = await storage.getAllPlans();
-              const defaultPlan = allPlans.find(p => p.name.includes('BASIC')) || allPlans[0];
-              
-              if (defaultPlan) {
-                // Determine if plan is annual (COMFORT or PLATINUM)
-                // COMFORT and PLATINUM plans are always annual (365 days)
-                // BASIC and INFINITY plans are monthly (30 days)
-                const isAnnualPlan = ['COMFORT', 'PLATINUM'].some(type => 
-                  defaultPlan.name.toUpperCase().includes(type)
-                );
-                
-                // ✅ VALIDAÇÃO A2: Garantir billing period correto para o plano
-                const validatedBillingPeriod = enforceCorrectBillingPeriod(
-                  defaultPlan, 
-                  isAnnualPlan ? 'annual' : 'monthly'
-                );
-                
-                const monthlyAmount = parseFloat(defaultPlan.basePrice || '0');
-                
-                const contractData = {
-                  clientId: clients.id,
-                  planId: defaultPlan.id,
-                  petId: 'pix-auto-pet', // Placeholder - cliente pode corrigir depois
-                  contractNumber: `PIX-AUTO-${Date.now()}-${clients.id.substring(0, 4).toUpperCase()}`,
-                  billingPeriod: validatedBillingPeriod,
-                  status: 'active' as const,
-                  startDate: new Date(),
-                  monthlyAmount: defaultPlan.basePrice || '0',
-                  annualAmount: isAnnualPlan ? (monthlyAmount * 12).toFixed(2) : '0.00',
-                  paymentMethod: 'pix',
-                  cieloPaymentId: paymentId,
-                  proofOfSale: queryResult.payment.proofOfSale || '',
-                  authorizationCode: queryResult.payment.authorizationCode || '',
-                  tid: queryResult.payment.tid || '',
-                  receivedDate: queryResult.payment.receivedDate ? new Date(queryResult.payment.receivedDate) : new Date(),
-                  returnCode: queryResult.payment.returnCode || '0',
-                  returnMessage: queryResult.payment.returnMessage || 'PIX Aprovado',
-                  pixQrCode: queryResult.payment.qrCodeBase64Image || null,
-                  pixCode: queryResult.payment.qrCodeString || null
-                };
-                
-                console.log('🔧 [PIX-AUTO-CONTRACT] Criando contrato automaticamente:', {
-                  correlationId,
-                  contractNumber: contractData.contractNumber,
-                  clientId: contractData.clientId,
-                  planId: contractData.planId
-                });
-                
-                contract = await storage.createContract(contractData);
-                
-                console.log('✅ [PIX-AUTO-CONTRACT] Contrato criado automaticamente:', {
-                  correlationId,
-                  contractId: contract.id,
-                  contractNumber: contract.contractNumber
-                });
-              }
-            }
-          }
-        } catch (error) {
-          console.error('❌ [PIX-AUTO-CONTRACT] Erro ao criar contrato automaticamente:', {
-            correlationId,
-            error: error instanceof Error ? error.message : 'Erro desconhecido'
-          });
-          // Continuar mesmo se não conseguir criar o contrato
-        }
-      }
+      // ✅ REMOVIDO: Código que criava contratos automaticamente foi removido
+      // O webhook da Cielo (cielo-webhook-service.ts) é responsável por processar
+      // pagamentos aprovados e criar contratos via processPendingPayment()
+      // Este endpoint serve apenas para CONSULTAR status, não para criar contratos
       
       // ✅ ATUALIZAR CONTRATO SE PIX DE RENOVAÇÃO FOI APROVADO
       const isPix = (queryResult as any).Payment?.Type === 'Pix' || queryResult.payment?.qrCodeBase64Image;

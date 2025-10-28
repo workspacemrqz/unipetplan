@@ -225,7 +225,8 @@ export class CieloWebhookService {
         });
 
         // Process the pending payment (create client, pets, contracts)
-        const result = await processPendingPayment(pendingPayment, correlationId);
+        // Webhook só é chamado quando pagamento está APROVADO, então criar contratos com status 'active'
+        const result = await processPendingPayment(pendingPayment, correlationId, 'active');
         
         console.log('✅ [CIELO-WEBHOOK] Pagamento pendente processado com sucesso', {
           correlationId,

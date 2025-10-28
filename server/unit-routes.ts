@@ -376,6 +376,17 @@ export function setupUnitRoutes(app: any, storage: IStorage) {
       if (atendimentoData.petId) {
         const petContracts = await storage.getContractsByPetId(atendimentoData.petId);
         
+        // ⚠️ CRÍTICO: Verificar se há contrato pendente (PIX não confirmado)
+        const pendingContract = petContracts.find((contract: any) => contract.status === 'pending');
+        if (pendingContract) {
+          return res.status(403).json({ 
+            error: "Pagamento pendente",
+            message: "Não é possível criar atendimento. O pagamento do plano deste pet ainda não foi confirmado. Aguarde a confirmação do pagamento PIX ou utilize cartão de crédito.",
+            contractStatus: 'pending',
+            contractId: pendingContract.id
+          });
+        }
+        
         // Verificar se há contrato suspenso
         const suspendedContract = petContracts.find((contract: any) => contract.status === 'suspended');
         if (suspendedContract) {

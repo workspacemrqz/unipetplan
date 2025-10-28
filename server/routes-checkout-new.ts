@@ -193,7 +193,8 @@ export async function processCheckout(req: any, res: any) {
         
         // Import and use the helper function to process the payment
         const { processPendingPayment } = await import('./routes.js');
-        const processResult = await processPendingPayment(pendingPayment, `CC-${Date.now()}`);
+        // Cartão aprovado (status 2) → criar contratos com status 'active'
+        const processResult = await processPendingPayment(pendingPayment, `CC-${Date.now()}`, 'active');
         
         // Increment coupon usage if payment was successful
         if (coupon) {
