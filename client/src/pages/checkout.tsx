@@ -806,18 +806,64 @@ export default function Checkout() {
           const errorDetails = errorData.details || '';
           
           // Mapear códigos de erro para mensagens mais user-friendly
+          const errorCode = errorData.errorCode || '';
           let userMessage = errorMessage;
-          let title = 'Pagamento Não Autorizado';
+          let title = 'Erro no Pagamento';
           
-          if (errorMessage.includes('não autorizado')) {
-            title = 'Cartão Recusado';
-            userMessage = 'Seu cartão foi recusado pela operadora. Verifique os dados do cartão ou tente outro cartão.';
-          } else if (errorMessage.includes('CPF')) {
-            title = 'CPF Inválido';
-            userMessage = 'O CPF informado não é válido. Verifique os números e tente novamente.';
-          } else if (errorMessage.includes('cartão') || errorMessage.includes('card')) {
-            title = 'Dados do Cartão';
-            userMessage = 'Verifique os dados do seu cartão (número, validade, CVV) e tente novamente.';
+          // Mapear códigos de erro específicos para mensagens amigáveis
+          switch (errorCode) {
+            case 'INVALID_CPF':
+              title = 'CPF Inválido';
+              userMessage = 'Por favor, insira um CPF válido. Verifique se digitou corretamente todos os 11 dígitos.';
+              break;
+            case 'INVALID_CARD_NUMBER':
+              title = 'Número do Cartão Inválido';
+              userMessage = 'O número do cartão informado é inválido. Por favor, verifique e tente novamente.';
+              break;
+            case 'INVALID_EXPIRATION_DATE':
+              title = 'Data de Validade Inválida';
+              userMessage = 'A data de validade deve estar no formato MM/AA. Por favor, verifique e tente novamente.';
+              break;
+            case 'EXPIRED_CARD':
+              title = 'Cartão Expirado';
+              userMessage = 'Este cartão está vencido. Por favor, utilize outro cartão de crédito.';
+              break;
+            case 'INVALID_CVV':
+              title = 'Código de Segurança Inválido';
+              userMessage = 'O código de segurança (CVV) deve ter 3 ou 4 dígitos. Verifique o verso do seu cartão.';
+              break;
+            case 'INVALID_CUSTOMER':
+              title = 'Nome Inválido';
+              userMessage = 'Por favor, informe seu nome completo corretamente.';
+              break;
+            case 'INVALID_AMOUNT':
+              title = 'Valor Inválido';
+              userMessage = 'Houve um problema com o valor da transação. Por favor, tente novamente.';
+              break;
+            case 'INCOMPLETE_CARD_DATA':
+              title = 'Dados Incompletos';
+              userMessage = 'Por favor, preencha todos os dados do cartão (número, titular, validade e CVV).';
+              break;
+            case 'INVALID_CARD_DATA':
+              title = 'Dados do Cartão';
+              userMessage = 'Os dados do cartão são obrigatórios. Por favor, preencha todos os campos.';
+              break;
+            default:
+              // Fallback para mensagens genéricas baseadas em palavras-chave
+              if (errorMessage.includes('não autorizado')) {
+                title = 'Cartão Recusado';
+                userMessage = 'Seu cartão foi recusado pela operadora. Verifique os dados do cartão ou tente outro cartão.';
+              } else if (errorMessage.includes('CPF')) {
+                title = 'CPF Inválido';
+                userMessage = 'Por favor, insira um CPF válido. Verifique se digitou corretamente todos os 11 dígitos.';
+              } else if (errorMessage.includes('cartão') || errorMessage.includes('card')) {
+                title = 'Dados do Cartão';
+                userMessage = 'Verifique os dados do seu cartão (número, validade, CVV) e tente novamente.';
+              } else {
+                title = 'Pagamento Não Autorizado';
+                userMessage = errorMessage;
+              }
+              break;
           }
           
           setPaymentError({

@@ -5330,6 +5330,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("❌ [SIMPLE-CHECKOUT] Erro:", error);
       
+      // Tratamento específico para erros da API Cielo
+      if (error.name === 'CieloApiError') {
+        const statusCode = error.statusCode || 400;
+        const errorCode = error.apiCode || 'VALIDATION_ERROR';
+        const errorMessage = error.message || 'Erro na validação dos dados';
+        
+        console.error(`❌ [SIMPLE-CHECKOUT] Erro Cielo - Código: ${errorCode}, Mensagem: ${errorMessage}`);
+        
+        return res.status(statusCode).json({
+          error: errorMessage,
+          errorCode: errorCode,
+          details: error.message
+        });
+      }
+      
+      // Tratamento para outros erros
       return res.status(500).json({
         error: "Erro interno do servidor",
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
