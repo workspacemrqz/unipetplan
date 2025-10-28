@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
 import { apiRequest } from "@/lib/admin/queryClient";
 import { insertSiteSettingsSchema, insertRulesSettingsSchema, insertChatSettingsSchema } from "@shared/schema";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, AlertTriangle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SiteSettingsImageUpload } from "@/components/admin/ui/site-settings-image-upload";
 import { ChatImageUpload } from "@/components/admin/ui/chat-image-upload";
@@ -22,6 +22,16 @@ import { Switch } from "@/components/admin/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/admin/ui/select";
 import { Separator } from "@/components/admin/ui/separator";
 import CustomIcon from "@/components/admin/ui/CustomIcon";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -29,6 +39,8 @@ export default function Settings() {
   const hasInitializedRef = useRef(false);
   const { logAction } = useAdminLogger();
   const { canEdit } = usePermissions();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingRulesData, setPendingRulesData] = useState<any>(null);
 
   const { data: siteSettings, isLoading: siteLoading } = useQuery({
     queryKey: ["/admin/api/settings/site"],
@@ -288,7 +300,16 @@ export default function Settings() {
   };
 
   const onSubmitRules = (data: any) => {
-    saveRulesMutation.mutate(data);
+    setPendingRulesData(data);
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmRulesSave = () => {
+    if (pendingRulesData) {
+      saveRulesMutation.mutate(pendingRulesData);
+      setShowConfirmDialog(false);
+      setPendingRulesData(null);
+    }
   };
 
   const onSubmitChat = (data: any) => {
@@ -1112,6 +1133,37 @@ export default function Settings() {
           )}
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-600" />
+              Confirmar Alteração de Regras
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p className="font-medium text-foreground">
+                Atenção: Esta ação irá alterar os parâmetros de TODOS os procedimentos já cadastrados no sistema.
+              </p>
+              <p>
+                Ao confirmar, os valores de "Pagar" e "Coparticipação" de todos os procedimentos ativos serão recalculados automaticamente com base nas novas porcentagens definidas.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Esta operação não pode ser desfeita. Certifique-se de que deseja continuar.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmRulesSave}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              Confirmar Alteração
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
