@@ -142,7 +142,10 @@ export default function Settings() {
       return result;
     },
     onSuccess: async (result) => {
-      queryClient.invalidateQueries({ queryKey: ["/admin/api/settings/rules"] });
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/settings/rules"] });
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures"] });
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/procedures-with-plans"] });
+      await queryClient.invalidateQueries({ queryKey: ["/admin/api/plan-procedures/all"] });
       
       await logAction({
         actionType: "updated",
@@ -156,7 +159,7 @@ export default function Settings() {
       
       toast({
         title: "Regras salvas",
-        description: "Configurações de regras foram salvas com sucesso.",
+        description: "Configurações de regras foram salvas com sucesso. Os procedimentos foram atualizados automaticamente.",
       });
     },
     onError: () => {

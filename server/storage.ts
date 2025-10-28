@@ -66,7 +66,7 @@ import {
   procedureCategories
 } from "../shared/schema.js";
 import { db } from "./db.js";
-import { eq, desc, asc, and, sql } from "drizzle-orm";
+import { eq, desc, asc, and, sql, gt, or } from "drizzle-orm";
 import { autoConfig } from "./config.js";
 
 export interface IStorage {
@@ -1947,15 +1947,28 @@ export class DatabaseStorage implements IStorage {
   async updateRulesSettings(settingsData: any): Promise<any | undefined> {
     const [existing] = await db.select().from(rulesSettings);
     
+    const oldFixedPercentage = existing ? parseFloat(String(existing.fixedPercentage) || '0') : 0;
+    const oldCoparticipationPercentage = existing ? parseFloat(String(existing.coparticipationPercentage) || '0') : 0;
+    
+    const newFixedPercentage = settingsData.fixedPercentage !== undefined 
+      ? parseFloat(String(settingsData.fixedPercentage)) 
+      : oldFixedPercentage;
+    const newCoparticipationPercentage = settingsData.coparticipationPercentage !== undefined 
+      ? parseFloat(String(settingsData.coparticipationPercentage)) 
+      : oldCoparticipationPercentage;
+    
+    const fixedPercentageChanged = oldFixedPercentage !== newFixedPercentage;
+    const coparticipationPercentageChanged = oldCoparticipationPercentage !== newCoparticipationPercentage;
+    
+    let updated: any;
     if (existing) {
-      const [updated] = await db
+      [updated] = await db
         .update(rulesSettings)
         .set({ ...settingsData, updatedAt: new Date() })
         .where(eq(rulesSettings.id, existing.id))
         .returning();
-      return updated;
     } else {
-      const [created] = await db
+      [updated] = await db
         .insert(rulesSettings)
         .values({
           id: crypto.randomUUID(),
@@ -1964,8 +1977,56 @@ export class DatabaseStorage implements IStorage {
           updatedAt: new Date(),
         })
         .returning();
-      return created;
     }
+    
+    if (fixedPercentageChanged || coparticipationPercentageChanged) {
+      console.log('📊 [RULES] Porcentagens alteradas, atualizando procedimentos...');
+      console.log(`   fixedPercentage: ${oldFixedPercentage}% → ${newFixedPercentage}%`);
+      console.log(`   coparticipationPercentage: ${oldCoparticipationPercentage}% → ${newCoparticipationPercentage}%`);
+      
+      const allProcedurePlans = await db.select().from(planProcedures);
+      console.log(`   Total de procedimentos encontrados: ${allProcedurePlans.length}`);
+      
+      let updatedPayValueCount = 0;
+      let updatedCoparticipacaoCount = 0;
+      let skippedCount = 0;
+      
+      for (const procedurePlan of allProcedurePlans) {
+        const updates: any = {};
+        const price = procedurePlan.price || 0;
+        
+        if (!price || price <= 0) {
+          skippedCount++;
+          continue;
+        }
+        
+        if (fixedPercentageChanged && procedurePlan.payValue && procedurePlan.payValue > 0) {
+          updates.payValue = Math.round(price * (newFixedPercentage / 100));
+          updatedPayValueCount++;
+        }
+        
+        if (coparticipationPercentageChanged && procedurePlan.coparticipacao && procedurePlan.coparticipacao > 0) {
+          updates.coparticipacao = Math.round(price * (newCoparticipationPercentage / 100));
+          updatedCoparticipacaoCount++;
+        }
+        
+        if (Object.keys(updates).length > 0) {
+          await db
+            .update(planProcedures)
+            .set(updates)
+            .where(eq(planProcedures.id, procedurePlan.id));
+        }
+      }
+      
+      console.log(`✅ [RULES] Atualização concluída:`);
+      console.log(`   - ${updatedPayValueCount} valores de "Pagar" atualizados`);
+      console.log(`   - ${updatedCoparticipacaoCount} valores de "Coparticipação" atualizados`);
+      if (skippedCount > 0) {
+        console.log(`   - ${skippedCount} procedimentos ignorados (sem preço definido)`);
+      }
+    }
+    
+    return updated;
   }
 
   async getProcedurePlans(procedureId: string): Promise<any[]> {
