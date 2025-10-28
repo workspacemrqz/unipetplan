@@ -865,60 +865,6 @@ export const updateUserSchema = z.object({
   isActive: z.boolean().optional()
 });
 
-// Pending Payments table - stores payment data temporarily until confirmation
-export const pendingPayments = pgTable("pending_payments", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  cieloPaymentId: varchar("cielo_payment_id").notNull().unique(),
-  paymentMethod: varchar("payment_method").notNull(), // 'credit_card' or 'pix'
-  paymentStatus: varchar("payment_status").default("pending").notNull(), // 'pending', 'approved', 'rejected', 'expired'
-  
-  // Customer data (temporarily stored)
-  customerName: varchar("customer_name").notNull(),
-  customerEmail: varchar("customer_email").notNull(),
-  customerCpf: varchar("customer_cpf"),
-  customerPhone: varchar("customer_phone"),
-  
-  // Address data
-  address: varchar("address"),
-  number: varchar("number"),
-  complement: varchar("complement"),
-  district: varchar("district"),
-  city: varchar("city"),
-  state: varchar("state"),
-  cep: varchar("cep"),
-  
-  // Plan and pricing data
-  planId: varchar("plan_id").notNull(),
-  billingPeriod: varchar("billing_period").notNull(), // 'monthly' or 'annual'
-  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
-  
-  // Pets data (JSON array)
-  petsData: json("pets_data").notNull(), // Array of pet objects
-  
-  // PIX specific fields
-  pixQrCode: text("pix_qr_code"),
-  pixCode: text("pix_code"),
-  
-  // Seller tracking
-  sellerId: varchar("seller_id"),
-  
-  // Coupon data
-  couponCode: varchar("coupon_code"),
-  couponDiscountAmount: decimal("coupon_discount_amount", { precision: 10, scale: 2 }),
-  
-  // Timestamps
-  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-  expiresAt: timestamp("expires_at"), // For PIX payments that expire after a certain time
-  
-  // Processing flags
-  processed: boolean("processed").default(false).notNull(), // Whether this pending payment has been processed
-  processedAt: timestamp("processed_at"),
-  
-  // Additional metadata
-  metadata: json("metadata"), // Any additional data needed
-});
-
 // === NEW TABLE VALIDATION SCHEMAS ===
 
 export const insertPetSchema = z.object({

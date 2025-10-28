@@ -63,8 +63,7 @@ import {
   coupons,
   contractInstallments,
   procedureUsage,
-  procedureCategories,
-  pendingPayments
+  procedureCategories
 } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, desc, asc, and, sql, gt, or } from "drizzle-orm";
@@ -276,13 +275,6 @@ export interface IStorage {
   // Action Logs (for network units)
   createActionLog(log: any): Promise<any>;
   getActionLogsByUnit(unitId: string): Promise<any[]>;
-
-  // Pending Payments
-  createPendingPayment(pendingPayment: any): Promise<any>;
-  getPendingPaymentByCieloId(cieloPaymentId: string): Promise<any | undefined>;
-  updatePendingPayment(id: string, data: any): Promise<any | undefined>;
-  markPendingPaymentAsProcessed(cieloPaymentId: string): Promise<boolean>;
-  cleanupExpiredPendingPayments(): Promise<number>;
 }
 
 // Storage em memória para quando não houver banco de dados
@@ -493,11 +485,6 @@ export class InMemoryStorage implements IStorage {
   async deleteVeterinarian(id: string): Promise<boolean> { return true; }
   async createActionLog(log: any): Promise<any> { return { id: Date.now().toString(), ...log, createdAt: new Date() }; }
   async getActionLogsByUnit(unitId: string): Promise<any[]> { return []; }
-  async createPendingPayment(pendingPayment: any): Promise<any> { return pendingPayment; }
-  async getPendingPaymentByCieloId(cieloPaymentId: string): Promise<any | undefined> { return undefined; }
-  async updatePendingPayment(id: string, data: any): Promise<any | undefined> { return undefined; }
-  async markPendingPaymentAsProcessed(cieloPaymentId: string): Promise<boolean> { return true; }
-  async cleanupExpiredPendingPayments(): Promise<number> { return 0; }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2435,58 +2422,6 @@ export class DatabaseStorage implements IStorage {
   async getActionLogsByUnit(unitId: string): Promise<any[]> {
     console.log('📝 [ACTION-LOG] Getting action logs for unit:', unitId);
     return [];
-  }
-
-  // Pending Payments implementation
-  async createPendingPayment(pendingPayment: any): Promise<any> {
-    const [payment] = await db
-      .insert(pendingPayments)
-      .values(pendingPayment)
-      .returning();
-    return payment;
-  }
-
-  async getPendingPaymentByCieloId(cieloPaymentId: string): Promise<any | undefined> {
-    const [payment] = await db
-      .select()
-      .from(pendingPayments)
-      .where(eq(pendingPayments.cieloPaymentId, cieloPaymentId));
-    return payment || undefined;
-  }
-
-  async updatePendingPayment(id: string, data: any): Promise<any | undefined> {
-    const [payment] = await db
-      .update(pendingPayments)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(pendingPayments.id, id))
-      .returning();
-    return payment;
-  }
-
-  async markPendingPaymentAsProcessed(cieloPaymentId: string): Promise<boolean> {
-    const [result] = await db
-      .update(pendingPayments)
-      .set({ 
-        processed: true, 
-        processedAt: new Date(), 
-        paymentStatus: 'approved',
-        updatedAt: new Date() 
-      })
-      .where(eq(pendingPayments.cieloPaymentId, cieloPaymentId))
-      .returning();
-    return !!result;
-  }
-
-  async cleanupExpiredPendingPayments(): Promise<number> {
-    // Clean up pending payments older than 24 hours
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const result = await db
-      .delete(pendingPayments)
-      .where(and(
-        eq(pendingPayments.processed, false),
-        sql`${pendingPayments.createdAt} < ${oneDayAgo}`
-      ));
-    return result.rowCount || 0;
   }
 
 }
