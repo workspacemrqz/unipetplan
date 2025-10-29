@@ -4046,6 +4046,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 🧪 ENDPOINT DE TESTE - Processar pending_payment manualmente (apenas desenvolvimento)
+  // Este endpoint simula o processamento do webhook da Cielo para teste local
+  app.post("/api/test/process-pending-payment/:cieloPaymentId", async (req, res) => {
+    try {
+      const { cieloPaymentId } = req.params;
+      
+      console.log('🧪 [TEST] Processando pending_payment manualmente', {
+        cieloPaymentId,
+        env: process.env.NODE_ENV
+      });
+
+      // Import webhook service
+      const { CieloWebhookService } = await import("./services/cielo-webhook-service.js");
+      const webhookService = new CieloWebhookService();
+
+      // Processar pending payment diretamente
+      await (webhookService as any).processPendingPixPayment(cieloPaymentId, 'test-manual');
+
+      console.log('✅ [TEST] Pending payment processado com sucesso');
+
+      res.json({
+        success: true,
+        message: 'Pending payment processado com sucesso. Pets e contratos criados.',
+        cieloPaymentId
+      });
+
+    } catch (error) {
+      console.error('❌ [TEST] Erro ao processar pending_payment', error);
+      res.status(500).json({
+        error: 'Erro ao processar pending_payment',
+        details: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+    }
+  });
+
 
 
   // === CHECKOUT ROUTES ===
