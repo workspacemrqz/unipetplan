@@ -181,7 +181,7 @@ export default function Clients() {
     
     // Se o cliente não tem pets, é carrinho abandonado
     if (petCount === 0) {
-      return "Carrinho Abandonado";
+      return "Abandonado";
     }
     
     // Se tem pets mas não tem contratos, está inativo
