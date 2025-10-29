@@ -4983,63 +4983,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Check if PIX was generated successfully (status 12 = Pending)
         if (pixPaymentResult.payment?.status === 12) {
-          // Create pets for PIX payment (immediately, not waiting for confirmation)
-          let firstPetId: string | null = null;
+          console.log('✅ [SIMPLE-PIX] PIX gerado com status pending (12)');
           
-          // Create pets immediately for PIX - check for duplicates first
-          const createdPetsPix: Pet[] = [];
-          if (petsToCreate && petsToCreate.length > 0) {
-            // Fetch existing pets for the client to check for duplicates
-            const existingPets = await storage.getPetsByClientId(client.id);
-            console.log(`🔍 [SIMPLE-PIX] Cliente possui ${existingPets.length} pet(s) existente(s)`);
-            
-            for (const petData of petsToCreate) {
-              // Check if a pet with the same name already exists (case-insensitive)
-              const normalizedPetName = petData.name?.trim().toLowerCase() || 'pet';
-              const existingPet = existingPets.find(p => {
-                const existingName = p.name?.trim().toLowerCase() || 'pet';
-                return existingName === normalizedPetName;
-              });
-              
-              if (existingPet) {
-                // Pet already exists - use existing pet instead of creating duplicate
-                createdPetsPix.push(existingPet);
-                if (!firstPetId) firstPetId = existingPet.id;
-                console.log(`⏭️ [SIMPLE-PIX] Pet "${existingPet.name}" já existe, usando pet existente (${existingPet.id})`);
-              } else {
-                // Pet doesn't exist - create new pet
-                const newPetData = {
-                  id: `pet-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`,
-                  clientId: client.id,
-                  name: petData.name || 'Pet',
-                  species: petData.species || 'Cão',
-                  breed: petData.breed || '',
-                  age: petData.age?.toString() || '1',
-                  sex: petData.sex || '',
-                  castrated: petData.castrated || false,
-                  weight: petData.weight?.toString() || '1',
-                  vaccineData: JSON.stringify([]),
-                  planId: selectedPlan.id,
-                  isActive: true
-                };
-                
-                try {
-                  const pet = await storage.createPet(newPetData);
-                  createdPetsPix.push(pet);
-                  if (!firstPetId) firstPetId = pet.id;
-                  console.log(`✅ [SIMPLE-PIX] Pet criado: ${pet.name} (${pet.id})`);
-                } catch (petError) {
-                  console.error(`⚠️ [SIMPLE-PIX] Erro ao criar pet (continuando):`, petError);
-                }
-              }
-            }
-          }
-          
-          if (!firstPetId) {
-            firstPetId = `temp-${Date.now()}`;
-          }
-          
-          console.log(`📋 [SIMPLE-PIX] PIX gerado - ${createdPetsPix.length} pets criados com sucesso`);
+          // ✅ NOVO FLUXO: Salvar em pending_payments ao invés de criar pets e contratos
+          // Pets e contratos serão criados apenas quando o pagamento for confirmado via webhook
           
           // Validate PIX response has required fields
           if (!pixPaymentResult.payment.qrCodeBase64Image || !pixPaymentResult.payment.qrCodeString) {
@@ -5050,248 +4997,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           }
           
-          // Create contract for each pet (PIX pending payment)
-          const contractsPix: any[] = [];
-          for (let i = 0; i < createdPetsPix.length; i++) {
-            const pet = createdPetsPix[i];
-            
-            // Calculate the correct price for this pet including discount
-            let petMonthlyAmount = parseFloat(selectedPlan.basePrice || '0');
-            
-            // Apply discount for 2nd, 3rd, 4th+ pets for BASIC and INFINITY plans
-            if (['BASIC', 'INFINITY'].some(type => selectedPlan.name.toUpperCase().includes(type)) && i > 0) {
-              const discountPercentage = i === 1 ? 5 :  // 2nd pet: 5%
-                                       i === 2 ? 10 : // 3rd pet: 10%
-                                       15;             // 4th+ pets: 15%
-              petMonthlyAmount = petMonthlyAmount * (1 - discountPercentage / 100);
-            }
-            
-            // Determine billing period based on plan type
-            // COMFORT and PLATINUM plans are always annual (365 days)
-            // BASIC and INFINITY plans are monthly (30 days)
-            const isAnnualPlan = ['COMFORT', 'PLATINUM'].some(type => 
-              selectedPlan.name.toUpperCase().includes(type)
-            );
-            
-            // ✅ VALIDAÇÃO A2: Garantir billing period correto para o plano
-            const validatedBillingPeriod = enforceCorrectBillingPeriod(
-              selectedPlan, 
-              isAnnualPlan ? 'annual' : 'monthly'
-            );
-            
-            // Para planos anuais: monthlyAmount = 0, annualAmount = valor total do ano
-            // Para planos mensais: monthlyAmount = valor mensal (com desconto), annualAmount = 0
-            const originalAnnualAmount = parseFloat(selectedPlan.basePrice || '0') * 12;
-            const contractMonthlyAmount = isAnnualPlan ? 0 : petMonthlyAmount;
-            const contractAnnualAmount = isAnnualPlan ? originalAnnualAmount : 0;
-            
-            const contractData = {
+          // Determine billing period based on plan type
+          const isAnnualPlan = ['COMFORT', 'PLATINUM'].some(type => 
+            selectedPlan.name.toUpperCase().includes(type)
+          );
+          
+          // ✅ Salvar dados do pagamento pendente em pending_payments
+          try {
+            const pendingPaymentData = {
               clientId: client.id,
-              petId: pet.id,
               planId: selectedPlan.id,
-              sellerId: sellerId, // Add seller referral for commission tracking
-              contractNumber: `UNIPET-${Date.now()}-${pet.id.substring(0, 4).toUpperCase()}`,
-              billingPeriod: validatedBillingPeriod,
-              status: 'active' as const,
-              startDate: new Date(),
-              monthlyAmount: contractMonthlyAmount.toFixed(2),
-              annualAmount: contractAnnualAmount.toFixed(2),
-              paymentMethod: 'pix',
+              sellerId: sellerId,
               cieloPaymentId: pixPaymentResult.payment.paymentId,
-              proofOfSale: pixPaymentResult.payment.proofOfSale || '',
-              authorizationCode: pixPaymentResult.payment.authorizationCode || '',
-              tid: pixPaymentResult.payment.tid || '',
-              receivedDate: new Date(),
-              returnCode: pixPaymentResult.payment.returnCode,
-              returnMessage: pixPaymentResult.payment.returnMessage,
-              pixQrCode: pixPaymentResult.payment.qrCodeBase64Image || null,
-              pixCode: pixPaymentResult.payment.qrCodeString || null
+              merchantOrderId: pixRequest.MerchantOrderId,
+              amount: (correctAmountInCents / 100).toFixed(2),
+              paymentMethod: 'pix' as const,
+              status: 'pending' as const,
+              pixQrCode: pixPaymentResult.payment.qrCodeBase64Image,
+              pixCode: pixPaymentResult.payment.qrCodeString,
+              couponCode: coupon || null,
+              petsData: petsToCreate,
+              planData: {
+                planId: selectedPlan.id,
+                billingPeriod: isAnnualPlan ? 'annual' as const : 'monthly' as const,
+                amount: correctAmountInCents
+              },
+              expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas
             };
             
-            try {
-              const contract = await storage.createContract(contractData);
-              contractsPix.push(contract);
-              console.log(`✅ [SIMPLE-PIX] Contrato criado para pet ${pet.name}: ${contract.id}`);
-              
-              // Track conversion for seller if present
-              if (sellerId) {
-                const revenue = isAnnualPlan ? parseFloat(contractAnnualAmount.toFixed(2)) : parseFloat(contractMonthlyAmount.toFixed(2));
-                await storage.trackSellerConversion(sellerId, revenue);
-                console.log(`📈 [ANALYTICS] Conversão rastreada para vendedor ${sellerId}, valor: ${revenue}`);
-              }
-            } catch (contractError: any) {
-              console.error(`❌ [SIMPLE-PIX] Erro ao criar contrato para pet ${pet.name}:`, contractError);
-            }
-          }
-          
-          if (contractsPix.length === 0) {
-            console.error(`❌ [SIMPLE-PIX] Nenhum contrato foi criado`);
-            return res.status(503).json({
-              error: 'Erro ao registrar pagamento',
-              details: 'Não foi possível registrar o pagamento PIX. Por favor, tente novamente.',
-              technicalDetails: process.env.NODE_ENV === 'development' ? 'Nenhum contrato foi criado' : undefined
+            const pendingPayment = await storage.createPendingPayment(pendingPaymentData);
+            console.log(`✅ [SIMPLE-PIX] Pagamento pendente salvo: ${pendingPayment.id}`);
+            console.log(`📋 [SIMPLE-PIX] Dados salvos - cliente: ${client.id}, ${petsToCreate.length} pet(s), plano: ${selectedPlan.name}`);
+          } catch (pendingError) {
+            console.error(`❌ [SIMPLE-PIX] Erro ao salvar pagamento pendente:`, pendingError);
+            return res.status(500).json({
+              error: 'Erro ao processar pagamento',
+              details: 'Não foi possível registrar o pagamento PIX. Por favor, tente novamente.'
             });
-          }
-          
-          // ✅ NOVA ABORDAGEM PIX: Criar parcelas para cada contrato e UM comprovante único com TODOS os pets
-          const { PaymentReceiptService } = await import("./services/payment-receipt-service.js");
-          const receiptService = new PaymentReceiptService();
-          
-          const allPixPetsData: any[] = [];
-          const pixInstallmentIds: string[] = [];
-          let pixFirstInstallmentPeriod: { periodStart: Date; periodEnd: Date; dueDate: Date; billingPeriod: string } | undefined = undefined;
-          
-          for (let i = 0; i < contractsPix.length; i++) {
-            const contract = contractsPix[i];
-            const pet = createdPetsPix.find(p => p.id === contract.petId);
-            
-            if (!pet) {
-              console.error(`❌ [SIMPLE-PIX] Pet não encontrado para contrato ${contract.id}`);
-              continue;
-            }
-            
-            // Calculate first installment dates
-            const now = new Date();
-            // ✅ CORRIGIDO: Para primeira parcela PIX pending, dueDate = data de criação
-            // Não adicionar período porque a próxima parcela será calculada corretamente quando esta for paga.
-            // Isso mantém consistência com o fluxo de cartão de crédito.
-            const dueDate = new Date(now);
-            
-            const periodStart = new Date(now);
-            
-            const periodEnd = contract.billingPeriod === 'annual'
-              ? addYears(periodStart, 1)
-              : addMonths(periodStart, 1);
-            periodEnd.setDate(periodEnd.getDate() - 1);
-            
-            // Store period from first contract for unified receipt
-            if (i === 0) {
-              pixFirstInstallmentPeriod = {
-                periodStart,
-                periodEnd,
-                dueDate,
-                billingPeriod: contract.billingPeriod
-              };
-            }
-            
-            // ✅ CORRIGIDO: Usar valores REAIS do contrato
-            const installmentAmount = contract.billingPeriod === 'annual' 
-              ? contract.annualAmount
-              : contract.monthlyAmount;
-            
-            const installmentData = {
-              contractId: contract.id,
-              installmentNumber: 1,
-              dueDate: dueDate,
-              periodStart: periodStart,
-              periodEnd: periodEnd,
-              amount: installmentAmount,
-              status: 'pending', // PIX pending confirmation
-              cieloPaymentId: pixPaymentResult.payment.paymentId,
-              createdAt: now,
-              updatedAt: now
-            };
-            
-            console.log("💳 [SIMPLE-PIX-INSTALLMENT] Criando primeira parcela:", {
-              contractId: contract.id,
-              petName: pet.name,
-              installmentNumber: 1,
-              amount: installmentData.amount,
-              status: 'pending'
-            });
-            
-            try {
-              const firstInstallment = await storage.createContractInstallment(installmentData);
-              pixInstallmentIds.push(firstInstallment.id);
-              console.log(`✅ [SIMPLE-PIX-INSTALLMENT] Parcela criada: ${firstInstallment.id}`);
-              
-              // ✅ CORRIGIDO: Usar APENAS valores do contrato (sem cálculo de desconto problemático)
-              const contractValue = parseFloat(contract.billingPeriod === 'annual' ? contract.annualAmount : contract.monthlyAmount) || 0;
-              
-              // Build pet data object usando valor do contrato diretamente
-              const petData = {
-                name: pet.name || 'Pet',
-                species: pet.species || 'Não informado',
-                breed: pet.breed || 'Não informado',
-                age: typeof pet.age === 'string' ? parseInt(pet.age) : pet.age || 0,
-                sex: pet.sex || 'Não informado',
-                planName: selectedPlan.name,
-                planType: selectedPlan.name.toUpperCase(),
-                value: Math.round(contractValue * 100), // valor em centavos - NECESSÁRIO para PDF
-                discountedValue: Math.round(contractValue * 100) // mesmo valor (sem desconto) - NECESSÁRIO para PDF
-              };
-              
-              allPixPetsData.push(petData);
-            } catch (error: any) {
-              console.error(`❌ [SIMPLE-PIX] Erro ao criar parcela:`, error.message);
-            }
-          }
-          
-          // ✅ CRIAR UM ÚNICO COMPROVANTE PIX COM TODOS OS PETS
-          if (allPixPetsData.length > 0 && pixFirstInstallmentPeriod) {
-            const pixPetNames = allPixPetsData.map(p => p.name).join(', ');
-            
-            const unifiedPixReceiptData = {
-              contractId: contractsPix[0].id,
-              sellerId: sellerId, // Add seller referral for commission tracking
-              cieloPaymentId: pixPaymentResult.payment.paymentId,
-              clientName: client.fullName,
-              clientEmail: client.email,
-              clientCPF: client.cpf || undefined,
-              clientPhone: client.phone,
-              clientAddress: client.address && client.cep ? {
-                street: client.address,
-                number: client.number || 'S/N',
-                complement: client.complement || '',
-                neighborhood: client.district || '',
-                city: client.city || '',
-                state: client.state || '',
-                zipCode: client.cep
-              } : undefined,
-              // ✅ Array com TODOS os pets
-              pets: allPixPetsData,
-              // ✅ Compatibilidade
-              petName: pixPetNames,
-              planName: selectedPlan.name,
-              paymentMethod: 'pix',
-              billingPeriod: pixFirstInstallmentPeriod.billingPeriod as "monthly" | "annual",
-              installmentPeriodStart: pixFirstInstallmentPeriod.periodStart.toISOString().split('T')[0],
-              installmentPeriodEnd: pixFirstInstallmentPeriod.periodEnd.toISOString().split('T')[0],
-              installmentNumber: 1,
-              installmentDueDate: pixFirstInstallmentPeriod.dueDate.toISOString().split('T')[0]
-            };
-            
-            console.log(`📄 [SIMPLE-PIX-RECEIPT] Gerando comprovante UNIFICADO PIX com ${allPixPetsData.length} pet(s):`, {
-              pixPetNames,
-              totalPets: allPixPetsData.length
-            });
-            
-            try {
-              const receiptResult = await receiptService.generatePaymentReceipt(
-                unifiedPixReceiptData, 
-                `simple_pix_unified_${pixPaymentResult.payment.paymentId}`
-              );
-              
-              if (receiptResult.success && receiptResult.receiptId) {
-                // Update ALL PIX installments with the unified receipt ID
-                for (const installmentId of pixInstallmentIds) {
-                  await storage.updateContractInstallment(installmentId, {
-                    paymentReceiptId: receiptResult.receiptId
-                  });
-                }
-                
-                console.log("✅ [SIMPLE-PIX-RECEIPT] Comprovante PIX unificado gerado:", {
-                  receiptId: receiptResult.receiptId,
-                  receiptNumber: receiptResult.receiptNumber,
-                  totalPets: allPixPetsData.length,
-                  pixPetNames
-                });
-              } else {
-                console.error("❌ [SIMPLE-PIX-RECEIPT] Erro ao gerar comprovante:", receiptResult.error);
-              }
-            } catch (error: any) {
-              console.error(`❌ [SIMPLE-PIX] Erro ao gerar comprovante:`, error.message);
-            }
           }
           
           return res.status(200).json({

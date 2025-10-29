@@ -36,6 +36,8 @@ import {
   type InsertSatisfactionSurvey,
   type Veterinarian,
   type InsertVeterinarian,
+  type PendingPayment,
+  type InsertPendingPayment,
   contactSubmissions,
   plans,
   networkUnits,
@@ -62,6 +64,7 @@ import {
   rulesSettings,
   coupons,
   contractInstallments,
+  pendingPayments,
   procedureUsage,
   procedureCategories
 } from "../shared/schema.js";
@@ -161,6 +164,12 @@ export interface IStorage {
   getContractByCieloPaymentId(cieloPaymentId: string): Promise<Contract | undefined>;
   deleteContract(id: string): Promise<boolean>;
   getAllContracts(): Promise<Contract[]>;
+
+  // Pending Payments
+  createPendingPayment(pendingPayment: InsertPendingPayment): Promise<PendingPayment>;
+  getPendingPaymentByCieloPaymentId(cieloPaymentId: string): Promise<PendingPayment | undefined>;
+  updatePendingPayment(id: string, data: Partial<InsertPendingPayment>): Promise<PendingPayment | undefined>;
+  deletePendingPayment(id: string): Promise<boolean>;
 
   // Procedures
   createProcedure(procedure: InsertProcedure): Promise<Procedure>;
@@ -385,6 +394,10 @@ export class InMemoryStorage implements IStorage {
   async deleteContract(id: string): Promise<boolean> { return true; }
   async getAllContracts(): Promise<Contract[]> { return []; }
   async getAllInstallments() { return []; }
+  async createPendingPayment(pendingPayment: InsertPendingPayment): Promise<PendingPayment> { return pendingPayment as any; }
+  async getPendingPaymentByCieloPaymentId(cieloPaymentId: string): Promise<PendingPayment | undefined> { return undefined; }
+  async updatePendingPayment(id: string, data: Partial<InsertPendingPayment>): Promise<PendingPayment | undefined> { return undefined; }
+  async deletePendingPayment(id: string): Promise<boolean> { return true; }
   async createProcedure(procedure: InsertProcedure): Promise<Procedure> { return procedure as any; }
   async updateProcedure(id: string, procedure: Partial<InsertProcedure>): Promise<Procedure | undefined> { return undefined; }
   async getProcedure(id: string): Promise<Procedure | undefined> { return undefined; }
@@ -1438,6 +1451,31 @@ export class DatabaseStorage implements IStorage {
 
   async getAllInstallments() {
     return await db.select().from(contractInstallments);
+  }
+
+  // Pending Payments
+  async createPendingPayment(pendingPayment: InsertPendingPayment): Promise<PendingPayment> {
+    const [newPendingPayment] = await db.insert(pendingPayments).values(pendingPayment as any).returning();
+    return newPendingPayment;
+  }
+
+  async getPendingPaymentByCieloPaymentId(cieloPaymentId: string): Promise<PendingPayment | undefined> {
+    const [pendingPayment] = await db.select().from(pendingPayments).where(eq(pendingPayments.cieloPaymentId, cieloPaymentId));
+    return pendingPayment || undefined;
+  }
+
+  async updatePendingPayment(id: string, data: Partial<InsertPendingPayment>): Promise<PendingPayment | undefined> {
+    const [updatedPendingPayment] = await db
+      .update(pendingPayments)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(pendingPayments.id, id))
+      .returning();
+    return updatedPendingPayment || undefined;
+  }
+
+  async deletePendingPayment(id: string): Promise<boolean> {
+    const result = await db.delete(pendingPayments).where(eq(pendingPayments.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
   // Procedures

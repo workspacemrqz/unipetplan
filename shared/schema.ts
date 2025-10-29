@@ -482,6 +482,39 @@ export const contractInstallments = pgTable("contract_installments", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Pending payments table for PIX payments awaiting confirmation
+export const pendingPayments = pgTable("pending_payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  clientId: varchar("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  planId: varchar("plan_id").notNull().references(() => plans.id),
+  sellerId: varchar("seller_id").references(() => sellers.id),
+  cieloPaymentId: varchar("cielo_payment_id").notNull().unique(),
+  merchantOrderId: varchar("merchant_order_id").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: text("payment_method").notNull(), // 'pix' or 'credit_card'
+  status: text("status").default("pending").notNull(), // pending, confirmed, expired, cancelled
+  pixQrCode: text("pix_qr_code"),
+  pixCode: text("pix_code"),
+  couponCode: text("coupon_code"),
+  petsData: json("pets_data").$type<Array<{
+    name: string;
+    species: string;
+    breed?: string;
+    age?: string;
+    sex?: string;
+    castrated?: boolean;
+    weight?: string;
+  }>>().notNull(),
+  planData: json("plan_data").$type<{
+    planId: string;
+    billingPeriod: 'monthly' | 'annual';
+    amount: number;
+  }>().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at"),
+});
+
 // === UNIFIED PROCEDURES SYSTEM ===
 
 // Procedure categories table
@@ -1153,6 +1186,10 @@ export type SatisfactionSurvey = typeof satisfactionSurveys.$inferSelect;
 export type InsertSatisfactionSurvey = typeof satisfactionSurveys.$inferInsert;
 export type PaymentReceipt = typeof paymentReceipts.$inferSelect;
 export type InsertPaymentReceipt = typeof paymentReceipts.$inferInsert;
+export type ContractInstallment = typeof contractInstallments.$inferSelect;
+export type InsertContractInstallment = typeof contractInstallments.$inferInsert;
+export type PendingPayment = typeof pendingPayments.$inferSelect;
+export type InsertPendingPayment = typeof pendingPayments.$inferInsert;
 
 // Payment and workflow schema types
 export type CreditCardPayment = z.infer<typeof creditCardPaymentSchema>;

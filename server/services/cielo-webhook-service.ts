@@ -230,6 +230,9 @@ export class CieloWebhookService {
         amount: paymentDetails.payment?.amount
       }, correlationId);
 
+      // ✅ NOVO FLUXO: Processar pending_payments PIX quando pagamento for confirmado
+      await this.processPendingPixPayment(notification.PaymentId, correlationId);
+
       // Generate official payment receipt automatically
       await this.generatePaymentReceipt(notification, paymentDetails, correlationId);
 
@@ -828,6 +831,197 @@ export class CieloWebhookService {
         paymentId: notification.PaymentId,
         error: error instanceof Error ? error.message : 'Erro desconhecido'
       }, correlationId);
+    }
+  }
+
+  /**
+   * Process pending PIX payment - creates pets and contracts after payment confirmation
+   */
+  private async processPendingPixPayment(cieloPaymentId: string, correlationId: string): Promise<void> {
+    try {
+      // Import storage dynamically
+      const { storage } = await import('../storage.js');
+      
+      // Buscar pending_payment
+      const pendingPayment = await storage.getPendingPaymentByCieloPaymentId(cieloPaymentId);
+      
+      if (!pendingPayment) {
+        console.log('ℹ️ [CIELO-WEBHOOK] Nenhum pending_payment encontrado - pode ser pagamento com cartão de crédito', {
+          correlationId,
+          cieloPaymentId
+        });
+        return; // Não é um erro, apenas não há pending_payment
+      }
+      
+      console.log('🔄 [CIELO-WEBHOOK] Processando pending_payment PIX confirmado', {
+        correlationId,
+        pendingPaymentId: pendingPayment.id,
+        clientId: pendingPayment.clientId,
+        petsCount: pendingPayment.petsData?.length || 0
+      });
+      
+      // Buscar cliente e plano
+      const client = await storage.getClientById(pendingPayment.clientId);
+      const plan = await storage.getPlan(pendingPayment.planId);
+      
+      if (!client || !plan) {
+        console.error('❌ [CIELO-WEBHOOK] Cliente ou plano não encontrado', {
+          correlationId,
+          clientId: pendingPayment.clientId,
+          planId: pendingPayment.planId,
+          hasClient: !!client,
+          hasPlan: !!plan
+        });
+        return;
+      }
+      
+      // Criar ou buscar pets
+      const createdPets: any[] = [];
+      const existingPets = await storage.getPetsByClientId(client.id);
+      
+      for (const petData of (pendingPayment.petsData || [])) {
+        const normalizedPetName = petData.name?.trim().toLowerCase() || 'pet';
+        const existingPet = existingPets.find(p => {
+          const existingName = p.name?.trim().toLowerCase() || 'pet';
+          return existingName === normalizedPetName;
+        });
+        
+        if (existingPet) {
+          createdPets.push(existingPet);
+          console.log(`⏭️ [CIELO-WEBHOOK] Pet "${existingPet.name}" já existe, usando pet existente`);
+        } else {
+          const newPetData = {
+            id: `pet-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`,
+            clientId: client.id,
+            name: petData.name || 'Pet',
+            species: petData.species || 'Cão',
+            breed: petData.breed || '',
+            age: petData.age?.toString() || '1',
+            sex: petData.sex || '',
+            castrated: petData.castrated || false,
+            weight: petData.weight?.toString() || '1',
+            vaccineData: JSON.stringify([]),
+            planId: plan.id,
+            isActive: true
+          };
+          
+          const pet = await storage.createPet(newPetData);
+          createdPets.push(pet);
+          console.log(`✅ [CIELO-WEBHOOK] Pet criado: ${pet.name}`);
+        }
+      }
+      
+      // Criar contratos para cada pet
+      const { enforceCorrectBillingPeriod } = await import('../utils/billing-validation.js');
+      const contracts: any[] = [];
+      
+      for (let i = 0; i < createdPets.length; i++) {
+        const pet = createdPets[i];
+        const isAnnualPlan = pendingPayment.planData.billingPeriod === 'annual';
+        
+        let petMonthlyAmount = parseFloat(plan.basePrice || '0');
+        if (['BASIC', 'INFINITY'].some(type => plan.name.toUpperCase().includes(type)) && i > 0) {
+          const discountPercentage = i === 1 ? 5 : i === 2 ? 10 : 15;
+          petMonthlyAmount = petMonthlyAmount * (1 - discountPercentage / 100);
+        }
+        
+        const validatedBillingPeriod = enforceCorrectBillingPeriod(plan, isAnnualPlan ? 'annual' : 'monthly');
+        const originalAnnualAmount = parseFloat(plan.basePrice || '0') * 12;
+        const contractMonthlyAmount = isAnnualPlan ? 0 : petMonthlyAmount;
+        const contractAnnualAmount = isAnnualPlan ? originalAnnualAmount : 0;
+        
+        const contractData = {
+          clientId: client.id,
+          petId: pet.id,
+          planId: plan.id,
+          sellerId: pendingPayment.sellerId,
+          contractNumber: `UNIPET-${Date.now()}-${pet.id.substring(0, 4).toUpperCase()}`,
+          billingPeriod: validatedBillingPeriod,
+          status: 'active' as const,
+          startDate: new Date(),
+          monthlyAmount: contractMonthlyAmount.toFixed(2),
+          annualAmount: contractAnnualAmount.toFixed(2),
+          paymentMethod: 'pix',
+          cieloPaymentId: cieloPaymentId,
+          receivedDate: new Date()
+        };
+        
+        const contract = await storage.createContract(contractData);
+        contracts.push(contract);
+        console.log(`✅ [CIELO-WEBHOOK] Contrato criado para pet ${pet.name}: ${contract.id}`);
+        
+        // Rastrear conversão do vendedor
+        if (pendingPayment.sellerId) {
+          const revenue = isAnnualPlan ? parseFloat(contractAnnualAmount.toFixed(2)) : parseFloat(contractMonthlyAmount.toFixed(2));
+          await storage.trackSellerConversion(pendingPayment.sellerId, revenue);
+          console.log(`📈 [CIELO-WEBHOOK] Conversão rastreada para vendedor ${pendingPayment.sellerId}`);
+        }
+        
+        // Criar primeira parcela
+        const { addMonths, addYears } = await import('date-fns');
+        const now = new Date();
+        const dueDate = new Date(now);
+        const periodStart = new Date(now);
+        const periodEnd = contract.billingPeriod === 'annual'
+          ? addYears(periodStart, 1)
+          : addMonths(periodStart, 1);
+        periodEnd.setDate(periodEnd.getDate() - 1);
+        
+        const installmentAmount = contract.billingPeriod === 'annual' 
+          ? contract.annualAmount
+          : contract.monthlyAmount;
+        
+        const installmentData = {
+          contractId: contract.id,
+          installmentNumber: 1,
+          dueDate: dueDate,
+          periodStart: periodStart,
+          periodEnd: periodEnd,
+          amount: installmentAmount,
+          status: 'paid',
+          cieloPaymentId: cieloPaymentId,
+          paidAt: now,
+          createdAt: now,
+          updatedAt: now
+        };
+        
+        const firstInstallment = await storage.createContractInstallment(installmentData);
+        console.log(`✅ [CIELO-WEBHOOK] Primeira parcela criada (paga): ${firstInstallment.id}`);
+        
+        // Criar próxima parcela
+        const { createNextAnnualInstallmentIfNeeded } = await import('../routes.js');
+        await createNextAnnualInstallmentIfNeeded(contract.id, firstInstallment, '[CIELO-WEBHOOK-PIX]');
+      }
+      
+      // Marcar pending_payment como confirmado
+      await storage.updatePendingPayment(pendingPayment.id, {
+        status: 'confirmed'
+      });
+      
+      // Incrementar uso do cupom se houver
+      if (pendingPayment.couponCode) {
+        try {
+          await storage.incrementCouponUsage(pendingPayment.couponCode);
+          console.log(`✅ [CIELO-WEBHOOK] Uso do cupom incrementado: ${pendingPayment.couponCode}`);
+        } catch (couponError) {
+          console.error(`⚠️ [CIELO-WEBHOOK] Erro ao incrementar uso do cupom:`, couponError);
+        }
+      }
+      
+      console.log('✅ [CIELO-WEBHOOK] Pending payment PIX processado com sucesso', {
+        correlationId,
+        pendingPaymentId: pendingPayment.id,
+        contractsCreated: contracts.length
+      });
+      
+    } catch (error) {
+      console.error('❌ [CIELO-WEBHOOK] Erro ao processar pending_payment PIX', {
+        correlationId,
+        cieloPaymentId,
+        error: error instanceof Error ? error.message : 'Erro desconhecido',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
     }
   }
 
