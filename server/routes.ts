@@ -8400,11 +8400,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { storage } = await import('./storage.js');
       let contract = await storage.getContractByCieloPaymentId(paymentId);
       
-      // ✅ NOVA LÓGICA: Atualizar mensalidades se PIX foi aprovado
+      // ✅ NOVA LÓGICA: Processar pets pendentes e atualizar mensalidades se PIX foi aprovado
       const isPixPayment = (queryResult as any).Payment?.Type === 'Pix' || queryResult.payment?.qrCodeBase64Image;
       const isPaymentApproved = (queryResult as any).Payment?.Status === 2 || queryResult.payment?.status === 2;
       
       if (isPixPayment && isPaymentApproved) {
+        // ✅ PROCESSAR PENDING PAYMENTS (pets e contratos pendentes)
+        try {
+          console.log('🔍 [PAYMENT-QUERY] PIX aprovado - verificando pending_payments', {
+            correlationId,
+            paymentId
+          });
+          
+          // Buscar pending payment pelo Cielo payment ID
+          const pendingPayment = await storage.getPendingPaymentByCieloPaymentId(paymentId);
+          
+          if (pendingPayment && pendingPayment.status === 'pending') {
+            console.log('🎯 [PAYMENT-QUERY] Processando pending_payment encontrado', {
+              correlationId,
+              pendingPaymentId: pendingPayment.id,
+              clientId: pendingPayment.clientId,
+              petsCount: pendingPayment.petsData?.length || 0
+            });
+            
+            // Importar o serviço de webhook para reutilizar a lógica de processamento
+            const { CieloWebhookService } = await import('./services/cielo-webhook-service.js');
+            const webhookService = new CieloWebhookService();
+            
+            try {
+              // Processar o pending payment (criar pets e contratos)
+              await (webhookService as any).processPendingPixPayment(paymentId, correlationId);
+              
+              console.log('✅ [PAYMENT-QUERY] Pending payment processado com sucesso via polling', {
+                correlationId,
+                paymentId,
+                clientId: pendingPayment.clientId
+              });
+            } catch (processError) {
+              console.error('❌ [PAYMENT-QUERY] Erro ao processar pending payment via polling', {
+                correlationId,
+                paymentId,
+                error: processError instanceof Error ? processError.message : 'Erro desconhecido'
+              });
+            }
+          } else if (pendingPayment && pendingPayment.status === 'confirmed') {
+            console.log('ℹ️ [PAYMENT-QUERY] Pending payment já foi processado anteriormente', {
+              correlationId,
+              paymentId,
+              status: pendingPayment.status
+            });
+          }
+        } catch (error) {
+          console.error('⚠️ [PAYMENT-QUERY] Erro ao verificar pending_payments (não-crítico)', {
+            correlationId,
+            paymentId,
+            error: error instanceof Error ? error.message : 'Erro desconhecido'
+          });
+        }
         // Buscar parcelas que tem o cieloPaymentId correspondente
         const directInstallments: any[] = [];
         
