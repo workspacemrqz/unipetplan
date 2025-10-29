@@ -69,8 +69,10 @@ import {
   procedureCategories
 } from "../shared/schema.js";
 import { db } from "./db.js";
-import { eq, desc, asc, and, sql, gt, or } from "drizzle-orm";
+import { eq, desc, asc, and, sql, gt, or, count } from "drizzle-orm";
 import { autoConfig } from "./config.js";
+
+export type ClientWithPetCount = Client & { petCount: number };
 
 export interface IStorage {
   // Contact Submissions
@@ -124,7 +126,7 @@ export interface IStorage {
   createClient(client: InsertClient): Promise<Client>;
   updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined>;
   deleteClient(id: string): Promise<boolean>;
-  getAllClients(): Promise<Client[]>;
+  getAllClients(): Promise<ClientWithPetCount[]>;
 
   // Sellers
   getSellerByEmail(email: string): Promise<Seller | undefined>;
@@ -354,7 +356,7 @@ export class InMemoryStorage implements IStorage {
   async createClient(client: InsertClient): Promise<Client> { return client as any; }
   async updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined> { return undefined; }
   async deleteClient(id: string): Promise<boolean> { return true; }
-  async getAllClients(): Promise<Client[]> { return []; }
+  async getAllClients(): Promise<ClientWithPetCount[]> { return []; }
   async getSellerByEmail(email: string): Promise<Seller | undefined> { return undefined; }
   async getSellerById(id: string): Promise<Seller | undefined> { return undefined; }
   async getSellerByWhitelabelUrl(whitelabelUrl: string): Promise<Seller | undefined> { return undefined; }
@@ -983,10 +985,57 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getAllClients(): Promise<Client[]> {
+  async getAllClients(): Promise<ClientWithPetCount[]> {
     try {
-      const clientsList = await db.select().from(clients);
-      return clientsList;
+      const result = await db
+        .select({
+          id: clients.id,
+          fullName: clients.fullName,
+          cpf: clients.cpf,
+          email: clients.email,
+          phone: clients.phone,
+          address: clients.address,
+          number: clients.number,
+          complement: clients.complement,
+          district: clients.district,
+          city: clients.city,
+          state: clients.state,
+          cep: clients.cep,
+          cpfHash: clients.cpfHash,
+          image: clients.image,
+          imageUrl: clients.imageUrl,
+          createdAt: clients.createdAt,
+          updatedAt: clients.updatedAt,
+          createdByUnitId: clients.createdByUnitId,
+          petCount: sql<number>`CAST(COUNT(${pets.id}) AS INTEGER)`,
+        })
+        .from(clients)
+        .leftJoin(pets, eq(clients.id, pets.clientId))
+        .groupBy(
+          clients.id,
+          clients.fullName,
+          clients.cpf,
+          clients.email,
+          clients.phone,
+          clients.address,
+          clients.number,
+          clients.complement,
+          clients.district,
+          clients.city,
+          clients.state,
+          clients.cep,
+          clients.cpfHash,
+          clients.image,
+          clients.imageUrl,
+          clients.createdAt,
+          clients.updatedAt,
+          clients.createdByUnitId
+        );
+      
+      return result.map(r => ({
+        ...r,
+        petCount: r.petCount || 0
+      }));
     } catch (error) {
       console.error('❌ Error fetching all clients:', error);
       return [];

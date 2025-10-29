@@ -19,6 +19,7 @@ import {
 } from "@/components/admin/ui/dropdown-menu";
 import { useLocation } from "wouter";
 import { Plus, Search, Edit, Eye, Copy, FileText, MoreHorizontal, ChevronLeft, ChevronRight, Check, Loader2 } from "lucide-react";
+import { Badge } from "@/components/admin/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getQueryOptions } from "@/lib/admin/queryClient";
@@ -76,6 +77,7 @@ interface Client {
   createdByUnitId?: string;
   createdByUnitName?: string;
   pets?: Pet[];
+  petCount?: number;
 }
 
 // Componente do ícone de adicionar pet
@@ -562,8 +564,17 @@ export default function Clients() {
               displayClients.map((client: Client) => (
                 <TableRow key={client.id} className="bg-white border-b border-[#eaeaea]">
                   {visibleColumns.includes("Nome") && (
-                    <TableCell className="font-medium whitespace-nowrap bg-white">
-                      {(client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : ''}
+                    <TableCell className="font-medium bg-white">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="whitespace-nowrap">
+                          {(client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : ''}
+                        </span>
+                        {client.petCount === 0 && (
+                          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 whitespace-nowrap">
+                            Carrinho Abandonado
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Telefone") && (
