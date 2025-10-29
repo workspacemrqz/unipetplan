@@ -6236,6 +6236,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           sessionTime = performance.now() - sessionStart;
           
+          // ✅ NOVA LÓGICA: Verificar e processar pending payments confirmados no login
+          const processPaymentsAsync = async () => {
+            try {
+              console.log('🔍 [CLIENT-LOGIN] Verificando pending payments para o cliente', {
+                clientId: client.id,
+                email: sanitizeEmail(client.email)
+              });
+              
+              // Buscar todos os pending payments do cliente que estão confirmados pela Cielo
+              const allPendingPayments = await storage.getAllPendingPayments();
+              const clientPendingPayments = allPendingPayments.filter(p => 
+                p.clientId === client.id && 
+                p.status === 'pending' && 
+                p.paymentMethod === 'pix'
+              );
+              
+              if (clientPendingPayments.length > 0) {
+                console.log('🔍 [CLIENT-LOGIN] Encontrados pending payments para verificar', {
+                  clientId: client.id,
+                  count: clientPendingPayments.length
+                });
+                
+                const { CieloService } = await import("./services/cielo-service.js");
+                const cieloService = new CieloService();
+                const { CieloWebhookService } = await import('./services/cielo-webhook-service.js');
+                const webhookService = new CieloWebhookService();
+                
+                for (const pendingPayment of clientPendingPayments) {
+                  try {
+                    // Verificar status do pagamento na Cielo
+                    const queryResult = await cieloService.queryPayment(pendingPayment.cieloPaymentId);
+                    const isApproved = (queryResult as any).Payment?.Status === 2 || queryResult.payment?.status === 2;
+                    
+                    if (isApproved) {
+                      console.log('✅ [CLIENT-LOGIN] PIX aprovado encontrado - processando pets e contratos', {
+                        paymentId: pendingPayment.cieloPaymentId,
+                        pendingPaymentId: pendingPayment.id
+                      });
+                      
+                      // Processar o pending payment (criar pets e contratos)
+                      await (webhookService as any).processPendingPixPayment(
+                        pendingPayment.cieloPaymentId, 
+                        `login-check-${client.id}`
+                      );
+                      
+                      console.log('✅ [CLIENT-LOGIN] Pending payment processado com sucesso no login', {
+                        clientId: client.id,
+                        paymentId: pendingPayment.cieloPaymentId
+                      });
+                    }
+                  } catch (error) {
+                    console.error('⚠️ [CLIENT-LOGIN] Erro ao verificar/processar pending payment (não-crítico)', {
+                      pendingPaymentId: pendingPayment.id,
+                      error: error instanceof Error ? error.message : 'Erro desconhecido'
+                    });
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('⚠️ [CLIENT-LOGIN] Erro ao verificar pending payments (não-crítico)', {
+                clientId: client.id,
+                error: error instanceof Error ? error.message : 'Erro desconhecido'
+              });
+            }
+          };
+          
+          // Processar payments de forma assíncrona após o login (não bloquear resposta)
+          processPaymentsAsync().catch(err => {
+            console.error('⚠️ [CLIENT-LOGIN] Erro no processamento assíncrono de payments:', err);
+          });
+          
           // Don't return cpfHash in response (security)
           const { cpfHash: _, ...clientResponse } = client;
           
