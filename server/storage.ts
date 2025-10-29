@@ -168,6 +168,7 @@ export interface IStorage {
   // Pending Payments
   createPendingPayment(pendingPayment: InsertPendingPayment): Promise<PendingPayment>;
   getPendingPaymentByCieloPaymentId(cieloPaymentId: string): Promise<PendingPayment | undefined>;
+  getAllPendingPayments(): Promise<PendingPayment[]>;
   updatePendingPayment(id: string, data: Partial<InsertPendingPayment>): Promise<PendingPayment | undefined>;
   deletePendingPayment(id: string): Promise<boolean>;
 
@@ -396,6 +397,7 @@ export class InMemoryStorage implements IStorage {
   async getAllInstallments() { return []; }
   async createPendingPayment(pendingPayment: InsertPendingPayment): Promise<PendingPayment> { return pendingPayment as any; }
   async getPendingPaymentByCieloPaymentId(cieloPaymentId: string): Promise<PendingPayment | undefined> { return undefined; }
+  async getAllPendingPayments(): Promise<PendingPayment[]> { return []; }
   async updatePendingPayment(id: string, data: Partial<InsertPendingPayment>): Promise<PendingPayment | undefined> { return undefined; }
   async deletePendingPayment(id: string): Promise<boolean> { return true; }
   async createProcedure(procedure: InsertProcedure): Promise<Procedure> { return procedure as any; }
@@ -1462,6 +1464,10 @@ export class DatabaseStorage implements IStorage {
   async getPendingPaymentByCieloPaymentId(cieloPaymentId: string): Promise<PendingPayment | undefined> {
     const [pendingPayment] = await db.select().from(pendingPayments).where(eq(pendingPayments.cieloPaymentId, cieloPaymentId));
     return pendingPayment || undefined;
+  }
+
+  async getAllPendingPayments(): Promise<PendingPayment[]> {
+    return await db.select().from(pendingPayments);
   }
 
   async updatePendingPayment(id: string, data: Partial<InsertPendingPayment>): Promise<PendingPayment | undefined> {

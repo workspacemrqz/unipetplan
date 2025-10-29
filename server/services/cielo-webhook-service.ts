@@ -853,6 +853,29 @@ export class CieloWebhookService {
         return; // Não é um erro, apenas não há pending_payment
       }
       
+      // ✅ VERIFICAÇÃO DE IDEMPOTÊNCIA: Evitar processamento duplicado
+      if (pendingPayment.status === 'confirmed') {
+        console.log('⚠️ [CIELO-WEBHOOK] Pending payment já foi processado anteriormente', {
+          correlationId,
+          pendingPaymentId: pendingPayment.id,
+          cieloPaymentId,
+          status: pendingPayment.status,
+          clientId: pendingPayment.clientId
+        });
+        
+        // Verificar se o contrato já foi criado para garantir consistência
+        const existingContract = await storage.getContractByCieloPaymentId(cieloPaymentId);
+        if (existingContract) {
+          console.log('✅ [CIELO-WEBHOOK] Contrato já existe para este pagamento', {
+            correlationId,
+            contractId: existingContract.id,
+            contractNumber: existingContract.contractNumber
+          });
+        }
+        
+        return; // Evitar reprocessamento
+      }
+      
       console.log('🔄 [CIELO-WEBHOOK] Processando pending_payment PIX confirmado', {
         correlationId,
         pendingPaymentId: pendingPayment.id,
