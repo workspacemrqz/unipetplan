@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
@@ -32,6 +32,23 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { capitalizeFirst } from "@/lib/utils";
 
 // Interfaces
+interface Contract {
+  id: string;
+  clientId: string;
+  petId: string;
+  planId: string;
+  contractNumber: string;
+  status: 'active' | 'inactive' | 'suspended' | 'cancelled' | 'pending';
+  startDate: string;
+  endDate?: string;
+  billingPeriod: 'monthly' | 'annual';
+  monthlyAmount: string;
+  annualAmount?: string;
+  paymentMethod: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface Pet {
   id: string;
   name: string;
@@ -96,6 +113,7 @@ const AddPetIcon = ({ className }: { className?: string }) => (
 
 const allColumns = [
   "Nome",
+  "Status",
   "Telefone",
   "Email",
   "CPF",
@@ -116,6 +134,7 @@ export default function Clients() {
   const { toast } = useToast();
   const { logAction } = useAdminLogger();
   const { canAdd, canEdit } = usePermissions();
+  const [clientContracts, setClientContracts] = useState<Record<string, Contract[]>>({});
 
   const { data: clients = [], isLoading } = useQuery<Client[]>({
     queryKey: ["/admin/api/clients"],
@@ -144,20 +163,72 @@ export default function Clients() {
   const endIndex = startIndex + pageSize;
   const displayClients = filteredClients.slice(startIndex, endIndex);
 
-  // DESABILITADO: Prefetching de pets causava múltiplas requisições desnecessárias
-  // Pets agora são carregados on-demand quando o modal é aberto
-  // useEffect(() => {
-  //   if (clients.length > 0 && !isLoading && displayClients.length > 0) {
-  //     const prefetchTimer = setTimeout(() => {
-  //       const clientIds = displayClients.map(client => client.id);
-  //       console.log(`📋 [PREFETCH] Prefetching pets for ${clientIds.length} visible clients`);
-  //       cacheManager.prefetchClientsPetsData(clientIds, 2).catch(error => {
-  //         console.warn("⚠️ [PREFETCH] Client pets prefetch failed:", error);
-  //       });
-  //     }, 800);
-  //     return () => clearTimeout(prefetchTimer);
-  //   }
-  // }, [clients, currentPage, searchQuery, isLoading, cacheManager]);
+  // Função para buscar contratos de um cliente
+  const fetchClientContracts = async (clientId: string): Promise<Contract[]> => {
+    try {
+      const response = await fetch(`/admin/api/clients/${clientId}/contracts`);
+      if (!response.ok) return [];
+      return response.json();
+    } catch (error) {
+      console.error("Error fetching contracts for client:", clientId, error);
+      return [];
+    }
+  };
+
+  // Função para determinar o status do cliente
+  const getClientStatus = (clientId: string, petCount?: number): string => {
+    const contracts = clientContracts[clientId] || [];
+    
+    // Se o cliente não tem pets, é carrinho abandonado
+    if (petCount === 0) {
+      return "Carrinho Abandonado";
+    }
+    
+    // Se tem pets mas não tem contratos, está inativo
+    if (!contracts.length) {
+      return "Inativo";
+    }
+    
+    // Verificar se há algum contrato ativo
+    const hasActiveContract = contracts.some(c => c.status === 'active');
+    if (hasActiveContract) {
+      return "Ativo";
+    }
+    
+    // Verificar outros status
+    const hasSuspendedContract = contracts.some(c => c.status === 'suspended');
+    if (hasSuspendedContract) {
+      return "Suspenso";
+    }
+    
+    const hasPendingContract = contracts.some(c => c.status === 'pending');
+    if (hasPendingContract) {
+      return "Pendente";
+    }
+    
+    const hasCancelledContract = contracts.some(c => c.status === 'cancelled');
+    if (hasCancelledContract) {
+      return "Cancelado";
+    }
+    
+    return "Inativo";
+  };
+
+  // Buscar contratos para os clientes exibidos
+  React.useEffect(() => {
+    const fetchAllContracts = async () => {
+      const contractsData: Record<string, Contract[]> = {};
+      for (const client of displayClients) {
+        const contracts = await fetchClientContracts(client.id);
+        contractsData[client.id] = contracts;
+      }
+      setClientContracts(contractsData);
+    };
+
+    if (displayClients.length > 0) {
+      fetchAllContracts();
+    }
+  }, [displayClients]);
 
   // Query para buscar pets do cliente selecionado
   const { data: clientPets = [], isLoading: petsLoading } = useQuery<Pet[]>({
@@ -314,7 +385,10 @@ export default function Clients() {
       
       // Adiciona apenas os campos que estão visíveis na tabela
       if (visibleColumns.includes("Nome")) {
-        pdfData['Nome'] = (client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : '';
+        pdfData['Nome'] = (client.fullName || client.full_name) ? capitalizeFirst((client.fullName || client.full_name) || '') : '';
+      }
+      if (visibleColumns.includes("Status")) {
+        pdfData['Status'] = getClientStatus(client.id, client.petCount);
       }
       if (visibleColumns.includes("Email")) {
         pdfData['Email'] = client.email || 'Não informado';
@@ -363,7 +437,8 @@ export default function Clients() {
         // Dados organizados do cliente - Seção Principal
         const exportData: any = {
           // === INFORMAÇÕES DO CLIENTE ===
-          '👤 Nome Completo': (client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : '',
+          '👤 Nome Completo': (client.fullName || client.full_name) ? capitalizeFirst((client.fullName || client.full_name) || '') : '',
+          '📍 Status': getClientStatus(client.id, client.petCount),
           '📧 Email': client.email || 'Não informado',
           '📱 Telefone': formatBrazilianPhoneForDisplay(client.phone || ''),
           '📄 CPF': client.cpf || '',
@@ -543,6 +618,7 @@ export default function Clients() {
           <TableHeader>
             <TableRow className="bg-white border-b border-[#eaeaea]">
               {visibleColumns.includes("Nome") && <TableHead className="w-[200px] bg-white">Nome</TableHead>}
+              {visibleColumns.includes("Status") && <TableHead className="w-[120px] bg-white">Status</TableHead>}
               {visibleColumns.includes("Telefone") && <TableHead className="w-[140px] bg-white">Telefone</TableHead>}
               {visibleColumns.includes("Email") && <TableHead className="w-[180px] bg-white">Email</TableHead>}
               {visibleColumns.includes("CPF") && <TableHead className="w-[120px] bg-white">CPF</TableHead>}
@@ -567,14 +643,33 @@ export default function Clients() {
                     <TableCell className="font-medium bg-white">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="whitespace-nowrap">
-                          {(client.fullName || client.full_name) ? capitalizeFirst(client.fullName || client.full_name) : ''}
+                          {(client.fullName || client.full_name) ? capitalizeFirst((client.fullName || client.full_name) || '') : ''}
                         </span>
-                        {client.petCount === 0 && (
-                          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 whitespace-nowrap">
-                            Carrinho Abandonado
-                          </Badge>
-                        )}
                       </div>
+                    </TableCell>
+                  )}
+                  {visibleColumns.includes("Status") && (
+                    <TableCell className="bg-white">
+                      <Badge 
+                        variant={
+                          getClientStatus(client.id, client.petCount) === "Ativo" ? "default" :
+                          getClientStatus(client.id, client.petCount) === "Carrinho Abandonado" ? "outline" :
+                          getClientStatus(client.id, client.petCount) === "Suspenso" ? "destructive" :
+                          getClientStatus(client.id, client.petCount) === "Pendente" ? "secondary" :
+                          getClientStatus(client.id, client.petCount) === "Cancelado" ? "destructive" :
+                          "secondary"
+                        }
+                        className={
+                          getClientStatus(client.id, client.petCount) === "Ativo" ? "bg-green-100 text-green-800 border-green-300" :
+                          getClientStatus(client.id, client.petCount) === "Carrinho Abandonado" ? "bg-amber-100 text-amber-800 border-amber-300" :
+                          getClientStatus(client.id, client.petCount) === "Suspenso" ? "bg-red-100 text-red-800 border-red-300" :
+                          getClientStatus(client.id, client.petCount) === "Pendente" ? "bg-yellow-100 text-yellow-800 border-yellow-300" :
+                          getClientStatus(client.id, client.petCount) === "Cancelado" ? "bg-gray-100 text-gray-800 border-gray-300" :
+                          "bg-gray-100 text-gray-800 border-gray-300"
+                        }
+                      >
+                        {getClientStatus(client.id, client.petCount)}
+                      </Badge>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Telefone") && (

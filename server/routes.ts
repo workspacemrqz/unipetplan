@@ -1144,6 +1144,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get contracts for a specific client (admin)
+  app.get("/admin/api/clients/:id/contracts", requireAdmin, async (req, res) => {
+    try {
+      const contracts = await storage.getContractsByClientId(req.params.id);
+      res.json(contracts);
+    } catch (error) {
+      console.error("❌ [ADMIN] Error fetching client contracts:", error);
+      res.status(500).json({ error: "Erro ao buscar contratos do cliente" });
+    }
+  });
+
   // Get atendimentos history for a specific pet (admin)
   app.get("/admin/api/pets/:petId/atendimentos", requireAdmin, async (req, res) => {
     try {
